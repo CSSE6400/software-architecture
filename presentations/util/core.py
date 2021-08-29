@@ -1,4 +1,5 @@
 from functools import partial
+import os
 
 from manim import *
 from manim_presentation import Slide
@@ -187,3 +188,10 @@ class EnumerateSlide(VGroup):
 Text = partial(Text, color=FONT_COLOUR)
 Line = partial(Line, color=FONT_COLOUR)
 Arrow = partial(Arrow, color=FONT_COLOUR)
+
+
+OUTPUT_DIR = None
+def export_image(mobj, name="untitled"):
+    if OUTPUT_DIR is not None:
+        os.makedirs(f"{OUTPUT_DIR}", exist_ok=True)
+        mobj.get_image().save(f"{OUTPUT_DIR}/{name}.png")

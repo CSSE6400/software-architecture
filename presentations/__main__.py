@@ -7,6 +7,7 @@ from PIL import Image
 from manim._config import config
 from manim.utils.file_ops import open_file as open_media_file
 
+import presentations.util.core as core
 from presentations.util.core import BaseScene, EnumerateSlide
 
 
@@ -55,7 +56,8 @@ def export_pdf(images, export_to="media/slides.pdf"):
 def build_presentation(module):
     slides = get_slides(module, export=True)
 
-    output_path = f"dist/{sys.argv[1]}"
+    output_path = f"workdir/{sys.argv[1]}"
+    core.OUTPUT_DIR = f"workdir/images/{sys.argv[1]}"
 
     if len(sys.argv) > 2:
         slide = slides.get(sys.argv[2])
@@ -66,7 +68,7 @@ def build_presentation(module):
         
         page_number = list(slides.values()).index(slide) + 1
         slide.PAGE = page_number
-        inst = render(slide)
+        inst = render(slide, output_directory=output_path)
         open_media_file(inst.renderer.file_writer.movie_file_path)
         if len(inst.images) > 0:
             export_pdf(inst.images, export_to=f"{output_path}/slides.pdf")

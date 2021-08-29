@@ -117,9 +117,13 @@ class DeploymentTopologies(BaseScene):
         layers = ("Presentation Layer", "Business Layer", "Persistence Layer", "Database Layer")
         monolith = self.new_layer(layers)
 
+        export_image(monolith, "monolithic")
+
         no_db = self.new_layer(layers[:-1])
         only_db = self.new_layer((layers[-1],))
         split_db = DistributedLayeredArchitecture(no_db, only_db).scale(0.75).center()
+
+        export_image(split_db, "separate-db")
 
         middleware = self.new_layer(layers[1:-1])
         presentation = self.new_layer((layers[0],))
@@ -127,7 +131,7 @@ class DeploymentTopologies(BaseScene):
 
         distributed = DistributedLayeredArchitecture(presentation, middleware, only_db).scale(0.6).center()
 
-
+        export_image(distributed, "distributed")
 
         def out_of_way(direction, scale=0.4):
             def f(obj):
