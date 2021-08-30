@@ -1,6 +1,4 @@
-from functools import partial
 import os
-from PIL import Image
 
 from manim import *
 from manim_presentation import Slide
@@ -76,11 +74,6 @@ class BaseScene(Slide):
 
     def save_image(self):
         self._images.append(self.camera.get_image().copy())
-
-
-Text = partial(Text, color=FONT_COLOUR)
-Line = partial(Line, color=FONT_COLOUR)
-Arrow = partial(Arrow, color=FONT_COLOUR)
 
 
 OUTPUT_DIR = None

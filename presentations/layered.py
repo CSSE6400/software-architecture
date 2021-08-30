@@ -1,5 +1,5 @@
-from presentations.util.common import EnumerateSlide
-from presentations.util.core import *
+from presentations.util.common import *
+from presentations.util.core import BaseScene, export_image
 
 PRESENTATION = "Layered Architecture"
 
