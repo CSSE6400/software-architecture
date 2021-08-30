@@ -1,3 +1,4 @@
+from presentations.util.common import EnumerateSlide
 from presentations.util.core import *
 
 PRESENTATION = "Layered Architecture"
@@ -159,14 +160,11 @@ class DeploymentTopologies(BaseScene):
         return super().play_scene()
 
 
-class Advantages(BaseScene):
-    def play_scene(self):
-        points = [
-            "Low Cost",
-            "Conceptual Simplicity",
-        ]
-        slide = EnumerateSlide("Layered Architecture Advantages", points)
-        for part in slide:
-            self.play(Write(part))
-            self.pause()
 
+
+class Advantages(EnumerateSlide):
+    title = "Layered Architecture Advantages"
+    points = [
+        "Low Cost",
+        "Conceptual Simplicity"
+    ]

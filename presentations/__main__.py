@@ -8,7 +8,7 @@ from manim._config import config
 from manim.utils.file_ops import open_file as open_media_file
 
 import presentations.util.core as core
-from presentations.util.core import BaseScene, EnumerateSlide
+from presentations.util.core import BaseScene
 
 
 def get_ordered_classes(module):
@@ -17,6 +17,8 @@ def get_ordered_classes(module):
         return inspect.getsourcelines(value[1])[1]
 
     classes.sort(key = _line_order)
+    # all classes declared in the same module
+    return filter(lambda value: inspect.getmodule(value[1]) == module, classes)
     return classes
 
 def get_slides(module, export=False):
@@ -24,7 +26,7 @@ def get_slides(module, export=False):
     for name, slide in get_ordered_classes(module):
         if not issubclass(slide, BaseScene):
             continue
-        if slide in (BaseScene, EnumerateSlide):
+        if slide in (BaseScene,):
             continue
         if getattr(slide, "SECTION", None) is None:
             slide.SECTION = getattr(module, "PRESENTATION", None)
