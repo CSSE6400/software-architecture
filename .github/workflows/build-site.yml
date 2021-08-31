@@ -1,0 +1,44 @@
+name: Build Site
+
+on:
+  workflow_dispatch:
+  # workflow_run:
+  #   workflows: ["Build Documents", "Build Videos"]
+  #   branches: [main]
+  #   types: 
+  #     - completed
+
+jobs:
+  build-site:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # - name: Download documents
+      #   uses: dawidd6/action-download-artifact@v2
+      #   with:
+      #     workflow: build-documents.yml
+      #     workflow_conclusion: success
+      #     branch: main
+      #     path: documents
+
+      # - run: cp ./documents/*/confirmation/dist/WebbConfirmation.pdf ./public/WebbConfirmation.pdf
+
+      # - name: Download slides
+      #   uses: dawidd6/action-download-artifact@v2
+      #   with:
+      #     workflow: build-videos.yml
+      #     workflow_conclusion: success
+      #     branch: main
+      #     path: slides
+
+      # - run: cp ./slides/WebbConfirmationSlides-*/slides.pdf ./public/WebbConfirmationSlides.pdf
+
+      - name: Publish GH Pages
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
