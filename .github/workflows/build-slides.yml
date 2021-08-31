@@ -1,0 +1,34 @@
+name: Build Slides
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-slides:
+    runs-on: ubuntu-latest
+    container: braewebb/manim:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup ID
+        id: vars
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
+      - name: Install dependencies
+        working-directory: ./presentations
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Compile Presentation
+        run: ./bin/build_slides.sh
+
+      - name: Upload Slides
+        uses: actions/upload-artifact@v2
+        with:
+          name: Slides-${{ steps.vars.outputs.sha_short }}
+          path: |
+            ./dist/slides/*.pdf
+  
