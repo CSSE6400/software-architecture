@@ -2,11 +2,11 @@ name: Build Site
 
 on:
   workflow_dispatch:
-  # workflow_run:
-  #   workflows: ["Build Documents", "Build Videos"]
-  #   branches: [main]
-  #   types: 
-  #     - completed
+  workflow_run:
+    workflows: ["Build Slides", "Build Notes"]
+    branches: [main]
+    types: 
+      - completed
 
 jobs:
   build-site:
@@ -16,15 +16,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # - name: Download documents
-      #   uses: dawidd6/action-download-artifact@v2
-      #   with:
-      #     workflow: build-documents.yml
-      #     workflow_conclusion: success
-      #     branch: main
-      #     path: documents
+      - name: Download notes
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: build-notes.yml
+          workflow_conclusion: success
+          branch: main
+          path: notes
 
-      # - run: cp ./documents/*/confirmation/dist/WebbConfirmation.pdf ./public/WebbConfirmation.pdf
+      - run: cp -r ./notes/* ./public
 
       - name: Download slides
         uses: dawidd6/action-download-artifact@v2

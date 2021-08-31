@@ -1,0 +1,27 @@
+name: Build Notes
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-notes:
+    container: braewebb/pandoc:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup ID
+        id: vars
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
+      - name: Compile Notes
+        run: ./bin/build_notes.sh
+
+      - name: Upload Slides
+        uses: actions/upload-artifact@v2
+        with:
+          name: Notes-${{ steps.vars.outputs.sha_short }}
+          path: |
+            ./dist/**/*.pdf
+  
