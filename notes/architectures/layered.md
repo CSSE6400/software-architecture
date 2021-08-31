@@ -24,6 +24,8 @@ Layered architecture has a couple of common forms.
 One of the more common forms of the layered architecture is a four-tier architecture.
 Here, our system is composed of a presentation layer, business layer, persistence layer, and database layer.
 
+![Four-Layered Architecture](images/architectures.layered/monolithic.png)
+
 The presentation layer takes data in a form which a programming language is able to understand and formats it in a way that is sensible for humans.
 For command line applications, the presentation layer would accept user input and print formatted messages for the user.
 For traditional GUI applications, the presentation layer would use a GUI library to communicate with the user.
@@ -43,10 +45,14 @@ Each layered can be physically deployed on different systems.
 The most common variant of distributed deployment is separating the database layer.
 Since databases have well defined contracts and are language independent, the database layer is a natural first choice for physical separation.
 
+![Separated Database Layer](images/architectures.layered/separate-db.png)
+
 Of course, in a well designed system, any layer of the system could be physically separated.
 The presentation is another common target.
 Physically separating the presentation layer gives users the ability to only install the presentation layer and allow communication to
 other software components to occur over network communication.
+
+![Separated Database and Presentation Layers](images/architectures.layered/distributed.png)
 
 This deployment form is very typical of web applications.
 The presentation layer is deployed as HTML/CSS/JavaScript which makes network requests to the remote business/persistence layer.

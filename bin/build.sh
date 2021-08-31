@@ -12,9 +12,9 @@ pandoc "${REPO_ROOT}/cases/"*.md -o "${REPO_ROOT}/dist/SoftwareArchitectureCases
 CONTENT="architectures.layered,LayeredArchitecture qualities,QualityAttributes"
 
 for i in ${CONTENT}; do IFS=","; set -- $i;
-    # python3 -m presentations $1
-    # cp "${REPO_ROOT}/workdir/$1/slides.pdf" "${REPO_ROOT}/dist/slides/$2.pdf"
-    # cp -r "${REPO_ROOT}/workdir/images" "${REPO_ROOT}"
+    python3 -m presentations $1
+    cp "${REPO_ROOT}/workdir/$1/slides.pdf" "${REPO_ROOT}/dist/slides/$2.pdf"
+    cp -r "${REPO_ROOT}/workdir/images" "${REPO_ROOT}"
 
     notes="${1//.//}.md"
     pandoc "${REPO_ROOT}/notes/${notes}" \
