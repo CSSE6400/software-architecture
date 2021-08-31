@@ -120,7 +120,7 @@ class EnumerateSlide(BaseScene):
         points = BulletedList(*self.points, color=self.FONT_COLOUR)
         points.align_to(header, LEFT)
 
-        for part in (header, points):
+        for part in (header, *points):
             self.play(Write(part))
             self.pause()
 

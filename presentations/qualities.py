@@ -1,7 +1,7 @@
 from math import cos, pi, sin
 from manim import *
 
-from presentations.util.core import BaseScene
+from presentations.util.core import BaseScene, export_image
 from presentations.util.common import *
 
 
@@ -83,6 +83,8 @@ class Tension(BaseScene):
 
         self.pause()
 
+        export_image(pentagram.points, name="circle")
+
         self.play(AnimationGroup(
             ReplacementTransform(pentagram.points, refined_pentagram.points),
             ReplacementTransform(pentagram.arrows, refined_pentagram.arrows)))
@@ -90,5 +92,17 @@ class Tension(BaseScene):
         self.pause()
 
         self.play(FadeOut(refined_pentagram.points, refined_pentagram.arrows))
+
+        law = Text("Everything in software architecture is a trade-off").scale(0.8).shift(UP * 0.5)
+        self.play(Write(law))
+        self.pause()
+
+        collary = Text("If an architect thinks they have discovered something that isn't a trade-off,\n more likely they just haven't identified the trade-off yet.")
+        collary.scale(0.5)
+        collary.next_to(law, DOWN)
+        self.play(Write(collary))
+        self.pause()
+
+        self.play(FadeOut(law, collary))
 
         return super().play_scene()
