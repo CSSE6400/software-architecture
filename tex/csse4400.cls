@@ -5,11 +5,24 @@
 \LoadClass[a4paper,12pt]{article}
 
 \RequirePackage[left=0.5 in,right=0.5 in,top=0.5in,bottom=1in]{geometry}
-
+\RequirePackage{graphicx}
 
 \RequirePackage[sfdefault]{cabin}
 \RequirePackage[T1]{fontenc}
 
+\RequirePackage{tcolorbox}
+
+\newcounter{definition}[section]
+\newenvironment{definition}[1][]
+    {\refstepcounter{definition}
+    \begin{tcolorbox}%
+    \noindent \textbf{Definition~\thedefinition. #1}
+    
+    \vspace{4pt}
+    }
+    {\end{tcolorbox}}
+
+\RequirePackage{hyperref}
 
 \renewcommand{\maketitle}{%
     \noindent\rule{\textwidth}{1pt}\vspace{8pt}
@@ -47,7 +60,7 @@
 
         \vspace{1cm}
 
-        \includegraphics[width=0.4\textwidth]{uqlogo.png}        
+        \includegraphics[width=0.4\textwidth]{uqlogo}        
             
         \vspace{0.8cm}
             
