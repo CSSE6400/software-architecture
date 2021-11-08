@@ -81,3 +81,8 @@
     \end{tabular} 
     \end{center}
     }
+
+\RequirePackage[yyyymmdd,hhmmss]{datetime}
+
+\newenvironment{drafting}
+    {\begin{tcolorbox}\color{blue} draft (\today~\currenttime)}{\end{tcolorbox}}
