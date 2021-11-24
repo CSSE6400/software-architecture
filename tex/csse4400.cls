@@ -85,4 +85,4 @@
 \RequirePackage[yyyymmdd,hhmmss]{datetime}
 
 \newenvironment{drafting}
-    {\begin{tcolorbox}\color{blue} draft (\today~\currenttime)}{\end{tcolorbox}}
+    {\begin{tcolorbox}\color{blue} draft (\today~\currenttime)\\}{\end{tcolorbox}}
