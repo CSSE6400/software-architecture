@@ -17,3 +17,14 @@ for i in ${CONTENT}; do IFS=","; set -- $i;
         --bibliography ${REPO_ROOT}/references/articles.bib \
         --csl ${REPO_ROOT}/references/style.csl
 done
+
+
+for folder in ${REPO_ROOT}/notes/*; do
+    echo $folder
+    if [[ -f "${folder}/latexmkrc" ]]; then
+        pushd $folder;
+        latexmk
+        cp ./out/main.pdf "${REPO_ROOT}/dist/handouts/$(basename $folder).pdf"
+        popd
+    fi
+done
