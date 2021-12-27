@@ -26,3 +26,8 @@ for folder in ${REPO_ROOT}/notes/*; do
         popd
     fi
 done
+
+pushd ${REPO_ROOT}/notes
+latexmk
+cp ./out/main.pdf "${REPO_ROOT}/dist/handouts/notes.pdf"
+popd

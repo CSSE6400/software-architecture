@@ -25,6 +25,8 @@
 \RequirePackage{hyperref}
 
 \renewcommand{\maketitle}{%
+    \addcontentsline{toc}{part}{\@title}
+    \setcounter{section}{0}
     \noindent\rule{\textwidth}{1pt}\vspace{8pt}
     {\Large \@title} \hfill Software Architecture\vspace{16pt}
 
