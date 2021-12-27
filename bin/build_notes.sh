@@ -29,5 +29,5 @@ done
 
 pushd ${REPO_ROOT}/notes
 latexmk
-cp ./out/main.pdf "${REPO_ROOT}/dist/handouts/notes.pdf"
+cp ./out/notes.pdf "${REPO_ROOT}/dist/handouts/notes.pdf"
 popd

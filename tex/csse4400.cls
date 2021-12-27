@@ -1,5 +1,8 @@
+\newcommand{\thecourse}{Software Architecture}
+\newcommand{\thecoursecode}{CSSE4400}
+
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{csse4400}[2022/01/01 Software Architecture]
+\ProvidesClass{csse4400}[2022/01/01 \thecourse]
 
 \newcommand{\headlinecolor}{\normalcolor}
 \LoadClass[a4paper,12pt]{article}
@@ -28,7 +31,7 @@
     \addcontentsline{toc}{part}{\@title}
     \setcounter{section}{0}
     \noindent\rule{\textwidth}{1pt}\vspace{8pt}
-    {\Large \@title} \hfill Software Architecture\vspace{16pt}
+    {\Large \@title} \hfill \thecourse\vspace{16pt}
 
     \noindent\@date \hfill \@author
 
@@ -57,7 +60,7 @@
             
         \vfill
 
-        Presented for the Sofware Architecture course\\
+        Presented for the \thecourse course\\
         at the University of Queensland
 
         \vspace{1cm}
