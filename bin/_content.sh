@@ -1,3 +1,3 @@
 #!/bin/bash
 
-CONTENT="qualities,QualityAttributes"
+CONTENT="architectures.layered,LayeredArchitecture qualities,QualityAttributes views,ArchitecturalViews"
