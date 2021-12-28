@@ -27,6 +27,17 @@
 
 \RequirePackage{hyperref}
 
+\newif\iflastupdated
+\lastupdatedtrue
+
+\RequirePackage{filemod}
+\RequirePackage{currfile}
+\RequirePackage[absolute]{textpos}
+
+\newcommand{\lastmodified}{%
+    \filemodprintdate{\currfilepath}%
+}
+
 \renewcommand{\maketitle}{%
     \addcontentsline{toc}{part}{\@title}
     \setcounter{section}{0}
@@ -37,6 +48,11 @@
 
     \noindent\rule{\textwidth}{1pt}
     
+    \iflastupdated
+    \begin{textblock*}{\textwidth}(425pt,20pt)
+        \footnotesize Last Updated on\lastmodified
+    \end{textblock*}
+    \fi
 }
 
 \newcommand{\makecover}{%
