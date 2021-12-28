@@ -50,7 +50,7 @@
     
     \iflastupdated
     \begin{textblock*}{\textwidth}(425pt,20pt)
-        \footnotesize Last Updated on\lastmodified
+        \footnotesize Last Updated on \lastmodified
     \end{textblock*}
     \fi
 }
