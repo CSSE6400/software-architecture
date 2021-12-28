@@ -77,6 +77,12 @@
     #1
 }
 
+\newcommand{\todo}[1]{
+    \begin{tcolorbox}
+        {\color{red} TODO: #1}
+    \end{tcolorbox}
+}
+
 \newenvironment{extra}
     {\begin{center}\begin{tabular}{|p{0.9\textwidth}|}
     \hline\\
