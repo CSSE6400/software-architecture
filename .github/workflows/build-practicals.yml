@@ -1,0 +1,44 @@
+name: Build Practicals
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - practicals/**
+
+jobs:
+  build-notes:
+    runs-on: ubuntu-latest
+    container: braewebb/pandoc:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup ID
+        id: vars
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
+      - name: Install latex dependencies
+        run: |
+          tlmgr update --self
+          tlmgr install cabin
+          tlmgr install fontaxes
+          tlmgr install tcolorbox
+          tlmgr install environ
+          tlmgr install datetime
+          tlmgr install fmtcount
+          tlmgr install filemod
+          tlmgr install currfile
+          tlmgr install textpos
+
+      - name: Compile Notes
+        run: ./bin/build_practicals.sh
+
+      - name: Upload Slides
+        uses: actions/upload-artifact@v2
+        with:
+          name: assessment
+          path: |
+            ./dist/**/*.pdf
+  
