@@ -16,7 +16,7 @@
 
 \RequirePackage{tcolorbox}
 
-\newcounter{definition}[section]
+\newcounter{definition}[part]
 \newenvironment{definition}[1][]
     {\refstepcounter{definition}
     \begin{tcolorbox}%
