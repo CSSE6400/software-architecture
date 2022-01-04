@@ -7,7 +7,7 @@ One quality attributes which developers often overlook is security.
 Security can be the cause of a great deal of frustration for developers;
 there are no comfortable architectures, nor command-line tools to magically make an application secure.
 As the world depends on technology more than ever while, at the same time the impacts of cyber attacks become more devastating,
-it has become crystal clear that security is everyones responsibility.
+it has become crystal clear that security is everyone's responsibility.
 As users of technology, as developers, and as architects, we all need to ensure we take security seriously.
 
 Learning, and for that matter, teaching, how to make software secure is no easy task.
@@ -27,8 +27,8 @@ But again, even if you follow these practices and embody the principles,
 you will still be hopeless insecure, unless,
 you are constantly reflect on the security implications of your each and every decision.
 
-\section{The Self}
-Before we even fantasize about keeping our applications secure, let's review if you're secure right now.
+\section{You}
+Before we even fantasise about keeping our applications secure, let's review if you're secure right now.
 As developers we often have heightened privileges and access, at times above that of even the CEOs.
 If you aren't secure, then nor is anything you work on.
 Let's review some of the basics.
@@ -43,7 +43,7 @@ You must to keep your software up to date.
 \textbf{Use multi-factor authentication.}
 This should be hard to explain to a grandmother but this should be obvious to software developers.
 One million passwords are stolen every week \cite{password-security}.
-If you don't have some sort of multi-factor authentication enabled, hackers can access your account immediantly after stealing your password.
+If you don't have some sort of multi-factor authentication enabled, hackers can access your account immediately after stealing your password.
 
 \textbf{Use a password manager.}
 Following from the startling statistic of a million stolen passwords, we must seriously consider how we use passwords.
@@ -59,49 +59,209 @@ So go through and update your passwords with randomly generated secure passwords
 Okay, now that we're not a security risk ourselves, we can start considering securing the software we develop.
 Before looking at pragmatic practices, we'll develop a set of guiding principles.
 These principles are far from comprehensive but they provide a useful foundation to enable discussion of our security practices.
+The principles presented in this course are derived from Viega and McGeaw \cite{2001-security-design-principles},
+Gasser \cite{1988-security-design-principles}, and Saltzer and Schroeder \cite{1975-security-design-principles}.
+Some principles have been renamed for consistency and clarity.
+Refer to Appendix \ref{all-principles} for the comprehensive list of principles from these sources. 
 
 \subsection{Principle of Least Privilege}
-\subsection{Principle of Separation of Duties}
-\subsection{Principle of Defense in Depth}
-\subsection{Principle of Failing Securely}
-\subsection{Principle of Open Design}
-\subsection{Principle of Avoiding Security by Obscurity}
-\subsection{Principle of Minimizing Attack Surface Area}
 
+\begin{quote}{Jerry Saltzer \cite{least-privilege}}
+Every program and every privileged user of the system should operate using the least amount of privilege necessary to complete the job.
+\end{quote}
+
+\noindent The principle of least privilege was identified in 1974 by Jerry Saltzer \cite{least-privilege}.
+This principle is mostly common sense and the benefits should be apparent.
+If you maintain the principle of least privilege then you minimise your attack surface by limiting the amount of damage any one user can do.
+This protects software from intentionally malicious actors while also minimising the damage of bugs which occur unintentionally in the software.
+
+\paragraph{Example}
+Consider a web application which lists COVID close contact locations for a state.
+We'll assume that the locations are maintained within an SQL database.
+Assume that each time the tracing page is loaded, an SQL query is sent to the database to find all current close contact locations.
+If the developers follow the principle of least privilege, then the account used to query that data would only be able to list the current locations.
+
+For this example, the tracing website had to be developed and rolled out quickly, as such,
+the developers created only one SQL user which they used for both the tracing website and the portal where the government can log new locations.
+This user account would have to have the ability to create new close contact locations, and if done poorly enough,
+the account might even have access to delete existing locations.
+
+Since the developers have violated the principle of least privilege,
+their software is now at risk.
+If a malicious actor is able to gain database access via SQL injection, or,
+just as likely, if their software has a typo in an SQL query, the integrity of the tracing data could be jeopardised.
+This could be mitigated by using the principle of least privilege and creating separate user accounts for modifying and subsequently viewing the data.
+
+\paragraph{Exemplar}
+One of the primary examples of a good application of this principle is within unix operating systems.
+In the unix operating system a sudoer (a user account which can use the sudo command) has a lot of destructive power.
+Commands running at the sudo level can do essentially anything they wish, including wiping the computer.
+However, a sudoer is not typically using these privileges.
+The user has to specify that they intend to run a command with elevated privileges
+which helps avoid accidental destruction of the computer.
+
+\paragraph{Fail-safe defaults}
+The principle of fail-safe defaults is often presented on it's own.
+Fail-safe defaults means that the default for access to a resource should be denied until explicit access is provided.
+We include fail-safe defaults as a property of the principle of least privilege given the strong connection.
+
+\subsection{Principle of Failing Securely}
+
+\begin{quote}{Howard and LeBlanc \cite{death-taxes-and-failure}}
+Death, taxes, and computer system failure are all inevitable to some degree. Plan for the event.
+\end{quote}
+
+\noindent Computer systems fail.
+As we'll see in the course, the more complicated your software, the more often and dramatically it can be expected to fail.
+The principle of failing securely asks us to stash away our optimism and become a realist for a moment.
+When designing an architecture or a piece of software, plan for the ways your software will fail.
+And, when your software does fail, it should not create a security vulnerability \cite{failing-securely}.
+
+\paragraph{Example}
+An interesting example of failing securely comes from Facebook's October outage which we discussed previously.
+As you may be aware, one cause of the outage was a DNS resolution issue triggered by Facebook's data centres going offline \cite{facebook-outage}.
+The DNS resolution issue meant that the internal Facebook development tools and communication channels went down as well.
+As you might expect, losing your tools and your team members makes resolving an outage far more difficult.
+
+Early reports of the incident indicated that the outage of Facebook's internal infrastructure also meant employees were locked out of the data centres.
+While it seems that developers were locked out of their buildings, the data centres was not affected.
+Nevertheless, it is interesting to consider whether an internal outage should, somewhat understandably, lock access to the data centres.
+
+This example highlights the key difference between a system which \textsl{fails safely} and a system which \textsl{fails securely}.
+In a fail safe system, an internal outage would allow physical access to the data centre to enable maintenance to fix the problem.
+Whereas in a fail secure system, the outage would cause the data centre to lock and prevent access to maintain the security of the data within.
+There isn't one correct way to deal with failure.
+While in this case it would have helped Facebook resolve the issue quicker,
+if a data breach occurred through an intentional outage there would be equal criticism.
+
+Regardless of the security policy you choose, it is always important to prepare for failure and weigh the pros and cons of each policy.
+
+\subsection{Principle of KISS}
+
+\begin{quote}{Leonardo Da Vinci\footnote{maybe}}
+Simplicity is the ultimate sophistication
+\end{quote}
+
+\noindent We'll keep this principle simple.
+The principle of Keep it Simple `Silly' (KISS) is needed as complicated software or processes are more often than not, insecure.
+Simple means less can go wrong.
+
+\subsection{Principle of Open Design}
+
+\begin{quote}{C. E. Shannon \cite{shannons-maxim}}
+One ought to design systems under the assumption that the enemy will immediately gain full familiarity with them.
+\end{quote}
+
+\noindent The principle of open design, also known as Kerckhoffs's principle,
+stresses that security through obscurity, or security through secrecy, does not work.
+If the security of your software relies on keeping certain implementation details secret then your system is not secure.
+Of course, there are some acceptable secrets such as private keys, however, these should still be considered a vulnerability.
+Always assume that if an implementation detail can be discovered, it will be.
+There is software constantly scanning the internet for open ports, unpublished IP addresses,
+and routers secured by the default username and password.
+
+\paragraph{Example}
+An example which immediately springs to mind is our first and second year assignment marking tools.
+To date, I'm not aware of the tools being exploited, however they are currently vulnerable.
+The tools currently rely on students not knowing how they work.
+There are techniques which I've used to create `assignments' which pass all the functionality tests for any given semester.
+Fortunately, the threat of academic misconduct is enough of a deterrent that it has yet to be a problem.
+
+This example illustrates why the principle of open design is so frequently violated.
+In the short-term security through obscurity can work, and work well, but it is a long-term disaster waiting to happen.
+It is also common place to violate the principle slightly by trying to built systems which don't rely on secrecy but keeping the systems secret `just in case'.
+In many situations this is appropriate, however, a truly secure system should be open for community scrutiny.
+
+\subsection{Principle of Usability}
+
+\begin{quote}{Unknown}
+TBD
+\end{quote}
+
+The final principle we should explore is the principle of usability, also known as `psychological acceptability'.
+This principle asks that we have realistic expectations of our users.
+If the user is made to jump through numerous hoops to log into your application, they will find a way around it.
+The idea is that the security systems put in place should, as much as possible, avoiding making it more difficult to access resources.
+
+\paragraph{Example}
+The example for this principle includes a confession.
+The university has implemented a multi-factor authentication mechanism for staff.\footnote{coming soon to students}
+Unfortunately, there is a bug in the single sign-on which means that MFA is not remembered causing the system to re-prompt me at every log in.
+A direct consequence of this inconvenience is that I've installed software on all my devices which automatically authenticates the MFA,
+bypassing in part the intended additional security.
+
+The university through violating the principle of usability has made it more difficult for users to be secure than insecure.
+As predicted by the principle, the inconvenience leads straight to bypassing.
+Violation of this principle has relatively minimal impacts,
+this can mean that it is not one which gets considered during software design.
+
+\begin{drafting}
+
+Other potentially useful principles:
+\begin{itemize}
+    \item Principle of Defense in Depth
+    \item Principle of Separation of Duties
+\end{itemize}
 
 \section{Practices of Secure Software}
 
+\subsection{Encryption}
+\subsection{Sanitization}
+\subsection{DoS Protection}
+\subsection{Dependency Management}
+\subsection{Firewalls}
 
-
-
-
-\begin{drafting}
-\begin{itemize}
-    \item introduce security
-    \item security is an on-going process
-    \item best kept in the back of your head
-    \item you will never be completely secure, but that shouldn't stop you trying
-    \item couple of useful principles
-    \begin{itemize}
-        \item principle of least privilege
-        \item principle of separation of duties
-        \item principle of defense in depth
-        \item principle of failing securely (facebook example)
-        \item principle of open design (2310)
-        \item principle of avoiding security by obscurity
-        \item principle of minimizing attack surface area
-    \end{itemize}
-    \item couple of best practices
-    \begin{itemize}
-        \item sanitizing inputs
-        \item use encryption where reasonable
-        \item keep software up to date
-        \item use MFA
-        \item use firewalls
-        \item track your systems
-        \item use a password manager
-        \item be smart, trust but verify
-    \end{itemize}
-    \item when in doubt, hire an expert
-\end{itemize}
+\section{Summary}
+hire or consult with an expert
 \end{drafting}
+
+\appendix
+\section{Original Security Design Principles}\label{all-principles}
+
+\paragraph{Saltzer and Schroeder}
+\begin{enumerate}
+    \item Economy of mechanism \dotfill Principle of KISS
+    \item Fail-safe defaults \dotfill Principle of Least Privilege
+    \item Complete mediation \dotfill Not covered
+    
+    \hspace{0.5em} Access to resources must \textsl{always} be authorized.
+
+    \item Open design \dotfill Principle of Open Design
+    \item Separation of privilege \dotfill Not covered
+    
+    \hspace{0.5em} No one user account or role should hold too much power.
+
+    \hspace{0.5em} Consider multi-role authentication where appropriate.
+
+    \item Least privilege \dotfill Principle of Least Privilege
+    \item Least common mechanism \dotfill Not covered
+    
+    \hspace{0.5em} Minimise the amount of resources shared between users.
+
+    \item Psychological acceptability \dotfill Principle of Usability
+\end{enumerate}
+
+\paragraph{Gasser}
+\begin{enumerate}
+    \item Consider Security from the Start \dotfill Implicit
+    \item Anticipate Future Security Requirements
+    \item Minimize and Isolate Security Controls
+    \item Enforce Least Privilege \dotfill Principle of Least Privilege
+    \item Structure the Security-Relevant Functions
+    \item Make Security Friendly \dotfill Principle of Usability
+    \item Do Not Depend on Secrecy for Security \dotfill Principle of Open Design
+\end{enumerate}
+
+\paragraph{Viega and McGeaw}
+\begin{enumerate}
+    \item Secure the Weakest Link
+    \item Practice Defense in Depth
+    \item Fail Securely \dotfill Principle of Failing Securely
+    \item Follow the Principle of Least Privilege \dotfill Principle of Least Privilege
+    \item Compartmentalize
+    \item Keep It Simple \dotfill Principle of KISS
+    \item Promote Privacy
+    \item Remember That Hiding Secrets is Hard
+    \item Be Reluctant to Trust
+    \item Use Your Community Resources
+\end{enumerate}

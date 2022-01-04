@@ -26,6 +26,18 @@
     }
     {\end{tcolorbox}}
 
+\RequirePackage{xparse}
+
+\let\oldquote\quote
+\let\endoldquote\endquote
+
+\RenewDocumentEnvironment{quote}{om}
+    {\oldquote}
+    {\par\nobreak\smallskip
+    \hfill --- #2\IfValueT{#1}{~---~#1}\endoldquote 
+    \addvspace{\bigskipamount}}
+
+
 \RequirePackage{hyperref}
 
 \newif\iflastupdated
