@@ -51,9 +51,15 @@
     \filemodprintdate{\currfilepath}%
 }
 
+\newcommand\unappendix{\par
+  \setcounter{apdxsection}{\value{section}}%
+  \setcounter{section}{\value{savesection}}%
+  \setcounter{subsection}{0}%
+  \gdef\thesection{\@arabic\c@section}}
+
 \renewcommand{\maketitle}{%
     \addcontentsline{toc}{part}{\@title}
-    \setcounter{section}{0}
+    \unappendix
     \noindent\rule{\textwidth}{1pt}\vspace{8pt}
     {\Large \@title} \hfill \thecourse\vspace{16pt}
 
