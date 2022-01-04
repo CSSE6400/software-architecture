@@ -52,7 +52,7 @@
 }
 
 \newcommand\unappendix{\par
-  \setcounter{section}{\value{savesection}}%
+  \setcounter{section}{0}%
   \setcounter{subsection}{0}%
   \gdef\thesection{\@arabic\c@section}}
 
