@@ -11,3 +11,5 @@ do
 
     touch -m -t "$TIME" "$FILE"
 done
+
+ls -lR .
