@@ -14,6 +14,23 @@ Akin to a program which primarily uses global variables,
 it is hard, if not impossible,
 to understand everything that is happening or could happen.
 
+\aside{
+Code examples in these notes are works of fiction.
+Any resemblance to a real language is pure coincidence.
+Having said that, syntax vaguely similar to python is used most often as it's concise.
+We expect that you can take away the important points from the code examples without getting distracted in the details.
+}
+
+
+\begin{code}[style=python]
+import gui
+import database
+
+button = gui.make_button("Click me to add to counter")
+button.onclick(e => 
+    database.query("INSERT INTO clicks (time) VALUES {{e.time}}"))
+\end{code}
+
 The first architectural style we will investigate is the layered architecture.
 Layered architecture (also called multi-tier or tiered architecture) 
 partitions software into specialized components and restricts how those components can communicate with each other.
@@ -48,10 +65,16 @@ For traditional GUI applications, the presentation layer would use a GUI library
 
 \todo{explain business, persistence, and database}
 
+
+\begin{code}[style=python]
+import todo
+
+todo("place a simple example of gui + simple business process i.e. order + persistence wrapper on db + imaginary db")
+todo("have communication business and persistence via native python calls")
+\end{code}
+
 One of the key benefits afforded by a well designed layered architecture is each layer should be interchangeable.
 A typical example is an application which starts as a command line application can be adapted to a GUI application by replacing the presentation layer.
-
-
 
 \section{Deployment Variations}
 
@@ -107,5 +130,96 @@ This deployment form is very typical of web applications.
 The presentation layer is deployed as a HTML/JavaScript application which makes network requests to the remote business/persistence layer.
 The business/persistence layer then validates requests and makes any appropriate database updates.
 
+\begin{code}[style=python]
+import todo
+
+todo("expand the previous example to separate the presentation&business layers from the persistence&database layer")
+todo("emphasise that it's a weird pattern")
+todo("advantage: easiest way to illustrate REST communication between business and persistence")
+\end{code}
 
 \section{Closed/Open Layers}
+
+Separating software into layers helps to increase the modularity and isolation of distinct components.
+But, of course, the components need to communicate with each other, otherwise they wouldn't be particularly useful.
+We categorize the flow of communication of a layer as \textsl{open} or \textsl{closed}.
+A layer, by default, is considered \textsl{closed}.
+Closed layers prevent the direct communication of their adjacent layers.
+Figure \ref{fig:closed-layers} shows the communication channels (as arrows) in a fully closed architecture.
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[component/.style={draw, anchor=center, text width=220pt}]
+        \node [component](P) at (0,0)  {Presentation Layer\hfill \color{gray}Closed};
+        \node [component](B) at (0,-1)  {Business Layer\hfill \color{gray}Closed};
+        \node [component](Pe) at (0,-2)  {Persistence Layer\hfill \color{gray}Closed};
+        \node [component](D) at (0,-3)  {Database Layer\hfill \color{gray}Closed};
+    
+        \node[draw, fit=(P) (D)](hardware) {};
+
+        \draw[-Latex] (P) -- (B);
+        \draw[-Latex] (B) -- (Pe);
+        \draw[-Latex] (Pe) -- (D);
+    \end{tikzpicture}
+    \caption{All layers closed requiring communication to pass through every layer.}
+    \label{fig:closed-layers}
+\end{figure}
+
+An architecture where all layers are closed enables maximum isolation.
+A change to the communication contracts of any layer will require changes to at most one other layer.
+However, there are a number of situations where an \textsl{open} layer can be useful.
+Open layers does not require communication to pass through, communication can occur `around' the layer.
+
+\todo{Find a good example for open layers}
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[component/.style={draw, anchor=center, text width=220pt}]
+        \node [component](P) at (0,0)  {Presentation Layer\hfill \color{gray}Closed};
+        \node [component](B) at (0,-1)  {Business Layer\hfill \color{gray}Open};
+        \node [component](Pe) at (0,-2)  {Persistence Layer\hfill \color{gray}Open};
+        \node [component](D) at (0,-3)  {Database Layer\hfill \color{gray}Closed};
+    
+        \node[draw, fit=(P) (D)](hardware) {};
+
+        \draw[-Latex] (P) -- (B);
+        \draw[-Latex] (B) -- (Pe);
+        \draw[-Latex] (Pe) -- (D);
+
+        \draw[-Latex] ([xshift=10pt]P.south) -- ([xshift=10pt]Pe.north);
+        \draw[-Latex] ([xshift=30pt]P.south) -- ([xshift=30pt]D.north);
+        \draw[-Latex] ([xshift=20pt]B.south) -- ([xshift=20pt]D.north);
+    \end{tikzpicture}
+    \caption{A wolf in layer's clothing \cite{bass2013software}}
+    \label{fig:wolf}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[component/.style={draw, anchor=east, fill=gray!40}]
+        \node [component, text width=100pt](P) at (0,0)  {Presentation Layer};
+        \node [component, text width=120pt](B) at (0,-1)  {Business Layer};
+        \node [component, text width=140pt](Pe) at (0,-2)  {Persistence Layer};
+        \node [component, text width=160pt](D) at (0,-3)  {Database Layer};
+
+        \def\stairs{([xshift=-10pt]P.north west)
+                --([xshift=-10pt,yshift=-9pt]P.west)
+                --([xshift=-10pt,yshift=9pt]B.north west)
+                --([xshift=-10pt,yshift=-9pt]B.west)
+                --([xshift=-10pt,yshift=9pt]Pe.north west)
+                --([xshift=-10pt,yshift=-9pt]Pe.west)
+                --([xshift=-10pt,yshift=9pt]D.north west)
+                --([xshift=-10pt,yshift=-10pt]D.west)
+                --([xshift=-40pt]D.south west)}
+        \draw \stairs;
+    
+        \begin{scope}[on background layer]
+            \fill[gray!40] \stairs |- cycle;
+        \end{scope}
+    
+        % \node[draw, fit=(P) (D)](hardware) {};
+    \end{tikzpicture}
+    \caption{A more complicated layered architecture \cite{bass2013software} \todo{Figure is an example of a variation on open/closed layer model (fig 13.2 in bass - reconstruction in progress)}}
+    \label{fig:complicated-layers}
+\end{figure}
+
