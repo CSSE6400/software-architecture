@@ -20,6 +20,8 @@
 \setbeamercolor{frametitle}{fg=primary}
 \setbeamercolor{description item}{fg=secondary}
 
+\setbeamercolor{caption name}{fg=primary}
+
 % Fonts
 \RequirePackage[sfdefault]{cabin}
 \RequirePackage[T1]{fontenc}
@@ -90,6 +92,15 @@
     \point[Question]{#1}
 }
 
+\newcommand{\questionanswer}[2]{
+    \point[Question]{#1
+    \par\bigskip
+    {\normalsize\color{focus}Answer}
+
+    \huge #2
+    }
+}
+
 % Point with a definition
 \renewcommand{\definition}[3][]{
     \point[#1]{
@@ -97,6 +108,15 @@
         \begin{defn}[#2]
             #3
         \end{defn}}
+    }
+}
+
+\renewcommand{\quote}[2][]{
+    \frame[c,plain]{
+        \par\bigskip
+        {\huge\color{black}#2}
+        \par
+        {\hfill\large\color{focus}- #1}
     }
 }
 
