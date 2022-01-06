@@ -34,12 +34,13 @@
 \defbeamertemplate*{title page}{customized}[1][]
 { \centering
   \usebeamerfont{title}\Huge{\color{primary}\inserttitle}\par
-  \usebeamerfont{subtitle}{\color{secondary}\insertsubtitle}\par
   \bigskip
-  \usebeamerfont{author}{\Large\color{secondary}\insertauthor}\par
+  \usebeamerfont{subtitle}{\Large\color{primary}\insertsubtitle}\par
+  \bigskip\vspace{3em}
+  \usebeamerfont{author}{\huge\color{secondary}\insertauthor}\par
   \bigskip
   \usebeamerfont{institute}\insertinstitute\par
-  \usebeamerfont{date}\insertdate\par
+  \usebeamerfont{date}{\large\color{secondary}\insertdate}\par
   \usebeamercolor[fg]{titlegraphic}\inserttitlegraphic
 }
 
