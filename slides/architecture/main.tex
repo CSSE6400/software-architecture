@@ -1,0 +1,154 @@
+\documentclass[aspectratio=169]{beamer}
+
+\title{Software Architecture}
+\author{Richard Thomas}
+\date{The Future}
+
+% Colours
+\usepackage{xcolor}
+
+\definecolor{primary}{RGB}{50, 98, 115}
+\definecolor{secondary}{RGB}{92, 158, 173}
+\definecolor{focus}{RGB}{227, 151, 116}
+
+\setbeamercolor{frametitle}{fg=primary}
+\setbeamercolor{description item}{fg=secondary}
+
+% Fonts
+\usepackage[sfdefault]{cabin}
+\usepackage[T1]{fontenc}
+
+% Remove navigation
+\beamertemplatenavigationsymbolsempty
+
+% Custom title page -- could be better
+\defbeamertemplate*{title page}{customized}[1][]
+{ \centering
+  \usebeamerfont{title}\Huge{\color{primary}\inserttitle}\par
+  \usebeamerfont{subtitle}{\color{secondary}\insertsubtitle}\par
+  \bigskip
+  \usebeamerfont{author}{\Large\color{secondary}\insertauthor}\par
+  \bigskip
+  \usebeamerfont{institute}\insertinstitute\par
+  \usebeamerfont{date}\insertdate\par
+  \usebeamercolor[fg]{titlegraphic}\inserttitlegraphic
+}
+
+% Footnote without the numbering
+\makeatletter
+\def\blfootnote{\gdef\@thefnmark{}\@footnotetext}
+\makeatother
+
+% Youtube video link with preview
+% https://youtube-thumbnail-grabber.com/
+\usepackage{stackengine}
+\newcommand{\youtubevideo}[2]{
+    \vspace{1em}
+    \href{#2}{%
+    \stackinset{c}{0pt}{c}{0pt}{%
+    \includegraphics[width=0.15\textwidth]{ytlogo}%
+    }{%
+    \includegraphics[width=0.6\textwidth]{#1}%
+    }
+    }\blfootnote{\url{#2}}
+    \vspace{1em}
+}
+
+% Definition environment which matches the notes
+\usepackage{tcolorbox}
+\newcounter{definition}[part]
+\newenvironment{defn}[1][]
+    {\refstepcounter{definition}
+    \vspace{1em}
+    \begin{tcolorbox}%
+    \noindent {\color{primary}{Definition~\thedefinition. #1}}
+    
+    \vspace{4pt}
+    }
+    {\end{tcolorbox}}
+
+% The standard `point' to highlight something
+\newcommand{\point}[2][]{
+    \frame[c,plain]{
+        \par\bigskip
+        {\color{primary}#1}
+
+        \huge #2
+    }
+}
+
+\newcommand{\todo}[1]{
+    \point[Oi!]{{\color{red}#1}}
+}
+
+\newcommand{\question}[1]{
+    \point[Question]{#1}
+}
+
+% Point with a definition
+\renewcommand{\definition}[3][]{
+    \point[#1]{
+        {\large
+        \begin{defn}[#2]
+            #3
+        \end{defn}}
+    }
+}
+
+% Use the focus font for highlighting
+\newcommand{\highlight}[1]{{\color{focus} \textsl{#1}}}
+
+\newcommand{\extra}[2][2-]{\only<#1>{\blfootnote{#2}}}
+
+\begin{document}
+
+\maketitle
+
+\question{What is \highlight{Software Architecture}?}
+
+\point{\highlight{Software Architecture} is hard to define.}
+
+\point[Let's hear from an expert]{\centering \youtubevideo{images/making-architecture-matter-thumb}{https://www.youtube.com/watch?v=DngAZyWMGR0}}
+
+\definition[Okay so...]{Software Architecture}{The important stuff; whatever that is.}
+
+\question{What do you want from this course?}
+
+\definition[Maybe...]{Software Architecture: The Course}%
+{The set of tools, processes, and design patterns which enable quality attributes to be met in software.}
+
+\question{What are \highlight{Quality Attributes}?\extra{Hint: CSSE3002 or CSSE3012}}
+
+\begin{frame}{Quality Attributes}
+
+Non-functional requirements for the success of software.
+
+\end{frame}
+
+\begin{frame}{Quality Attributes: Examples}
+
+\begin{description}[<+->]
+    \item[Modularity] Components of the software are separated into \highlight{discrete modules}.
+    \item[Availability] The software is \highlight{available to access} by end users, either at any time or on any platform, or both.
+    \item[Scalability] The software is \highlight{simultaneously usable} by a large amount of end users.
+    \item[Extensibility] Features or extensions can be \highlight{easily added} to the base software.
+    \item[Testibility] The software is designed so that \highlight{automated tests} can be easily deployed.
+\end{description}
+
+\end{frame}
+
+\point[Problem]{Software cannot met all quality attributes.}
+
+\point[``Solution'']{Software architects prioritize the important attributes.\extra{on a software-by-software basis}}
+
+\definition{The First Law of Software Architecture}{Everything in software architecture is a trade-off.}
+
+\definition{Wicked Architecture}%
+{There are often no clear problem descriptions, no clear solutions, good or bad solutions, no clear rules when to ``stop'' architecting
+and mostly team rather than individual work.}
+
+\point[Why now?]{Architecture is more important today thanks to \highlight{expectations} and \highlight{infrastructure}.}
+
+\todo{End it gracefully}
+
+\end{document}
