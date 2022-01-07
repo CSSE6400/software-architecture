@@ -1,4 +1,6 @@
 \definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
+\definecolor{titlecolor}{rgb}{0.3,0.3,0.3}
+\definecolor{titleborder}{rgb}{0.6,0.6,0.6}
 \usepackage{framed}
 
 
@@ -64,4 +66,22 @@
     language=python
 }
 
-\lstnewenvironment{code}[1][]{\lstset{#1}\shaded}{\endshaded}
+\usepackage{xifthen}
+
+\lstnewenvironment{code}[2][]{
+    \ifthenelse{\isempty{#2}}{}{
+        \setlength{\FrameSep}{3pt}
+        {\hspace{-3pt}\ttfamily\color{titlecolor} \shaded >> cat #2 \endshaded}
+    }
+    \lstset{
+        numbers=left,
+        numberstyle=\ttfamily\tiny\color{gray},
+        numberblanklines=false,
+        #1
+    }\setlength{\FrameSep}{3pt}
+    \ifthenelse{\isempty{#2}}{}{
+        \vspace{-\baselineskip}
+        \vspace{-\baselineskip}
+    }
+    \shaded}
+    {\endshaded}

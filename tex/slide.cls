@@ -22,6 +22,10 @@
 
 \setbeamercolor{caption name}{fg=primary}
 
+\let\oldcite\cite
+\renewcommand{\cite}[1]{{\color{primary}\oldcite{#1}}}
+
+
 % Fonts
 \RequirePackage[sfdefault]{cabin}
 \RequirePackage[T1]{fontenc}
@@ -117,7 +121,7 @@
         \par\bigskip
         {\huge\color{black}#2}
         \par
-        {\hfill\large\color{focus}- #1}
+        {\hfill\large\color{primary}- #1}
     }
 }
 
