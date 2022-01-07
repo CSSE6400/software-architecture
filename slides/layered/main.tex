@@ -4,6 +4,8 @@
 \author{Richard Thomas}
 \date{The Future}
 
+\usepackage{languages}
+
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 \usetikzlibrary{fit}
@@ -16,6 +18,17 @@
 \quote[Shrek]{Ogres are like onions. Orgres have layers, onions have layers... You get it? We both have layers.}
 
 \point[In the beginning...]{There was the big ball of mud \cite{ballofmud}}
+
+\begin{frame}[fragile]
+\begin{code}[style=python]
+import gui
+import database
+
+button = gui.make_button("Click me to add to counter")
+button.onclick(e => 
+    database.query("INSERT INTO clicks (time) VALUES {{e.time}}"))
+\end{code}
+\end{frame}
 
 \point[Problem]{Any change can affect any other part of the software.}
 
@@ -35,6 +48,46 @@
     \caption{The \highlight{traditional} specialized components of a layered architecture.}
     \label{fig:traditional-layered}
 \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{code}[style=python,title=presentation.code,captionpos=t]
+import gui
+import business
+
+button = gui.make_button("Click me to add to counter")
+button.onclick(business.click)
+\end{code}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{code}[style=python,title=business.code,captionpos=t]
+import persistence
+
+def click():
+    persistence.click_counts.add(1)
+\end{code}
+\end{frame}
+
+\begin{frame}[fragile]
+\small
+\begin{code}[style=python,title=persistence.code,captionpos=t]
+import db
+
+class ClickCounter:
+    clicks = 0
+
+    def constructor():
+        clicks = db.query("SELECT COUNT(*) FROM clicks")
+
+    def get_click():
+        return clicks
+
+    def add(amount):
+        db.query("INSERT INTO clicks (time) VALUES {{time.now}}")
+
+click_counts = ClickCounter()
+\end{code}
 \end{frame}
 
 \question{Can you identify an example of layered architecture?}
