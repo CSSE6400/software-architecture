@@ -17,7 +17,7 @@ variable "students" {
 }
 
 provider "github" {
-    owner = var.owner
+  owner = var.owner
 }
 
 # Documentation assignment repo
@@ -35,54 +35,26 @@ resource "github_repository" "architecture-documentation" {
 }
 
 # Configure main branch
-resource "github_branch" "main" {
-  repository = github_repository.architecture-documentation.name
-  branch     = "main"
+module "main" {
+  source = "./protected-branch"
+  repo = github_repository.architecture-documentation.name
+  branch = "main"
+  default = true
 }
 
-resource "github_branch" "release" {
-  repository = github_repository.architecture-documentation.name
+module "release" {
+  source = "./protected-branch"
+  repo = github_repository.architecture-documentation.name
   branch = "release"
 }
 
-resource "github_branch_default" "default"{
-  repository = github_repository.architecture-documentation.name
-  branch     = github_branch.main.branch
-}
-
-resource "github_branch_protection" "protect_main" {
-  repository_id = github_repository.architecture-documentation.name
-
-  pattern          = github_branch.main.branch
-  enforce_admins   = false
-  allows_deletions = false
-
-  allows_force_pushes = false
-}
-
-resource "github_branch_protection" "protect_release" {
-  repository_id = github_repository.architecture-documentation.name
-
-  pattern          = github_branch.release.branch
-  enforce_admins   = false
-  allows_deletions = false
-
-  allows_force_pushes = false
-}
-
 # Staff access
-# resource "github_repository_collaborator" "brae" {
-#   repository = github_repository.architecture-documentation.name
-#   username   = "braewebb"
-#   permission = "admin"
-# }
-
-resource "github_repository_collaborator" "richo" {
+resource "github_repository_collaborator" "staff" {
+  for_each = toset([ "applebyter" ])
   repository = github_repository.architecture-documentation.name
-  username   = "applebyter"
+  username   = each.value
   permission = "admin"
 }
-
 
 module "student-access" {
   source = "./student-access"
