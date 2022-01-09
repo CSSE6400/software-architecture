@@ -1,25 +1,3 @@
-terraform {
-  required_providers {
-    github = {
-      source  = "integrations/github"
-      version = "~> 4.0"
-    }
-  }
-}
-
-variable "owner" {
-  type = string
-  default = "BraeWebb" # change when org is made
-}
-
-variable "students" {
-  type = list
-}
-
-provider "github" {
-  owner = var.owner
-}
-
 # Documentation assignment repo
 resource "github_repository" "architecture-documentation" {
   name = "architecture-documentation"
@@ -35,28 +13,28 @@ resource "github_repository" "architecture-documentation" {
 }
 
 # Configure main branch
-module "main" {
+module "documentation-main" {
   source = "./protected-branch"
   repo = github_repository.architecture-documentation.name
   branch = "main"
   default = true
 }
 
-module "release" {
+module "documentation-release" {
   source = "./protected-branch"
   repo = github_repository.architecture-documentation.name
   branch = "release"
 }
 
 # Staff access
-resource "github_repository_collaborator" "staff" {
+resource "github_repository_collaborator" "documentation-staff" {
   for_each = toset([ "applebyter" ])
   repository = github_repository.architecture-documentation.name
   username   = each.value
   permission = "admin"
 }
 
-module "student-access" {
+module "documentation-student-access" {
   source = "./student-access"
 
   repo = github_repository.architecture-documentation.name
