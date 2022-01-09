@@ -13,7 +13,7 @@ resource "github_repository" "architecture-assignments" {
 # Staff access
 resource "github_repository_collaborator" "assignments-staff" {
   for_each = toset([ "applebyter" ])
-  repository = github_repository.architecture-documentation.name
+  repository = github_repository.architecture-assignments.name
   username   = each.value
   permission = "admin"
 }
