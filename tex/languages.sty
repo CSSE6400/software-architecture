@@ -15,7 +15,9 @@
     keywordstyle=\color{lightblue}\bfseries,
     identifierstyle=\color{black},
     commentstyle=\color{bluegreen}\ttfamily,
-    stringstyle=\color{lightgreen}\ttfamily
+    stringstyle=\color{lightgreen}\ttfamily,
+    showstringspaces=false,
+    upquote=true
 }
 
 \lstdefinelanguage{docker}{
@@ -47,6 +49,26 @@
   },
   keepspaces,
   mathescape,
+}
+
+\lstdefinelanguage{terraform}{
+    basicstyle=\normalfont\ttfamily,
+    keywords = [2]{resource, string, enum, list},
+    showstringspaces=false,
+    breaklines=true,
+    morecomment=[l]{\#},
+    morestring=[b]",
+}
+
+\lstdefinelanguage{javascript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
 }
 
 \lstdefinestyle{clang}{
@@ -82,7 +104,7 @@
 
 \usepackage{xifthen}
 
-\lstnewenvironment{code}[2][]{
+\newcommand{\codeheader}[2][]{
     \ifthenelse{\isempty{#2}}{}{
         \setlength{\FrameSep}{3pt}
         {\hspace{-3pt}\ttfamily\color{titlecolor} \shaded >> cat #2 \endshaded}
@@ -97,5 +119,23 @@
         \vspace{-\baselineskip}
         \vspace{-\baselineskip}
     }
+}
+
+\lstnewenvironment{code}[2][]{
+    \codeheader[#1]{#2}
     \shaded}
     {\endshaded}
+
+\newcommand{\codefile}[3][]{
+    \codeheader[]{#2}
+    \shaded
+    \lstinputlisting[#1]{#3}
+    \endshaded
+}
+
+\newcommand{\codeline}[3][]{
+    \codeheader[]{#2}
+    \shaded
+    \lstinline[#1]{#3}
+    \endshaded
+}
