@@ -1,0 +1,211 @@
+\documentclass{slide}
+
+\title{Software at Scale}
+\subtitle{CSSE6400}
+\author{Brae Webb}
+\date{The Future}
+
+\usepackage{languages}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows}
+\usetikzlibrary{fit}
+
+\begin{document}
+
+\maketitle
+
+\questionanswer{How many concurrent users can your software handle?}{Maybe \highlight{400}\only<3->{\footnote{HTTP server on a t2.micro EC2 instance}}? Maximum.}
+
+\definition{Stress Testing}{Measure the robustness of software by pushing usage to an extreme.}
+
+\point[Demonstration]{Let's build `hello world'}
+
+\point[Our Goal]{
+\vspace{10pt}
+\browser{Hello, world!}{http://3.6.9.12/}{
+    \hspace{10pt}Hello world from \highlight{your name here}
+}
+}
+
+\point[My Goal]{
+\vspace{10pt}
+\browser{Hello, world!}{http://3.6.9.12/}{
+    \hspace{10pt}Hello world from Brae
+}
+}
+
+\begin{frame}[fragile]
+\footnotesize
+\only<1>{\codefile[language=terraform,linerange={1-3,16}]{hello-server.tf}{resources/hello-server.tf}}
+\only<2>{\codefile[language=terraform,linerange={1-5,16}]{hello-server.tf}{resources/hello-server.tf}}
+\only<3>{\codefile[language=bash]{setup.sh}{resources/setup.sh}}
+\only<4>{\codefile[language=terraform,linerange={1-11,16}]{hello-server.tf}{resources/hello-server.tf}}
+\only<5>{\codefile[language=terraform,linerange={1-16}]{hello-server.tf}{resources/hello-server.tf}}
+\end{frame}
+
+\begin{frame}[fragile]
+\par\bigskip
+{\color{primary}Starting the server}
+\begin{code}[language=shell]{}
+>> terraform init
+>> terraform plan
+>> terraform apply
+\end{code}
+\end{frame}
+
+\point[Before]{
+\vspace{10pt}
+\browser{3.6.9.12}{http://3.6.9.12/}{
+    \centering \includegraphics[scale=0.5]{chrome-error}\\[1em]
+    \footnotesize
+    This site can't be reached\\[1em]
+    \fontsize{5pt}{5pt}\selectfont
+    3.6.9.12 took too long to respond.
+}
+}
+
+\point[After]{
+\vspace{10pt}
+\browser{Hello, world!}{http://3.6.9.12/}{
+    \hspace{10pt}Hello world from Brae
+}
+}
+
+\question{How much traffic can this website handle?}
+
+\begin{frame}[fragile]
+\footnotesize
+\only<1>{\codefile[language=javascript,linerange={1-4,20-24}]{stress-test.js}{resources/stress-test.js}}
+\only<2>{\codefile[language=javascript,linerange={1-4,6-8,17-18,20-24}]{stress-test.js}{resources/stress-test.js}}
+% \only<3>{\codeline[language=shell]{}{>> k6 run stress-test.js}}
+% \only<4>{\codefile[language=javascript]{stress-test.js}{resources/stress-test.js}}
+\end{frame}
+
+\begin{frame}[fragile]
+\par\bigskip
+{\color{primary}Run the tests}
+\begin{code}[language=shell]{}
+>> k6 run stress-test.js
+\end{code}
+\end{frame}
+
+\begin{frame}[fragile]
+\par\bigskip
+{\color{primary}Looks good so far}
+\begin{code}[language=shell]{}
+ status was 200
+  100% - 347867 / 0
+
+checks.........................: 100%   
+data_received..................: 100 MB 44 kB/s
+data_sent......................: 27 MB  12 kB/s
+iterations.....................: 347997 152.552084/s
+vus............................: 1    min=1    max=400 
+\end{code}
+\end{frame}
+
+\begin{frame}[fragile]
+\par\bigskip
+{\color{primary}Let's upgrade the traffic}
+\footnotesize
+\only<1>{\codefile[language=javascript,linerange={6-18}]{stress-test.js}{resources/stress-test.js}}
+\end{frame}
+
+\begin{frame}[fragile]
+\par\bigskip
+{\color{primary}And run the tests again}
+\begin{code}[language=shell]{}
+>> k6 run stress-test.js
+\end{code}
+\end{frame}
+
+\begin{frame}[fragile]
+\par\bigskip
+{\color{primary}Oh no...}
+\begin{code}[language=shell]{}
+status was 200
+99% - 347867 / 130
+
+checks.........................: 99.96%
+data_received..................: 100 MB 44 kB/s
+data_sent......................: 27 MB  12 kB/s
+iterations.....................: 347997 152.552084/s
+vus............................: 1    min=1    max=400 
+\end{code}
+\end{frame}
+
+\point[Back to square one]{
+\vspace{10pt}
+\browser{3.6.9.12}{http://3.6.9.12/}{
+    \centering \includegraphics[scale=0.5]{chrome-error}\\[1em]
+    \footnotesize
+    This site can't be reached\\[1em]
+    \fontsize{5pt}{5pt}\selectfont
+    3.6.9.12 took too long to respond.
+}
+}
+
+\questionanswer{How can we fix this?}{More servers?}
+
+\begin{frame}[fragile]
+\footnotesize
+\only<1>{\codefile[language=terraform]{hello-server.tf}{resources/hello-server.tf}}
+\only<2>{\codefile[language=terraform,linerange={1-17}]{hello-scale.tf}{resources/hello-scale.tf}}
+\end{frame}
+
+\definition{Target Group}{A collection of EC2 instances.\\More specifically, a collection of network connection points to EC2 instances.}
+
+\begin{frame}[fragile]
+\par\bigskip
+{\color{primary}An empty HTTP target group}
+\footnotesize
+\only<1>{\codefile[language=terraform,linerange={19-23,31-31}]{hello-scale.tf}{resources/hello-scale.tf}}
+\end{frame}
+
+\definition{Health Check}{Monitors attributes of hardware or software to detect deficiencies.}
+
+\begin{frame}[fragile]
+\par\bigskip
+{\color{primary}Add a health check}
+\footnotesize
+\only<1>{\codefile[language=terraform,linerange={19-31}]{hello-scale.tf}{resources/hello-scale.tf}}
+\end{frame}
+
+\begin{frame}[fragile]
+\par\bigskip
+{\color{primary}Add our instances to the target group}
+\footnotesize
+\only<1>{\codefile[language=terraform,linerange={33-38}]{hello-scale.tf}{resources/hello-scale.tf}}
+\end{frame}
+
+\definition{Load Balancer}{A networking tool to route and distribute traffic to targets.}
+
+\begin{frame}[fragile]
+\par\bigskip
+{\color{primary}Create a load balancer}
+\footnotesize
+\only<1>{\codefile[language=terraform,linerange={40-53}]{hello-scale.tf}{resources/hello-scale.tf}}
+\end{frame}
+
+\begin{frame}[fragile]
+\par\bigskip
+{\color{primary}Route load balancer traffic to the target group}
+\footnotesize
+\only<1>{\codefile[language=terraform,linerange={55-64}]{hello-scale.tf}{resources/hello-scale.tf}}
+\end{frame}
+
+\point[We're live!]{
+\vspace{10pt}
+\browser{Hello, world!}{http://hello-balancer-1992631166.us-east-1.elb.amazonaws.com/}{
+    \hspace{10pt}Hello world from Brae
+}
+}
+
+\point[Exercise]{Use \highlight{k6} to determine the new \highlight{load limits}}
+
+\nocite{*}
+\references{articles,books}
+
+\end{document}
