@@ -66,6 +66,19 @@
     \vspace{1em}
 }
 
+\RequirePackage[absolute,overlay]{textpos}
+
+\newcommand{\browser}[3]{
+    % \begin{center}
+    \stackinset{l}{5pt}{t}{30pt}{\parbox{5in}{#3}}{
+    \includegraphics[width=\textwidth]{browser-window}
+    }
+    \put(-400,242.5){\fontsize{5pt}{5pt}\selectfont \hspace{0.45in} #1}
+    \put(-400,232.5){\fontsize{5pt}{5pt}\selectfont \hspace{0.55in} #2}
+    % \put(-400,212.5){\parbox{5in}{#3}}
+    % \end{center}
+}
+
 % Definition environment which matches the notes
 \RequirePackage{tcolorbox}
 \newcounter{definition}[part]
@@ -99,11 +112,11 @@
 
 \newcommand{\questionanswer}[2]{
     \point[Question]{#1
-    \par\bigskip
+    \only<2->{\par\bigskip
     {\normalsize\color{focus}Answer}
 
     \huge #2
-    }
+    }}
 }
 
 % Point with a definition
