@@ -2,7 +2,7 @@
 \maketitle
 
 \section{Introduction}
-In the beginning there was the big ball of mud.
+In the beginning there was the \textsl{big ball of mud}.
 The ball of mud is an architectural style identified by it's lack of architectural style \cite{ballofmud}.
 In a ball of mud architecture, all components of the system are allowed to communicate.
 If your GUI code wants to ask the database a question, it will write an SQL query and ask it.
@@ -14,15 +14,43 @@ Akin to a program which primarily uses global variables,
 it is hard, if not impossible,
 to understand everything that is happening or could happen.
 
-The first architectural style we will investigate is the layered architecture.
+\aside{
+Code examples in these notes are works of fiction.
+Any resemblance to a working code is pure coincidence.
+Having said that, python-esque syntax is often used for it's brevity.
+We expect that you can take away the important points from the code examples without getting distracted in the details.
+}
+
+\begin{figure}[ht]
+\begin{code}[style=python]{}
+import gui
+import database
+
+button = gui.make_button("Click me to add to counter")
+button.onclick(e => 
+    database.query("INSERT INTO clicks (time) VALUES {{e.time}}"))
+\end{code}
+\caption{
+A small example of a \textsl{big ball of mud} architecture.
+This type of software is fine, even preferred, for smaller projects.
+However, it does not work well at scale.
+}
+\end{figure}
+
+The first architectural style we will investigate is a layered architecture.
 Layered architecture (also called multi-tier or tiered architecture) 
 partitions software into specialized components and restricts how those components can communicate with each other.
-The intention of a layered architecture is to create superficial boundaries between software components.
+A layered architecture creates superficial boundaries between the software components, or layers.
 Often component boundaries aren't enforced by the technology but by architectural policy.
+
+The creation of these boundaries provides the beginnings of some control over what your software is allowed to do.
+Communication between the component boundaries is done via well-specified \textsl{contracts}.
+The use of contracts results in each layer knowing precisely how it can be interacted with.
+Furthermore, when a layer needs to be replaced or rewritten, it can be safely substituted with a layer fulfilling the contract.
 
 % The isolated components of a layered architecture are normally technically partitioned rather than domain partitioned.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \centering
 \begin{tikzpicture}[component/.style={draw, anchor=center, text width=120pt}]
     \node [component](P) at (0,0)  {Presentation Layer};
@@ -46,23 +74,70 @@ The presentation layer takes data and formats it in a way that is sensible for h
 For command line applications, the presentation layer would accept user input and print formatted messages for the user.
 For traditional GUI applications, the presentation layer would use a GUI library to communicate with the user.
 
-\todo{explain business, persistence, and database}
+The business layer is the logic central to the application.
+The interface to the business layer is events or queries triggered by the presentation layer.
+It's the responsibility of the business layer to determine the data updates or queries required to fulfil the event or query.
+
+The presentation layer is essentially a wrapper over the database, allowing more abstract data updates or queries to be made by the business layer.
+One advantage of the presentation layer using a presentation layer is it enables the database to be swapped out easily.
+
+Finally, the database layer is normally a commercial database application like MySQL, Postgres, etc. which is populated with data specific to the software.
+Figure \ref{fig:standard-form-example} is a over-engineered example of a layered architecture.
+
+\begin{figure}[H]
+\begin{code}[style=python]{presentation.code}
+import gui
+import business
+
+button = gui.make_button("Click me to add to counter")
+button.onclick(business.click)
+\end{code}
+
+\begin{code}[style=python]{business.code}
+import persistence
+
+def click():
+    persistence.click_counts.add(1)
+\end{code}
+\caption{An unnecessarily complicated example of software components separated into the standard layered form.}
+\label{fig:standard-form-example}
+\end{figure}
+
+\begin{figure}[H]
+\ContinuedFloat
+\begin{code}[style=python]{persistence.code}
+import db
+
+class ClickCounter:
+    clicks = 0
+
+    def constructor():
+        clicks = db.query("SELECT COUNT(*) FROM clicks")
+
+    def get_click():
+        return clicks
+
+    def add(amount):
+        db.query("INSERT INTO clicks (time) VALUES {{time.now}}")
+
+click_counts = ClickCounter()
+\end{code}
+\caption{An unnecessarily complicated example of software components separated into the standard layered form.}
+\end{figure}
 
 One of the key benefits afforded by a well designed layered architecture is each layer should be interchangeable.
 A typical example is an application which starts as a command line application can be adapted to a GUI application by replacing the presentation layer.
 
-
-
 \section{Deployment Variations}
 
-While the layered architecture is popular with monolithic applications, as it allows monoliths to simulate physical isolation,
-a layered architecture does not have to be monolithic.
+While the layered architecture is popular with software deployed on one machine, as it allows simulation of physical isolation,
+a layered architecture can be deployed to separate machines.
 
-Each layer can be physically deployed to separate binaries on different systems.
+Each layer can be deployed to separate binaries on separate machines.
 The most common variant of distributed deployment is separating the database layer.
 Since databases have well defined contracts and are language independent, the database layer is a natural first choice for physical separation.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \begin{tikzpicture}[component/.style={draw, anchor=center, text width=120pt}]
         \node [component](P) at (0,0)  {Presentation Layer};
@@ -79,12 +154,12 @@ Since databases have well defined contracts and are language independent, the da
     \label{fig:layered-db-separated}
 \end{figure}
 
-Of course, in a well designed system, any layer of the system could be physically separated.
+Of course, in a well designed system, any layer of the system could be physically separated with minimal difficulty.
 The presentation is another common target.
 Physically separating the presentation layer gives users the ability to only install the presentation layer and allow communication to
 other software components to occur via network communication.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \begin{tikzpicture}[component/.style={draw, anchor=center, text width=120pt}]
         \node [component](P) at (0,0)  {Presentation Layer};
@@ -107,5 +182,149 @@ This deployment form is very typical of web applications.
 The presentation layer is deployed as a HTML/JavaScript application which makes network requests to the remote business/persistence layer.
 The business/persistence layer then validates requests and makes any appropriate database updates.
 
+A much more uncommon deployment variation (Figure \ref{fig:uncommon-diagram}) separates
+the presentation layer and business layer from the persistence layer and database layer.
+An updated version of our running example is given in Figure \ref{fig:uncommon-code},
+the presentation layer remains the same but the communication between the business and persistence is now via REST.\footnote{\url{https://restfulapi.net/}}
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[component/.style={draw, anchor=center, text width=220pt}]
+        \node [component](P) at (0,0)  {Presentation Layer\hfill \color{gray}192.168.0.20};
+        \node [component](B) at (0,-1)  {Business Layer\hfill \color{gray}192.168.0.20};
+        \node [component](Pe) at (0,-2.5)  {Persistence Layer\hfill \color{gray}192.168.0.40};
+        \node [component](D) at (0,-3.5)  {Database Layer\hfill \color{gray}192.168.0.40};
+    
+        \node[draw, fit=(P) (B)](hardware1) {};
+        \node[draw, fit=(Pe) (D)](hardware2) {};
+
+        \draw (hardware1) -- (hardware2);
+    \end{tikzpicture}
+    \caption{A contrived example of a deployment variation.}
+    \label{fig:uncommon-diagram}
+\end{figure}
+
+\begin{figure}[H]
+\begin{code}[style=python]{business.code}
+import http
+
+def click():
+    http.post(
+        address="192.168.0.40",
+        endpoint="/click/add",
+        payload=1
+    )
+\end{code}
+\caption{Code adapted for the contrived example of a deployment variation.}
+\label{fig:uncommon-code}
+\end{figure}
+
+\begin{figure}[H]
+\ContinuedFloat
+\begin{code}[style=python]{persistence.code}
+import db
+import http
+
+class ClickCounter:
+    ... # as above
+
+click_counts = ClickCounter()
+
+http.on(
+    method="post",
+    endpoint="/click/add",
+    action=(payload => click_counts.add(payload))
+)
+\end{code}
+\caption{Code adapted for the contrived example of a deployment variation.}
+\end{figure}
 
 \section{Closed/Open Layers}
+
+Separating software into layers helps to increase the modularity and isolation of distinct components.
+But, of course, components must communicate via their specified contracts, otherwise they wouldn't be particularly useful.
+Flows of communication between components are categorized as either \textsl{open} or \textsl{closed}.
+A layer, by default, is considered \textsl{closed}.
+Closed layers prevent the direct communication between their adjacent layers.
+Figure \ref{fig:closed-layers} shows the communication channels (as arrows) in a completely closed architecture.
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[component/.style={draw, anchor=center, text width=220pt}]
+        \node [component](P) at (0,0)  {Presentation Layer\hfill \color{gray}Closed};
+        \node [component](B) at (0,-1)  {Business Layer\hfill \color{gray}Closed};
+        \node [component](Pe) at (0,-2)  {Persistence Layer\hfill \color{gray}Closed};
+        \node [component](D) at (0,-3)  {Database Layer\hfill \color{gray}Closed};
+    
+        \node[draw, fit=(P) (D)](hardware) {};
+
+        \draw[-Latex] (P) -- (B);
+        \draw[-Latex] (B) -- (Pe);
+        \draw[-Latex] (Pe) -- (D);
+    \end{tikzpicture}
+    \caption{All layers closed requiring communication to pass through every layer.}
+    \label{fig:closed-layers}
+\end{figure}
+
+An architecture where all layers are closed enables maximum isolation.
+A change to the communication contracts of any layer will require changes to at most one other layer.
+However, there are a number of situations where an \textsl{open} layer can be useful.
+Open layers does not require communication to pass through, communication can occur `around' the layer.
+
+\todo{
+Thinking about it, I'm not sure that open and closed layers is worth teaching.
+I think variations in the physical structures of layers which enables sidecars, etc from Bass would be better.
+It's more flexible and enables more obvious examples, i.e. a logging service sidecar
+}
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[component/.style={draw, anchor=center, text width=220pt}]
+        \node [component](P) at (0,0)  {Presentation Layer\hfill \color{gray}Closed};
+        \node [component](B) at (0,-1)  {Business Layer\hfill \color{gray}Open};
+        \node [component](Pe) at (0,-2)  {Persistence Layer\hfill \color{gray}Open};
+        \node [component](D) at (0,-3)  {Database Layer\hfill \color{gray}Closed};
+    
+        \node[draw, fit=(P) (D)](hardware) {};
+
+        \draw[-Latex] (P) -- (B);
+        \draw[-Latex] (B) -- (Pe);
+        \draw[-Latex] (Pe) -- (D);
+
+        \draw[-Latex] ([xshift=10pt]P.south) -- ([xshift=10pt]Pe.north);
+        \draw[-Latex] ([xshift=30pt]P.south) -- ([xshift=30pt]D.north);
+        \draw[-Latex] ([xshift=20pt]B.south) -- ([xshift=20pt]D.north);
+    \end{tikzpicture}
+    \caption{A wolf in layer's clothing \cite{bass2013software}}
+    \label{fig:wolf}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[component/.style={draw, anchor=east, fill=gray!40}]
+        \node [component, text width=100pt](P) at (0,0)  {Presentation Layer};
+        \node [component, text width=120pt](B) at (0,-1)  {Business Layer};
+        \node [component, text width=140pt](Pe) at (0,-2)  {Persistence Layer};
+        \node [component, text width=160pt](D) at (0,-3)  {Database Layer};
+
+        \def\stairs{([xshift=-10pt]P.north west)
+                --([xshift=-10pt,yshift=-9pt]P.west)
+                --([xshift=-10pt,yshift=9pt]B.north west)
+                --([xshift=-10pt,yshift=-9pt]B.west)
+                --([xshift=-10pt,yshift=9pt]Pe.north west)
+                --([xshift=-10pt,yshift=-9pt]Pe.west)
+                --([xshift=-10pt,yshift=9pt]D.north west)
+                --([xshift=-10pt,yshift=-10pt]D.west)
+                --([xshift=-40pt]D.south west)}
+        \draw \stairs;
+    
+        \begin{scope}[on background layer]
+            \fill[gray!40] \stairs |- cycle;
+        \end{scope}
+    
+        % \node[draw, fit=(P) (D)](hardware) {};
+    \end{tikzpicture}
+    \caption{A more complicated layered architecture \cite{bass2013software} \todo{Figure is an example of a variation on open/closed layer model (fig 13.2 in bass - reconstruction in progress)}}
+    \label{fig:complicated-layers}
+\end{figure}
+

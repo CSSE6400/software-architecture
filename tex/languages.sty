@@ -1,4 +1,6 @@
 \definecolor{shadecolor}{rgb}{0.9,0.9,0.9}
+\definecolor{titlecolor}{rgb}{0.3,0.3,0.3}
+\definecolor{titleborder}{rgb}{0.6,0.6,0.6}
 \usepackage{framed}
 
 
@@ -9,28 +11,64 @@
 \definecolor{lightgreen}{HTML}{669900}
 \definecolor{bluegreen}{HTML}{33997e}
 
-\lstdefinelanguage{docker}{
-    keywords={FROM, RUN, COPY, ADD, ENTRYPOINT, CMD,  ENV, ARG, WORKDIR, EXPOSE, LABEL, USER, VOLUME, STOPSIGNAL, ONBUILD, MAINTAINER},
+\lstset{
     keywordstyle=\color{lightblue}\bfseries,
     identifierstyle=\color{black},
-    sensitive=false,
-    comment=[l]{\#},
     commentstyle=\color{bluegreen}\ttfamily,
     stringstyle=\color{lightgreen}\ttfamily,
+    showstringspaces=false,
+    upquote=true
+}
+
+\lstdefinelanguage{docker}{
+    keywords={FROM, RUN, COPY, ADD, ENTRYPOINT, CMD,  ENV, ARG, WORKDIR, EXPOSE, LABEL, USER, VOLUME, STOPSIGNAL, ONBUILD, MAINTAINER},
+    sensitive=false,
+    comment=[l]{\#},
     morestring=[b]',
     morestring=[b]"
 }
 
 \lstdefinelanguage{shell}{
     otherkeywords={>>},
-    keywordstyle=\color{lightblue}\bfseries,
-    identifierstyle=\color{black},
     sensitive=false,
     comment=[l]{\#},
-    commentstyle=\color{bluegreen}\ttfamily,
-    stringstyle=\color{lightgreen}\ttfamily,
     morestring=[b]',
     morestring=[b]"
+}
+
+\lstdefinelanguage{lambda}{
+  morekeywords={
+    if,then,else,fix,let
+  },
+  morekeywords={[2]int},
+  otherkeywords={:},
+  literate={
+    {->}{{$\to$}}{2}
+    {lambda}{{{\color{lightblue}\bfseries$\lambda$}}}{1}
+    {type}{{$\tau$}}{1}
+  },
+  keepspaces,
+  mathescape,
+}
+
+\lstdefinelanguage{terraform}{
+    basicstyle=\normalfont\ttfamily,
+    keywords = [2]{resource, string, enum, list},
+    showstringspaces=false,
+    breaklines=true,
+    morecomment=[l]{\#},
+    morestring=[b]",
+}
+
+\lstdefinelanguage{javascript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
 }
 
 \lstdefinestyle{clang}{
@@ -64,3 +102,40 @@
     language=python
 }
 
+\usepackage{xifthen}
+
+\newcommand{\codeheader}[2][]{
+    \ifthenelse{\isempty{#2}}{}{
+        \setlength{\FrameSep}{3pt}
+        {\hspace{-3pt}\ttfamily\color{titlecolor} \shaded >> cat #2 \endshaded}
+    }
+    \lstset{
+        numbers=left,
+        numberstyle=\ttfamily\tiny\color{gray},
+        numberblanklines=false,
+        #1
+    }\setlength{\FrameSep}{3pt}
+    \ifthenelse{\isempty{#2}}{}{
+        \vspace{-\baselineskip}
+        \vspace{-\baselineskip}
+    }
+}
+
+\lstnewenvironment{code}[2][]{
+    \codeheader[#1]{#2}
+    \shaded}
+    {\endshaded}
+
+\newcommand{\codefile}[3][]{
+    \codeheader[]{#2}
+    \shaded
+    \lstinputlisting[#1]{#3}
+    \endshaded
+}
+
+\newcommand{\codeline}[3][]{
+    \codeheader[]{#2}
+    \shaded
+    \lstinline[#1]{#3}
+    \endshaded
+}

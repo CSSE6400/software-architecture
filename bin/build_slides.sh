@@ -9,7 +9,11 @@ for folder in ${REPO_ROOT}/slides/*; do
     echo $folder
     if [[ -f "${folder}/latexmkrc" ]]; then
         pushd $folder;
-        latexmk
+        latexmk -halt-on-error
+        if [ $? -ne 0 ]; then
+            echo "error: $(basename $folder) slides failed to build"
+            exit 1
+        fi
         cp ./out/main.pdf "${REPO_ROOT}/dist/slides/$(basename $folder).pdf"
         popd
     fi

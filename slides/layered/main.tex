@@ -1,0 +1,100 @@
+\documentclass{slide}
+
+\title{Layered Architecture}
+\subtitle{CSSE6400}
+\author{Richard Thomas}
+\date{The Future}
+
+\usepackage{languages}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{fit}
+\usetikzlibrary{arrows.meta}
+
+\begin{document}
+
+\maketitle
+
+\quote[Shrek]{Ogres are like onions.\\
+\highlight{Orgres have layers}, onions have layers...\\
+You get it? We both have layers.}
+
+\point[In the beginning...]{There was the big ball of mud \cite{ballofmud}}
+
+\begin{frame}[fragile]
+\begin{code}[style=python]{}
+import gui
+import database
+
+button = gui.make_button("Click me to add to counter")
+button.onclick(e => 
+    database.query("INSERT INTO clicks (time) VALUES {{e.time}}"))
+\end{code}
+\end{frame}
+
+\point[Problem]{Any change can affect any other part of the software.}
+
+\point[``Solution'']{Layered architecture}
+
+\begin{frame}
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[component/.style={draw, anchor=center, text width=120pt}]
+        \node [component](P) at (0,0)  {{\only<2>{\color{focus}} Presentation} Layer};
+        \node [component] at (0,-1)  {{\only<3>{\color{focus}} Business} Layer};
+        \node [component] at (0,-2)  {{\only<4>{\color{focus}} Persistence} Layer};
+        \node [component](D) at (0,-3)  {{\only<5>{\color{focus}} Database} Layer};
+    
+        \node[draw, fit=(P) (D)](hardware) {};
+    \end{tikzpicture}
+    \caption{The \highlight{traditional} specialized components of a layered architecture.}
+    \label{fig:traditional-layered}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{code}[style=python]{presentation.code}
+import gui
+import business
+
+button = gui.make_button("Click me to add to counter")
+button.onclick(business.click)
+\end{code}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{code}[style=python]{business.code}
+import persistence
+
+def click():
+    persistence.click_counts.add(1)
+\end{code}
+\end{frame}
+
+\begin{frame}[fragile]
+\small
+\begin{code}[style=python,captionpos=t]{persistence.code}
+import db
+
+class ClickCounter:
+    clicks = 0
+
+    def constructor():
+        clicks = db.query("SELECT COUNT(*) FROM clicks")
+
+    def get_click():
+        return clicks
+
+    def add(amount):
+        db.query("INSERT INTO clicks (time) VALUES {{time.now}}")
+
+click_counts = ClickCounter()
+\end{code}
+\end{frame}
+
+\questionanswer{Can you identify an example of layered architecture?}{Pick any website.}
+
+\references{articles,books}
+
+\end{document}

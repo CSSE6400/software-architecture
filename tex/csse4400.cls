@@ -131,3 +131,11 @@
 
 \newenvironment{drafting}
     {\begin{tcolorbox}\color{blue} draft (\today~\currenttime)\\}{\end{tcolorbox}}
+
+\definecolor{aside}{RGB}{120, 128, 181}
+
+\newcommand\aside[1]{
+    \begin{tcolorbox}[title=Aside]
+    #1
+    \end{tcolorbox}
+}
