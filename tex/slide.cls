@@ -21,10 +21,12 @@
 \setbeamercolor{description item}{fg=secondary}
 
 \setbeamercolor{caption name}{fg=primary}
+\setbeamercolor{local structure}{fg=secondary}
 
 \let\oldcite\cite
 \renewcommand{\cite}[1]{{\color{primary}\oldcite{#1}}}
 
+\setbeamertemplate{itemize items}[circle]
 
 % Fonts
 \RequirePackage[sfdefault]{cabin}
