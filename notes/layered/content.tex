@@ -14,6 +14,8 @@ Akin to a program which primarily uses global variables,
 it is hard, if not impossible,
 to understand everything that is happening or could happen.
 
+\todo{Monolith is technically before layered architecture and monolith $\neq$ big ball of mud}
+
 \aside{
 Code examples in these notes are works of fiction.
 Any resemblance to a working code is pure coincidence.
@@ -39,7 +41,7 @@ However, it does not work well at scale.
 
 The first architectural style we will investigate is a layered architecture.
 Layered architecture (also called multi-tier or tiered architecture) 
-partitions software into specialized components and restricts how those components can communicate with each other.
+partitions software into specialised components and restricts how those components can communicate with each other.
 A layered architecture creates superficial boundaries between the software components, or layers.
 Often component boundaries aren't enforced by the technology but by architectural policy.
 
@@ -60,7 +62,7 @@ Furthermore, when a layer needs to be replaced or rewritten, it can be safely su
 
     \node[draw, fit=(P) (D)](hardware) {};
 \end{tikzpicture}
-\caption{The traditional specialized components of a layered architecture.}
+\caption{The traditional specialised components of a layered architecture.}
 \label{fig:traditional-layered}
 \end{figure}
 
@@ -78,8 +80,8 @@ The business layer is the logic central to the application.
 The interface to the business layer is events or queries triggered by the presentation layer.
 It's the responsibility of the business layer to determine the data updates or queries required to fulfil the event or query.
 
-The presentation layer is essentially a wrapper over the database, allowing more abstract data updates or queries to be made by the business layer.
-One advantage of the presentation layer using a presentation layer is it enables the database to be swapped out easily.
+The persistence layer is essentially a wrapper over the database, allowing more abstract data updates or queries to be made by the business layer.
+One advantage of the persistence layer is it enables the database to be swapped out easily.
 
 Finally, the database layer is normally a commercial database application like MySQL, Postgres, etc. which is populated with data specific to the software.
 Figure \ref{fig:standard-form-example} is a over-engineered example of a layered architecture.
@@ -126,12 +128,12 @@ click_counts = ClickCounter()
 \end{figure}
 
 One of the key benefits afforded by a well designed layered architecture is each layer should be interchangeable.
-A typical example is an application which starts as a command line application can be adapted to a GUI application by replacing the presentation layer.
+A typical example is an application which starts as a command line application but can later be adapted to a GUI application by just replacing the presentation layer.
 
 \section{Deployment Variations}
 
-While the layered architecture is popular with software deployed on one machine, as it allows simulation of physical isolation,
-a layered architecture can be deployed to separate machines.
+While the layered architecture is popular with software deployed on one machine (a non-distributed system),
+layered architectures are also often deployed to separate machines.
 
 Each layer can be deployed to separate binaries on separate machines.
 The most common variant of distributed deployment is separating the database layer.
@@ -179,8 +181,8 @@ other software components to occur via network communication.
 \end{figure}
 
 This deployment form is very typical of web applications.
-The presentation layer is deployed as a HTML/JavaScript application which makes network requests to the remote business/persistence layer.
-The business/persistence layer then validates requests and makes any appropriate database updates.
+The presentation layer is deployed as a HTML/JavaScript application which makes network requests to the remote business layer.
+The business layer then validates requests and makes any appropriate data updates.
 
 A much more uncommon deployment variation (Figure \ref{fig:uncommon-diagram}) separates
 the presentation layer and business layer from the persistence layer and database layer.
@@ -269,7 +271,7 @@ Figure \ref{fig:closed-layers} shows the communication channels (as arrows) in a
 An architecture where all layers are closed enables maximum isolation.
 A change to the communication contracts of any layer will require changes to at most one other layer.
 However, there are a number of situations where an \textsl{open} layer can be useful.
-Open layers does not require communication to pass through, communication can occur `around' the layer.
+Open layers do not require communication to pass through, communication can occur `around' the layer.
 
 \todo{
 Thinking about it, I'm not sure that open and closed layers is worth teaching.
