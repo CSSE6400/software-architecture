@@ -15,3 +15,4 @@ tlmgr install stackengine
 tlmgr install xifthen
 tlmgr install ifmtarg
 tlmgr install enumitem
+tlmgr install cjk
