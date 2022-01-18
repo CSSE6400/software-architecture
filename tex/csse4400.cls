@@ -1,6 +1,6 @@
 \RequirePackage{xspace}
 \newcommand{\thecourse}{Software Architecture\xspace}
-\newcommand{\thecoursecode}{CSSE4400\xspace}
+\newcommand{\thecoursecode}{CSSE6400\xspace}
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{csse4400}[2022/01/01 \thecourse]
