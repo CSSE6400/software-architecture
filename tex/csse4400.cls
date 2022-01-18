@@ -139,3 +139,7 @@
     #1
     \end{tcolorbox}
 }
+
+\newcommand{\link}[2]{%
+\href{#2}{#1}\footnote{\url{#2}}%
+}
