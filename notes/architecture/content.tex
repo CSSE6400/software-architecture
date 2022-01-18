@@ -7,7 +7,7 @@ An introduction to Software Architecture would be incomplete without the requisi
 exploration into the term `software architecture'.
 The term is often overloaded to describe a number of completely detached concepts.
 The overloaded nature of the term makes an introduction quite challenging.
-Martin Fowler wrestles with this difficultly in his talk on ``Making Architecture Matter''.\footnote{\url{https://www.youtube.com/watch?v=DngAZyWMGR0}}
+Martin Fowler wrestles with this difficultly in his talk on \link{``Making Architecture Matter''}{https://www.youtube.com/watch?v=DngAZyWMGR0}.
 In the talk Fowler settles on the slightly vague definition from Ralph Johnson \cite{fowler-what-is-architecture}:
 
 \begin{definition}[Software Architecture]
@@ -23,20 +23,82 @@ This is purely the definition used to provide an appropriate scope for the cours
 The set of tools, processes, and design patterns which enable me to deliver high quality software
 \end{definition}
 
-\todo{Insert content about high quality software}
+\section{High Quality Software}
+We assume that as software engineers you wish to deliver high quality software systems.
+The issue is that ``quality'', like ``beauty,'' is in the eye of the beholder.
+As a diligent and enthusiastic software engineer, you may think that ``high quality'' means well designed software with few defects.
+On the other hand, your users may think that ``high quality'' means an engaging user experience, with no defects.
+While your project sponsor, who is funding the project, may think that ``high quality'' means the software includes all the features they requested.
+Rarely is there enough time and money available to deliver everything to the highest standard.
+The development team has to balance competing expectations and priorities to develop a software system that is a good compromise and meets its key goals.
 
-\section{Quality Attributes}
-Software requirements are defined by their functional and non-functional requirements.
-The functional requirements specify what the software should do, this is the usual requirements of software.
-On the other hand, non-functional requirements specify properties required for the project to be successful.
-Non-functional requirements are termed Quality Attributes.
+From the perspective of designing a software architecture, competing expectations provides what are sometimes called \textit{architectural drivers}.
+
+\subsection{Functional Requirements}
+A seemingly obvious driver is the functional requirements for the software system, i.e. what the software should do.
+If you do not know what the software is meant to do, how can you design it?
+You do not need an extensive and in-depth description of every small feature of the software,
+but you do need to know what problem the software is meant to solve, who are the key users,
+and what are the key features of the software.
+Without this information, you do not know what style of architecture is going to be appropriate for the software system.
+
+For example, consider an application that allows users to write and save notes with embedded images and videos.
+Say the decision was made to implement it as a simple mobile app that saves notes locally.
+If it is then decided that web and desktop applications are needed, allowing users to sync their notes across applications and share notes with others,
+the application will need to redesigned from scratch.
+Knowing up-front that the software needed to support multiple platforms, and that syncing and sharing notes was important, 
+would have allowed the developers to design a software architecture that would support this from the start.\footnote{This is different to building a quick-and-dirty prototype
+to explore options. That is a valid design process, and in that case minimal effort will be put into creating a well-designed app.}
+
+\subsection{Constraints}
+Constraints are external factors that are imposed on the development project.
+Commonly, these are imposed by the organisation for whom you are building the software system.
+The most obvious constraint is time and budget. A sophisticated software architecture will take more
+time, and consume more of the total budget, than a simple but less flexible architecture.
+
+Other common constraints are technology, people and the organisation's environment.
+Technology constraints are one of the most common set of constraints that affect the design of the architecture.
+Even if it is a ``greenfields'' project\footnote{This refers to the idea that it is a new project and is not limited by
+needing to conform to existing system's or expectations.}
+there will usually be restrictions on choices of technology that may or may not be used.
+For example, if all of the organisations existing applications are running on the Google cloud platform,
+there will probably be a restriction requiring all new applications to be built on the same platform
+to avoid the overheads of working with different cloud providers.
+
+People constraints takes into consideration the skills that are available within the organisation and the availability of developers for the project.
+Designing an architecture that requires skills that are not available, will add an overhead to the project's development cost.
+If contractors can be hired, or training is available, that may reduce the overhead but the decision needs to be made based on the risks and benefits.
+
+The organisation's environment may influence other constraints, or add new constraints.
+An organisation that encourages innovation may be flexible in allowing some technology constraints to be broken.
+If the project is of strategic value to the business, there may be options to negotiate for a larger budget or to adopt
+a new technology, if they could lead to a more robust solution with a longer lifespan.
+Politics can introduce constraints on architectural choices.
+If there is an influential group who promote a particular architectural style, it may be difficult or impossible to make different choices.
+
+\subsection{Principles}
+Principles are self-imposed approaches to designing the software.
+Typically these are standards that all developers are expected to follow to try to ensure the overall software design is consistent.
+From a programming perspective, coding standards and test coverage goals are examples of principles that all developers are expected to follow.
+Architectural principles typically relate to how the software should be structured and how design decisions should be made to work well with the software architecture.
+Consequently, principles usually do not influence the architecture\footnote{The exception to this is if some principles are constraints enforced by the organisation.},
+rather the architecture will influence which principles should be prioritised during software design.
+
+As an example, if the software architecture is designed to be scalable to accommodate peaks in load,
+then an architectural principle might be that software components should be stateless to allow them to be easily replicated to share the load.
+Another principle might be that an architecture that relies on an underlying object model, will adopt the SOLID design principles \cite{martin-principles-patterns}.
+
+\subsection{Quality Attributes}
+While the functional requirements specify what the software should do,
+non-functional requirements specify properties required for the project to be successful.
+These non-functional requirements are also termed \emph{quality attributes}.
 
 Often quality attributes are specified by phrases ending in -ility.
-Medical software needs reliability.
-Social media needs availability.
-Census software needs scalability.
+Medical software needs \textit{reliability}.
+Social media needs \textit{availability}.
+Census software needs \textit{scalability}.
 
-Below is a collection of non-exhaustive quality attributes to help give you an idea of what we'll be looking at in this course.
+Below is a collection of non-exhaustive quality attributes to help give you an idea of what we will be looking at in this course.
 
 \begin{description}
     \item[Modularity] Components of the software are separated into discrete modules.
@@ -58,7 +120,7 @@ One of the defining characteristics of quality attributes is that they are often
 It is a valiant yet wholly impractical pursuit to construct software which meets all quality attributes.
 
 The role of a software architect is to identify which quality attributes are crucial to the success of their project,
-and to implement practices which ensure the quality attribute is achieved.
+and to implement practices which ensure the quality attributes are achieved.
 
 The first law of software architecture as defined by Richards \cite{richards2020fundamentals} reflects the difficultly in supporting multiple quality attributes.
 
@@ -91,8 +153,8 @@ Interestingly, the outage also caused other sites such as Gmail, TikTok, and Sna
 
 This is a massive change in public expectations for software availability.
 Just \todo{when was this} years ago,
-human resources at UQ would monopolise the universities computing resources for a day each month to calculate the payroll.
-Nowadays that lack of availabilities from even the universities software systems would be completely unacceptable.
+human resources at UQ would monopolise the university's computing resources for a day each month to calculate the payroll.
+Nowadays that lack of availability from even the university's software systems would be completely unacceptable.
 The change in expectations has forced developers to adapt by designing architectures capable of supporting this heightened up-time.
 
 In addition to shifting expectations, developers now have access to a range of Infrastructure as a Service (IaaS) platforms.
