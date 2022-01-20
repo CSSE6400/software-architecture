@@ -143,3 +143,12 @@
 \newcommand{\link}[2]{%
 \href{#2}{#1}\footnote{\url{#2}}%
 }
+
+% Highlight hyperlinks in notes with colours for each type of link.
+\hypersetup{
+    colorlinks=true,
+    linkcolor=violet,
+    filecolor=purple,      
+    urlcolor=blue,
+    citecolor=black,
+}
