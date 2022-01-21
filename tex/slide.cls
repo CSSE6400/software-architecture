@@ -1,6 +1,4 @@
-\RequirePackage{xspace}
-\newcommand{\thecourse}{Software Architecture\xspace}
-\newcommand{\thecoursecode}{CSSE6400\xspace}
+\RequirePackage{common}
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{slide}[2022/01/01 \thecourse Slides]
@@ -36,7 +34,7 @@
 % Remove navigation
 \beamertemplatenavigationsymbolsempty
 
-% Custom title page -- could be better
+% Custom title page
 \defbeamertemplate*{title page}{customized}[1][]
 { \centering
   \usebeamerfont{title}\Huge{\color{primary}\inserttitle}\par
@@ -45,8 +43,9 @@
   \bigskip\vspace{3em}
   \usebeamerfont{author}{\huge\color{secondary}\insertauthor}\par
   \bigskip
-  \usebeamerfont{institute}\insertinstitute\par
+  
   \usebeamerfont{date}{\large\color{secondary}\insertdate}\par
+  {\large\color{secondary}\usebeamerfont{institute}\insertinstitute}\par
   \usebeamercolor[fg]{titlegraphic}\inserttitlegraphic
 }
 

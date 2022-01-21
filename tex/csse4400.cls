@@ -1,6 +1,4 @@
-\RequirePackage{xspace}
-\newcommand{\thecourse}{Software Architecture\xspace}
-\newcommand{\thecoursecode}{CSSE6400\xspace}
+\RequirePackage{common}
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{csse4400}[2022/01/01 \thecourse]
@@ -8,24 +6,12 @@
 \newcommand{\headlinecolor}{\normalcolor}
 \LoadClass[a4paper,12pt]{article}
 
+% Thin margins
 \RequirePackage[left=0.5 in,right=0.5 in,top=0.5in,bottom=1in]{geometry}
+
 \RequirePackage{graphicx}
 
-\RequirePackage[sfdefault]{cabin}
-\RequirePackage[T1]{fontenc}
-
-\RequirePackage{tcolorbox}
-
-\newcounter{definition}[part]
-\newenvironment{definition}[1][]
-    {\refstepcounter{definition}
-    \begin{tcolorbox}%
-    \noindent \textbf{Definition~\thedefinition. #1}
-    
-    \vspace{4pt}
-    }
-    {\end{tcolorbox}}
-
+% Pretty quotes
 \RequirePackage{xparse}
 
 \let\oldquote\quote
@@ -38,23 +24,36 @@
     \addvspace{\bigskipamount}}
 
 
+% Links
 \RequirePackage{hyperref}
-
-\newif\iflastupdated
-\lastupdatedtrue
-
-\RequirePackage{filemod}
-\RequirePackage{currfile}
-\RequirePackage[absolute]{textpos}
-
-\newcommand{\lastmodified}{%
-    \filemodprintdate{\currfilepath}%
+\newcommand{\link}[2]{%
+\href{#2}{#1}\footnote{\url{#2}}%
 }
 
+% Highlight hyperlinks in notes with colours for each type of link.
+\hypersetup{
+    colorlinks=true,
+    linkcolor=violet,
+    filecolor=purple,      
+    urlcolor=blue,
+    citecolor=black,
+}
+
+% Todo macro
+\newcommand{\todo}[1]{
+    \begin{tcolorbox}
+        {\color{red} TODO: #1}
+    \end{tcolorbox}
+}
+
+% Undo the effects of an appendix in the full notes
 \newcommand\unappendix{\par
   \setcounter{section}{0}%
   \setcounter{subsection}{0}%
   \gdef\thesection{\@arabic\c@section}}
+
+% Top of page title header
+\RequirePackage[absolute]{textpos}
 
 \renewcommand{\maketitle}{%
     \addcontentsline{toc}{part}{\@title}
@@ -73,6 +72,7 @@
     \fi
 }
 
+% Full page title
 \newcommand{\makecover}{%
 \begin{titlepage}
     \begin{center}
@@ -107,16 +107,14 @@
 \end{titlepage}
 }
 
+% Misc environments
+\RequirePackage{tcolorbox}
+
 \newcommand{\hint}[1]{
     #1
 }
 
-\newcommand{\todo}[1]{
-    \begin{tcolorbox}
-        {\color{red} TODO: #1}
-    \end{tcolorbox}
-}
-
+% Extra content? Do I use this?
 \newenvironment{extra}
     {\begin{center}\begin{tabular}{|p{0.9\textwidth}|}
     \hline\\
@@ -127,28 +125,26 @@
     \end{center}
     }
 
+% Draft box
 \RequirePackage[yyyymmdd,hhmmss]{datetime}
-
 \newenvironment{drafting}
     {\begin{tcolorbox}\color{blue} draft (\today~\currenttime)\\}{\end{tcolorbox}}
 
+% Aside
 \definecolor{aside}{RGB}{120, 128, 181}
-
 \newcommand\aside[1]{
     \begin{tcolorbox}[title=Aside]
     #1
     \end{tcolorbox}
 }
 
-\newcommand{\link}[2]{%
-\href{#2}{#1}\footnote{\url{#2}}%
-}
-
-% Highlight hyperlinks in notes with colours for each type of link.
-\hypersetup{
-    colorlinks=true,
-    linkcolor=violet,
-    filecolor=purple,      
-    urlcolor=blue,
-    citecolor=black,
-}
+% Defintion
+\newcounter{definition}[part]
+\newenvironment{definition}[1][]
+    {\refstepcounter{definition}
+    \begin{tcolorbox}%
+    \noindent \textbf{Definition~\thedefinition. #1}
+    
+    \vspace{4pt}
+    }
+    {\end{tcolorbox}}
