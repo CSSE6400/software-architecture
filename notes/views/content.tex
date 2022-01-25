@@ -122,27 +122,29 @@ Component-and-connector views describe the software's logical architecture.
 This design of the logical architecture must contain components that can be allocated appropriately to processing nodes,
 and these nodes must have communication links that enable the components to interact.
 
-\section{On-line Store Example}
+\section{On-line Store Example}\label{sec:storeExample}
 Consider a simple on-line store selling a number of different products. Customers can use both web and mobile applications to shop at the store.
 The architecture is designed to support the functional requirement that a customer can start shopping on one device and continue on another device.
 
-\subsection{Allocation View}
-Figure \ref{fig:deploymentDiagram} is an example allocation view of the system.
-It is a UML deployment diagram showing the system's physical architecture
-and some of the components that are deployed onto that structure.
+\subsection{Allocation View}\label{sec:storeAllocView}
+Figure \ref{fig:deploymentDiagram} uses a UML deployment diagram as a visual representation of the physical architecture of the system as part of the allocation view.
+The diagram also shows some of the important software components that are deployed onto parts of the physical architecture.
 For simplicity, details such as load balancing and failover are not shown in this example.
 
-\begin{figure}[h]
-    \includegraphics[trim=37 57 20 40,clip,width=\textwidth]{images/deployment_diagram.png}
-    \caption{Example allocation view for an on-line store.}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[trim=39 42 25 45,clip,width=0.85\textwidth]{images/uml/deployment_diagram.png}
+    \caption{Example physical architecture for an on-line store.}
     \label{fig:deploymentDiagram}
 \end{figure}
 
 \noindent
-There are both web and mobile applications that allow customers to shop at the store.
+There are both web and mobile applications that customers use to shop at the store.
 A J2EE server (e.g. \link{TomEE}{https://tomee.apache.org/}), running on a web server hardware platform,
-handles browser requests from customers, using the HTTP protocol over the Internet.
+handles browser requests from customers, using the HTTPS protocol over the Internet.
 A JavaScript module called \texttt{ProductAnimator} is downloaded to the customer's browser to allow them to see interactive 3d views of products.
+(\textbf{Note}, for many web applications you would not show the customer's computer and browser in the deployment diagram.
+They are only shown in this example because the \texttt{ProductAnimator} module is an important part of the overall application being developed.)
 The \texttt{ProductBrowsing} and \texttt{ShoppingCartView} components run on the J2EE server, providing those aspects of the user interaction.
 The J2EE server uses RMI\footnote{Remote Method Invocation} over a network connection to an application server.
 
@@ -188,14 +190,16 @@ Artifacts are used in this diagram to represent software that has to be packaged
 (i.e. deployed through a manifest), which corresponds to the idea of an artifact in the note above.
 An artifact is represented by a rectangle with the \guillemotleft artifact\guillemotright~keyword and the name of the artifact that is created for deployment.
 
-\subsection{Component-and-Connector View}
-Figure \ref{fig:componentDiagram} is an example component-and-connector view of a small part of the system.
-It is a UML component diagram showing the logical architecture of the components that allow customers to browse for products and add them to their shopping cart.
+\subsection{Component-and-Connector View}\label{sec:cnc_view}
+Figure \ref{fig:componentDiagram} uses a UML component diagram as a visual representation of
+the logical components that deliver system behaviour as part of the component-and-connector view.
+It models the logical architecture of the components that allow customers to browse for products, add them to their shopping cart, and purchase them.
+To keep the example manageable, this is the only part of the system that is shown in this view.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[trim=37 48 18 50,clip,width=0.75\textwidth]{images/component_diagram.png}
-    \caption{Example component-and-connector view for part of an on-line store.}
+    \includegraphics[trim=39 37 22 49,clip,width=0.77\textwidth]{images/uml/component_diagram.png}
+    \caption{Example logical architecture -- browsing for products and purchasing them.}
     \label{fig:componentDiagram}
 \end{figure}
 
@@ -225,16 +229,23 @@ This notation visualises the connection between components.
 
 Dependency arrows point from a component whose runtime behaviour depends on behaviour provided by the target component.
 
-\subsection{Module View}
-Figure \ref{fig:classDiagram} is an example module view that is a UML class diagram showing the static structure of the classes that implement the \texttt{ShoppingCart} component.
-To keep the diagram simple, most operations and attributes are not shown and only the classes and interfaces related to adding items to a shopping cart and checking out are shown.
+Boxes around groups of components are \emph{system boundary boxes}.
+They represent a logical grouping of elements in a UML diagram and can be given a name to describe the grouping.
+Colours and shading can be used to help distinguish between different logical groups.
+
+\subsection{Module View}\label{sec_moduleView}
+Figure \ref{fig:classDiagram} uses a UML class diagram as a visual representation of the static structure
+of the classes that implement the \texttt{ShoppingCart} component as part of the module view.
+Usually only architecturally significant operations and attributes are shown.
+(e.g. Operations and attributes needed to understand relationships and behaviour in the component-and-connector view.)
+And for simplicity in this diagram, only the classes and interfaces related to adding items to a shopping cart and checking out are shown.
 
 \begin{figure}[h]
     \centering
-    \begin{adjustwidth}{-9mm}{-10mm}
-        \includegraphics[trim=24 51 23 43,clip,width=0.97\paperwidth]{images/shopping_cart_class_diagram.png}
+    \begin{adjustwidth}{-10mm}{-11mm}
+        \includegraphics[trim=24 53 23 43,clip,width=0.98\paperwidth]{images/uml/shopping_cart_class_diagram.png}
     \end{adjustwidth}
-    \caption{Example module view for part of the shopping cart package in the class model.}
+    \caption{Example static structure for part of the shopping cart package in the class model.}
     \label{fig:classDiagram}
 \end{figure}
 
@@ -292,25 +303,25 @@ An additional stereotype \guillemotleft bean\guillemotright~is used to indicate 
 
 \section{C4 Model}
 Simon Brown's C4 model provides a set of abstractions that describe the static structure of the software architecture \cite{brown2022c4}.
-The C4 model provides a hierarchical set of views leading to finer levels of detail.
+The C4 model uses these abstractions in a hierarchical set of diagrams, each leading to finer levels of detail.
 The hierarchical structure is based on the idea that a software system is composed of containers, which are implemented by components, that are built using code.
 \begin{description}
-    \item[Software System] Represents something that delivers value to it users (human or other system).
-    \item[Containers] Deployable `block' of code or data that provides behaviour in the software system.
-    \item[Components] Encapsulate a group of related functionality, which is hidden behind a published interface.
+    \item[Software System] Something that delivers functional value to its users (human or other systems).
+    \item[Containers] Deployable `block' of code or data that provides behaviour as part of the software system.
+    \item[Components] Encapsulate a group of related functionality, usually hidden behind a published interface.
     \item[Code] Elements built from programming language constructs, e.g. classes, interfaces, functions, ....
 \end{description}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[trim=0 8 0 5,clip,width=0.8\textwidth]{images/c4_terminology.jpg}
-    \caption{Levels within the C4 model (figure 2.1 from \cite{brown2022c4}).}
-    \label{fig:c4terms}
-\end{figure}
+%\begin{figure}[h]
+%    \centering
+%    \includegraphics[trim=0 8 0 5,clip,width=0.7\textwidth]{images/c4_terminology.jpg}
+%    \caption{Levels within the C4 model (figure 2.1 from \cite{brown2022c4}).}
+%    \label{fig:c4terms}
+%\end{figure}
 
 \noindent
 This leads to describing the static structure of software architecture through four levels of abstraction.
-Each level provides detail about each part of the previous level.
+Each level providing detail about parts of the previous level.
 \begin{description}
     \item[Context] How the software system fits into the broader context around it.
     \item[Containers] How the containers are connected to deliver system functionality.
@@ -318,23 +329,201 @@ Each level provides detail about each part of the previous level.
     \item[Code] How the code is structured to implement a component.
 \end{description}
 
+\subsection{System Context}
+The system context provides the `big picture' perspective of the software system.
+It describes the key purpose of the system, who uses it, and with which other systems it interacts.
+The context diagram is usually a simple block diagram.
+The software system being designed typically sits in the centre of the diagram surrounded by uers and other systems.
+The intent is to set the context for thinking about the software system's architecture.
+It can also be used to communicate basic structural ideas to non-technical stakeholders.
+Figure \ref{fig:c4_context} is a context diagram for the on-line store example from section \ref{sec:storeExample}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[trim=230 240 230 270,clip,width=0.9\textwidth]{images/c4/context_diagram.png}
+    \caption{Context diagram for the on-line store.}
+    \label{fig:c4_context}
+\end{figure}
+
 \noindent
-The software system's context and container views provide an overview of the software architecture.
-The context describes the software system's scope, users and external dependencies.
-Containers describe the main structure of the software system and the technologies selected.
-Examples of containers would be web or mobile applications, databases, message buses, ....
-Decisions about how to structure containers will have major implications for how the components and code will be designed.
+Figure \ref{fig:c4_context_key} is the key to help interpret the context diagram.
+A key is important for C4 diagrams, as they do not have a formal syntax and specification like UML diagrams.
 
-The component view describes the major parts of a container and how they are connected.
-This includes the important responsibilities of each component, their public interfaces, and technology choices.
-Examples of technology choices at the component level would be using Node.js and React to implement a web application, 
-and React Native to implement the mobile apps.
+\begin{figure}[h]
+    \centering
+    \includegraphics[trim=20 15 20 15,clip,width=\textwidth]{images/c4/context_diagram-key.png}
+    \caption{Context diagram key.}
+    \label{fig:c4_context_key}
+\end{figure}
 
+\noindent
+The context diagram situates the on-line store's software system in the environment in which it will be used.
 
+There are customers who shop at the on-line store, which is part of Saraha eCommerce's software ecosystem.
+The on-line store uses a data mining service that is also implemented by the company.
+The two key relationships between the on-line store and the data mining service are 
+that the on-line store sends customer browsing data to the service,
+and that the on-line store requests the data mining service to recommend products for a customer.
+
+In C4, arrows are used to indicate the main direction of the relationship, not the flow of data.
+So, in this example, the arrow points from the on-line store to the data mining service as it is the store that manages the communication.
+
+In UML, a high-level use case diagram can be used to convey similar information to the C4 context diagram.
+Krutchen's ``4+1 View Model of Software Architecture'' \cite{4+1-model} uses this approach.
+
+\subsection{Containers}
+Container diagrams provide an overview of the software architecture.
+They describe the main structure of the software system and the technologies selected to implement these aspects of the system.
+Containers are `blocks' of code that can be independently deployed and executed.
+Examples of containers are web or mobile applications, databases, message buses, ....
+It is important to note that this is not a type of deployment diagram.
+Containers may be deployed on the same computing infrastructure or on different devices.
+While the container diagram does not explicitly show computing infrastructure, some of the infrastructure may be implied by the types of containers.
+Decisions about how containers are connected and communicate have major implications for how the components and code will be designed and deployed.
+Figure \ref{fig:c4_container_store} is a container diagram for the on-line store.
+
+\begin{figure}[h!]
+    \centering
+    \begin{adjustwidth}{-5mm}{-5mm}
+        \includegraphics[trim=250 226 286 258,clip,width=0.92\paperwidth]{images/c4/store_container_diagram.png}
+    \end{adjustwidth}
+    \caption{Container diagram for the on-line store software system.}
+    \label{fig:c4_container_store}
+\end{figure}
+
+\noindent
+Customers can access the on-line store through either web or mobile applications.
+The \texttt{Interactive Web Pages} container indicates that some of the web application's behaviour is delivered in a separate container.
+This indicates similar information as in figure \ref{fig:deploymentDiagram},
+where the customer's computer and browser were included in the deployment diagram to show that a JavaScript component was to be deployed to run in the browser.
+
+The web and mobile applications both communicate with the application backend, via different protocols, to provide the logical behaviour of the on-line store.
+The backend uses JPA to perform database operations on the application's database.
+
+To provide a link to the context diagram, a container diagram usually shows which containers communicate with which external elements.
+The text inside the square brackets in a container, and on a relationship, indicates the technology used to implement that container or relationship.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[trim=24 21 98 26,clip,width=0.87\textwidth]{images/c4/container_diagram-key.png}
+    \caption{Container diagram key.}
+    \label{fig:c4_container_key}
+\end{figure}
+
+\noindent
+While a container diagram does not explicitly show computing infrastructure, some of it can be implied by the types of containers in the diagram.
+Clearly, the mobile app and the code running in the interactive web pages have to be separate computing platforms to the rest of the on-line store's software system.
+Colours and icons can be used to provide further information in the diagrams.
+The diagram key can explain the purpose of each icon and colour.
+UML also allows you to use icons and colours to add further information to a model, it is just difficult to do in many UML modelling tools.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[trim=185 185 185 185,clip,width=\textwidth]{images/c4/datamining_container_diagram.png}
+    \caption{Container diagram for the data mining service software system.}
+    \label{fig:c4_container_datamining}
+\end{figure}
+
+\noindent
+The data mining service software system has three main containers.
+
+\texttt{Data Mining Interface} provides the interface used to interact with the data mining service.
+It accepts data to store for future data mining.
+It returns suggestions based on requests from external systems, such as the on-line store.
+
+\texttt{Data Mining Process} performs the data mining logic.
+
+\texttt{Data Warehouse} stores the data and provides an SQL-based query system to manipulate the data.
+
+\subsection{Components}
+Component diagrams describe the major parts of containers and how they are connected.
+Components should describe their important responsibilities and the technology used to implement them
+(e.g. using React to implement a web frontend component).
+Like a container diagram, a component diagram can include elements from higher level diagrams
+to provide context of how the components interact with elements outside of the container.
+
+\begin{figure}[h!]
+    \centering
+    \begin{adjustwidth}{-5mm}{-5mm}
+        \includegraphics[trim=190 185 197 198,clip,width=0.92\paperwidth]{images/c4/appbackend_component_diagram.png}
+    \end{adjustwidth}
+    \caption{Component diagram for the application backend container.}
+    \label{fig:c4_component_appbackend}
+\end{figure}
+
+In figure \ref{fig:c4_component_appbackend}, the application backend is divided into five main components.
+The \texttt{Shopping Cart} component provides the backend logic of implementing a shopping cart.
+The web application interacts with the \texttt{Shopping Cart} component via RMI.
+The \texttt{Shopping Cart} component would provide interfaces for this interaction.
+The mobile applications use a REST API provided by the \texttt{Shopping Cart Controller} component to interact with the \texttt{Shopping Cart}.
+\texttt{Shopping Cart} uses the \texttt{Product}, \texttt{Order} and \texttt{Customer} components to deliver its behaviour.
+These are all implemented as Java beans.
+
+The \texttt{Product}, \texttt{Order} and \texttt{Customer} components use JPA to retrieve and store data in the application database.
+(As indicated in section \ref{sec:cnc_view}, we are only showing the components related to managing the shopping cart.)
+
+\pagebreak
+\noindent
+Figure \ref{fig:c4_component_webapp}, shows the components that provide the frontend behaviour
+of browsing for products, adding them to the shopping cart and purchasing them.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[trim=190 193 190 195,clip,width=0.6\textwidth]{images/c4/webapp_component_diagram.png}
+    \caption{Component diagram for the web application container.}
+    \label{fig:c4_component_webapp}
+\end{figure}
+
+\noindent
+Figure \ref{fig:c4_component_browser}, shows that the \texttt{Product Animator} component
+is downloaded from the web application to the customer's browser and that it is implemented in JavaScript.
+This provides similar information about the \texttt{Product Animator} component, as described in section \ref{sec:storeAllocView}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[trim=245 265 245 270,clip,width=0.6\textwidth]{images/c4/browser_component_diagram.png}
+    \caption{Component diagram for the interactive web pages container.}
+    \label{fig:c4_component_browser}
+\end{figure}
+
+\pagebreak
+\noindent
+Figure \ref{fig:c4_component_key}, shows the icons and colours used to represent different elements in the component diagrams.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[trim=15 210 90 20,clip,width=\textwidth]{images/c4/component_diagram-key.png}
+    \caption{Component diagram key.}
+    \label{fig:c4_component_key}
+\end{figure}
+
+\subsubsection{Component Diagram Detail}
+There may be some components that are important parts of the software design, but which may not necessarily be included in component diagrams.
+For example, a logging component is an important part of many software systems.
+But, due to the nature of a logging component, most other components will use it.
+Adding it to component diagrams will often clutter the diagrams without adding much useful information.
+Usually it is better to add a note indicating which logging component is used in the system.
+If it is helpful to indicate which components use the logging component,
+it may be better to colour code these components or use an icon to represent that they use the logging component.
+
+\subsection{Code}
+The code-level diagrams describe the structure of the code that implements a component.
+The intent is to provide a visual representation of the important aspects of the code's structure.
+Rarely do you need to provide all the detail that replicates the source code.
+(The source code could be considered a fifth level to the C4 model.)
+
+The C4 model suggests using diagrams appropriate to your programming paradigm.
+Assuming the implementation is in an object-oriented language, a UML class diagram would be an appropriate way to model the design of the code.
+Figure \ref{fig:classDiagram}, from section \ref{sec_moduleView},
+would be an example class diagram of how the \texttt{Shopping Cart} component is implemented.
+
+\subsection{Views}
+The C4 model does not explicitly include the concept of views.
+The emphasis is on the static structure of the software architecture.
+It does recommend including concepts from some views, where they provide valuable information about the architecture.
+This includes producing a deployment or infrastructure diagram to understand how a complex software system is distributed across multiple computing platforms.
 
 \section{4+1 Views}
-These notes have adopted the approach advocated by Bass et al \cite{bass2021software}.
-Other experts in the field have advocated other views to describe software architecture.
 Phillipe Krutchen was one of the earliest to advocate the idea of using views to document software architectures.
 In the article ``4+1 View Model of Software Architecture'' \cite{4+1-model} he describes five different views.
 These are logical, process, development, physical and scenario views, which are described below.
@@ -346,9 +535,9 @@ These are logical, process, development, physical and scenario views, which are 
                                     This is also known as the implementation view.
     \item[Physical] The hardware environment and deployment of software components.
                             This is also known as the deployment view.
-    \item[Scenario] Interactions between objects and between processes to deliver functional requirements.
+    \item[Scenario] The key usage scenarios that demonstrate how the architecture delivers the functional requirements.
                              This is the `+1' view as it is used to validate the software architecture.
-                             This is also known as the use case view.
+                             This is also known as the use case view, as high-level use case diagrams are used to outline the key use cases and actors.
 \end{description}
 
 \section{Conclusion}
