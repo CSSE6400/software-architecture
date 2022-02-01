@@ -5,6 +5,7 @@ workspace {
 		enterpriseBoundary = group "Saraha eCommerce" {
 			onlineStore = softwareSystem "On-line Store" "Allows customers to browse and search for items and to order them." {
 				!docs docs
+				!adrs adrs
 				webApp = container "Web Application" "Delivers the web front-end for the on-line store." "J2EE Server" {
 #					signIn = component "Sign In" "Allows customers to sign into the on-line store. Also provides customer registration." "JSF"
 #					acctMgt = component "Account Management" "Allows customers to manage their account." "JSF"
