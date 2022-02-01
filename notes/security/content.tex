@@ -15,41 +15,41 @@ As users of technology, as developers, and as architects, we all need to ensure 
 
 Learning, and for that matter, teaching, how to make software secure is no easy task.
 Every application has different flaws and risks, every attack vector and exploit is unique; managing to keep up with it all is daunting.
-None of us will ever be able to build a completely secured system but that is no reason to stop trying.
+None of us will ever be able to build a completely secure system but that is no reason to stop trying.
 As developers and architects, security should be an on-going process in the back of your minds.
 A nagging voice which constantly asks `what if?'.
 
 We introduce security first to set the example.
 As we go through this course, the principle of security will recur again and again.
 With each architecture introduced, we will stop and ask ourselves `what if?'.
-In your future careers, you should endeavour to carry this same practice.
+In your future careers, you should endeavour to continue this same practice.
 Each feature, pipeline, access control change, or code review, ask yourself, `what are the security implications?'.
 
 With that said, there are some useful principles, and a handful of best practices which we will explore.
 But again, even if you follow these practices and embody the principles,
-you will still be hopeless insecure, unless,
-you are constantly reflect on the security implications of your each and every decision.
+your applications will still be hopelessly insecure, unless,
+you constantly reflect on the security implications of your each and every decision.
 
 \section{You}
-Before we even fantasise about keeping our applications secure, let's review if you're secure right now.
+Before we even fantasise about keeping our applications secure, let's review if you are secure right now.
 As developers we often have heightened privileges and access, at times above that of even company CEOs.
-If you aren't secure, then nor is anything you work on.
+If you are not secure, then nor is anything you work on.
 Let's review some of the basics.
 
 \textbf{Keep your software up to date.}
 Are you running the latest version of your operating system?
-The latest Chrome, or Firefox, or god-forbid, Internet Explorer?
-If not then there is a good chance you are currently at risk.
+The latest Chrome, or Firefox, or god-forbid, Edge?
+If not, then there is a good chance you are currently at risk.
 Software updates, while annoying, provide vital patches to discovered exploits.
-You must to keep your software up to date.
+You must keep your software up to date.
 
 \textbf{Use multi-factor authentication.}
-This should be hard to explain to a grandmother but this should be obvious to software developers.
+This may be hard to explain to your grandmother but this should be obvious to software developers.
 One million passwords are stolen every week \cite{password-security}.
 If you don't have some sort of multi-factor authentication enabled, hackers can access your account immediately after stealing your password.
 
 \textbf{Use a password manager.}
-Following from the startling statistic of a million stolen passwords, we must seriously consider how we use passwords.
+Following from the startling statistic of a million stolen passwords per week, we must seriously consider how we use passwords.
 Our practices should be guided by the fact that at least one service we use likely stores our password insecurely.
 We should assume that our password will be compromised.
 What can we do about this?
@@ -59,8 +59,8 @@ So go through and update your passwords with randomly generated secure passwords
 
 
 \section{Principles of Securing Software}
-Okay, now that we're not a security risk ourselves, we can start considering securing the software we develop.
-Before looking at pragmatic practices, we'll develop a set of guiding principles.
+Okay, now that we are not a security risk ourselves, we can start considering how to secure the software we develop.
+Before looking at pragmatic practices, we will develop a set of guiding principles.
 These principles are far from comprehensive but they provide a useful foundation to enable discussion of our security practices.
 The principles presented in this course are derived from Saltzer and Schroeder \cite{1975-security-design-principles},
 Gasser \cite{1988-security-design-principles}, and Viega and McGeaw \cite{2001-security-design-principles}.
@@ -80,7 +80,7 @@ This protects software from intentionally malicious actors while also minimising
 
 \paragraph{Example}
 Consider a web application which lists COVID close contact locations for a state.
-We'll assume that the locations are maintained within an SQL database.
+We will assume that the locations are maintained within an SQL database.
 Assume that each time the tracing page is loaded, an SQL query is sent to the database to find all current close contact locations.
 If the developers follow the principle of least privilege, then the account used to query that data would only be able to list the current locations.
 
@@ -92,19 +92,19 @@ the account might even have access to delete existing locations.
 Since the developers have violated the principle of least privilege,
 their software is now at risk.
 If a malicious actor is able to gain database access via SQL injection, or,
-just as likely, if their software has a typo in an SQL query, the integrity of the tracing data could be jeopardised.
+just as likely, if the software has a typo in an SQL query, the integrity of the tracing data could be jeopardised.
 This could be mitigated by using the principle of least privilege and creating separate user accounts for modifying and subsequently viewing the data.
 
 \paragraph{Exemplar}
-One of the primary examples of a good application of this principle is within unix operating systems.
-In the unix operating system a sudoer (a user account which can use the sudo command) has a lot of destructive power.
+One of the primary examples of a good application of this principle is within Unix operating systems.
+In the Unix operating system, a sudoer (a user account which can use the \texttt{sudo} command) has a lot of destructive power.
 Commands running at the sudo level can do essentially anything they wish, including wiping the computer.
 However, a sudoer is not typically using these privileges.
-The user has to specify that they intend to run a command with elevated privileges
+The user has to specify that they intend to run a command with elevated privileges,
 which helps avoid accidental destruction of the computer.
 
 \paragraph{Fail-safe defaults}
-The principle of fail-safe defaults is often presented on it's own.
+The principle of fail-safe defaults is often presented on its own.
 Fail-safe defaults means that the default for access to a resource should be denied until explicit access is provided.
 We include fail-safe defaults as a property of the principle of least privilege given the strong connection.
 
@@ -115,13 +115,13 @@ Death, taxes, and computer system failure are all inevitable to some degree. Pla
 \end{quote}
 
 \noindent Computer systems fail.
-As we'll see in the course, the more complicated your software, the more often and dramatically it can be expected to fail.
+As we will see in this course, the more complicated your software, the more often and dramatically it can be expected to fail.
 The principle of failing securely asks us to stash away our optimism and become a realist for a moment.
 When designing an architecture or a piece of software, plan for the ways your software will fail.
 And when your software does fail, it should not create a security vulnerability \cite{failing-securely}.
 
 \paragraph{Example}
-An interesting example of failing securely comes from Facebook's October outage which we discussed previously.
+An interesting example of failing securely comes from Facebook's October 2021 outage which we discussed previously.
 As you may be aware, one cause of the outage was a DNS resolution issue triggered by Facebook's data centres going offline \cite{facebook-outage}.
 The DNS resolution issue meant that the internal Facebook development tools and communication channels went down as well.
 As you might expect, losing your tools and your team members makes resolving an outage far more difficult.
@@ -145,7 +145,7 @@ Regardless of the security policy you choose, it is always important to prepare 
 Simplicity is the ultimate sophistication
 \end{quote}
 
-\noindent We'll keep this principle simple.
+\noindent We will keep this principle simple.
 The principle of Keep it Simple Stupid (KISS) is needed as complicated software or processes are, more often than not, insecure.
 Simple means less can go wrong.
 
@@ -155,7 +155,7 @@ Simple means less can go wrong.
 One ought to design systems under the assumption that the enemy will immediately gain full familiarity with them.
 \end{quote}
 
-\noindent The principle of open design, also known as Kerckhoffs's principle,
+\noindent The principle of open design, also known as Kerckhoffs' principle,
 stresses that security through obscurity, or security through secrecy, does not work.
 If the security of your software relies on keeping certain implementation details secret then your system is not secure.
 Of course, there are some acceptable secrets such as private keys, however, these should still be considered a vulnerability.
@@ -172,7 +172,7 @@ Fortunately, the threat of academic misconduct is enough of a deterrent that it 
 
 The example does illustrate why the principle of open design is so frequently violated.
 In the short-term security through obscurity can work, and work well, but it is a long-term disaster waiting to happen.
-It is also common place to violate the principle slightly by trying to build systems which don't rely on secrecy but keeping the systems secret `just in case'.
+It is also common place to violate the principle slightly by trying to build systems which do not rely on secrecy but keeping the systems secret `just in case'.
 In many situations this is appropriate, however, a truly secure system should be open for community scrutiny.
 
 \subsection{Principle of Usability}
@@ -181,6 +181,7 @@ In many situations this is appropriate, however, a truly secure system should be
 TBD
 \end{quote}
 
+\noindent
 The final principle we should explore is the principle of usability, also known as `psychological acceptability'.
 This principle asks that we have realistic expectations of our users.
 If the user is made to jump through numerous hoops to securely use your application, they will find a way around it.
@@ -195,8 +196,10 @@ bypassing, in part, the intended additional security.
 
 The university through violating the principle of usability has made it more difficult for users to be secure than insecure.
 As predicted by the principle, the inconvenience leads straight to bypassing.
-Violation of this principle often has relatively minimal impacts,
+Violation of this principle often usually has relatively minimal \emph{visible} impacts,
 which results in the principle not being considered as often.
+The long-term implications are that what was an annoyance circumvented by your users,
+may become the cause of a major security breach long after the security feature was implemented.
 
 \begin{drafting}
 
