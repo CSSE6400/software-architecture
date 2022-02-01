@@ -143,8 +143,6 @@ There are both web and mobile applications that customers use to shop at the sto
 A J2EE server (e.g. \link{TomEE}{https://tomee.apache.org/}), running on a web server hardware platform,
 handles browser requests from customers, using the HTTPS protocol over the Internet.
 A JavaScript module called \texttt{ProductAnimator} is downloaded to the customer's browser to allow them to see interactive 3d views of products.
-(\textbf{Note}, for many web applications you would not show the customer's computer and browser in the deployment diagram.
-They are only shown in this example because the \texttt{ProductAnimator} module is an important part of the overall application being developed.)
 The \texttt{ProductBrowsing} and \texttt{ShoppingCartView} components run on the J2EE server, providing those aspects of the user interaction.
 The J2EE server uses RMI\footnote{Remote Method Invocation} over a network connection to an application server.
 
@@ -155,6 +153,10 @@ The application server also uses RMI over a network connection to communicate wi
 
 The data mining server uses JDBC\footnote{Java DataBase Connectivity} over a network connection to a server running the data warehouse.
 The mobile applications run on their respective phone environments and use REST API calls over the Internet to interact with application server.
+
+\textbf{Note}, for web applications the customer's computer and browser would only be shown in the deployment diagram
+if the software system downloads application logic to the browser (e.g. JavaScript).
+In this example the \texttt{ProductAnimator.js} module is an important part of the application's functional requirements.
 
 \subsubsection{Deployment Diagram Notation}\label{sec:deploymentNotation}
 In the diagram, cube icons represent \emph{nodes}. Nodes are computational resources that can execute software artifacts.
@@ -539,6 +541,55 @@ These are logical, process, development, physical and scenario views, which are 
                              This is the `+1' view as it is used to validate the software architecture.
                              This is also known as the use case view, as high-level use case diagrams are used to outline the key use cases and actors.
 \end{description}
+
+\section{Architecture Decision Records}
+Architecture decision records (ADR) are an important part of documenting software architecture.
+As the name implies, an ADR describes a decision that has been made regarding the software architecture.
+Michael Nygard was one of the early proponents of ADRs.
+His argument is that no one reads large documents but not knowing the rationale behind architecturally important decisions
+can lead to disastrous consequences, when later decisions are made that defeat the earlier decisions \cite{nygard-adr}.
+Nygard created ADRs as a light-weight approach to documenting important architecture decisions, to suit agile development processes.
+The ideas were based on Philipe Krutchen's discussion of the importance of architecture decisions in his article
+``The Decision View's Role in Software Architecture Practice'' \cite{krutchen-arch-decisions}.
+In this article Krutchen discusses extending his ``4+1 View Model of Software Architecture'' \cite{4+1-model}
+to capture the rationale for important decisions while designing each view of the architecture.
+
+Architecture decision records should capture important decisions that are made about the design of the architecture.
+These include decisions that influence the 
+\begin{itemize}[noitemsep,nolistsep]
+    \item structure of the architecture,
+    \item delivery of quality attributes,
+    \item dependencies between key parts of the architecture,
+    \item interfaces between key parts of the architecture or external interfaces, and
+    \item and implementation techniques or platforms.
+\end{itemize}
+These decisions provide important information for developers who have to work with the architecture,
+so that they know why decisions have been made and know how to design their code to fit into the architecture.
+They also provide important information for those who have to maintain the software in the future.
+ADRs help maintainers to know why decisions were made,
+so that they do not inadvertently make decisions that result in breaking expectations about the software.
+
+ADRs are short notes about a single decision.
+The intent is to make it easy to record the information about the decision, so that it is more likely to be documented.
+ADRs are usually kept with the key project documentation.
+The argument is often made that this should be within the version control system (e.g. git) holding the project's source code.
+For example, a directory \texttt{doc/architecture/adr} in the project repository to contain the ADRs.
+The C4 model recommends you create a directory in the project repository to hold the C4 diagrams
+with a subdirectory for documentation, and another subdirectory for ADRs
+(e.g. \texttt{c4-model/adrs}).
+
+Each ADR is written in a separate file, using a simple notation like markdown.
+The file names are numbered so the history of decisions can be viewed.
+It is also recommended that the file name describe the decision,
+to make it easier to scan for information about specific types of architectural decisions.
+Examples of meaningful file names include
+\begin{itemize}[noitemsep,nolistsep]
+    \item \texttt{0001-independent-business-logic.md}
+    \item \texttt{0002-implement-JSF-webapp.md}
+    \item \texttt{0003-choose-database.md}
+\end{itemize}
+The directory containing these ADR files is the history of all architectural decisions made for the project.
+
 
 \section{Conclusion}
 Architectural views help developers understand the different dimensions and details of a complex software architecture.
