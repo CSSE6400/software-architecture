@@ -43,11 +43,12 @@ Java has good support for interacting with databases, to deliver the data storag
 Advantages
 - Separation of concerns, keeping application logic and interface logic separate.
 - Ensures consistency, if business logic is only implemented in one place.
-- The business logic can execute in a computing environment optimised for processing and transactions.
-    - This also makes load balancing easier to implement.
+- Business logic can execute in a computing environment optimised for processing and transactions.
+    - Also makes load balancing easier to implement.
 
 Neutral
-- Java can deliver multiple interfaces to interact with the different frontend applications.
+- Multiple interfaces are required for different frontend applications.
+  These can be delivered through different Java libraries.
 
 Disadvantages
 - Additional complexity for the overall architecture of the system.

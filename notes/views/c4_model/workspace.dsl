@@ -1,8 +1,8 @@
 workspace {
     model {
-        customer = person "Customer" "Someone who shops at the on-line store."
+        customer = person "Customer" "Someone who shops at the Sahara on-line store."
 		
-		enterpriseBoundary = group "Saraha eCommerce" {
+		enterpriseBoundary = group "Sahara eCommerce" {
 			onlineStore = softwareSystem "On-line Store" "Allows customers to browse and search for items and to order them." {
 				!docs docs
 				!adrs adrs
@@ -15,7 +15,7 @@ workspace {
 				browserApp = container "Interactive Web Pages" "Provides the environment in which customers can view products" "JSF & JavaScript" "browser" {
 					productAnimator = component "Product Animator" "Provides interactive 3d views of products." "JavaScript"
 				}
-				appServer = container "Application Backend" "Provides backend logic for the on-line store." "Java" {
+				appBackend = container "Application Backend" "Provides backend logic for the on-line store." "Java" {
 					cart = component "Shopping Cart" "Holds products that customer may purchase." "JavaBean"
 					cust = component "Customer" "Details about a customer." "JavaBean"
 					order = component "Order" "Record of completed orders." "JavaBean"
@@ -39,15 +39,14 @@ workspace {
 		
 		webApp -> browserApp "Delivers content to the customer's browser." "HTTPS"
 		webApp -> productAnimator "Downloads to customer's browser." "HTTPS"
-		webApp -> appServer "Sends messages" "RMI"
+		webApp -> appBackend "Sends messages" "RMI"
 		browsing -> cartView "Uses"
 		browsing -> cart "Sends messages" "RMI"
 		cartView -> cart "Sends messages" "RMI"
 		
-#		mobileApp -> appServer "REST API" "JSON/HTTPS"
 		mobileApp -> cartController "REST API" "JSON/HTTPS"
 		
-		appServer -> appDB "Queries & Updates" "JPA"
+		appBackend -> appDB "Queries & Updates" "JPA"
 		cart -> cust "Uses"
 		cart -> order "Uses"
 		cart -> product "Uses"
@@ -58,8 +57,8 @@ workspace {
 		
         onlineStore -> dataMining "Customer Browsing History"
         onlineStore -> dataMining "Get Product Suggestions"
-        appServer -> dataMiningIntf "Customer Browsing History and Product Suggestions" "RMI"
-        appServer -> dataMiningIntf "Get Product Suggestion" "RMI"
+        appBackend -> dataMiningIntf "Customer Browsing History and Product Suggestions" "RMI"
+        appBackend -> dataMiningIntf "Get Product Suggestion" "RMI"
 		dataMiningIntf -> dataWarehouse "Store Customer Browsing History" "JDBC"
 		dataMiningIntf -> dataMiningProcess "Get Product Recommendations"
 		dataMiningProcess -> dataWarehouse "Perform Data Mining" "JDBC"
@@ -86,7 +85,7 @@ workspace {
 #			autoLayout lr
 		}
 		
-		component appServer "appServer_component_diagram" {
+		component appBackend "appBackend_component_diagram" {
 			include *
 #			autoLayout lr
 		}
