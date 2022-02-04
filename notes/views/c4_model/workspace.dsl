@@ -62,6 +62,47 @@ workspace {
 		dataMiningIntf -> dataWarehouse "Store Customer Browsing History" "JDBC"
 		dataMiningIntf -> dataMiningProcess "Get Product Recommendations"
 		dataMiningProcess -> dataWarehouse "Perform Data Mining" "JDBC"
+
+		deploymentEnvironment "Live" {
+            deploymentNode "Customer's Mobile Device" "" "Apple iOS or Android" {
+                liveMobileAppInstance = containerInstance mobileApp
+            }
+
+            deploymentNode "Customer's Computer" "" "MS Windows, Apple macOS or Linux" {
+                deploymentNode "Web Browser" "" "Chrome, Firefox, Safari or Edge" {
+                    liveInteractiveWebPagesInstance = containerInstance browserApp
+                }
+            }
+
+            deploymentNode "Sahara" "" "Sahara eCommerce Data Centre" {
+                deploymentNode "Web Server" "" "Ubuntu 20.04 LTS" "" 4 {
+                    deploymentNode "Apache TomEE" "" "Apache TomEE 8.0" {
+                        liveWebAppInstance = containerInstance webApp
+                    }
+                }
+				
+                deploymentNode "Application Server" "" "Ubuntu 20.04 LTS with Java 17 LTS" "" 8 {
+                    liveAppServerInstance = containerInstance appBackend
+                }
+
+                deploymentNode "Application Database Server" "" "Ubuntu 20.04 LTS" {
+                    appDatabaseServer = deploymentNode "MySQL" "" "MySQL 8.0" {
+                        liveAppDatabaseInstance = containerInstance appDB
+                    }
+                }
+
+                deploymentNode "Data Mining Server" "" "Ubuntu 20.04 LTS with Java 17 LTS" "" 2 {
+                    liveDataMiningIntfInstance = containerInstance dataMiningIntf
+                    liveDataMiningProcessInstance = containerInstance dataMiningProcess
+                }
+				
+                deploymentNode "Data Warehouse" "" "Ubuntu 20.04 LTS" "Oracle Cloud Infrastructure - Autonomous Data Warehouse" {
+                    liveDataWarehouseInstance = deploymentNode "Oracle" "" "Oracle 19c" {
+                        liveSecondaryDatabaseInstance = containerInstance dataWarehouse
+                    }
+                }
+            }
+        }
     }
 
     views {
@@ -94,6 +135,11 @@ workspace {
 			include *
 			autoLayout lr
 		}
+		
+		deployment * "Live" "live_deployment_diagram" {
+			include *
+			autoLayout lr
+		}
 
 		styles {
 			element ancillary {
@@ -121,7 +167,7 @@ workspace {
 			}
 		}
 
-        theme default
+        themes default https://static.structurizr.com/themes/oracle-cloud-infrastructure-2021.04.30/theme.json
     }
     
 }
