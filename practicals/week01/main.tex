@@ -11,16 +11,18 @@
 \maketitle
 
 \section{Before Class}
-Prior to attending class, decide on an open-source website that you would be interested in deploying.
-In this guide, we'll be deploying \link{hextris}{https://hextris.io} \cite{hextris}, an online game similar to tetris.
-You are welcome to deploy hextris, although,
-it's more interesting if you choose something which interests you.
-A few potential ideas are:
-\begin{description}
-    \item[edX] \url{https://github.com/edx/}
-    \item[DailyNotes] \url{https://github.com/m0ngr31/DailyNotes/}
-    \item[kcal] \url{https://github.com/kcal-app/kcal} 
-\end{description}
+Prior to attending class, \textbf{select an open-source website} that you would be interested in deploying.
+In this guide, we'll be deploying hextris \cite{hextris}, an online game similar to tetris.
+You may also deploy hextris, although,
+you can take the opportunity choose something which interests you.
+Note that deploying other websites is likely to be more involved than the example in the guide.
+
+Potential ideas are:
+\begin{itemize}
+    \item \textbf{edX:} \url{https://docs.tutor.overhang.io/}
+    \item \textbf{DailyNotes:} \url{https://github.com/m0ngr31/DailyNotes/}
+    \item \textbf{kcal:} \url{https://github.com/kcal-app/kcal} 
+\end{itemize}
 
 \noindent Alternatively, browse through the impressive collection here:\\ \url{https://github.com/awesome-selfhosted/awesome-selfhosted}
 
@@ -90,14 +92,14 @@ The following steps will enter the learner lab:
 
 \includegraphics[width=0.9\textwidth]{images/aws-console}
 
+\end{enumerate}
+
 \aside{A short introduction to AWS:
 Amazon Web Services (AWS) is an Infrastructure as a Service (IaaS) provider.
 They offer a collection of services which are helpful for development.
 For example, they offer virtual compute resources, database storage options, and networking to tie it all together.
 Services are offered with a pay as you go model, meaning you only pay for the seconds you use a service.
 We'll get acquainted with services offered by AWS now.}
-
-\end{enumerate}
 
 \section{AWS EC2}
 
@@ -123,22 +125,25 @@ Amazon offers a range of built-in AMIs. There are also community AMIs or you can
 As we aren't doing anything too complicated today, we'll use one of the built-in AMIs.
 
 Every AMI has a unique AMI code, something that looks like \texttt{ami-0a8b4cd432b1c3063}.
-We'll use this AMI today, it's considered one of the fundamental images.%
+We'll use this AMI today%
 \footnote{Check the requirements for your chosen website, if your website requires a specific operating system, look for it as a community AMI.
 Ask for help if you aren't sure.}
+, it's considered one of the fundamental images.
 Search for it via the code and select it.
 
 \subsection{Instance Settings}
 The next few settings for configuring your instance are:
 \begin{enumerate}
-\item We don't need a large server, just choose \texttt{t2.micro}.
-\item Keep all the `Configure Instance' settings as default.
+\item We don't need a large server, choose \texttt{t2.micro}.
+\item Keep the `Configure Instance' settings as default.
 \item Keep the `Add Storage' settings as default.
 \item Add a `Name' tag, call it the name of your website, i.e. \texttt{hextris}.
 \item Choose `Create a \textbf{new} security group'.
+\begin{enumerate}
 \item Give it a meaningful name, e.g. \texttt{hextris-http-ssh-access}.
 \item Change the description to something meaningful, e.g. \texttt{Hextris HTTP and SSH access}.
 \item Add a rule, select the \texttt{Type} as \texttt{HTTP}.
+\end{enumerate}
 \item When asked to choose a key pair, select the existing \texttt{vockey | RSA} option.
 \end{enumerate}
 
@@ -153,9 +158,10 @@ Note the public IPv4 address, we'll need to use this to connect to the server.
 
 \begin{enumerate}
     \item Return to the learner lab interface.
-    \item Run the following: \texttt{ssh -i ~/.ssh/labsuser.pem ec2-user@127.0.0.1}, replacing \texttt{127.0.0.1} with the public IP of your instance.
+    \item Run the following, replacing \texttt{127.0.0.1} with the public IP of your instance.
           This command uses the \texttt{vockey | RSA} key pair to gain SSH access to the machine.
 \end{enumerate}
+\bash{ssh -i ~/.ssh/labsuser.pem ec2-user@127.0.0.1}
 
 \section{Installing Hextris}
 Hextris is very simple to install, using an EC2 interface is perhaps overkill for it.
@@ -165,11 +171,10 @@ First, we'll need to enable the basic serving of static files.
 We can install and start the \texttt{httpd} service for this.
 The AMI we've picked uses the yum package manager, so to install httpd we run:
 
-\texttt{sudo yum install httpd}
-
-\texttt{sudo systemctl enable httpd}
-
-\texttt{sudo systemctl start httpd}
+\bash{sudo yum install httpd^^J
+\$ sudo systemctl enable httpd^^J
+\$ sudo systemctl start httpd
+}
 
 All files in the \texttt{/var/www/html} directory will now be served when accessed via HTTP.
 Change to this directory and notice that it's currently empty.
@@ -177,22 +182,26 @@ Change to this directory and notice that it's currently empty.
 Next, we'll need to download the static files to server.
 We can use git for this, but first git needs to be installed on the machine.
 
-\texttt{sudo yum install git}
+\bash{sudo yum install git}
 
 Finally, let's double check we're in the \texttt{/var/www/html} directory.
 
-\texttt{cd /var/www/html}
+\bash{cd /var/www/html}
 
 And clone the repository into that directory.
 
-\texttt{sudo git clone https://github.com/Hextris/hextris .}
+\bash{sudo git clone https://github.com/Hextris/hextris .}
 
-Now if you navigate to the \textbf{http} address of the public IP address, you should be able to see your newly deployed website.
+Now if you navigate to the \textbf{http} address of the public IP address (i.e. \url{http://18.208.165.253}), you should be able to see your newly deployed website.
 
 \section{Further Work}
 If you picked your own website to deploy, the steps for installation will likely be more involved.
 Track down those instructions and try your best to deploy the site.
 If you get stuck, ask your neighbour or your tutor.
+
+Once you've worked out how to deploy your chosen website,
+please commit an installation script or installation instructions for others to re-use:
+\url{https://github.com/CSSE6400/selfhost-instructions}
 
 \bibliographystyle{ieeetr}
 \bibliography{hextris}
