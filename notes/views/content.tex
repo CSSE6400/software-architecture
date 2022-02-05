@@ -33,7 +33,36 @@ it is critical for design to be communicated as effectively as possible.
 In addition to facilitating communication,
 architectural views also enable architectural policies to be designed and implemented.
 
-The seminal architecture book, Software Architecture in Practice \cite{bass2021software},
+\section{4+1 Views}
+Philippe Kruchten was one of the earliest to advocate the idea of using views to document software architectures.
+In the article ``4+1 View Model of Software Architecture'' \cite{4+1-model} he describes five different views.
+These are logical, process, development, physical, and scenario views, which are summarised below.
+\begin{description}
+    \item[Logical] How functionality is implemented, using class and state diagrams.
+    \item[Process] Runtime behaviour, including concurrency, distribution, performance and scalability.
+                            Sequence, communication and activity diagrams are used to describe this view.
+    \item[Development] The software structure from a developer's perspective, using package and component diagrams.
+                                    This is also known as the implementation view.
+    \item[Physical] The hardware environment and deployment of software components.
+                            This is also known as the deployment view.
+    \item[Scenario] The key usage scenarios that demonstrate how the architecture delivers the functional requirements.
+                             This is the `+1' view as it is used to validate the software architecture.
+                             This is also known as the use case view, as high-level use case diagrams are used to outline the key use cases and actors.
+\end{description}
+The experience which led to the development the 4+1 View Model was developing the air traffic control management system for Canada.
+The system provides an integrated air traffic control system for the entire Canadian airspace.
+This airspace is about double the size of the Australian airspace and borders the two busiest airspaces in the world.
+The project's architecture was designed by a team of three people led by Philippe.
+Development was done by a team of 2500 developers from two large consulting companies.
+The project was delivered on-time and on-budget, with three incremental releases in less than three years\footnote{Contrast
+this to the United States Federal Aviation Administration's Advanced Automation System project from a similar era.
+The original estimate was \$2.5 billion and fourteen years to implement.
+The project was effectively cancelled after twelve years.
+By then the estimate had almost tripled and the project was at least a decade behind schedule \cite{faa-aas}.}.
+This project also developed many of the ideas that led to the Rational Unified Process \cite{kruchten2004rational}.
+
+\section{\textit{Software Architecture in Practice} Views}
+The seminal architecture book, \textit{Software Architecture in Practice} \cite{bass2021software},
 categorises architectural views into three groups.
 These three groups each answer different questions about the architecture, specifically:
 \begin{description}
@@ -42,7 +71,7 @@ These three groups each answer different questions about the architecture, speci
     \item[Allocation Views] How the components are allocated to personnel, file stores, hardware, etc.
 \end{description}
 
-\section{Module Views}
+\subsection{Module Views}
 Module views are composed of modules, which are static units of functionality such as classes, functions, packages, or whole programs.
 The defining characteristic of a module is that it represents software responsible for some well-defined functionality.
 For example, a class which converts JSON to XML would be considered a module, as would a function which performs the same task.
@@ -93,7 +122,7 @@ class JSONtoXML:
 \caption{A simple module view of a JSON to XML program.}
 \end{figure}
 
-\section{Component-and-Connector Views}
+\subsection{Component-and-Connector Views}
 Component-and-connector views focus on the runtime, or dynamic behaviour of a system.
 Components are units which perform some computation or operation at runtime.
 These components could overlap with the modules of a module view but are often at a higher level of abstraction.
@@ -107,7 +136,7 @@ They are common because they contain runtime information which is not easily aut
 Module views can be generated after the fact, i.e. it is easy enough for a project to generate a UML inheritance diagram.
 Component-and-connector views are often something that are maintained manually by architects and developers.
 
-\section{Allocation Views}
+\subsection{Allocation Views}
 According to Bass et al, allocation views map the software's structures to the system's non-software structures \cite{bass2021software}.
 They include concepts such as who is developing which software elements,
 where are source files stored for different activities such as development and testing,
@@ -122,8 +151,8 @@ Component-and-connector views describe the software's logical architecture.
 This design of the logical architecture must contain components that can be allocated appropriately to processing nodes,
 and these nodes must have communication links that enable the components to interact.
 
-\section{On-line Store Example}\label{sec:storeExample}
-Consider a simple on-line store selling a number of different products. Customers can use both web and mobile applications to shop at the store.
+\section{Sahara eCommerce Example}\label{sec:storeExample}
+Consider an on-line store selling a number of different products. Customers can use both web and mobile applications to shop at the store.
 The architecture is designed to support the functional requirement that a customer can start shopping on one device and continue on another device.
 
 \subsection{Allocation View}\label{sec:storeAllocView}
@@ -133,7 +162,7 @@ For simplicity, details such as load balancing and failover are not shown in thi
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=39 42 25 45,clip,width=0.85\textwidth]{images/uml/deployment_diagram.png}
+    \includegraphics[trim=39 42 25 45,clip,width=0.91\textwidth]{images/uml/deployment_diagram.png}
     \caption{Example physical architecture for an on-line store.}
     \label{fig:deploymentDiagram}
 \end{figure}
@@ -154,8 +183,9 @@ The application server also uses RMI over a network connection to communicate wi
 The data mining server uses JDBC\footnote{Java DataBase Connectivity} over a network connection to a server running the data warehouse.
 The mobile applications run on their respective phone environments and use REST API calls over the Internet to interact with application server.
 
+\noindent
 \textbf{Note}, for web applications the customer's computer and browser would only be shown in the deployment diagram
-if the software system downloads application logic to the browser (e.g. JavaScript).
+if the software system downloads application logic that executes in the browser (e.g. JavaScript).
 In this example the \texttt{ProductAnimator.js} module is an important part of the application's functional requirements.
 
 \subsubsection{Deployment Diagram Notation}\label{sec:deploymentNotation}
@@ -200,12 +230,11 @@ To keep the example manageable, this is the only part of the system that is show
 
 \begin{figure}[h]
     \centering
-    \includegraphics[trim=39 37 22 49,clip,width=0.77\textwidth]{images/uml/component_diagram.png}
+    \includegraphics[trim=39 37 22 49,clip,width=0.8\textwidth]{images/uml/component_diagram.png}
     \caption{Example logical architecture -- browsing for products and purchasing them.}
     \label{fig:componentDiagram}
 \end{figure}
 
-\noindent
 As was shown in figure \ref{fig:deploymentDiagram}, the \texttt{ProductBrowsing} and \texttt{ShoppingCartView} components are deployed on the J2EE server.
 These two component provide the user interaction behaviour of browsing for products, adding them to the shopping cart, and purchasing the products.
 
@@ -217,6 +246,7 @@ These two interfaces are realised (or implemented) by the \texttt{Product} and \
 The \texttt{ShoppingCartView} component uses the \texttt{\textsl{CartCheckout}} interface, which is realised by the \texttt{ShoppingCart} component.
 These interfaces describe the communication pathways between the components on the different nodes of the physical architecture.
 
+\noindent
 The \texttt{ShoppingCart} component uses the \texttt{Product}, \texttt{Customer} and \texttt{Order} components.
 At the programming level, there could be interfaces between these components which are not shown in this diagram.
 
@@ -244,15 +274,14 @@ And for simplicity in this diagram, only the classes and interfaces related to a
 
 \begin{figure}[h]
     \centering
-    \begin{adjustwidth}{-10mm}{-11mm}
-        \includegraphics[trim=24 53 23 43,clip,width=0.98\paperwidth]{images/uml/shopping_cart_class_diagram.png}
+    \begin{adjustwidth}{-10.5mm}{-11mm}
+        \includegraphics[trim=23 53 23 43,clip,width=0.98\paperwidth]{images/uml/shopping_cart_class_diagram.png}
     \end{adjustwidth}
     \caption{Example static structure for part of the shopping cart package in the class model.}
     \label{fig:classDiagram}
 \end{figure}
 
-\noindent
-The \texttt{CartManager} and \texttt{Checkout} control classes implement, respectively, the \texttt{\textsl{ManageCart}} and \texttt{\textsl{Cart\-Checkout}} interfaces.
+The \texttt{CartManager} and \texttt{Checkout} control classes implement, respectively, the \texttt{\textsl{ManageCart}} and \texttt{\textsl{Cart\-Check\-out}} interfaces.
 These two classes implement the Façade design pattern and manage how adding items to a shopping cart and checking out are delivered by the classes in this package.
 Going back to the component and connector view (figure \ref{fig:componentDiagram}),
 when a customer, via their web browser, selects to add a product to their shopping cart,
@@ -260,6 +289,7 @@ the \texttt{ProductBrowsing} component's logic uses the \texttt{\textsl{ManageCa
 The \texttt{CartManager} class would load the product details from the application database, using the \texttt{productId} (details not shown in this diagram),
 create a \texttt{Product} object to represent it, and add that object to the \texttt{Cart} specified by the \texttt{cartId}.
 
+\noindent
 When a customer wants to checkout the products in their shopping cart, the \texttt{ShoppingCartView} component
 uses the \texttt{\textsl{Checkout}} interface's \texttt{products} operation to get a list of the product details to be displayed in the shopping cart.
 The \texttt{ProductDetails} class is a Java bean that is used to pass the data about each product to the \texttt{ShoppingCartView}.
@@ -297,7 +327,7 @@ indicates that the class is \emph{realising} (or implementing) that interface.
 In this example, the keyword \guillemotleft interface\guillemotright~indicates that the classifier is an interface.
 Stereotypes use the same notation as keywords. Three standard stereotypes for classes in UML are:
 \begin{description}[nosep,left=5mm]
-    \item[\guillemotleft entity\guillemotright] An entity (or concept) from the problem domain.
+    \item[\guillemotleft entity\guillemotright] Represents a concept (\emph{entity}) from the problem domain.
     \item[\guillemotleft control\guillemotright] Provides logical behaviour from the solution domain.
     \item[\guillemotleft boundary\guillemotright] Communicates with something outside of the system. (Not shown in diagram.)
 \end{description}
@@ -338,12 +368,12 @@ The context diagram is usually a simple block diagram.
 The software system being designed typically sits in the centre of the diagram surrounded by uers and other systems.
 The intent is to set the context for thinking about the software system's architecture.
 It can also be used to communicate basic structural ideas to non-technical stakeholders.
-Figure \ref{fig:c4_context} is a context diagram for the on-line store example from section \ref{sec:storeExample}.
+Figure \ref{fig:c4_context} is a context diagram for the Sahara eCommerce example from section \ref{sec:storeExample}.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[trim=230 240 230 270,clip,width=0.9\textwidth]{images/c4/context_diagram.png}
-    \caption{Context diagram for the on-line store.}
+    \includegraphics[trim=195 173 177 197,clip,width=\textwidth]{images/c4/context_diagram.png}
+    \caption{Context diagram for the Saraha eCommerce on-line store.}
     \label{fig:c4_context}
 \end{figure}
 
@@ -351,17 +381,19 @@ Figure \ref{fig:c4_context} is a context diagram for the on-line store example f
 Figure \ref{fig:c4_context_key} is the key to help interpret the context diagram.
 A key is important for C4 diagrams, as they do not have a formal syntax and specification like UML diagrams.
 
-\begin{figure}[h]
+\begin{figure}[h!]
     \centering
-    \includegraphics[trim=20 15 20 15,clip,width=\textwidth]{images/c4/context_diagram-key.png}
+    \begin{adjustwidth}{-7.5mm}{-7.5mm}
+        \includegraphics[trim=20 15 20 15,clip,width=0.95\paperwidth]{images/c4/context_diagram-key.png}
+    \end{adjustwidth}
     \caption{Context diagram key.}
     \label{fig:c4_context_key}
 \end{figure}
 
 \noindent
-The context diagram situates the on-line store's software system in the environment in which it will be used.
+The context diagram situates the on-line store software system in the environment in which it will be used.
 
-There are customers who shop at the on-line store, which is part of Saraha eCommerce's software ecosystem.
+There are customers who shop at the on-line store, which is part of Sahara eCommerce's software ecosystem.
 The on-line store uses a data mining service that is also implemented by the company.
 The two key relationships between the on-line store and the data mining service are 
 that the on-line store sends customer browsing data to the service,
@@ -371,7 +403,7 @@ In C4, arrows are used to indicate the main direction of the relationship, not t
 So, in this example, the arrow points from the on-line store to the data mining service as it is the store that manages the communication.
 
 In UML, a high-level use case diagram can be used to convey similar information to the C4 context diagram.
-Krutchen's ``4+1 View Model of Software Architecture'' \cite{4+1-model} uses this approach.
+Kruchten's ``4+1 View Model of Software Architecture'' \cite{4+1-model} uses this approach.
 
 \subsection{Containers}
 Container diagrams provide an overview of the software architecture.
@@ -392,6 +424,8 @@ Figure \ref{fig:c4_container_store} is a container diagram for the on-line store
     \caption{Container diagram for the on-line store software system.}
     \label{fig:c4_container_store}
 \end{figure}
+
+\newpage
 
 \noindent
 Customers can access the on-line store through either web or mobile applications.
@@ -421,7 +455,9 @@ UML also allows you to use icons and colours to add further information to a mod
 
 \begin{figure}[h]
     \centering
-    \includegraphics[trim=185 185 185 185,clip,width=\textwidth]{images/c4/datamining_container_diagram.png}
+    \begin{adjustwidth}{-5mm}{-5mm}
+        \includegraphics[trim=185 185 185 185,clip,width=0.92\paperwidth]{images/c4/datamining_container_diagram.png}
+    \end{adjustwidth}
     \caption{Container diagram for the data mining service software system.}
     \label{fig:c4_container_datamining}
 \end{figure}
@@ -446,8 +482,8 @@ to provide context of how the components interact with elements outside of the c
 
 \begin{figure}[h!]
     \centering
-    \begin{adjustwidth}{-5mm}{-5mm}
-        \includegraphics[trim=190 185 197 198,clip,width=0.92\paperwidth]{images/c4/appbackend_component_diagram.png}
+    \begin{adjustwidth}{-8.5mm}{-8.5mm}
+        \includegraphics[trim=190 185 197 198,clip,width=0.96\paperwidth]{images/c4/appbackend_component_diagram.png}
     \end{adjustwidth}
     \caption{Component diagram for the application backend container.}
     \label{fig:c4_component_appbackend}
@@ -462,7 +498,7 @@ The mobile applications use a REST API provided by the \texttt{Shopping Cart Con
 These are all implemented as Java beans.
 
 The \texttt{Product}, \texttt{Order} and \texttt{Customer} components use JPA to retrieve and store data in the application database.
-(As indicated in section \ref{sec:cnc_view}, we are only showing the components related to managing the shopping cart.)
+(As indicated in section \ref{sec:cnc_view}, only the components related to managing the shopping cart are shown in this example.)
 
 \pagebreak
 \noindent
@@ -471,7 +507,7 @@ of browsing for products, adding them to the shopping cart and purchasing them.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=190 193 190 195,clip,width=0.6\textwidth]{images/c4/webapp_component_diagram.png}
+    \includegraphics[trim=190 193 190 195,clip,width=0.65\textwidth]{images/c4/webapp_component_diagram.png}
     \caption{Component diagram for the web application container.}
     \label{fig:c4_component_webapp}
 \end{figure}
@@ -483,7 +519,7 @@ This provides similar information about the \texttt{Product Animator} component,
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=245 265 245 270,clip,width=0.6\textwidth]{images/c4/browser_component_diagram.png}
+    \includegraphics[trim=245 265 245 270,clip,width=0.65\textwidth]{images/c4/browser_component_diagram.png}
     \caption{Component diagram for the interactive web pages container.}
     \label{fig:c4_component_browser}
 \end{figure}
@@ -494,7 +530,9 @@ Figure \ref{fig:c4_component_key}, shows the icons and colours used to represent
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=15 210 90 20,clip,width=\textwidth]{images/c4/component_diagram-key.png}
+    \begin{adjustwidth}{-5mm}{-5mm}
+        \includegraphics[trim=15 210 90 20,clip,width=0.92\paperwidth]{images/c4/component_diagram-key.png}
+    \end{adjustwidth}
     \caption{Component diagram key.}
     \label{fig:c4_component_key}
 \end{figure}
@@ -525,73 +563,8 @@ The emphasis is on the static structure of the software architecture.
 It does recommend including concepts from some views, where they provide valuable information about the architecture.
 This includes producing a deployment or infrastructure diagram to understand how a complex software system is distributed across multiple computing platforms.
 
-\section{4+1 Views}
-Phillipe Krutchen was one of the earliest to advocate the idea of using views to document software architectures.
-In the article ``4+1 View Model of Software Architecture'' \cite{4+1-model} he describes five different views.
-These are logical, process, development, physical and scenario views, which are described below.
-\begin{description}
-    \item[Logical] How functionality is implemented, using class and state diagrams.
-    \item[Process] Runtime behaviour, including concurrency, distribution, performance and scalability.
-                            Sequence, communication and activity diagrams are used to describe this view.
-    \item[Development] The software structure from a developer's perspective, using package and component diagrams.
-                                    This is also known as the implementation view.
-    \item[Physical] The hardware environment and deployment of software components.
-                            This is also known as the deployment view.
-    \item[Scenario] The key usage scenarios that demonstrate how the architecture delivers the functional requirements.
-                             This is the `+1' view as it is used to validate the software architecture.
-                             This is also known as the use case view, as high-level use case diagrams are used to outline the key use cases and actors.
-\end{description}
-
-\section{Architecture Decision Records}
-Architecture decision records (ADR) are an important part of documenting software architecture.
-As the name implies, an ADR describes a decision that has been made regarding the software architecture.
-Michael Nygard was one of the early proponents of ADRs.
-His argument is that no one reads large documents but not knowing the rationale behind architecturally important decisions
-can lead to disastrous consequences, when later decisions are made that defeat the earlier decisions \cite{nygard-adr}.
-Nygard created ADRs as a light-weight approach to documenting important architecture decisions, to suit agile development processes.
-The ideas were based on Philipe Krutchen's discussion of the importance of architecture decisions in his article
-``The Decision View's Role in Software Architecture Practice'' \cite{krutchen-arch-decisions}.
-In this article Krutchen discusses extending his ``4+1 View Model of Software Architecture'' \cite{4+1-model}
-to capture the rationale for important decisions while designing each view of the architecture.
-
-Architecture decision records should capture important decisions that are made about the design of the architecture.
-These include decisions that influence the 
-\begin{itemize}[noitemsep,nolistsep]
-    \item structure of the architecture,
-    \item delivery of quality attributes,
-    \item dependencies between key parts of the architecture,
-    \item interfaces between key parts of the architecture or external interfaces, and
-    \item and implementation techniques or platforms.
-\end{itemize}
-These decisions provide important information for developers who have to work with the architecture,
-so that they know why decisions have been made and know how to design their code to fit into the architecture.
-They also provide important information for those who have to maintain the software in the future.
-ADRs help maintainers to know why decisions were made,
-so that they do not inadvertently make decisions that result in breaking expectations about the software.
-
-ADRs are short notes about a single decision.
-The intent is to make it easy to record the information about the decision, so that it is more likely to be documented.
-ADRs are usually kept with the key project documentation.
-The argument is often made that this should be within the version control system (e.g. git) holding the project's source code.
-For example, a directory \texttt{doc/architecture/adr} in the project repository to contain the ADRs.
-The C4 model recommends you create a directory in the project repository to hold the C4 diagrams
-with a subdirectory for documentation, and another subdirectory for ADRs
-(e.g. \texttt{c4-model/adrs}).
-
-Each ADR is written in a separate file, using a simple notation like markdown.
-The file names are numbered so the history of decisions can be viewed.
-It is also recommended that the file name describe the decision,
-to make it easier to scan for information about specific types of architectural decisions.
-Examples of meaningful file names include
-\begin{itemize}[noitemsep,nolistsep]
-    \item \texttt{0001-independent-business-logic.md}
-    \item \texttt{0002-implement-JSF-webapp.md}
-    \item \texttt{0003-choose-database.md}
-\end{itemize}
-The directory containing these ADR files is the history of all architectural decisions made for the project.
-
-
 \section{Conclusion}
 Architectural views help developers understand the different dimensions and details of a complex software architecture.
 As a software architect you need to choose which views provide meaningful information about your software system.
 The graphical notation used to describe a view is only one part of the view (though an important part).
+Ensure you provide enough supporting information so others will know how to work with your architecture and why you made the choices that you did.

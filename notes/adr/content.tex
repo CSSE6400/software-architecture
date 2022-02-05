@@ -1,0 +1,212 @@
+\title{Architectural Decision Records}
+\author{Richard Thomas}
+\date{\week{2}} % maybe week one?
+
+\maketitle
+
+\section{Introduction}
+
+Documenting reasons why a decision was made about some aspect of the software architecture is important for the long-term maintainability of the system.
+Architecture decision records (ADR) are a simple but informative approach to documenting these reasons.
+
+Michael Nygard was one of the early proponents of ADRs.
+His argument is that no one reads large documents but not knowing the rationale behind architecturally important decisions
+can lead to disastrous consequences, when later decisions are made that defeat the earlier decisions \cite{nygard-adr}.
+Nygard created ADRs as a light-weight approach to documenting important architecture decisions, to suit agile development processes.
+The ideas were based on Philippe Kruchten's discussion of the importance of architecture decisions in his article
+``The Decision View's Role in Software Architecture Practice'' \cite{kruchten-arch-decisions}.
+In this article Kruchten discusses extending his ``4+1 View Model of Software Architecture'' \cite{4+1-model}
+to capture the rationale for important decisions while designing each view of the architecture.
+
+Architecture decision records should capture important decisions that are made about the design of the architecture.
+These include decisions that influence the 
+\begin{itemize}[noitemsep,nolistsep]
+    \item structure of the architecture,
+    \item delivery of quality attributes,
+    \item dependencies between key parts of the architecture,
+    \item interfaces between key parts of the architecture or external interfaces, and
+    \item implementation techniques or platforms.
+\end{itemize}
+These decisions provide important information for developers who have to work with the architecture,
+so that they know why decisions have been made and know how to design their code to fit into the architecture.
+They also provide important information for those who have to maintain the software in the future.
+ADRs help maintainers to know why decisions were made,
+so that they do not inadvertently make decisions that result in breaking expectations about the software.
+
+ADRs are short notes about a single decision.
+The intent is to make it easy to record the information about the decision, so that it is more likely to be documented.
+ADRs are usually kept with the key project documentation.
+The argument is often made that this should be within the version control system (e.g. git) holding the project's source code.
+For example, a directory \texttt{doc/architecture/adr} in the project repository to contain the ADRs.
+The C4 model recommends you create a directory in the project repository to hold the C4 diagrams
+with a subdirectory for documentation, and another subdirectory for ADRs
+(e.g. \texttt{c4-model}, \texttt{c4-model/docs} and \texttt{c4-model/adrs}).
+Note that the C4 modelling tools do not like having the subdirectory containing the ADRs within the documentation subdirectory.
+
+Each ADR is written in a separate file, using a simple notation like markdown.
+The file names are numbered so the history of decisions can be viewed.
+It is recommended that the file name describe the decision,
+to make it easier to scan for information about specific types of architectural decisions.
+Examples of meaningful file names include:
+\begin{itemize}[noitemsep,nolistsep]
+    \item \texttt{0001-independent-business-logic.md}
+    \item \texttt{0002-implement-JSF-webapp.md}
+    \item \texttt{0003-choose-database.md}
+\end{itemize}
+The directory containing these ADR files is the history of all architectural decisions made for the project.
+
+\section{Template}
+There are a few templates available to help provide consistent formatting of an ADR.
+The recommended template format contains the following sections.
+\begin{description}
+    \item[Title] Short phrase that describes the key decision.
+    \item[Date] When the decision was made.
+    \item[Status] Current status of the decision (i.e. proposed, accepted, deprecated, superseded or rejected).
+    \item[Summary] Summarise the decision and its rationale.
+    \item[Context] Describe the facts that influence the decision. State these in value-neutral language.
+    \item[Decision] Explain how the decision will solve the problem, in light of the facts presented in the context.
+    \item[Consequences] Describe the impact of the decision. What becomes easier and harder to do?
+                                       There will be positive, neutral and negative consequences, identify all of them.
+\end{description}
+
+\section{ADR Example}
+The following is an example ADR from the Sahara eCommerce application from section 4 of the \textit{Architectural Views} notes.
+\newline
+
+\noindent\textbf{1. Independent Business Logic}
+
+\noindent\textbf{Date:} 2022-01-06
+
+\noindent\textbf{Status:} Accepted
+
+\noindent\textbf{Summary}\\
+\emph{In the context of} delivering an application with multiple platform interfaces,  
+\emph{facing} budget constraints on development costs,  
+\emph{we decided} to implement all business logic in an independent tier of the software architecture,  
+\emph{to achieve} consistent logical behaviour across platforms,  
+\emph{accepting} potential complexity of interfaces to different platforms.
+
+\noindent\textbf{Context}
+\begin{itemize}[noitemsep,nolistsep]
+    \item The system is to have both mobile and web application frontends.
+    \item Marketing department wants a similar user experience across platforms.
+    \item Delivering functional requirements requires complex processing and database transactions.
+    \begin{itemize}[noitemsep,nolistsep]
+        \item Product recommendations based on both a customer's history and on purchasing behaviour of similar customers.
+        \item Recording all customer interactions in the application.
+    \end{itemize}
+    \item Sales department wants customers to be able to change between using mobile and web applications without interrupting their sales experience.
+    \item Development team has experience using Java.
+\end{itemize}
+
+\noindent\textbf{Decision}\\
+All business logic will be implemented in its own tier of the software architecture.
+Web and mobile applications will implement the interaction tier.
+They will communicate with the backend to perform all logic processing.
+This provides clear separation of concerns and ensures consistency of business logic across frontend applications.
+It means the business logic only needs to be implemented once.
+This follows good design practices and common user interface design patterns.
+
+The business logic will be implemented in Java.
+This suits the current development team's experience and is a common environment.
+Java has good performance characteristices.
+Java has good support for interacting with databases, to deliver the data storage and transaction processing requirements.
+
+\filbreak
+\noindent\textbf{Consequences}\\
+Advantages
+\begin{itemize}[noitemsep,nolistsep]
+    \item Separation of concerns, keeping application logic and interface logic separate.
+    \item Ensures consistency, if business logic is only implemented in one place.
+    \item Business logic can execute in a computing environment optimised for processing and transactions.
+    \begin{itemize}[noitemsep,nolistsep]
+        \item Also makes load balancing easier to implement.
+    \end{itemize}
+\end{itemize}
+Neutral
+\begin{itemize}[noitemsep,nolistsep]
+    \item Multiple interfaces are required for different frontend applications.
+             These can be delivered through different Java libraries.
+\end{itemize}
+Disadvantages
+\begin{itemize}[noitemsep,nolistsep]
+    \item Additional complexity for the overall architecture of the system.
+\end{itemize}
+
+\section{Quality}
+A well written ADR explains the reasons for making the decision, while discussing pros and cons of the decision.
+In some cases it is helpful to explain reasons for not selecting other seemingly good options.
+The ADR should be specific about a single decision, not a group of decisions.
+
+The context should provide all the relevant facts that influence the decision.
+The decisions section should explain how business priorities or the organisation's strategic goals influenced the decision.
+Where the team's membership or skills has influenced the decision, these should be acknowledged.
+All consequences should be described.
+These may include decisions that need to be resolved later or
+links to other ADRs that record decisions that were made as a result of this decision.
+
+The summary follows the format of a Y-statement \cite{y-statement}.
+It includes key information about the decision for quick consumption, leaving the details for the rest of the ADR.
+The template for a Y-statement is:
+
+\textbf{In the context of} \emph{functional requirement or architecture characteristic},
+
+\textbf{facing} \emph{non-functional requirement or quality attribute},
+
+\textbf{we decided} \emph{selected option},
+
+\textbf{to achieve} \emph{benefits},
+
+\textbf{accepting} \emph{drawbacks}.
+
+\noindent
+The Y-statement can be expanded to include \textbf{neglected} \emph{alternative options} after the \textbf{we decided} clause.
+A \textbf{because} clause providing \emph{additional rationale} can be added to the end of the statement.
+Some teams use this expanded form of the Y-statement as the complete ADR for simple decisions.
+
+ADRs should be reviewed after about one month.
+Consider how the consequences have played out in reality.
+Revise bad decisions before too much has been built based on the decision.
+The ADR may need to be updated to include any consequences that have been uncovered in practice.
+
+ADRs should be immutable. Do not change existing information in an ADR.
+An ADR can have new information added to it, like adding new consequences.
+If the decision needs to be changed, create a new ADR.
+The original ADR should have its status changed to \emph{deprecated},
+and then \emph{superceded} once the new decision is accepted and put into practice.
+Add a link in the original ADR to the new ADR, and the new ADR should link back to the original.
+
+Sometimes an ADR is not superceded by a new ADR, instead it is extended or amended by another ADR.
+In these cases, the original ADR still has an \emph{accepted} status but
+a link is added indicating the other ADR that amends or extends the original ADR.
+The new ADR then includes a link back to the original ADR, indicating that the new ADR extends or amends the original.
+
+\filbreak
+\section{What to Put in an ADR?}
+Only document important decisions that affect the architecture's structure,
+non-functional characteristics, dependencies, interfaces, or construction techniques.
+Michael Nygard calls these ``architecturally significant'' decisions \cite{nygard-adr}.
+The types of decisions that usually should be documented are:
+\begin{itemize}[noitemsep,nolistsep]
+    \item Critical or important to delivering system functionality.
+    \item Helps deliver important quality attributes.
+    \item Unconventional or risky approach to a solution.
+    \item Has expensive consequences.
+    \item Has long lasting effects or will affect a large part of the design.
+    \item Will affect a large number of stakeholders or an important stakeholder.
+    \item Took a long time or significant effort to decide.
+    \item Unexpected decisions that were required late in the project. These may also be important learning experiences.
+\end{itemize}
+
+\section{Conclusion}
+Decisions that affect the software architecture need to be recorded for reference in the future.
+In a large project it is not possible for everyone to be aware of every decision that is made.
+ADRs provide a mechanism for team members to find reasons for decisions to help them understand how to work within its constraints.
+ADRs give new team members a starting point to learn about the architecture and understand how it evolved into its current state.
+They also provide a reminder for yourself when you are wondering why you did something a particular way,
+or when you need to explain your decision to someone else, months after you made the decision.
+
+The takeaway is, write an ADR whenever you make an important decision.
+You, or a colleague, will need to refer to it at some point in the future.
+Eli Perkins has a good summary of why you should write ADRs at the
+\link{GitHub Blog}{https://github.blog/2020-08-13-why-write-adrs/} \cite{why-write-adrs}.

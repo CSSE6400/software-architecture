@@ -20,7 +20,7 @@ Accepted
 - Project sponsor wants a rich user experience.
 - Marketing department wants a similar experience across platforms.
 - Development team has experience using Java.
-- Backend logic will be implemented in Java to cater for complex processing and database transactions.
+- Backend logic will be implemented in Java to cater for complex processing and database transactions ([ADR0001](0001-independent-business-logic.md)).
 - There are many JavaScript libraries available for web applications.
 - There are many web development frameworks available to create web applications.
 - Several popular frameworks are under rapid development and changes.
