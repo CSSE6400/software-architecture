@@ -162,7 +162,7 @@ For simplicity, details such as load balancing and failover are not shown in thi
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=39 42 25 45,clip,width=0.91\textwidth]{images/uml/deployment_diagram.png}
+    \includegraphics[trim=38 42 24 45,clip,width=0.91\textwidth]{images/uml/deployment_diagram.png}
     \caption{Example physical architecture for an on-line store.}
     \label{fig:deploymentDiagram}
 \end{figure}
@@ -558,13 +558,16 @@ Figure \ref{fig:classDiagram}, from section \ref{sec_moduleView},
 would be an example class diagram of how the \texttt{Shopping Cart} component is implemented.
 
 \subsection{Deployment}
-Deployment diagrams describe the physical architecture or infrastructure on which the system will be deployed.
-It shows which containers will run on which computing platforms.
+While not one of the ``four C's'', deployment diagrams are important for most systems.
+They describe the physical architecture or infrastructure on which the system will be deployed.
+It shows which containers will run on which computing platforms (\emph{deployment nodes}).
+Deployment nodes can be nested, as shown in figure \ref{fig:c4_deployment}.
+They may also contain infrastructure nodes or software system instances\footnote{\url{https://github.com/structurizr/dsl/blob/master/docs/language-reference.md\#deploymentNode}}.
 
 \begin{figure}[h!]
     \centering
     \begin{adjustwidth}{-6mm}{-6mm}
-        \includegraphics[trim=195 225 195 195,clip,width=0.93\paperwidth]{images/c4/deployment_diagram.png}
+        \includegraphics[trim=195 235 195 198,clip,width=0.93\paperwidth]{images/c4/deployment_diagram.png}
     \end{adjustwidth}
     \caption{Deployment diagram for the Sahara eCommerce System.}
     \label{fig:c4_deployment}
@@ -572,17 +575,96 @@ It shows which containers will run on which computing platforms.
 
 \noindent
 Figure \ref{fig:c4_deployment} is an example deployment diagram for the Sahara eCommerce example.
-It takes a different approach to the physical architecture than was shown in figure \ref{fig:deploymentDiagram}.
+It takes a slightly different approach to the physical architecture than was shown in figure \ref{fig:deploymentDiagram}.
+It shows that the on-line store software system runs in Sahara's data centre.
+The data mining service runs on Oracle's cloud infrastructure.
+There are still the apps running on mobile devices and the code running in the customer's browser.
 
-\subsection{Views}
-The C4 model does not explicitly include the concept of views.
-The emphasis is on the static structure of the software architecture.
-It does recommend including concepts from some views, where they provide valuable information about the architecture.
-This includes describing the computing infrastructure and how the software will be deployed on that infrastructure.
-For complex systems a diagram usually helps visualise the infrastructure and deployment details.
+Like UML, a software environment is embedded in the hardware environment on which it runs.
+The web application runs in an Apache TomEE J2EE server, which is running on a Ubuntu server.
+The ``\texttt{x4}'' inside the web server deployment node indicates that there will be four of these servers to share the load.
+The application backend runs on eight Ubuntu servers, providing the core business logic shared by the web and mobile applications.
+The application database runs in MySQL on its own Ubuntu server.
+The application database is replicated to a secondary database running on another server to allow for failover.
+
+In this version of the example, the application backend communicates with the data mining service
+through an API published by the data mining interface running on a virtual machine in Oracle's cloud infrastructure.
+The data mining service uses Oracle's machine learning services to perform the data mining.
+Oracle's cloud-based data warehouse infrastructure is used to hold all the data.
+
+Figure \ref{fig:c4_deployment_key} is the key describing the symbols and colours used in the deployment diagram.
+
+\begin{figure}[h!]
+    \centering
+    \begin{adjustwidth}{-5mm}{-5mm}
+        \includegraphics[trim=22 210 22 24,clip,width=0.92\paperwidth]{images/c4/deployment_diagram-key.png}
+    \end{adjustwidth}
+    \caption{Deployment diagram key.}
+    \label{fig:c4_deployment_key}
+\end{figure}
+
+\section{Tools}
+We do not advocate a specific notation or support tools.
+Both UML and C4 have been used so that you are aware of some options.
+UML is a standardised notation, with formal syntax and semantics.
+There will be situations where the formality will be useful.
+C4 is popular because it has a basic structure, but the rules are intentionally loose to make it easy to adopt.
+
+Regardless of whether you use UML, C4 or another notation, you should use tools to aid the creation of your diagrams and documentation.
+The important thing is that you want to use a modelling tool, not a drawing tool.
+Many drawing tools provide UML templates, and some also support C4.
+The issue with drawing tools is that they do not know what the elements of the diagram mean.
+If the name of an operation in a class is changed in a drawing tool, you will need to manually change it wherever it is referenced in other diagrams
+(e.g. in sequence diagrams).
+A modelling tool will track the information that describes the model, so that a change to a model element in one place,
+will be replicated wherever that element appears in any other diagrams.
+
+There are many tools that support UML.
+In a commercial project using UML on a large system, the cost of professional UML tools is negligible and is quickly recovered by the automation they provide.
+There are a number of free UML tools. Some to consider are \link{Astah}{https://astah.net/products/free-student-license/},
+\link{ModelIO}{https://www.modelio.org/} or \link{PlantUML}{https://plantuml.com/}.
+ \begin{description}[nosep]
+    \item[Astah] Is a commercial product that supports modelling in many notations. They provide a free UML tool for students.
+    \item[ModelIO] Is an open source UML modelling tool.
+    \item[PlantUML] Is an open source text-based descriptive language that generates UML diagrams.
+                              \link{PlantText}{https://www.planttext.com/} is an online tool supporting it.
+\end{description}
+
+There are fewer tools that support C4.
+\link{Structurizr}{https://www.structurizr.com/} was developed by Simon Brown as a tool to support generating C4 diagrams from textual descriptions.
+It is an \link{open source tool}{https://github.com/structurizr/}.
+You can use a domain specific language to describe a C4 model, or you can embed the details in Java or .Net code.
+There is also \link{C4-PlantUML}{https://github.com/plantuml-stdlib/C4-PlantUML}, which extends PlantUML to support C4.
 
 \section{Conclusion}
-Architectural views help developers understand the different dimensions and details of a complex software architecture.
+Architectural views help developers understand different dimensions and details of a complex software architecture.
+They are useful both during design and as documentation.
+During design, views help you to focus on a particular aspect of the software architecture and ensure that it will allow the system to deliver all of its requirements.
+As documentation, views help developers to understand how different aspects of the architecture are intended to behave.
+
+We have intentionally looked at a few different approaches to helping you describe a software architecture.
+You should be conversant with multiple different approaches.
+The hallmark of a professional is to know when to select a particular approach.
+
+If you compare the ``4+1 View Model'' \cite{4+1-model} with the views described in \textit{Software Architecture in Practice} (SAP) \cite{bass2021software},
+you will see that there are obvious similarities but also significant differences.
+The logical and development views from the 4+1 view model map closely to the module and component-and-connector views from SAP.
+The physical view corresponds to the allocation view.
+But, the 4+1 view model also includes process and scenario views, which do not correspond directly to the SAP views.
+This is because SAP emphasises the structure of the software architecture.
+
+The C4 model does not explicitly include the concept of views.
+Like SAP, it emphasises the static structure of the software architecture.
+
+There will be situations where you need to consider dynamic details, which is described by the process view of the 4+1 view model.
+Dealing with issues such as concurrency, real-time interactions or latency, can often be more easily considered by having a separate view for them.
+
+Kruchten's experience with Canada's integrated, nation-wide, air traffic control system was such a case.
+Data from radar systems and aircraft transponders have to be processed and reported to air traffic controllers in near real-time.
+With thousands of input sources and hundreds of controller stations, understanding concurrency issues is critical.
+Tracking aircraft from one control space to another means that communication latency is important.
+Each control space has its own hardware and is separated from neighbouring spaces by hundreds or thousands of kilometres.
+
 As a software architect you need to choose which views provide meaningful information about your software system.
 The graphical notation used to describe a view is only one part of the view (though an important part).
 Ensure you provide enough supporting information so others will know how to work with your architecture and why you made the choices that you did.

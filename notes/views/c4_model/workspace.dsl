@@ -86,23 +86,31 @@ workspace {
                 }
 
                 deploymentNode "Application Database Server" "" "Ubuntu 20.04 LTS" {
-                    appDatabaseServer = deploymentNode "MySQL" "" "MySQL 8.0" {
+                    primaryDatabaseServer = deploymentNode "MySQL Primary" "" "MySQL 8.0" {
                         liveAppDatabaseInstance = containerInstance appDB
                     }
                 }
+
+                deploymentNode "Secondary Database Server" "" "Ubuntu 20.04 LTS" "failover" {
+                    secondaryDatabaseServer = deploymentNode "MySQL Secondary" "" "MySQL 8.0" "failover" {
+                        liveSeondaryDatabaseInstance = containerInstance appDB
+                    }
+                }
+				
+				primaryDatabaseServer -> secondaryDatabaseServer "Replicates Data"
             }
 			
-            deploymentNode "Data Mining Service" "" "Oracle Cloud Infrastructure" "Oracle Cloud Infrastructure - API Service" {
-                deploymentNode "Data Mining API" "" "" "Oracle Cloud Infrastructure - Analytics Cloud Service" {
+            deploymentNode "Data Mining Service" "" "Oracle Cloud Infrastructure" "Oracle Cloud Infrastructure - Cloud Service" {
+                deploymentNode "Data Mining API" "" "" "Oracle Cloud Infrastructure - Virtual Machine" {
                     liveDataMiningIntfInstance = containerInstance dataMiningIntf
                 }
 				
-                deploymentNode "Data Mining Analytics" "" "" "Oracle Cloud Infrastructure - Analytics Cloud Service" {
+                deploymentNode "Machine Learning Process" "" "" "Oracle Cloud Infrastructure - Oracle Machine Learning" {
                     liveDataMiningProcessInstance = containerInstance dataMiningProcess
                 }
 				
                 deploymentNode "Data Warehouse" "" "" "Oracle Cloud Infrastructure - Autonomous Data Warehouse Cloud Service" {
-                    liveSecondaryDatabaseInstance = containerInstance dataWarehouse
+                    liveDataWarehouseInstance = containerInstance dataWarehouse
 				}
 			}
         }
@@ -167,6 +175,9 @@ workspace {
 				background #b3deff
 				/* colour is text colour. */
 				colour #000000
+			}
+			element failover {
+				opacity 45
 			}
 		}
 
