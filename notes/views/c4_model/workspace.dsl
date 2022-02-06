@@ -81,7 +81,7 @@ workspace {
                     }
                 }
 				
-                deploymentNode "Application Server" "" "Ubuntu 20.04 LTS with Java 17 LTS" "" 8 {
+                deploymentNode "Application Server" "" "Ubuntu 20.04 LTS & Java 17 LTS" "" 8 {
                     liveAppServerInstance = containerInstance appBackend
                 }
 
@@ -90,18 +90,21 @@ workspace {
                         liveAppDatabaseInstance = containerInstance appDB
                     }
                 }
-
-                deploymentNode "Data Mining Server" "" "Ubuntu 20.04 LTS with Java 17 LTS" "" 2 {
+            }
+			
+            deploymentNode "Data Mining Service" "" "Oracle Cloud Infrastructure" "Oracle Cloud Infrastructure - API Service" {
+                deploymentNode "Data Mining API" "" "" "Oracle Cloud Infrastructure - Analytics Cloud Service" {
                     liveDataMiningIntfInstance = containerInstance dataMiningIntf
+                }
+				
+                deploymentNode "Data Mining Analytics" "" "" "Oracle Cloud Infrastructure - Analytics Cloud Service" {
                     liveDataMiningProcessInstance = containerInstance dataMiningProcess
                 }
 				
-                deploymentNode "Data Warehouse" "" "Ubuntu 20.04 LTS" "Oracle Cloud Infrastructure - Autonomous Data Warehouse" {
-                    liveDataWarehouseInstance = deploymentNode "Oracle" "" "Oracle 19c" {
-                        liveSecondaryDatabaseInstance = containerInstance dataWarehouse
-                    }
-                }
-            }
+                deploymentNode "Data Warehouse" "" "" "Oracle Cloud Infrastructure - Autonomous Data Warehouse Cloud Service" {
+                    liveSecondaryDatabaseInstance = containerInstance dataWarehouse
+				}
+			}
         }
     }
 
@@ -138,7 +141,7 @@ workspace {
 		
 		deployment * "Live" "live_deployment_diagram" {
 			include *
-			autoLayout lr
+#			autoLayout lr
 		}
 
 		styles {
