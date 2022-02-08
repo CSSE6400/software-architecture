@@ -1,8 +1,9 @@
-workspace {
+workspace "Sahara eCommerce" "An example C4 model of an on-line shopping system." {
     model {
         customer = person "Customer" "Someone who shops at the Sahara on-line store."
 		
-		enterpriseBoundary = group "Sahara eCommerce" {
+		# Software systems, containers and components for the Sahara eCommerce enterprise-wide system.
+		enterprise "Sahara eCommerce" {
 			onlineStore = softwareSystem "On-line Store" "Allows customers to browse and search for items and to order them." {
 				!docs docs
 				!adrs adrs
@@ -32,11 +33,13 @@ workspace {
 			}
 		}
 
+		# Customer usage relationships.
         customer -> onlineStore "Search, browse and purchase products."
         customer -> webApp "Search, browse and purchase products." "HTTPS"
 		customer -> browserApp "View product details and their 3d view."
         customer -> mobileApp "Search, browse and purchase products."
 		
+		# Web App relationships.
 		webApp -> browserApp "Delivers content to the customer's browser." "HTTPS"
 		webApp -> productAnimator "Downloads to customer's browser." "HTTPS"
 		webApp -> appBackend "Sends messages" "RMI"
@@ -46,6 +49,7 @@ workspace {
 		
 		mobileApp -> cartController "REST API" "JSON/HTTPS"
 		
+		# Application backend relationships.
 		appBackend -> appDB "Queries & Updates" "JPA"
 		cart -> cust "Uses"
 		cart -> order "Uses"
@@ -55,6 +59,7 @@ workspace {
 		cust -> appDB "Retrieves customer credentials" "JPA"
 		product -> appDB "Retrieves product details" "JPA"
 		
+		# Data Mining Service relationships.
         onlineStore -> dataMining "Customer Browsing History"
         onlineStore -> dataMining "Get Product Suggestions"
         appBackend -> dataMiningIntf "Customer Browsing History and Product Suggestions" "RMI"
@@ -63,6 +68,7 @@ workspace {
 		dataMiningIntf -> dataMiningProcess "Get Product Recommendations"
 		dataMiningProcess -> dataWarehouse "Perform Data Mining" "JDBC"
 
+		# Physical architecture of the 'live' system.
 		deploymentEnvironment "Live" {
             deploymentNode "Customer's Mobile Device" "" "Apple iOS or Android" {
                 liveMobileAppInstance = containerInstance mobileApp
@@ -146,6 +152,15 @@ workspace {
 			include *
 			autoLayout lr
 		}
+
+        dynamic appBackend "add_to_cart" "Overview of how a customer using the web interface adds a product to their shopping cart." {
+            browsing -> cart "Sends product id to be added to cart id" "RMI"
+            cart -> appDB "select * from carts where cartid = ?" "JPA"
+            cart -> appDB "select * from products where productid = ?" "JPA"
+            cart -> appDB "insert into cartProducts values (cartId, productId)" "JPA"
+            cart -> browsing "Confirms success of updating cart" "RMI"
+#            autoLayout lr
+        }
 		
 		deployment * "Live" "live_deployment_diagram" {
 			include *
