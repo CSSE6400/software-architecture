@@ -156,8 +156,45 @@ This design of the logical architecture must contain components that can be allo
 and these nodes must have communication links that enable the components to interact.
 
 \section{Sahara eCommerce Example}\label{sec:storeExample}
-Consider an on-line store selling a wide range of different products. Customers can use both web and mobile applications to shop at the store.
-The architecture is designed to support the functional requirement that a customer can start shopping on one device and continue on another device.
+Sahara\footnote{Yes, that is intentionally a dry joke.} eCommerce is an ambitious company who's prime business unit is an on-line store selling a wide range of products.
+They provide both web and mobile applications to deliver the shopping experience to customers.
+
+\subsection{Architecturally Significant Requirements}\label{sec:storeReq}
+\emph{Architecturally significant requirements} (ASR) are functional or non-functional requirements,
+or constraints or principles, which influence the design of the system architecture.
+The structure of a software architecture has to be designed to ensure that the ASRs can be delivered.
+
+Not all requirements for a system will be architecturally significant, but those that are need to be identified.
+Once ASRs are identified, an architecture needs to be designed to deliver them.
+This may require some research, and experimentation with prototypes, to determine which options are appropriate.
+Tests should be designed to verify that the architecture is delivering the ASRs.
+Ideally, these should be part of an automated test suite.
+This may not be possible for all tests.
+Regardless, the ASR tests should be executed frequently during development to provide assurance that the system will deliver the ASRs.
+
+Inevitably, some ASRs will be discovered later in the project.
+The existing architecture will need to be evaluated to determine if it can deliver the new ASRs.
+If it can, new tests need to be added to the ASR test suite to verify delivery of the new ASRs.
+If the architecture is no longer suitable due to the new ASRs,
+a major redesign needs to be done to create a new, more suitable, architecture.
+
+The architecturally significant requirements for the Sahara eCommerce system are:
+\begin{itemize}
+    \item Customers can start shopping on one device and continue on another device.
+             (e.g. Add a product to their shopping cart while browsing on their computer when they are bored at school.
+              Checkout their shopping cart from their mobile phone on their way home on the bus.)
+    \item The system must be scalable. It must cater for peaks in demand (e.g. Cyber Monday and Singles Day).
+             It must cater for an unknown distribution of customers accessing the on-line store through web or mobile applications.
+    \item The system must be robust. The system must continue to operate if a server fails.
+             It must be able to recover quickly from sub-system failures.
+    \item The system must have high availability.
+             Target availability is ``four nines''\footnote{A number of nines (e.g. four nines)
+             is a common way to measure availability. It represents the percentage of time the system is ``up''.
+             Four nines means the system is available 99.99\% of the time, or it is not available for less than one hour per year.}
+            up time.
+\end{itemize}
+\noindent
+The following sections will describe the physical and software architecture for this system, and demonstrate how it delivers these ASRs.
 
 \subsection{Allocation View}\label{sec:storeAllocView}
 Figure \ref{fig:deploymentDiagram} uses a UML deployment diagram as a visual representation of the physical architecture of the system as part of the allocation view.
@@ -166,12 +203,11 @@ For simplicity, details such as load balancing and failover are not shown in thi
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=38 38 23 44,clip,width=0.9\textwidth]{images/uml/deployment_diagram.png}
-    \caption{Example physical architecture for an on-line store.}
+    \includegraphics[trim=38 38 23 44,clip,width=0.92\textwidth]{images/uml/deployment_diagram.png}
+    \caption{Example physical architecture for the Sahara eCommerce system.}
     \label{fig:deploymentDiagram}
 \end{figure}
 
-\noindent
 There are both web and mobile applications that customers use to shop at the store.
 A J2EE server (e.g. \link{TomEE}{https://tomee.apache.org/}), running on a web server hardware platform,
 handles browser requests from customers, using the HTTPS protocol over the Internet.
@@ -185,7 +221,6 @@ Running the applicaiton server on its own device allows easier scalability of th
 The application server could be replicated on multiple devices to handle requests from different sources, without duplicating unneeded web or database logic.
 Examples of components that would run on the application server are \texttt{Customer}, \texttt{ShoppingCart}, \texttt{Order} and \texttt{Product}.
 
-\noindent
 The application server uses JPA\footnote{Java Persistence API} over a network connection to communicate with the application data\-base running on a separate server.
 The \texttt{orders} schema is an example of one of the tables that would be created in the application database.
 The application server also uses RMI over a network connection to communicate with a data mining server.
@@ -246,9 +281,10 @@ To keep the example manageable, this is the only part of the system that is show
     \label{fig:componentDiagram}
 \end{figure}
 
-\noindent
-As was shown in figure \ref{fig:deploymentDiagram}, the \texttt{ProductBrowsing} and \texttt{ShoppingCartView} components are deployed on the J2EE server.
-These two component provide the user interaction behaviour of browsing for products, adding them to the shopping cart, and purchasing the products.
+As was shown in figure \ref{fig:deploymentDiagram},
+the \texttt{ProductBrowsing} and \texttt{ShoppingCartView} components are deployed on the J2EE server.
+These two component provide the user interaction behaviour in the web application
+of browsing for products, adding them to the shopping cart, and purchasing the products.
 
 The \texttt{Product}, \texttt{ShoppingCart}, \texttt{Order} and \texttt{Customer} components are deployed on the application server.
 These components deliver the logical behaviour of providing information about products, tracking what is in the shopping cart, and placing orders.
@@ -261,6 +297,7 @@ These interfaces describe the communication pathways between the components on t
 The \texttt{ShoppingCart} component uses the \texttt{Product}, \texttt{Customer} and \texttt{Order} components.
 At the programming level, there could be interfaces between these components which are not shown in this diagram.
 
+\noindent
 The applicaiton database is not shown in this component diagram as all of its behaviour is defined within the application server's logic.
 JPA automates the process of saving and retrieving objects from a relational database.
 Consequently, the database is just a storage mechanism and does not implement any application logic.
@@ -278,7 +315,6 @@ This notation visualises the connection between components.
 
 Dependency arrows point from a component whose runtime behaviour depends on behaviour provided by the target component.
 
-\noindent
 Boxes around groups of components are \emph{system boundary boxes}.
 They represent a logical grouping of elements in a UML diagram and can be given a name to describe the grouping.
 Colours and shading can be used to help distinguish between different logical groups.
@@ -298,12 +334,12 @@ It also shows \texttt{ShoppingCart} component communicating with the application
     \label{fig:sequenceDiagram}
 \end{figure}
 
-\noindent
 Figure \ref{fig:sequenceDiagram} does not provide much additional information that is not already shown or implied by
 figures \ref{fig:deploymentDiagram} and \ref{fig:componentDiagram}.
 Normally sequence or communication diagrams would be used to describe behaviour that is not clear from other diagrams and descriptions.
 This can include complex interactions between modules, complex concurrency, real-time constraints, or latency constraints.
 
+\noindent
 For example, when Boeing was upgrading the combat control system of the \link{F-111}{https://www.youtube.com/watch?v=xUcpZJE050s}
 for the Australian Airforce, they used a software architecture that used
 \link{CORBA}{https://www.ibm.com/docs/en/integration-bus/9.0.0?topic=corba-common-object-request-broker-architecture} as middleware.
@@ -370,7 +406,6 @@ to load the product details and the customer's shopping cart from the applicatio
 The DAOs create \texttt{Product} and \texttt{Cart} entity objects, and \texttt{CartManager} adds the product to the cart.
 Once this is done the \texttt{CartDAO} is used to save the updated cart data into the database.
 
-\noindent
 When a customer wants to checkout the products in their shopping cart, the \texttt{ShoppingCartView} component
 uses the \texttt{\textsl{Checkout}} interface's \texttt{products} operation to get a list of the product details to be displayed in the shopping cart.
 The \texttt{ProductDetails} class is a Java bean that is used to pass the data about each product to the \texttt{ShoppingCartView}.
@@ -390,6 +425,8 @@ Solid lines represent \emph{associations}, which may optionally have an arrow in
 An association indicates a structural relationship between classes.
 Typically this means that the target of an association will be an implicit attribute of the class.
 The end of an association can use \emph{multiplicity} to indicate the number of objects of the class that may take part in the relationship.
+
+\noindent
 A diamond on the end of an association indicates \emph{aggregate} relationship.
 The diamond is on the end that is the aggregate, and the other end is the part.
 The diamond may be filled or not. A filled diamond represents \emph{composition} in UML.
@@ -420,6 +457,16 @@ Figure \ref{fig:detailedSequenceDiagram} is a detailed sequence showing how the 
 figure \ref{fig:classDiagram} implements the behaviour of a customer adding a product to their shopping cart.
 Like with the high-level sequence diagram, you would only provide detailed sequence diagrams to describe architecturally important details of the design.
 
+\begin{figure}[h!]
+    \centering
+    \begin{adjustwidth}{-11mm}{-11mm}
+        \includegraphics[trim=35 70 31 49,clip,width=0.98\paperwidth]{images/uml/detailed_sequence_diagram.png}
+    \end{adjustwidth}
+    \caption{Example detailed sequence diagram showing the implementation of customer adding a product to their shopping cart.}
+    \label{fig:detailedSequenceDiagram}
+\end{figure}
+
+\noindent
 The scenario starts with the JSF session-scoped bean \texttt{WebCart} receiving the \texttt{updateCart} message from the browser.
 \texttt{WebCart} retrieves the product id and uses the \texttt{ManageCart} interface to send it, along with the cart id,
 to the \texttt{ShoppingCart} component on the application server.
@@ -430,16 +477,6 @@ Once the product is added to the cart, the \texttt{CartDAO} saves the updated ca
 Upon successfully saving the updated cart, the \texttt{CartManager} notifies the \texttt{WebCart}
 object in the \texttt{ProductBrowsing} component in the J2EE server.
 
-\begin{figure}[h!]
-    \centering
-    \begin{adjustwidth}{-11mm}{-11mm}
-        \includegraphics[trim=35 70 31 49,clip,width=0.98\paperwidth]{images/uml/detailed_sequence_diagram.png}
-    \end{adjustwidth}
-    \caption{Example detailed sequence diagram showing the implementation of customer adding a product to their shopping cart.}
-    \label{fig:detailedSequenceDiagram}
-\end{figure}
-
-\pagebreak
 \subsubsection{Sequence Diagram Notation}
 The \guillemotleft create\guillemotright~and \guillemotleft destroy\guillemotright~stereotypes indicate when instances are created or destroyed.
 When an instance is created, its lifeline starts at the level of the sequence diagram that indicates the time when it is created.
@@ -448,6 +485,45 @@ Lifelines that are at the top of the diagram indicate instances that existed bef
 Lifelines that reach the bottom of the diagram indicate instances that still exist after the end of the scenario.
 
 In figure \ref{fig:detailedSequenceDiagram}, system boundary boxes are used to indicate which objects execute on which nodes from the deployment diagram.
+
+\subsection{Delivering Architecturally Significant Requirements}
+In section \ref{sec:storeReq}, four ASRs were identified for the Sahara eCommerce system.
+These were the abililty to continue shopping on different devices, scalability, robustness and availability.
+
+Implementing shared logic on an application server, as shown in figure \ref{fig:deploymentDiagram},
+enables the web and mobile applications to share common logic and state.
+This delivers the functionality of allowing a customer to start shopping on one device and to continue on another device.
+It also minimises duplication of logic, as it is shared by the frontend applications.
+
+Using separate servers for the web server, application server, application database, and data mining server,
+as shown in figure \ref{fig:deploymentDiagram}, provides more options to deliver scalability, robustness and availability.
+For scalability and performance, each computing environment can be optimised for the services it delivers.
+It also means that new servers can be deployed to target specific bottlenecks.
+
+The system follows the \link{\emph{stateless architecture} pattern}{https://www.redhat.com/en/topics/cloud-native-apps/stateful-vs-stateless}.
+The web and mobile applications do not store any application state (e.g. products currently stored in the shopping cart).
+Every time the customer performs a transaction (e.g. viewing product details or adding a product to their shopping cart),
+the web or mobile application sends a message to the application server to perform the action.
+The application server then saves or loads data to or from the application database.
+This means that web and mobile applications can send messages to a different application server for each request.
+This facilitates scalability, robustness and availability.
+A new application server can be started to cater for increasing system load, or to replace a failed server.
+The stateless nature of the application server logic means that no data will be lost if a server fails,
+or if a frontend application accesses a different application server in the middle of a customer's shopping experience.
+
+Having multiple application servers, and multiple application databases and data mining servers,
+means that if one server fails its load can be picked up by other servers.
+Automating the process of starting or restarting servers improves robustness and availability.
+
+One challenge of a stateless architecture is providing a replicated database that contains up-to-date copies of the system's state.
+We will look at this issue later in the course.
+
+By designing the architecture as a set of components running on different servers, it is also easier to migrate the application to cloud-based infrastructure.
+Figure \ref{fig:deploymentDiagram} does not constrain the system to run on physical hardware hosted by Sahara eCommerce.
+Any of the nodes could be provisioned by a service offered by a cloud provider.
+Figure \ref{fig:c4_deployment} in section \ref{sec:c4_deployment} provides an example of a hybrid cloud solution.
+In that example, the on-line store components of the architecture run on hardware hosted by Sahara eCommerce.
+The data mining components run on Oracle's cloud infrastructure.
 
 \section{C4 Model}
 Simon Brown's C4 model provides a set of abstractions that describe the static structure of the software architecture \cite{brown2022c4}.
@@ -460,12 +536,12 @@ The hierarchical structure is based on the idea that a software system is compos
     \item[Code] Elements built from programming language constructs, e.g. classes, interfaces, functions, ....
 \end{description}
 
-%\begin{figure}[h]
-%    \centering
-%    \includegraphics[trim=0 8 0 5,clip,width=0.77\textwidth]{images/c4_terminology.jpg}
-%    \caption{Levels within the C4 model (figure 2.1 from \cite{brown2022c4}).}
-%    \label{fig:c4terms}
-%\end{figure}
+\begin{figure}[h]
+    \centering
+    \includegraphics[trim=0 8 0 5,clip,width=0.8\textwidth]{images/c4_terminology.jpg}
+    \caption{Levels within the C4 model (figure 2.1 from \cite{brown2022c4}).}
+    \label{fig:c4terms}
+\end{figure}
 
 \noindent
 This leads to describing the static structure of software architecture through four levels of abstraction.
@@ -529,12 +605,12 @@ It is important to note that this is not a type of deployment diagram.
 Containers may be deployed on the same computing infrastructure or on different devices.
 While the container diagram does not explicitly show computing infrastructure, some of the infrastructure may be implied by the types of containers.
 Decisions about how containers are connected and communicate have major implications for how the components and code will be designed and deployed.
-Figure \ref{fig:c4_container_store} is a container diagram for the on-line store.
+Figure~\ref{fig:c4_container_store} is a container diagram for the on-line store.
 
 \begin{figure}[h!]
     \centering
-    \begin{adjustwidth}{-5mm}{-5mm}
-        \includegraphics[trim=250 226 286 258,clip,width=0.92\paperwidth]{images/c4/store_container_diagram.png}
+    \begin{adjustwidth}{-9mm}{-9mm}
+        \includegraphics[trim=250 226 286 258,clip,width=0.96\paperwidth]{images/c4/store_container_diagram.png}
     \end{adjustwidth}
     \caption{Container diagram for the on-line store software system.}
     \label{fig:c4_container_store}
@@ -554,7 +630,7 @@ The text inside the square brackets in a container, and on a relationship, indic
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=24 21 98 26,clip,width=0.87\textwidth]{images/c4/container_diagram-key.png}
+    \includegraphics[trim=24 21 98 26,clip,width=\textwidth]{images/c4/container_diagram-key.png}
     \caption{Container diagram key.}
     \label{fig:c4_container_key}
 \end{figure}
@@ -563,19 +639,12 @@ While a container diagram does not explicitly show computing infrastructure,
 some of it can be implied by the types of containers in the diagram.
 Clearly, the mobile app and the code running in the interactive web pages
 have to be separate computing platforms to the rest of the on-line store's software system.
+
 Colours and icons can be used to provide further information in the diagrams.
-The diagram key in figure \ref{fig:c4_container_key} explains the purpose of each icon and colour.
+The diagram key in figure~\ref{fig:c4_container_key} explains the purpose of each icon and colour.
 UML also allows you to use icons and colours to add further information to a model, it is just difficult to do in many UML modelling tools.
 
-\begin{figure}[h]
-    \centering
-    \begin{adjustwidth}{-5mm}{-5mm}
-        \includegraphics[trim=185 185 185 185,clip,width=0.92\paperwidth]{images/c4/datamining_container_diagram.png}
-    \end{adjustwidth}
-    \caption{Container diagram for the data mining service software system.}
-    \label{fig:c4_container_datamining}
-\end{figure}
-
+\filbreak
 \noindent
 The data mining service software system (figure \ref{fig:c4_container_datamining}) has three main containers.
 
@@ -587,7 +656,14 @@ It returns suggestions based on requests from external systems, such as the on-l
 
 \texttt{Data Warehouse} stores the data and provides an SQL-based query system to manipulate the data.
 
-\newpage
+\begin{center}
+    \begin{adjustwidth}{-5mm}{-5mm}
+        \includegraphics[trim=185 185 185 185,clip,width=0.92\paperwidth]{images/c4/datamining_container_diagram.png}
+    \end{adjustwidth}
+    \captionof{figure}{Container diagram for the data mining service software system.}
+    \label{fig:c4_container_datamining}
+\end{center}
+
 \subsection{Components}
 Component diagrams describe the major parts of containers and how they are connected.
 Components should describe their important responsibilities and the technology used to implement them
@@ -616,6 +692,19 @@ These are all implemented as Java beans.
 The \texttt{Product}, \texttt{Order} and \texttt{Customer} components use JPA to retrieve and store data in the application database.
 (As indicated in section \ref{sec:CnC_view}, only the components related to managing the shopping cart are shown in this example.)
 
+Figure \ref{fig:c4_component_key}, shows the icons and colours used to represent different elements in the component diagrams.
+
+\begin{figure}[h!]
+    \centering
+    \begin{adjustwidth}{-7.5mm}{-7.5mm}
+        \includegraphics[trim=15 210 90 20,clip,width=0.95\paperwidth]{images/c4/component_diagram-key.png}
+    \end{adjustwidth}
+    \caption{Component diagram key.}
+    \label{fig:c4_component_key}
+\end{figure}
+
+\newpage
+\noindent
 Figure \ref{fig:c4_component_webapp} shows the components that provide the frontend behaviour
 of browsing for products, adding them to the shopping cart, and purchasing them.
 
@@ -626,7 +715,6 @@ of browsing for products, adding them to the shopping cart, and purchasing them.
     \label{fig:c4_component_webapp}
 \end{figure}
 
-\newpage
 \noindent
 Figure \ref{fig:c4_component_browser}, shows that the \texttt{Product Animator} component
 is downloaded from the web application to the customer's browser and that it is implemented in JavaScript.
@@ -637,18 +725,6 @@ This provides similar information about the \texttt{Product Animator} component,
     \includegraphics[trim=245 265 245 270,clip,width=0.65\textwidth]{images/c4/browser_component_diagram.png}
     \caption{Component diagram for the interactive web pages container.}
     \label{fig:c4_component_browser}
-\end{figure}
-
-\noindent
-Figure \ref{fig:c4_component_key}, shows the icons and colours used to represent different elements in the component diagrams.
-
-\begin{figure}[h!]
-    \centering
-    \begin{adjustwidth}{-5mm}{-5mm}
-        \includegraphics[trim=15 210 90 20,clip,width=0.92\paperwidth]{images/c4/component_diagram-key.png}
-    \end{adjustwidth}
-    \caption{Component diagram key.}
-    \label{fig:c4_component_key}
 \end{figure}
 
 \subsubsection{Component Diagram Detail}
@@ -699,7 +775,7 @@ It also shows the communication between the \texttt{Shopping Cart} component and
 If the information is useful, a more detailed dynamic diagram, like the detailed sequence diagram in figure \ref{fig:detailedSequenceDiagram}, can be provided.
 Sequence diagrams can be used instead of C4 dynamic diagrams, if the order of events is important.
 
-\subsection{Deployment}
+\subsection{Deployment}\label{sec:c4_deployment}
 While not one of the ``four C's'', deployment diagrams are important for most systems.
 They describe the physical architecture or infrastructure on which the system will be deployed.
 It shows which containers will run on which computing platforms (\emph{deployment nodes}).
@@ -708,39 +784,42 @@ They may also contain infrastructure nodes or software system instances\footnote
 
 \begin{figure}[h!]
     \centering
-    \begin{adjustwidth}{-6mm}{-6mm}
-        \includegraphics[trim=195 235 195 198,clip,width=0.93\paperwidth]{images/c4/deployment_diagram.png}
+    \begin{adjustwidth}{-7.5mm}{-7.5mm}
+        \includegraphics[trim=195 235 195 198,clip,width=0.95\paperwidth]{images/c4/deployment_diagram.png}
     \end{adjustwidth}
     \caption{Deployment diagram for the Sahara eCommerce System.}
     \label{fig:c4_deployment}
 \end{figure}
 
-\noindent
-Figure \ref{fig:c4_deployment} is an example deployment diagram for the Sahara eCommerce example.
+Figure \ref{fig:c4_deployment} is an example C4 deployment diagram for the Sahara eCommerce system.
 It takes a slightly different approach to the physical architecture than was shown in figure \ref{fig:deploymentDiagram}.
 It shows that the on-line store software system runs in Sahara's data centre.
 The data mining service runs on Oracle's cloud infrastructure.
+This approach of a system that uses cloud services for some of its implementation is called a \emph{hybrid cloud} application.
 There are still the apps running on mobile devices and the code running in the customer's browser.
 
-\noindent
 Like UML, a software environment is embedded in the hardware environment on which it runs.
 The web application runs in an Apache TomEE J2EE server, which is running on a Ubuntu server.
 The ``\texttt{x4}'' inside the web server deployment node indicates that there will be four of these servers to share the load.
 The application backend runs on eight Ubuntu servers, providing the core business logic shared by the web and mobile applications.
+
 The application database runs in MySQL on its own Ubuntu server.
-The application database is replicated to a secondary database running on another server to allow for failover.
+Replication of the application database is explicitly shown in this example, whereas it was not shown in figure \ref{fig:deploymentDiagram}.
+Replicating the database running on another server allows for failover.
+The application backend can continue to operate if the primary application database fails.
 
 In this version of the example, the application backend communicates with the data mining service
-through an API published by the data mining interface running on a virtual machine in Oracle's cloud infrastructure.
+through an API published by the data mining interface running in a virtual machine on Oracle's cloud infrastructure.
 The data mining service uses Oracle's machine learning services to perform the data mining.
 Oracle's cloud-based data warehouse infrastructure is used to hold all the data.
 
+\noindent
 Figure \ref{fig:c4_deployment_key} is the key describing the icons and colours used in the deployment diagram.
 
 \begin{figure}[h!]
     \centering
-    \begin{adjustwidth}{-5mm}{-5mm}
-        \includegraphics[trim=22 210 22 24,clip,width=0.92\paperwidth]{images/c4/deployment_diagram-key.png}
+    \begin{adjustwidth}{-7.5mm}{-7.5mm}
+        \includegraphics[trim=22 210 22 24,clip,width=0.95\paperwidth]{images/c4/deployment_diagram-key.png}
     \end{adjustwidth}
     \caption{Deployment diagram key.}
     \label{fig:c4_deployment_key}
@@ -760,9 +839,8 @@ The issue with drawing tools is that they do not know what the elements of the d
 If the name of an operation in a class is changed in a drawing tool, you will need to manually change it wherever it is referenced in other diagrams
 (e.g. in sequence diagrams).
 A modelling tool will track the information that describes the model, so that a change to a model element in one place,
-will be replicated wherever that element appears in any other diagrams.
+will be replicated wherever that element appears in other diagrams.
 
-\noindent
 There are many tools that support UML.
 In a commercial project using UML on a large system, the cost of professional UML tools is negligible and is quickly recovered by the automation they provide.
 There are a number of free UML tools. Some to consider are \link{Astah}{https://astah.net/products/free-student-license/},
@@ -780,6 +858,7 @@ There are fewer tools that support C4.
 It is an \link{open source tool}{https://github.com/structurizr/}.
 You can use a domain specific language to describe a C4 model, or you can embed the details in Java or .Net code.
 There is also \link{C4-PlantUML}{https://github.com/plantuml-stdlib/C4-PlantUML}, which extends PlantUML to support C4.
+Astah Professional supports C4, but they no longer provide that version of the tool free to students.
 
 \section{Conclusion}
 Architectural views help developers understand different dimensions and details of a complex software architecture.
