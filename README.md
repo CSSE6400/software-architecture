@@ -1,11 +1,11 @@
-# Software Architecture [![Site Published](https://img.shields.io/badge/website-published-brightgreen)](https://csse4400.brae.dev/)
+# Software Architecture [![Site Published](https://img.shields.io/badge/website-published-brightgreen)](https://csse6400.brae.dev/)
 
 
-[![Build Assessment](https://github.com/BraeWebb/software-architecture/actions/workflows/build-assessment.yml/badge.svg?branch=main)](https://github.com/BraeWebb/software-architecture/actions/workflows/build-assessment.yml)
-[![Build Notes](https://github.com/BraeWebb/software-architecture/actions/workflows/build-notes.yml/badge.svg)](https://github.com/BraeWebb/software-architecture/actions/workflows/build-notes.yml)
-[![Build Practicals](https://github.com/BraeWebb/software-architecture/actions/workflows/build-practicals.yml/badge.svg)](https://github.com/BraeWebb/software-architecture/actions/workflows/build-practicals.yml)
-[![Build Site](https://github.com/BraeWebb/software-architecture/actions/workflows/build-site.yml/badge.svg)](https://github.com/BraeWebb/software-architecture/actions/workflows/build-site.yml)
-[![Build Slides](https://github.com/BraeWebb/software-architecture/actions/workflows/build-slides.yml/badge.svg)](https://github.com/BraeWebb/software-architecture/actions/workflows/build-slides.yml)
+[![Build Assessment](https://github.com/CSSE6400/software-architecture/actions/workflows/build-assessment.yml/badge.svg?branch=main)](https://github.com/CSSE6400/software-architecture/actions/workflows/build-assessment.yml)
+[![Build Notes](https://github.com/CSSE6400/software-architecture/actions/workflows/build-notes.yml/badge.svg)](https://github.com/CSSE6400/software-architecture/actions/workflows/build-notes.yml)
+[![Build Practicals](https://github.com/CSSE6400/software-architecture/actions/workflows/build-practicals.yml/badge.svg)](https://github.com/CSSE6400/software-architecture/actions/workflows/build-practicals.yml)
+[![Build Site](https://github.com/CSSE6400/software-architecture/actions/workflows/build-site.yml/badge.svg)](https://github.com/CSSE6400/software-architecture/actions/workflows/build-site.yml)
+[![Build Slides](https://github.com/CSSE6400/software-architecture/actions/workflows/build-slides.yml/badge.svg)](https://github.com/CSSE6400/software-architecture/actions/workflows/build-slides.yml)
 
 
 This repository hosts the course on Software Architecture at the University of Queensland.
