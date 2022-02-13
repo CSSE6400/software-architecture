@@ -160,3 +160,10 @@
 \newcommand{\highlight}[1]{{\color{focus} \textsl{#1}}}
 
 \newcommand{\extra}[2][2-]{\only<#1>{\blfootnote{#2}}}
+
+% Add page numbers
+% \addtobeamertemplate{navigation symbols}{}{%
+%     \usebeamerfont{footline}%
+%     {\color{primary}\insertframenumber}{\color{secondary}/\inserttotalframenumber}%
+%     \vspace{40pt}%
+% }
