@@ -177,10 +177,6 @@ In many situations this is appropriate, however, a truly secure system should be
 
 \subsection{Principle of Usability}
 
-\begin{quote}{Unknown}
-TBD
-\end{quote}
-
 \noindent
 The final principle we should explore is the principle of usability, also known as `psychological acceptability'.
 This principle asks that we have realistic expectations of our users.
@@ -201,25 +197,75 @@ which results in the principle not being considered as often.
 The long-term implications are that what was an annoyance circumvented by your users,
 may become the cause of a major security breach long after the security feature was implemented.
 
-\begin{drafting}
-
-Other potentially useful principles:
-\begin{itemize}
-    \item Principle of Defense in Depth
-    \item Principle of Separation of Duties
-\end{itemize}
 
 \section{Practices of Secure Software}
+With some of the guiding principles of secure software now covered,
+there are a few useful practices which can be employed to help secure our systems.
 
 \subsection{Encryption}
-\subsection{Sanitization}
-\subsection{DoS Protection}
-\subsection{Dependency Management}
-\subsection{Firewalls}
+In the arms race between hackers and security practitioners \textsl{encryption} was one of the first weapons wielded.
+Encryption is the act of encoding data in a way which is difficult to decode.
+The most notable early example of encryption was the Enigma Machine in the 1930s,
+if you trace the history of cryptography back far enough you will eventually end up in World War II Germany~\cite{web-application-security}.
 
-\section{Summary}
-hire or consult with an expert
-\end{drafting}
+While encryption is outside of the scope of this course,
+it is well worth having knowledge of available encryption techniques.
+In the design of a secured software system encryption can play many roles.
+
+\subsection{Sanitization}
+Another practice which you should endeavour to utilise is sanitization.
+If we assume that you can't tell the difference between your user and a potential attacker,
+then you can't trust your user.
+If you can't trust your user, then you shouldn't trust the data they give you.
+One of the oldest and most common forms of attacks is user input injection.
+In such an injection attack, a user intentionally or unintentionally provides input which damages your system.
+
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=\textwidth]{bobbytables.png}
+\end{center}
+\caption{\url{https://xkcd.com/327/}}
+\end{figure}
+
+When done maliciously, attackers enter characters or sequences of characters which are commonly used to escape a string,
+the input which follows would then be run as code on the victims system.
+The method for preventing against injection attacks is called \textsl{sanitization},
+which is simply a process of removing dangerous or unnecessary characters from a users input.
+
+\subsection{Firewalls}
+A firewall is a piece of networking software which is designed to protect a computer system against unwanted traffic.
+Firewalls scan incoming and outgoing network packets and are able to drop the packet if it's deemed unwanted.
+Firewalls can be configured by a set of rules defining which traffic is unwanted.
+A firewall rule could specify that a computer system drop all packets destined for port 80 or all packets not destined for port 80.
+They may also be configured to support more advanced packet filtering.
+
+From our perspective the primary advantage of a firewall is to prevent traffic which we did not intend.
+If we are hosting a web server, only allowing traffic on port 80 and port 443 is desirable
+and prevents users accessing a database on the server which we forgot to password protect.
+The principle for firewalls is to block by default and allow when required.
+
+\subsection{Dependency Management}
+Modern software has a lot of dependencies.
+Each new dependency a software adopts is a new potential attack surface.
+Relying on software which is automatically updated is dangerous,
+the authors can at any point inject malicious code into your system.
+There's a particularly interesting recent example of dependency injection which is worth reading about~\cite{color-js}.
+
+One simple practice to help prevent against dependency injection is by using lock files.
+Most package managers generate lock files when installing software.
+Lock files keep track of the exact version of library that is installed.
+If you ask a package manager to install version >=2.4.0 of a library and it actually downloads version 2.5.6,
+this will be tracked in the lock file.
+Additionally, lock files track the hash of the dependency so that if someone attempts a dependency injection,
+the code change will be noticed by the package manager.
+Lock files should be tracked in version control and updated periodically when a safe and tested version of a dependency is released.
+
+\section{Conclusion}
+We have looked at a few guiding principles for designing and developing secure software.
+This list of principles is incomplete, security requires constant consideration.
+Software security is an ongoing arms race for which we are all currently unqualified to enlist.
+Secure yourself as best you can and, when you are in doubt,
+consult with or hire an expert.
 
 \appendix
 \section{Original Security Design Principles}\label{all-principles}
@@ -271,3 +317,5 @@ hire or consult with an expert
     \item Be Reluctant to Trust
     \item Use Your Community Resources
 \end{enumerate}
+
+\pagebreak
