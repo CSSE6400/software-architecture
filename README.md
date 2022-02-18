@@ -28,3 +28,16 @@ This repository hosts the course on Software Architecture at the University of Q
 Workflows are enumerated above as build status badges.
 The typical workflow will build it's artifacts (normally PDF files) and upload them.
 The completion of each workflow will trigger the `Build Sites` workflow which downloads the all artifacts and places them into the public directory which is used as the public site.
+
+## License
+
+Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
+
+This work is licensed under a
+[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa].
+
+[![CC BY-NC-SA 4.0][cc-by-nc-sa-image]][cc-by-nc-sa]
+
+[cc-by-nc-sa]: http://creativecommons.org/licenses/by-nc-sa/4.0/
+[cc-by-nc-sa-image]: https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png
+[cc-by-nc-sa-shield]: https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg
