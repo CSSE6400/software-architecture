@@ -3,9 +3,10 @@
 \title{Layered Architecture}
 \subtitle{CSSE6400}
 \author{Richard Thomas}
-\date{\week{2}}
+\date{\week{1}}
 
 \usepackage{languages}
+\usepackage{changepage}
 
 \usepackage{tikz}
 \usetikzlibrary{positioning}
@@ -22,20 +23,21 @@ You get it? We both have layers.}
 
 \point[In the beginning...]{There was the big ball of mud \cite{ballofmud}}
 
-\begin{frame}[fragile]
-\begin{code}[style=python]{}
-import gui
-import database
 
-button = gui.make_button("Click me to add to counter")
-button.onclick(e => 
-    database.query("INSERT INTO clicks (time) VALUES {{e.time}}"))
-\end{code}
+\begin{frame}
+
+\begin{figure}
+    \href{https://tech.zensurance.com/posts/spaghetti-code}{\includegraphics[height=\paperheight-11mm]{images/spaghetti-code.png}}
+    \caption{Image from \href{https://tech.zensurance.com/posts/spaghetti-code}{``How to Avoid Spaghetti Code''} \cite{spaghetti-code}.}
+\end{figure}
+
 \end{frame}
+
 
 \point[Problem]{Any change can affect any other part of the software.}
 
 \point[``Solution'']{Layered architecture}
+
 
 \begin{frame}
 \begin{figure}[h]
@@ -48,52 +50,74 @@ button.onclick(e =>
     
         \node[draw, fit=(P) (D)](hardware) {};
     \end{tikzpicture}
-    \caption{The \highlight{traditional} specialized components of a layered architecture.}
+    \caption{\highlight{Traditional} 4-tier, layered architecture.}
     \label{fig:traditional-layered}
 \end{figure}
 \end{frame}
 
-\begin{frame}[fragile]
-\begin{code}[style=python]{presentation.code}
-import gui
-import business
-
-button = gui.make_button("Click me to add to counter")
-button.onclick(business.click)
-\end{code}
-\end{frame}
-
-\begin{frame}[fragile]
-\begin{code}[style=python]{business.code}
-import persistence
-
-def click():
-    persistence.click_counts.add(1)
-\end{code}
-\end{frame}
-
-\begin{frame}[fragile]
-\small
-\begin{code}[style=python,captionpos=t]{persistence.code}
-import db
-
-class ClickCounter:
-    clicks = 0
-
-    def constructor():
-        clicks = db.query("SELECT COUNT(*) FROM clicks")
-
-    def get_click():
-        return clicks
-
-    def add(amount):
-        db.query("INSERT INTO clicks (time) VALUES {{time.now}}")
-
-click_counts = ClickCounter()
-\end{code}
-\end{frame}
 
 \questionanswer{Can you identify an example of layered architecture?}{Pick any website.}
+
+
+\begin{frame}
+
+\begin{figure}
+    \begin{adjustwidth}{-7mm}{-7mm}
+        \includegraphics[width=0.96\paperwidth]{images/j2ee-arch.png}
+    \end{adjustwidth}
+    \caption{J2EE layered architecture (from \textit{Requirements Analysis and System Design} \cite{rasd2007}).}
+\end{figure}
+
+\end{frame}
+
+
+\begin{frame}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\paperwidth]{images/pcbmer.png}
+    \caption{PCBMER layered architecture with sidecars (adapted from \textit{Requirements Analysis and System Design} \cite{rasd2007}).}
+\end{figure}
+
+\end{frame}
+
+
+\begin{frame}{PCBMER Layers}
+
+\large{
+\begin{description}[<+->]
+    \item[Presentation] Displays bean data, implements UI logic, and updates beans.
+    \item[Controller] Implements application specific logic and instantiates beans.
+    \item[Bean] Data transfer objects used by the Presentation layer.
+    \item[Mediator] Manages business transactions, enforces business rules, instantiates business objects in the Entity layer, and manages the entity memory cache.
+    \item[Entity] Classes representing persistent business objects.
+    \item[Resource] Manages interactions with external persistent data sources.
+\end{description}
+}
+
+\end{frame}
+
+
+\definition{Layer Isolation Principle}
+{Layers should not depend on implementation details of another layer.
+Layers should only communicate through well defined interfaces (\emph{contracts}).}
+
+\definition{Neighbour Communication Principle}
+{Components can communicate across layers only through directly neighbouring layers.}
+
+\definition{Downward Dependency Principle}
+{Higher-level layers depend on lower layers, but lower-level layers are not dependent on higher layers.}
+
+\definition{Upward Notification Principle}
+{Lower layers communicate with higher layers using general interfaces, callbacks and/or events.
+Dependencies are minimised by not relying on specific details published in a higher layer’s interface.}
+
+\definition{Sidecar Spanning Principle}
+{A sidecar layer contains interfaces that support complex communication between layers
+(e.g. design patterns like the observer pattern) or external services (e.g. a logging framework).}
+
+\point[Good architectural design...]{Applies these principles to deliver simple, modular designs that support modifiability.}
+
 
 \references{articles,books}
 
