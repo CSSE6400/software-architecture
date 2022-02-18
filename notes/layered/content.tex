@@ -1,6 +1,6 @@
 \title{Layered Architecture}
-\author{Brae Webb}
-\date{\week{2}}
+\author{Richard Thomas \& Brae Webb}
+\date{\week{1}}
 
 \maketitle
 
@@ -115,14 +115,15 @@ and let it separate component from component\footnote{Liberties taken from
 
 The first architectural style we will investigate is a layered architecture.
 Layered architecture (also called multi-tier or tiered architecture) 
-partitions software into specialised components and restricts how those components can communicate with each other.
-A layered architecture creates superficial boundaries between the software components, or layers.
-Often component boundaries aren't enforced by the technology but by architectural policy.
+partitions software into specialised clusters of components (i.e. \emph{layers})
+and restricts how components in one layer can communicate with components in another layer.
+A layered architecture creates superficial boundaries between the layers.
+Often component boundaries are not enforced by the implementation technology but by architectural policy.
 
 The creation of these boundaries provides the beginnings of some control over what your software is allowed to do.
-Communication between the component boundaries is done via well-specified \textsl{contracts}.
+Communication between the component boundaries is done via well-specified \emph{contracts}.
 The use of contracts results in each layer knowing precisely how it can be interacted with.
-Furthermore, when a layer needs to be replaced or rewritten, it can be safely substituted with a layer fulfilling the contract.
+Furthermore, when a layer needs to be replaced or rewritten, it can be safely substituted with another layer fulfilling the contract.
 
 % The isolated components of a layered architecture are normally technically partitioned rather than domain partitioned.
 
@@ -264,7 +265,7 @@ This deployment form is very typical of web applications.
 The presentation layer is deployed as a \mbox{HTML/}JavaScript application which makes network requests to the remote business layer.
 The business layer then validates requests and makes any appropriate data updates.
 
-Some database driven appliation generators will separate embedded the application logic in the database code
+Some database driven appliation generators will embedded the application logic in the database code
 so that all logic runs on the database server.
 The presentation layer is then separated from the application logic,
 as shown in figure \ref{fig:layered-pres-separated}.
@@ -340,13 +341,133 @@ http.on(
 \label{fig:uncommon-code}
 \end{figure}
 
-\subsection{Closed/Open Layers}
+\subsection{Layered Principles}
 
-Separating software into layers helps to increase the modularity and isolation of distinct components.
-But, of course, components must communicate via their specified contracts, otherwise they wouldn't be particularly useful.
-Flows of communication between components are categorized as either \textsl{open} or \textsl{closed}.
-A layer, by default, is considered \textsl{closed}.
-Closed layers prevent the direct communication between their adjacent layers.
+Separating software into layers is intended to increase the modularity and isolation of the components within each layer.
+Isolation is provided by defining a public interface through which all communication with the layer is to be performed.
+
+\begin{definition}[Layer Isolation Principle]
+    Layers should not have any dependencies on implementation details of another layer.
+    Layers should only communicate through well defined interfaces (\emph{contracts}).
+\end{definition}
+
+Layering should be enforced. One layer should not ``reach across'' another layer to access behaviour implemented in some other layer.
+For example, in our standard form of the layered architecture,
+if the presentation layer uses a component from the presistence layer, it defeats the intent of having a business layer in the architecture.
+
+A consequence of this is chains of message passing.
+An extreme example would be if the presentation layer needed to display some information from the database,
+the presentation layer would send a message to the business layer to get the object to be displayed.
+The business layer would send a message to the persistence layer to retrieve the object.
+The persistence layer would then send a message to the database layer to load the object.
+
+Typically, there would not be a need to send messages from the highest to lowest layer.
+If the business layer knew it had an up-to-date copy of the object, it would return it to the presentation layer without messaging the persistence layer.
+If the persistence layer had already retrieved the object from the database, it would return it to the business layer without messaging the database layer.
+
+\begin{definition}[Neighbour Communication Principle]
+    Components can communicate across layers only through directly neighbouring layers.
+\end{definition}
+
+Layers should be hierarchical. Higher layers depend on services provided by lower layers but not vice versa.
+This dependency is only through a public interface, so that components in the lower layer may be replaced by another component implementing the same interface.
+Components in a lower layer should not use components from a higher layer, even if the layers are neighbours.
+
+\begin{definition}[Downward Dependency Principle]
+    Higher layers depend on lower layers, but are isolated from the lower layer's implementation through its interface.
+\end{definition}
+
+Downward dependency does not mean that data is not passed to higher layers.
+It does not even mean that control cannot flow from a lower level to a higher level.
+The restriction is on dependencies or usage, not on data or control flow.
+A lower layer should not use components from a higher layer, even through the higher layer's interface.
+Breaking this increases the overall coupling of the system and means it is no longer possible to replace a lower layer with another layer.
+
+Lower layers need a mechanism to be able to notify a higher layer that something has happened, of which the higher layer needs to be aware.
+A common example of this is the presentation layer wants to be notified if data that it is displaying has been updated in a lower layer.
+The \link{observer design pattern}{https://refactoring.guru/design-patterns/observer} is a common solution to this notification issue.
+The component responsible for displaying the data in the presentation layer implements the \emph{Observer} interface.
+The object containing data that may be updated implements the \emph{Subject} interface.
+The subject and observer interfaces are general purpose interfaces that do not belong to the presentation layer.
+The lower layer uses the observer interface to notify the presentation layer that data has changed and
+the presentation layer can decide whether to retrieve the new data and display it.
+This allows the higher layer to be notified of events, without the lower layer using anything from the higher layer.
+
+The same issue occurs with error handling and asynchronous messaging.
+If a component in a higher layer sends a message, through an interface, to a component in a lower layer,
+the component in the lower layer needs a mechanism to report errors.
+A simple boolean or error code return may work in some situations, but often that is not appropriate.
+If the message is meant to return a value, in most languages it cannot also return an error result.
+There may also be different types of errors that need to be communicated to the higher layer.
+(e.g. The call from the higher layer broke the contract specified in the interface.
+Or, the lower layer is encountering a transient fault and the higher layer should try again later.)
+Exception handling would work, if all layers are within one executable environment,
+but a key purpose of a layered architecture is to allow separation of the layers,
+so throwing an exception is not appropriate.
+
+\link{Callbacks}{https://www.codefellows.org/blog/what-is-a-callback-anyway/}
+are used to deal with this issue for both error handling and asynchronous messaging.
+A component from a higher layer in the architecture passes a function as a parameter when it sends a message to a component in a lower layer.
+This function is called by the component in the lower layer of the architecture to report an error
+or to indicate that an asynchronous call has completed.
+
+\begin{definition}[Upward Notification Principle]
+    Lower layers communicate with higher layers using general interfaces, callbacks and/or events.
+    Dependencies are minimised by not relying on specific details published in a higher layer's interface.
+\end{definition}
+
+The subject and observer interfaces are examples of supporting logical infrastructure.
+Logging framworks are another example of supporting infrastructure.
+Commonly, all layers will need to use the logging framework.
+These are typically defined in separate ``layers'' that can be used by any of the other layers.
+These are sometimes called \emph{sidecar} or acquaintance layers, as visually they are often drawn on the side of the layered diagram.
+
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=0.33\textwidth]{images/layered_with_sidecar.png}
+  \end{center}
+  \caption{Layered architecture with sidecar.}
+\end{figure}
+
+\begin{definition}[Sidecar Spanning Principle]
+    A sidecar layer contains interfaces that support complex communication between layers
+    (e.g. design patterns like the observer pattern) or external services (e.g. a logging framework).
+\end{definition}
+
+A purist design approach says that a sidecar layer may only contain interfaces.
+In some environments, an architecture may decide that multiple sidecars are beneficial,
+and may even use these for reusable components from broader organisational systems
+or for objects that hold data passed to higher layers.
+Figure \ref{fig:sidecar2} is an example of using sidecars for both of these purposes in a
+\link{J2EE}{https://www.oracle.com/java/technologies/appmodel.html} application.
+
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=0.75\textwidth]{images/layered_with_multiple_sidecars.png}
+  \end{center}
+  \caption{Layered architecture with sidecars delivering implementation (figure 2.27 in Clements et al, 2010) \cite{clements2010documenting}.}
+  \label{fig:sidecar2}
+\end{figure}
+
+In the example shown in figure \ref{fig:sidecar2}, the servlets and action classes layer is equivalent to the presentation layer.
+The controller and service classes layers are a further partitioning of the business layer.
+The DAO (Data Access Objects) classes layer is equivalent to the persistence layer.
+
+The Presentation DTOs (Data Transfer Objects) sidecar contains simple \link{JavaBeans}{https://www.educative.io/edpresso/why-use-javabean}
+that contain data that is to be displayed.
+This approach takes advantage of J2EE's mechanism that automatically populates and updates data in the presentation layer.
+
+The Corporate DTOs and POJOs (Plain Old Java Objects) sidecar contains classes implemented by corporate-wide systems,
+and which are shared between systems.
+These provide common data and behaviour that spans multiple layers in many systems.
+
+\subsubsection{Closed/Open Layers}
+
+Some textbooks discuss the concept of closed and open layers.
+This is a way to descrive how communication flows between layers.
+Layers are categorised as either \textsl{open} or \textsl{closed}.
+By default layers are \textsl{closed}.
+Closed layers prevent direct communication between their adjacent layers, i.e. they enforce the neighbour communication principle.
 Figure \ref{fig:closed-layers} shows the communication channels (as arrows) in a completely closed architecture.
 
 \begin{figure}[ht]
@@ -367,16 +488,16 @@ Figure \ref{fig:closed-layers} shows the communication channels (as arrows) in a
     \label{fig:closed-layers}
 \end{figure}
 
-An architecture where all layers are closed enables maximum isolation.
+An architecture where all layers are closed provides maximum isolation.
 A change to the communication contracts of any layer will require changes to at most one other layer.
-However, there are a number of situations where an \textsl{open} layer can be useful.
-Open layers do not require communication to pass through, communication can occur `around' the layer.
 
-\todo{
-Thinking about it, I'm not sure that open and closed layers is worth teaching.
-I think variations in the physical structures of layers which enables sidecars, etc from Bass would be better.
-It's more flexible and enables more obvious examples, i.e. a logging service sidecar
-}
+Some architects will advocate that there are some situations where an \textsl{open} layer may be useful.
+Open layers do not require communication to pass through the layer, other layers can ``reach across'' the layer.
+The preferred approach is to use general interfaces, callbacks and/or events, as discussed in the sections describing
+the downward dependency, upward notification, and sidecar spanning principles.
+This provides mechanisms that allow data and control to flow both up and down in a layered architecture,
+without breaking the isolation principle that was the original intent of using a layered architecture.
+Open layers in architecture design should be avoided.
 
 \begin{figure}[ht]
     \centering
@@ -396,36 +517,30 @@ It's more flexible and enables more obvious examples, i.e. a logging service sid
         \draw[-Latex] ([xshift=30pt]P.south) -- ([xshift=30pt]D.north);
         \draw[-Latex] ([xshift=20pt]B.south) -- ([xshift=20pt]D.north);
     \end{tikzpicture}
-    \caption{A wolf in layer's clothing \cite{bass2013software}}
+    \caption{A wolf in layer's clothing \cite{bass2013software}.}
     \label{fig:wolf}
 \end{figure}
 
-\begin{figure}[ht]
-    \centering
-    \begin{tikzpicture}[component/.style={draw, anchor=east, fill=gray!40}]
-        \node [component, text width=100pt](P) at (0,0)  {Presentation Layer};
-        \node [component, text width=120pt](B) at (0,-1)  {Business Layer};
-        \node [component, text width=140pt](Pe) at (0,-2)  {Persistence Layer};
-        \node [component, text width=160pt](D) at (0,-3)  {Database Layer};
+\subsection{Advantages}
+The layer isolation principle means that the implementation of a layer can be changed without affecting any other layer,
+as long as the interface does not change.
 
-        \def\stairs{([xshift=-10pt]P.north west)
-                --([xshift=-10pt,yshift=-9pt]P.west)
-                --([xshift=-10pt,yshift=9pt]B.north west)
-                --([xshift=-10pt,yshift=-9pt]B.west)
-                --([xshift=-10pt,yshift=9pt]Pe.north west)
-                --([xshift=-10pt,yshift=-9pt]Pe.west)
-                --([xshift=-10pt,yshift=9pt]D.north west)
-                --([xshift=-10pt,yshift=-10pt]D.west)
-                --([xshift=-40pt]D.south west)}
-        \draw \stairs;
-    
-        \begin{scope}[on background layer]
-            \fill[gray!40] \stairs |- cycle;
-        \end{scope}
-    
-        % \node[draw, fit=(P) (D)](hardware) {};
-    \end{tikzpicture}
-    \caption{A more complicated layered architecture \cite{bass2013software} \todo{Figure is an example of a variation on open/closed layer model (fig 13.2 in bass - reconstruction in progress)}}
-    \label{fig:complicated-layers}
-\end{figure}
+The layer isolation principle also means that a developer only needs to understand the public interface to use a layer, and not its implementation details.
 
+The neighbour communication and downward dependency principles mean that if a layer changes its public interface, at most one other layer needs to change.
+
+The upward notification and sidecar spanning principles mean that complex systems, with sophisticated flows of control and data,
+can be implemented while maintaining the other layered architecture design principles.
+
+Lower layers in the architecture can be designed to deliver common services that may be reused across multiple applications.
+(e.g. The persistence layer can be designed to allow general purpose access to the database layer, allowing any type of database to be substituted into the system.)
+
+Layers may be deployed on different computing infrastructure. This enables the hardware to be optimised for the types of services provided by just one layer.
+It also enables scaling and replication by allowing layers to be duplicated across multiple servers.
+
+\subsection{Disadvantages}
+Poorly designed layers will encourage developers to break the layered architecture design principles in order to get the system to work.
+This can lead to a system that in detail more closely resembles a big ball of mud, than a layered design.
+
+Layering often introduces performance penalties.
+Requiring a chain of message passing to obtain a service from a much lower layer in the architecture adds to the cost of delivering the behaviour.
