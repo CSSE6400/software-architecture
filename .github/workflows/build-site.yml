@@ -7,6 +7,7 @@ on:
       - Build Assessment
       - Build Notes
       - Build Practicals
+      - Build Tutorials
       - Build Slides
     branches: [main]
     types: 
@@ -42,6 +43,16 @@ jobs:
           path: practicals
 
       - run: cp -r ./practicals/practicals/practicals ./public
+
+      - name: Download tutorials
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: build-tutorials.yml
+          workflow_conclusion: success
+          branch: main
+          path: tutorials
+
+      - run: cp -r ./tutorials/tutorials/tutorials ./public
 
       - name: Download slides
         uses: dawidd6/action-download-artifact@v2
