@@ -80,6 +80,22 @@
     % \end{center}
 }
 
+% Tweet environment
+\RequirePackage{wrapfig}
+\definecolor{tweetborder}{RGB}{239, 243, 244}
+\definecolor{tweethandlecolor}{RGB}{83, 100, 113}
+\newcommand{\tweet}[5]{
+    \begin{tcolorbox}[colframe=white,width=0.5\textwidth]
+        \begin{wrapfigure}[2]{l}{2\baselineskip}
+            \vspace{-1.3\baselineskip}
+            \tikz{\clip circle (\baselineskip) node {\includegraphics[height=2\baselineskip]{#1}}}
+        \end{wrapfigure}
+        \textbf{#2}\\
+        {\color{tweethandlecolor} @#3}\\[0.5em]
+        {#4}
+    \end{tcolorbox}
+}
+
 % Definition environment which matches the notes
 \RequirePackage{tcolorbox}
 \newcounter{definition}[part]
