@@ -19,3 +19,4 @@ tlmgr install changepage
 tlmgr install datenumber
 tlmgr install thmtools
 tlmgr install cjk
+tlmgr install wrapfig

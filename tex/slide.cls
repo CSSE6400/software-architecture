@@ -30,13 +30,19 @@
 \RequirePackage[sfdefault]{cabin}
 \RequirePackage[T1]{fontenc}
 
+\RequirePackage{wrapfig}
 
 % Remove navigation
 \beamertemplatenavigationsymbolsempty
 
 % Custom title page
 \defbeamertemplate*{title page}{customized}[1][]
-{ \centering
+{
+\mbox{}\hfill\raisebox{-1.4\height}[0pt][0pt]{%
+{\usebeamercolor[fg]{titlegraphic}\inserttitlegraphic}}
+\vspace*{-\baselineskip}
+
+%   \centering
   \usebeamerfont{title}\Huge{\color{primary}\inserttitle}\par
   \bigskip
   \usebeamerfont{subtitle}{\Large\color{primary}\insertsubtitle}\par
@@ -46,7 +52,6 @@
   
   \usebeamerfont{date}{\large\color{secondary}\insertdate}\par
   {\large\color{secondary}\usebeamerfont{institute}\insertinstitute}\par
-  \usebeamercolor[fg]{titlegraphic}\inserttitlegraphic
 }
 
 % Footnote without the numbering
@@ -81,7 +86,6 @@
 }
 
 % Tweet environment
-\RequirePackage{wrapfig}
 \definecolor{tweetborder}{RGB}{239, 243, 244}
 \definecolor{tweethandlecolor}{RGB}{83, 100, 113}
 \newcommand{\tweet}[5]{
