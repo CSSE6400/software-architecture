@@ -1,0 +1,35 @@
+name: Build Tutorials
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - tutorials/**
+
+jobs:
+  build-notes:
+    runs-on: ubuntu-latest
+    container: braewebb/pandoc:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install latex dependencies
+        run: ./.github/workflows/latex-dependencies.sh
+
+      - name: Correct last modified
+        run: ./.github/workflows/set-last-updated.sh
+
+      - name: Compile Tutorials
+        run: ./bin/build_tutorials.sh
+
+      - name: Upload Slides
+        uses: actions/upload-artifact@v2
+        with:
+          name: tutorials
+          path: |
+            ./dist/**/*.pdf
+  
