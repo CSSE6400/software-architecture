@@ -50,7 +50,12 @@
 \newif\ifteachermode
 \newcommand{\teacher}[1]{
     \ifteachermode
-    \begin{tcolorbox}[title=For the teacher]
+    \begin{tcolorbox}[
+        title=For the teacher,
+        colframe = green!25,
+        colback  = green!10,
+        coltitle = green!20!black
+    ]
         {#1}
     \end{tcolorbox}
     \fi
@@ -78,6 +83,11 @@
     \iflastupdated
     \begin{textblock*}{\textwidth}(425pt,20pt)
         \footnotesize Last Updated on \lastmodified
+    \end{textblock*}
+    \fi
+    \ifteachermode
+    \begin{textblock*}{\textwidth}(225pt,55pt)
+        \rotatebox{25}{\large \color{red} Teacher Version}
     \end{textblock*}
     \fi
 }
