@@ -158,6 +158,14 @@
     \end{tcolorbox}
 }
 
+% Notice
+\definecolor{notice}{RGB}{255, 105, 97}
+\newcommand\notice[1]{
+    \begin{tcolorbox}[title=Notice,colframe=notice]
+    #1
+    \end{tcolorbox}
+}
+
 % Defintion
 \newcounter{definition}[part]
 \newenvironment{definition}[1][]

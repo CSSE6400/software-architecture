@@ -1,7 +1,5 @@
 \documentclass{csse4400}
 
-% \teachermodetrue
-
 \usepackage{languages}
 
 \title{AWS Academy Introduction}
@@ -75,7 +73,7 @@ In this course, we will be using it in two ways:
 
 
 \section{Exploring the Interface}
-\aside{We will just be looking at the learner lab today, please ask on the discussion board if you need help using the cloud foundations course.}
+\aside{We will just be looking at the learner lab today, please ask on the slack if you need help using the cloud foundations course.}
 
 The following steps will enter the learner lab:
 
@@ -136,6 +134,8 @@ You might find this interface overwhelming.
 It is important to note that since EC2 is one of the primary services offered by AWS,
 many smaller services we do not need are bundled into the service.
 
+\teacher{The foundation course has a module (6) that covers EC2 in more depth, feel free to direct students to it for after the hextris example.}
+
 \vspace{3mm}
 \includegraphics[width=0.9\textwidth]{images/ec2-interface}
 \vspace{3mm}
@@ -156,6 +156,8 @@ Ask for help if you aren't sure.}
 , it is considered one of the fundamental images.
 Search for it via the code and select it.
 
+\teacher{This AMI is an instance of Amazon Linux 2 which is a RedHat style distro with yum as its package manager.}
+
 \subsection{Instance Settings}
 The next few settings for configuring your instance are:
 \begin{enumerate}
@@ -169,6 +171,7 @@ The next few settings for configuring your instance are:
 \item Change the description to something meaningful, e.g. \texttt{Hextris HTTP and SSH access}.
 \item Add a rule, select the \texttt{Type} as \texttt{HTTP}.
 \end{enumerate}
+\teacher{To make the box pingable dont forget to add the All-ICMP4 with source anywhere.}
 \item When prompted to choose a key pair (after the clicking \texttt{Launch} button), select the existing \texttt{vockey | RSA} option.
 \end{enumerate}
 
@@ -182,12 +185,31 @@ You should now see a new instance created, its instance state might not yet be \
 
 Note the public IPv4 address, we will need to use this to connect to the server.
 
+\notice{
+    For terminal examples in this section, lines that begin with a \$ indicate a line which you should 
+    type while the other lines are example output that you should expect. Not all of the output is captured 
+    in the examples to save on space. 
+}
+
 \begin{enumerate}
     \item Return to the learner lab interface.
-    \item Run the following, replacing \texttt{127.0.0.1} with the public IP of your instance.
+    \item Run the following, \textcolor{red}{replacing \texttt{127.0.0.1}} with the public IP of your instance.
           This command uses the \texttt{vockey | RSA} key pair to gain SSH access to the machine.
 \end{enumerate}
 \bash{ssh -i ~/.ssh/labsuser.pem ec2-user@127.0.0.1}
+
+example:
+\bash{
+    ssh -i ~/.ssh/labsuser.pem ec2-user@35.173.230.42^^J
+The authenticity of host '35.173.230.42 (35.173.230.42)' can not be established.^^J
+ECDSA key fingerprint is SHA256:W7OzzZm6nhwM9tB9Kb7enONPryo1a4259hJmSAZX7HQ.^^J
+Are you sure you want to continue connecting (yes/no)?^^J
+^^J
+# At this point you will want to type yes and press enter ^^J
+Warning: Permanently added '35.173.230.42' (ECDSA) to the list of known hosts.^^J
+Connection to 35.173.230.42 closed by remote host.^^J
+Connection to 35.173.230.42 closed.
+}
 
 \section{Installing Hextris}
 Hextris is very simple to install, using an EC2 interface is perhaps overkill for it.
@@ -198,8 +220,21 @@ We can install and start the \texttt{httpd} service for this.
 The AMI we have picked uses the yum package manager, so to install httpd we run:
 
 \bash{sudo yum install httpd^^J
-\$ sudo systemctl enable httpd^^J
-\$ sudo systemctl start httpd
+Loaded plugins: extras_suggestions, langpacks, priorities, update-motd^^J
+Resolving Dependencies^^J
+..... ^^J
+..... ^^J
+Total download size: 1.9 M^^J
+Installed size: 5.2 M^^J
+Is this ok [y/d/N]:^^J
+^^J
+# enter y to install ^^J
+..... ^^J
+..... ^^J
+Complete! ^^J
+\$ sudo systemctl enable httpd ^^J
+Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service to /usr/lib/systemd/system/httpd.service. ^^J
+\$ sudo systemctl start httpd ^^J
 }
 
 All files in the \texttt{/var/www/html} directory will now be served when accessed via HTTP.
@@ -214,9 +249,14 @@ Finally, let's double check we are in the \texttt{/var/www/html} directory.
 
 \bash{cd /var/www/html}
 
+\teacher{This path will currently be owned by root, proper permissions can be done (but are not nesscary) by following \url{https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Tutorials.WebServerDB.CreateWebServer.html}}
+
 And clone the repository into that directory.
 
 \bash{sudo git clone https://github.com/Hextris/hextris .}
+
+\teacher{Mention to not forget about the "." as it is easily missed.}
+\teacher{If git is prompting for a username and password then there may be a typo in the repository url.}
 
 Now if you navigate to the \textbf{http} address of the public IP address (e.g. \url{http://18.208.165.253}), you should be able to see your newly deployed website.
 
