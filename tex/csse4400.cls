@@ -46,6 +46,16 @@
     \end{tcolorbox}
 }
 
+% Teaching macro
+\newif\ifteachermode
+\newcommand{\teacher}[1]{
+    \ifteachermode
+    \begin{tcolorbox}[title=For the teacher]
+        {#1}
+    \end{tcolorbox}
+    \fi
+}
+
 % Undo the effects of an appendix in the full notes
 \newcommand\unappendix{\par
   \setcounter{section}{0}%
