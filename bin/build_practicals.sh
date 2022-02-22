@@ -15,6 +15,14 @@ for folder in ${REPO_ROOT}/practicals/*; do
             exit 1
         fi
         cp ./out/main.pdf "${REPO_ROOT}/dist/practicals/$(basename $folder).pdf"
+
+        # Build instructor version with flags enabled
+        latexmk -halt-on-error -usepretex 
+        if [ $? -ne 0 ]; then
+            echo "error: $(basename $folder) practical failed to build instructor version"
+            exit 1
+        fi
+        cp ./out/main.pdf "${REPO_ROOT}/dist/practicals/$(basename $folder)-instructor.pdf"
         popd
     fi
 done
