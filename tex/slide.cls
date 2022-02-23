@@ -113,6 +113,17 @@
     }
     {\end{tcolorbox}}
 
+\newcounter{corollary}[part]
+\newenvironment{col}[1][]
+    {\refstepcounter{corollary}
+    \vspace{1em}
+    \begin{tcolorbox}%
+    \noindent {\color{primary}{Corollary~\thecorollary. #1}}
+    
+    \vspace{4pt}
+    }
+    {\end{tcolorbox}}
+
 % The standard `point' to highlight something
 \newcommand{\point}[2][]{
     \frame[c,plain]{
@@ -147,6 +158,16 @@
         \begin{defn}[#2]
             #3
         \end{defn}}
+    }
+}
+
+% Point with a corollary
+\renewcommand{\corollary}[3][]{
+    \point[#1]{
+        {\large
+        \begin{col}[#2]
+            #3
+        \end{col}}
     }
 }
 
