@@ -1,0 +1,22 @@
+@startuml activity-tracking
+skinparam shadowing false
+
+[ActivityEvent] as source <<source>>
+[TagTime] as tagTime <<filter>>
+[EventCache] as cache <<filter>>
+package "Page Analytics" {
+    [Anonymize] as anon <<filter>>
+    database "PageAnalytics" as pagedb
+}
+package "User Analytics" {
+    [TagPage] as tagPage <<filter>>
+    database "UserAnalytics" as userdb
+}
+
+source -right-> tagTime
+tagTime -right-> cache
+cache -right-> anon
+anon --> pagedb
+cache --> tagPage
+tagPage --> userdb
+@enduml

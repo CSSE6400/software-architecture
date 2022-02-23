@@ -6,11 +6,16 @@
 
 \section{Introduction}
 
-The pipeline architecture needs very minimal introduction.
+Pipeline architectures take the attribute of modularity of a system to the extreme.
+Pipeline architectures are composed of small well-designed components which can ideally be combined interchangeably.
+In a pipeline architecture, input is passed through a sequence of components until the desired output is reached.
 Almost every developer will have been exposed to software which implements this architecture.
-Some notable examples are bash, hadoop, and most functional programming languages.
-A pipeline architecture consists of modular components which accept input and return output.
-Data is piped through a sequence of components until the desired output is reached.
+Some notable examples are bash, hadoop, some older compilers, and most functional programming languages.
+
+\begin{definition}[Pipeline Architecture]
+    Components connected in such a way that the output of one component is the input of another.
+\end{definition}
+
 
 \begin{figure}[ht]
     \centering
@@ -32,13 +37,26 @@ Data is piped through a sequence of components until the desired output is reach
 \label{fig:bash-example}
 \end{figure}
 
+The de-facto example of a well-implemented pipeline architecture is bash,
+we'll explore the philosophy that supports the architecture shortly.
+The above diagram represents the bash command, \bash{cat assignment.py | grep "f***" | wc -l | tee anger.txt}.
+
+\noindent
+If you're unfamiliar with unix processes (start learning quick!),
+\begin{description}
+    \item[cat] Send the contents of a file to the output.
+    \item[grep] Send all lines of the input matching a pattern to the output.
+    \item[wc -l] Send the number of lines in the input to the output.
+    \item[tee] Send the input to stdout and a file.
+\end{description}
+
 \section{Terminology}
 
-As illustrated by Figure \ref{fig:pipe-filter}, a pipeline architecture consists of just two components;
+As illustrated by Figure \ref{fig:pipe-filter}, a pipeline architecture consists of just two elements;
 
 \begin{description}
     \item[Filters] modular software components, and
-    \item[Pipes] the flow of data between filters.   
+    \item[Pipes] the transmission of data between filters.   
 \end{description}
 
 \begin{figure}[ht]
@@ -69,7 +87,7 @@ As illustrated by Figure \ref{fig:pipe-filter}, a pipeline architecture consists
 \end{description}
 
 The example in Figure \ref{fig:bash-example} shows how bash's pipeline architecture can be used to manipulate data in unix files.
-Figure \ref{fig:bash-example-labelled} helps to clarify the above terminology by labelling each of the bash processes in the example.
+Figure \ref{fig:bash-example-labelled} labels the bash command using the terminology of pipeline architectures.
 
 \begin{figure}[H]
     \centering
@@ -90,6 +108,45 @@ Figure \ref{fig:bash-example-labelled} helps to clarify the above terminology by
 \caption{Figure \ref{fig:bash-example} with labelled filter types.}
 \label{fig:bash-example-labelled}
 \end{figure}
+
+\section{Pipeline Principles}
+While the concept of a pipeline architecture is straightforward,
+there are some principles which should be maintained to produce a well-designed and re-usable architecture.
+
+\begin{definition}[One Direction Principle]
+    Data should flow in one direction, this is the \textsl{downstream}.
+\end{definition}
+
+The data in a pipeline architecture should all flow in the same direction.
+Pipelines should not have loops nor should filters pass data back to their \textsl{upstream} or input filter.
+The data flow \textsl{is} allowed to split into multiple paths.
+For example, Figure \ref{fig:analytics} demonstrates a potential architecture of a software which processes the stream of user activity on a website.
+The pipeline is split into a pipeline which aggregates activity on the current page and a pipeline which records the activity of this specific user.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{diagrams/activity-tracking.png}
+    \label{fig:analytics}
+    \caption{Pipeline architecture for processing activity on a website for later analytics.}
+\end{figure}
+
+The One Direction Principle makes the pipeline architecture a poor choice for applications which require interactivity,
+as the results aren't propagated back to the input source.
+However, it is a good choice when you have data which needs processing with no need for interactive feedback.
+
+\begin{definition}[Independent Filter Principle]
+Testers and transformers should not rely on specific upstream or down-stream filters.
+\end{definition}
+
+In order to maintain the reusability offered by the pipeline architecture,
+it is important to remove dependencies between individual filters.
+Where possible, filters should be able to move around freely.
+In the example architecture in Figure \ref{fig:analytics},
+\todo{Filters needed between tags and databases}
+the EventCache component should be able to work fine without
+the TagTime component.
+Likewise, EventCache should be able to process data if the
+Anonymize filter is placed before it.
 
 \section{Case Study: MapReduce}
 
