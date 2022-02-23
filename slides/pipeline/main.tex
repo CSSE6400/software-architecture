@@ -1,4 +1,7 @@
 \documentclass{slide}
+% \usepackage{pgfpages}
+
+% \setbeameroption{show notes on second screen}
 
 \title{Pipeline Architecture}
 \subtitle{CSSE6400}
@@ -16,31 +19,56 @@
 
 \maketitle
 
-\questionanswer{Can you name a \highlight{pipeline archiecture}?}{How about \highlight{bash}?}
+\point[So far\dots]{Layered architectures reduce the impact of changing a layer}
+
+\note{We're emphasizing that pipeline architecture is an layrered architecture taken to an extreme, minus the ability to have upward notifications.}
+
+\questionanswer{Why does the layer order matter?}{Each layer implements a different interface.}
+
+\point[So\dots]{If every layer implements the same interface?}
+
+\note{We essentially have a pipeline architecture.}
+
+\point[Extreme layered architecture]{Pipeline Architectures\footnote{sorta}}
+
+\definition{Pipeline Architecture}{Components connected in such a way that the output of one component is the input of another.}
+
+\questionanswer{Can you think of a \highlight{pipeline archiecture}?}{How about \highlight{bash}?}
+
+\note[itemize]{
+    \item Bash
+    \item Compilers
+    \item Functional programming
+    \item ??
+}
 
 \begin{frame}[fragile]
 \begin{code}[language=shell,mathescape]{}
 $>>$ cat assignment.py | grep "hack" | wc -l \
     | tee code-quality.txt
 \end{code}
-\end{frame}
-
-\begin{frame}
+\only<2-3>{Notice:
+\begin{itemize}
+    \item Each program performs a small well-defined task.
+    \item<3-> Each program implements the same interface (i.e. raw text).
+\end{itemize}}
+\only<4->{
     \centering
-\begin{tikzpicture}[>=latex']
-    \tikzset{block/.style= {draw, rectangle, align=center,minimum width=2cm,minimum height=1cm},}
-
-    \node [block] (input) {cat assignment.py};
-    \node [block, right =1cm of input] (grep) {grep "hack"};
-    \node [block, right =1cm of grep] (wc) {wc -l};
-    \node [block, right =1cm of wc] (tee) {tee code-quality.txt};
-
-    \path[draw,->]
-                (input) edge (grep)
-                (grep) edge (wc)
-                (wc) edge (tee)
-                ;
-\end{tikzpicture}
+    \begin{tikzpicture}[>=latex']
+        \tikzset{block/.style= {draw, rectangle, align=center,minimum width=2cm,minimum height=1cm},}
+    
+        \node [block] (input) {cat assignment.py};
+        \node [block, right =1cm of input] (grep) {grep "hack"};
+        \node [block, right =1cm of grep] (wc) {wc -l};
+        \node [block, right =1cm of wc] (tee) {tee code-quality.txt};
+    
+        \path[draw,->]
+                    (input) edge (grep)
+                    (grep) edge (wc)
+                    (wc) edge (tee)
+                    ;
+    \end{tikzpicture}
+}
 \end{frame}
 
 \begin{frame}[c]
@@ -63,6 +91,8 @@ $>>$ cat assignment.py | grep "hack" | wc -l \
 }
 }
 
+\note{Note the simplicity and modularity.}
+
 \only<2->{
     \par\bigskip{\normalsize\color{primary}Filters}
 
@@ -76,7 +106,7 @@ $>>$ cat assignment.py | grep "hack" | wc -l \
 }
 \end{frame}
 
-\begin{frame}
+\begin{frame}{Types of filters}
 \begin{minipage}{0.45\textwidth}
 \only<1->{
     \par\bigskip{\normalsize\color{primary}Producers}
@@ -125,44 +155,108 @@ $>>$ cat assignment.py | grep "hack" | wc -l \
 \end{tikzpicture}
 \end{frame}
 
-\question{Does this seem familiar?}
+\definition{One Direction Principle}{Data should flow in one direction, this is the \textsl{downstream}.}
 
-\point[Poll]{Who has done \highlight{functional programming}?}
+\note{This makes pipeline architectures bad for interactivity.}
 
-\begin{frame}[fragile]
-\begin{code}[language=lambda]{}
-let sum = reduce 
-            (lambda total value -> total + value) 
-            (map (lambda seq -> size seq) xs)
-            0
-\end{code}
+\definition{Independent Filter Principle}{Testers and transformers should not rely on specific upstream or downstream filters.}
+
+\note[itemize]{
+    \item This is not required but it helps in designing good architectures.
+    \item Note that producers and consumers can assume they don't have an upstream or downstream respectively.
+}
+
+\corollary{Shared Interface}{All testers and transformers implement the same interface.}
+
+\note{This follows from independent filters.}
+
+\point[\textsl{The} Case Study]{Bash}
+
+\note{Quick discussion about how the bash philosophy enables many small components which work well together.}
+
+\question{What does \highlight{BASH} stand for?}
+
+\begin{frame}
+\centering
+\includegraphics[width=0.9\textwidth]{bashcomponents.jpg}
+\end{frame}
+
+\question{Who has heard of \highlight{literate programming}?}
+
+\note{We're now going on a quick tangent about how the pipeline archiecture of bash allowed McIlroy to best Knuth.}
+
+\point[The Challenge --- set by Jon Bently]{
+    \begin{enumerate}
+        \item Read a file of text.
+        \item Determine the n most frequently used words.
+        \item Print out a sorted list of those words along with their frequencies.
+    \end{enumerate}
+}
+
+\point[Knuth's Solution]{\highlight{17 pages} of elegant and descriptive code.}
+
+\begin{frame}
+\includegraphics[page=1,width=0.45\textwidth]{perls.pdf}
+\includegraphics[page=2,width=0.45\textwidth]{perls.pdf}
 \end{frame}
 
 \begin{frame}[fragile]
-\begin{code}[language=lambda]{}
-let sum = reduce + (map size xs) 0
-\end{code}
+    \par\bigskip
+        {\color{primary}McIlroy's Solution}
+    \begin{code}[language=bash]{}
+tr -cs A-Za-z '\n'
+tr A-Z a-z |
+sort |
+uniq -c |
+sort -rn |
+sed ${1}q
+    \end{code}
 \end{frame}
 
-\begin{frame}[fragile]
-\large
-\begin{defn}[$map$]
-\begin{code}[language=lambda]{}
-map : (type$_1$ -> type$_2$) -> type$_1 Seq$ -> type$_2 Seq$
-map $f$ $xs$
-\end{code}
-\end{defn}
+\questionanswer{Is literate programming bad?}{No, the unix philosophy is just good.}
+
+\point[The Unix Philosophy]{
+\begin{itemize}
+\item Write programs that do one thing and do it well.
+\item<2-> Write programs to work together.
+\item<3-> Write programs to handle text streams, because that is a universal interface.
+\end{itemize}}
+
+\begin{frame}{Bash itself is a pipeline}
+\centering
+\begin{tikzpicture}[>=latex']
+    \tikzset{block/.style= {draw, rectangle, align=center,minimum width=2cm,minimum height=1cm},}
+
+    \node [block] (input) {Input};
+    \node [block,right =1cm of input] (parsing) {Parsing};
+    \node [block,right =1cm of parsing] (braces) {Brace Expansion};
+    \node [block,right =1cm of braces] (tilde) {Tilde Expansion};
+    \node [block,below =2cm of input] (variable) {Variable Expansion};
+    \node [block,right =1cm of variable] (arithmetic) {Arithmetic};
+    \node [block,right =1cm of arithmetic] (split) {Word Splitting};
+    \node [block,right =1cm of split] (fin) {\dots};
+
+    \path[draw,->]
+                (input) edge (parsing)
+                (parsing) edge (braces)
+                (braces) edge (tilde)
+                (tilde) edge (variable)
+                (variable) edge (arithmetic)
+                (arithmetic) edge (split)
+                (split) edge (fin)
+                ;
+\end{tikzpicture}
 \end{frame}
 
-\begin{frame}[fragile]
-\large
-\begin{defn}[$reduce$]
-\begin{code}[language=lambda]{}
-reduce : (type$_1$ -> type$_1$ -> type$_1$) -> type$_1 Seq$ -> type$_1$ -> type$_1 Seq$
-reduce $f$ $xs$ $initial$
-\end{code}
-\end{defn}
-\end{frame}
+\note{Just an aside looking at it more practically rather than philosophically.}
+
+\point[Case Study]{Compilers}
+
+\note{Exploring how the pipeline architecture can be integrated with other architectural styles like blackboard.}
+
+\point[Case Study]{MapReduce}
+
+\note{Exploring the power in simplicity.}
 
 \questionanswer{What's the advantage of the map reduce pattern?}{Parallelism \cite{mapreduce}}
 
