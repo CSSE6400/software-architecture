@@ -176,3 +176,13 @@
     \vspace{4pt}
     }
     {\end{tcolorbox}}
+
+\newcounter{corollary}[part]
+\newenvironment{corollary}[1][]
+    {\refstepcounter{corollary}
+    \begin{tcolorbox}%
+    \noindent \textbf{Corollary~\thecorollary. #1}
+    
+    \vspace{4pt}
+    }
+    {\end{tcolorbox}}

@@ -1,22 +1,30 @@
 @startuml activity-tracking
 skinparam shadowing false
+skinparam ComponentBorderColor black
+skinparam ArrowColor black
 
 [ActivityEvent] as source <<source>>
 [TagTime] as tagTime <<filter>>
 [EventCache] as cache <<filter>>
 package "Page Analytics" {
     [Anonymize] as anon <<filter>>
+    [StoreEvents] as pageStore <<filter>>
     database "PageAnalytics" as pagedb
 }
 package "User Analytics" {
     [TagPage] as tagPage <<filter>>
+    [StoreEvents] as userStore <<filter>>
     database "UserAnalytics" as userdb
 }
 
 source -right-> tagTime
 tagTime -right-> cache
+
 cache -right-> anon
-anon --> pagedb
+anon --> pageStore
+pageStore --> pagedb
+
 cache --> tagPage
-tagPage --> userdb
+tagPage --> userStore
+userStore --> userdb
 @enduml
