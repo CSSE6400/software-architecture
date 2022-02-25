@@ -1,5 +1,5 @@
 \title{Pipeline Architecture}
-\author{Brae Webb}
+\author{Brae Webb \& Richard Thomas}
 \date{\week{2}}
 
 \maketitle
@@ -38,11 +38,11 @@ Some notable examples are bash, hadoop, some older compilers, and most functiona
 \end{figure}
 
 The de-facto example of a well-implemented pipeline architecture is bash,
-we'll explore the philosophy that supports the architecture shortly.
+we will explore the philosophy that supports the architecture shortly.
 The above diagram represents the bash command, \bash{cat assignment.py | grep "f***" | wc -l | tee anger.txt}.
 
 \noindent
-If you're unfamiliar with unix processes (start learning quick!),
+If you are unfamiliar with Unix processes (start learning quick!).
 \begin{description}
     \item[cat] Send the contents of a file to the output.
     \item[grep] Send all lines of the input matching a pattern to the output.
@@ -86,7 +86,7 @@ As illustrated by Figure \ref{fig:pipe-filter}, a pipeline architecture consists
     \item[Consumers] The final state of a pipeline architecture is a consumer filter, where data is eventually used.
 \end{description}
 
-The example in Figure \ref{fig:bash-example} shows how bash's pipeline architecture can be used to manipulate data in unix files.
+The example in Figure \ref{fig:bash-example} shows how bash's pipeline architecture can be used to manipulate data in Unix files.
 Figure \ref{fig:bash-example-labelled} labels the bash command using the terminology of pipeline architectures.
 
 \begin{figure}[H]
@@ -120,18 +120,18 @@ there are some principles which should be maintained to produce a well-designed 
 The data in a pipeline architecture should all flow in the same direction.
 Pipelines should not have loops nor should filters pass data back to their \textsl{upstream} or input filter.
 The data flow \textsl{is} allowed to split into multiple paths.
-For example, Figure \ref{fig:analytics} demonstrates a potential architecture of a software which processes the stream of user activity on a website.
+For example, figure \ref{fig:analytics} demonstrates a potential architecture of a software which processes the stream of user activity on a website.
 The pipeline is split into a pipeline which aggregates activity on the current page and a pipeline which records the activity of this specific user.
 
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{diagrams/activity-tracking.png}
-    \label{fig:analytics}
     \caption{Pipeline architecture for processing activity on a website for later analytics.}
+    \label{fig:analytics}
 \end{figure}
 
 The One Direction Principle makes the pipeline architecture a poor choice for applications which require interactivity,
-as the results aren't propagated back to the input source.
+as the results are not propagated back to the input source.
 However, it is a good choice when you have data which needs processing with no need for interactive feedback.
 
 \begin{definition}[Independent Filter Principle]\label{independent}
@@ -141,7 +141,7 @@ Filters should not rely on specific upstream or downstream components.
 In order to maintain the reusability offered by the pipeline architecture,
 it is important to remove dependencies between individual filters.
 Where possible, filters should be able to be moved freely.
-In the example architecture in Figure \ref{fig:analytics},
+In the example architecture in figure \ref{fig:analytics},
 the EventCache component should be able to work fine without
 the TagTime component.
 Likewise, EventCache should be able to process data if the
@@ -152,18 +152,26 @@ However, a producer should be indifferent to which downstream filter it feeds in
 Likewise a consumer should not depend on the upstream filter.
 
 \begin{corollary}[Generic Interface]\label{interface}
-The interface between filters should be generic.
+    The interface between filters should be generic.
 \end{corollary}
 
-Corollary \ref{interface} follows from Definition \ref{independent}.
+Corollary \ref{interface} follows from definition \ref{independent}.
 In order to reduce the dependence on specific filters,
 all filters of a system should implement a generic interface.
-For example, in bash filters interface through the piping
-of raw text data.
-All unix processes should support raw text input and output.
+For example, in bash, filters interface through the piping of raw text data.
+All Unix processes should support raw text input and output.
+
+\begin{corollary}[Composable Filters]\label{composable}
+    Filters (i.e. Transformers \& Testers) can be applied in any order.
+\end{corollary}
+
+Corollary \ref{composable} also follows from definition \ref{independent}.
+If filters are independent they can be linked together in any order.
+This means that a software designer can deliver different behaviour based on the order in which filters are linked.
+For example, in bash, applying a tester before or after a transformer can lead to different results.
 
 \section{Conclusion}
 
 A pipeline architecture is a good choice for data processing when interactivity is not a concern.
 Conceptually pipelines are very simple.
-Following the principles of a pipeline architecture will delivery a modular system which supports high reuse.
+Following the principles of a pipeline architecture will deliver a modular system which supports high reuse.
