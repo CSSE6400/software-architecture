@@ -1,6 +1,6 @@
 \title{Security Principles}
 \author{Brae Webb}
-\date{\week{1}}
+\date{\week{2}}
 
 \maketitle
 
@@ -33,7 +33,7 @@ you constantly reflect on the security implications of your each and every decis
 \section{You}
 Before we even fantasise about keeping our applications secure, let's review if you are secure right now.
 As developers we often have heightened privileges and access, at times above that of even company CEOs.
-If you are not secure, then nor is anything you work on.
+If you are not secure, then nor is anything on which you work.
 Let's review some of the basics.
 
 \textbf{Keep your software up to date.}
@@ -46,7 +46,7 @@ You must keep your software up to date.
 \textbf{Use multi-factor authentication.}
 This may be hard to explain to your grandmother but this should be obvious to software developers.
 One million passwords are stolen every week \cite{password-security}.
-If you don't have some sort of multi-factor authentication enabled, hackers can access your account immediately after stealing your password.
+If you do not have some sort of multi-factor authentication enabled, hackers can access your account immediately after stealing your password.
 
 \textbf{Use a password manager.}
 Following from the startling statistic of a million stolen passwords per week, we must seriously consider how we use passwords.
@@ -55,7 +55,7 @@ We should assume that our password will be compromised.
 What can we do about this?
 The first thing is to avoid password reuse, one password per service.
 Of course, humans have very limited memory for remembering good passwords.
-So go through and update your passwords with randomly generated secure passwords and then, store them in a password manager.
+So go through and update your passwords with randomly generated secure passwords, and then store them in a password manager.
 
 
 \section{Principles of Securing Software}
@@ -63,7 +63,7 @@ Okay, now that we are not a security risk ourselves, we can start considering ho
 Before looking at pragmatic practices, we will develop a set of guiding principles.
 These principles are far from comprehensive but they provide a useful foundation to enable discussion of our security practices.
 The principles presented in this course are derived from Saltzer and Schroeder \cite{1975-security-design-principles},
-Gasser \cite{1988-security-design-principles}, and Viega and McGeaw \cite{2001-security-design-principles}.
+Gasser \cite{1988-security-design-principles}, and Viega and McGraw \cite{2001-security-design-principles}.
 Some principles have been renamed for consistency and clarity.
 Refer to Appendix \ref{all-principles} for the comprehensive list of principles from these sources. 
 
@@ -86,7 +86,7 @@ If the developers follow the principle of least privilege, then the account used
 
 For this example, the tracing website had to be developed and rolled out quickly, as such,
 the developers created only one SQL user which they used for both the tracing website and the portal where the government can log new locations.
-This user account would have to have the ability to create new close contact locations, and if done poorly enough,
+This user account would have the ability to create new close contact locations, and if done poorly enough,
 the account might even have access to delete existing locations.
 
 Since the developers have violated the principle of least privilege,
@@ -124,7 +124,7 @@ And when your software does fail, it should not create a security vulnerability 
 An interesting example of failing securely comes from Facebook's October 2021 outage which we discussed previously.
 As you may be aware, one cause of the outage was a DNS resolution issue triggered by Facebook's data centres going offline \cite{facebook-outage}.
 The DNS resolution issue meant that the internal Facebook development tools and communication channels went down as well.
-As you might expect, losing your tools and your team members makes resolving an outage far more difficult.
+As you might expect, losing your tools and access to your team members makes resolving an outage far more difficult.
 
 Early reports of the incident indicated that the outage of Facebook's internal infrastructure also meant employees were locked out of the data centres.
 While it seems that developers were locked out of their buildings, the data centres were not affected.
@@ -165,7 +165,7 @@ and routers secured by the default username and password.
 
 \paragraph{Example}
 An example which immediately springs to mind is our first and second year assignment marking tools.
-To date, I'm not aware of the tools being exploited, however they are currently vulnerable.
+To date, I am not aware of the tools being exploited, however they are currently vulnerable.
 The tools currently rely on students not knowing how they work.
 There are ways to create `assignment' submissions which pass all the functionality tests for any given semester.
 Fortunately, the threat of academic misconduct is enough of a deterrent that it has yet to be a problem.
@@ -181,18 +181,18 @@ In many situations this is appropriate, however, a truly secure system should be
 The final principle we should explore is the principle of usability, also known as `psychological acceptability'.
 This principle asks that we have realistic expectations of our users.
 If the user is made to jump through numerous hoops to securely use your application, they will find a way around it.
-The idea is that the security systems put in place should, as much as possible, avoiding making it more difficult to access resources.
+The idea is that the security systems put in place should, as much as possible, avoid making it more difficult to access resources.
 
 \paragraph{Example}
 The example for this principle includes a confession.
 The university has implemented a multi-factor authentication mechanism for staff.\footnote{coming soon to students}
 Unfortunately, there is a bug in the single sign-on which means that MFA is not remembered causing the system to re-prompt me at every \textsl{single} log in.
-A direct consequence of this inconvenience is that I've installed software on all my devices which automatically authenticates the MFA,
+A direct consequence of this inconvenience is that I have installed software on all my devices which automatically authenticates the MFA,
 bypassing, in part, the intended additional security.
 
 The university through violating the principle of usability has made it more difficult for users to be secure than insecure.
 As predicted by the principle, the inconvenience leads straight to bypassing.
-Violation of this principle often usually has relatively minimal \emph{visible} impacts,
+Violation of this principle often has relatively minimal \emph{visible} impacts,
 which results in the principle not being considered as often.
 The long-term implications are that what was an annoyance circumvented by your users,
 may become the cause of a major security breach long after the security feature was implemented.
@@ -210,13 +210,15 @@ if you trace the history of cryptography back far enough you will eventually end
 
 While encryption is outside of the scope of this course,
 it is well worth having knowledge of available encryption techniques.
+You should not attempt to design your own encryption algorithms, unless you are an expert in security and encryption.
+Rather, you should use existing well-known and well-tested encryption algorithms.
 In the design of a secured software system encryption can play many roles.
 
-\subsection{Sanitization}
-Another practice which you should endeavour to utilise is sanitization.
-If we assume that you can't tell the difference between your user and a potential attacker,
-then you can't trust your user.
-If you can't trust your user, then you shouldn't trust the data they give you.
+\subsection{Sanitisation}
+Another practice which you should endeavour to utilise is sanitisation.
+If we assume that you cannot tell the difference between your user and a potential attacker,
+then you cannot trust your user.
+If you cannot trust your user, then you should not trust the data they give you.
 One of the oldest and most common forms of attacks is user input injection.
 In such an injection attack, a user intentionally or unintentionally provides input which damages your system.
 
@@ -227,20 +229,20 @@ In such an injection attack, a user intentionally or unintentionally provides in
 \caption{\url{https://xkcd.com/327/}}
 \end{figure}
 
-When done maliciously, attackers enter characters or sequences of characters which are commonly used to escape a string,
-the input which follows would then be run as code on the victims system.
-The method for preventing against injection attacks is called \textsl{sanitization},
-which is simply a process of removing dangerous or unnecessary characters from a users input.
+When done maliciously, attackers enter characters or sequences of characters which are commonly used to escape a string.
+The input which follows would then be run as code on the victim's system.
+The method for preventing against injection attacks is called \textsl{sanitisation},
+which is simply a process of removing dangerous or unnecessary characters from a user's input.
 
 \subsection{Firewalls}
 A firewall is a piece of networking software which is designed to protect a computer system against unwanted traffic.
-Firewalls scan incoming and outgoing network packets and are able to drop the packet if it's deemed unwanted.
+Firewalls scan incoming and outgoing network packets and are able to drop the packet if it is deemed unwanted.
 Firewalls can be configured by a set of rules defining which traffic is unwanted.
 A firewall rule could specify that a computer system drop all packets destined for port 80 or all packets not destined for port 80.
 They may also be configured to support more advanced packet filtering.
 
 From our perspective the primary advantage of a firewall is to prevent traffic which we did not intend.
-If we are hosting a web server, only allowing traffic on port 80 and port 443 is desirable
+If we are hosting a web server, only allowing traffic on port 80 and port 443 is desirable,
 and prevents users accessing a database on the server which we forgot to password protect.
 The principle for firewalls is to block by default and allow when required.
 
@@ -249,11 +251,11 @@ Modern software has a lot of dependencies.
 Each new dependency a software adopts is a new potential attack surface.
 Relying on software which is automatically updated is dangerous,
 the authors can at any point inject malicious code into your system.
-There's a particularly interesting recent example of dependency injection which is worth reading about~\cite{color-js}.
+There is a particularly interesting recent example of dependency injection which is worth reading about~\cite{color-js}.
 
 One simple practice to help prevent against dependency injection is by using lock files.
 Most package managers generate lock files when installing software.
-Lock files keep track of the exact version of library that is installed.
+Lock files keep track of the exact version of a library that is installed.
 If you ask a package manager to install version >=2.4.0 of a library and it actually downloads version 2.5.6,
 this will be tracked in the lock file.
 Additionally, lock files track the hash of the dependency so that if someone attempts a dependency injection,
@@ -317,5 +319,3 @@ consult with or hire an expert.
     \item Be Reluctant to Trust
     \item Use Your Community Resources
 \end{enumerate}
-
-\pagebreak
