@@ -64,6 +64,16 @@ jobs:
 
       - run: cp -r ./slides/slides/slides ./public
 
+      - name: Download assessment
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: build-assessment.yml
+          workflow_conclusion: success
+          branch: main
+          path: assessment
+
+      - run: cp -r ./assessment/assessment/assessment ./public
+
       - name: Publish GH Pages
         if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v3

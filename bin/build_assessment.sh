@@ -7,7 +7,7 @@ mkdir -p "${REPO_ROOT}/dist/assessment"
 
 for folder in ${REPO_ROOT}/assessment/*; do
     echo $folder
-    if [[ -f "${folder}/latexmkrc" ]]; then
+    if [[ -f "${folder}/latexmkrc" && -f "${folder}/publish" ]]; then
         pushd $folder;
         latexmk -halt-on-error
         if [ $? -ne 0 ]; then
