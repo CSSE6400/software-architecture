@@ -88,7 +88,7 @@ public interface PayAdjustmentPlugin {
 }
 \end{lstlisting}
 \end{shaded}
-\caption{Plug-in interface example for payroll system.}
+\caption{Example plug-in interface for payroll system.}
 \label{fig:interface}
 \end{figure}
 
@@ -107,14 +107,85 @@ there are some principles which should be maintained to produce a maintainable a
     The only dependency on the core system is through the plug-in interface.
 \end{definition}
 
-\todo{Provide commentary about the Independent Plug-in Principle.}
+Plug-ins should be independent of each other.
+If a plug-in depends on other plug-ins it increases the complexity of the design.
+This complexity is called \link{\emph{coupling}}{https://leanpub.com/isaqbglossary/read\#term-coupling},
+which is a measure of how dependent different parts of a system are on each other \cite{glossary-architecture}.
+High coupling (many dependencies) makes it difficult to understand the software,
+which in turn makes it difficult to modify and test the software.
+Consequently, if a plug-in depends on other plug-ins it requires understanding the dependencies on the other plug-ins to modify or test the plug-in
+This can lead to an architecture that resembles a ``big ball of mud''.
+
+Plug-ins and the core system should be \emph{loosely} coupled.
+The core system should only depend on the plug-in interface and data returned via that interface, not any implementation details of individual plug-ins.
+Plug-ins should only depend on the data passed to them via the plug-in interface.
+Plug-ins should not rely on implementation details of the core system, nor its datastore.
+If plug-ins and the core system are not isolated from each other by an interface,
+then any changes to the core system may require changes to some or all of the plug-ins.
+Similarly, the plug-in interface should mean that any changes to the plug-in will have no impact on the core system.
 
 \begin{definition}[Standard Interface Principle]
-    ...
+    There should be a single interface that defines how the core system uses plug-ins.
 \end{definition}
 
-\todo{Provide commentary about the Standard Interface Principle.}
+To provide an extensible design, the core system needs a standard way to use plug-ins.
+This means that the plug-in interface needs to be the same for all plug-ins.
+That way the core system can use any plug-in without needing to know details about how the plug-in is implemented.
+This again is about reducing coupling between the core system and the plug-ins.
+The standard interface principle means that there is no additional complexity if the core system uses two plug-ins or thousands of plug-ins.
 
+
+\section{Architecture Partitioning}
+
+\begin{wrapfigure}{r}{0.32\textwidth}
+    \vspace{-20pt}
+    \centering
+    \includegraphics[trim=74 58 40 41,clip,width=0.3\textwidth]{diagrams/technical-partitioning.png}
+    \caption{Layered architecture as example of technical partitioning.}
+    \label{fig:technical-partitioning}
+\end{wrapfigure}
+
+\subsection{Technical Partitioning}
+The notes about \link{layered architecture}{https://csse6400.uqcloud.net/handouts/layered.pdf}
+described the idea of partitioning an architecture into layers, as in figure \ref{fig:technical-partitioning}.
+
+This approach to partitioning the architecture is called \emph{technical partitioning}.
+Each layer represents a different technical capability.
+The presentation layer deals with user interaction.
+The business layer deals with the application's core logic.
+The persistence layer deals with storing and loading data.
+The database layer deals with file storage and access details.
+
+Technical partitioning corresponds to how developers view the code.
+Its advantage is that all related code resides in a single layer of the architecture,
+making each layer \link{cohesive}{https://leanpub.com/isaqbglossary/read\#term-cohesion} from a technical perspective.
+This makes it easier to work with different parts of the code that deal with the same technical capability.
+The \emph{layer isolation}, \emph{neighbour communication}, \emph{downward dependency},
+and \emph{upward notification} principles help reduce coupling between layers.
+
+\clearpage
+\subsection{Domain Partitioning}
+An alternative partitioning approach is called \emph{domain partitioning}.
+In domain parititioning, the architecture is split into partitions (or major components)
+corresponding to independent business processes or workflows (the \emph{domains}).
+Figure \ref{fig:domain-partitioning} is an example of domain partitioning for an on-line store, similar to the
+Sahara eCommerce example from the \link{architectural views}{https://csse6400.uqcloud.net/handouts/views.pdf} notes.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[trim=38 42 19 44,clip,width=0.9\textwidth]{diagrams/domain-partitioning.png}
+    \caption{Example of domain partitioning.}
+    \label{fig:domain-partitioning}
+\end{figure}
+
+In this approach, each domain is independent of the others.
+The components within the domain partition are responsible for delivering all of that workflow's behaviour.
+The advantage of this is that it fits well with an agile delivery focus.
+A single user story will be implemented entirely within one domain.
+This also makes it easier to implement multiple user stories concurrently, if they are all from different domains.
+Eric Evans popularised domain partitioning in his book \textit{Domain-Driven Design} \cite{ddd-evans}.
+
+\todo{More detail about advantages and disadvantages of technical vs domain partitioning.}
 
 
 \section{Extensions}
