@@ -102,7 +102,7 @@ The core system could lookup a plug-in by its name and then apply it by invoking
 While the concept of a microkernel architecture is straightforward,
 there are some principles which should be maintained to produce a maintainable and extendable architecture.
 
-\begin{definition}[Independent Plug-in Principle]
+\begin{definition}[Independent Plug-in Principle]\label{independent-plug-in}
     Plug-ins should be independent, with no dependencies on other plug-ins.
     The only dependency on the core system is through the plug-in interface.
 \end{definition}
@@ -124,7 +124,8 @@ If plug-ins and the core system are not isolated from each other by an interface
 then any changes to the core system may require changes to some or all of the plug-ins.
 Similarly, the plug-in interface should mean that any changes to the plug-in will have no impact on the core system.
 
-\begin{definition}[Standard Interface Principle]
+\vspace{1mm}
+\begin{definition}[Standard Interface Principle]\label{std-intf}
     There should be a single interface that defines how the core system uses plug-ins.
 \end{definition}
 
@@ -156,18 +157,31 @@ The business layer deals with the application's core logic.
 The persistence layer deals with storing and loading data.
 The database layer deals with file storage and access details.
 
-Technical partitioning corresponds to how developers view the code.
-Its advantage is that all related code resides in a single layer of the architecture,
-making each layer \link{cohesive}{https://leanpub.com/isaqbglossary/read\#term-cohesion} from a technical perspective.
+An advantage of technical partitioning is that it corresponds to how developers view the code.
+Another advantage is that all related code resides in a single layer of the architecture, making each layer
+\link{cohesive}{https://leanpub.com/isaqbglossary/read\#term-cohesion} from a technical perspective.
 This makes it easier to work with different parts of the code that deal with the same technical capability.
 The \emph{layer isolation}, \emph{neighbour communication}, \emph{downward dependency},
 and \emph{upward notification} principles help reduce coupling between layers.
 
 \clearpage
+A disadvantage of technical partitioning is that business processes cut across technical capabilities.
+Consider when a customer adds a new product to their shopping cart in the Sahara eCommerce example
+from the \link{architectural views}{https://csse6400.uqcloud.net/handouts/views.pdf} notes.
+In a technically partitioned architecture, code to implement this is required in all layers of the architecture.
+If the team is structured with specialist developers who work on different layers of the architecture,
+they all need to collaborate to implement the behaviour, which adds communication overheads to the project.
+
+Another disadvantage is the potential for higher data coupling, if all domain data is stored in a single database.
+If it is decided that the system needs to be split into distributed software containers for scalability,
+the database may need to be split to have separate databases for each distributed container.
+If the database was originally designed to cater for a monolith architecture, large parts of the database may need to be refactored.
+
 \subsection{Domain Partitioning}
-An alternative partitioning approach is called \emph{domain partitioning}.
-In domain parititioning, the architecture is split into partitions (or major components)
+\emph{Domain partitioning} is an alternative approach, where the architecture is split into partitions (or major components)
 corresponding to independent business processes or workflows (the \emph{domains}).
+The implementation of a domain is responsible for delivering all of that workflow's behaviour.
+Eric Evans popularised domain partitioning in his book \textit{Domain-Driven Design} \cite{ddd-evans}.
 Figure \ref{fig:domain-partitioning} is an example of domain partitioning for an on-line store, similar to the
 Sahara eCommerce example from the \link{architectural views}{https://csse6400.uqcloud.net/handouts/views.pdf} notes.
 
@@ -178,27 +192,126 @@ Sahara eCommerce example from the \link{architectural views}{https://csse6400.uq
     \label{fig:domain-partitioning}
 \end{figure}
 
-In this approach, each domain is independent of the others.
-The components within the domain partition are responsible for delivering all of that workflow's behaviour.
-The advantage of this is that it fits well with an agile delivery focus.
+An advantage of domain partitioning is that it can model how the business functions, rather than it being structured based on technical decisions.
+This results in message flows within the software matching how communication happens in the problem domain.
+This makes it easier to discuss features, and the high-level view of how they are implemented, with business stakeholders who are familiar with how the business operates.
+
+If the domain partitions are independent of each other, it usually makes it easier to split the system into distributed software containers.
+Even if the system starts with a single database, the independence of domain partitions is likely to lead to a design with lower data coupling,
+making it easier to split the database.
+
+Another advantage of domain partitioning is that it fits well with an agile or continuous delivery process.
 A single user story will be implemented entirely within one domain.
 This also makes it easier to implement multiple user stories concurrently, if they are all from different domains.
-Eric Evans popularised domain partitioning in his book \textit{Domain-Driven Design} \cite{ddd-evans}.
 
-\todo{More detail about advantages and disadvantages of technical vs domain partitioning.}
+A disadvantage of domain partitioning is that \emph{boundary} code is distributed throughout all the partitions.
+This means that any large changes to a particular boundary (e.g. changing the persistence library) will result in changes to all domain partitions.
+Boundary code is code that interacts with actors or agents outside of the system.
+The two common technical partitions of the presentation and persistence layers are examples of boundary code.
+The presentation layer is the boundary between the system and the users.
+The persistence layer is the boundary between the system and the storage mechanisms.
+Other boundary partitions may be for message queues or network communication.
+
+It is possible for each domain partition to use technical partitioning within it,
+to provide some of the lower coupling benefits of a layered architecture for the domain.
+
+\subsection{Achitecture Patterns and Partitioning}
+Different architecture patterns are biased more towards technical or domain partitioning.
+Those that focus on technical structure are biased towards technical partitioning (e.g. layered architecture).
+Those that focus on message passing between components are biased towards domain partitioning (e.g. microservices architecture).
+The core system of the microkernel architecture can follow either technical or domain partitioning.
+
+A consequence of this leads to a variation of principle \ref{std-intf}.
+
+\vspace{1mm}
+\begin{definition}[Domain Standard Interface Principle]\label{domain-intf}
+    Each domain should have a single interface that defines how the domain uses plug-ins.
+\end{definition}
+
+Some domains may share a plug-in interface, but allowing domains to have different plug-in interfaces
+means that each business process can be customised independently by a set of plug-ins.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[trim=38 42 23 42,clip,width=0.5\textwidth]{diagrams/domain-microkernel.png}
+    \caption{Microkernel architecture with domains.}
+    \label{fig:microkernel-domains}
+\end{figure}
 
 
 \section{Extensions}
 
-While the core system is often a monolith and it, along with all its plug-ins, is often deployed as a single monolith
+While the microkernel architecture often implements the core system as a monolith
+and it, along with all its plug-ins, is often deployed as a single monolith
 (e.g. a web browser), that is not the only approach to using the microkernel architecture.
 
-\todo{Describe variations on the microkernel architecture and distribution options.
-This includes using the Adapter design pattern for components that don't implement the standard interface.}
+\subsection{Distributed Microkernel}
+
+The internal partitions of the core system can be distributed to run on different computing infrastructure.
+Figure \ref{fig:3-tier-microkernel} is an example of implementing a distributed microkernel architecture using three computing tiers.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[trim=40 41 18 43,clip,width=0.9\textwidth]{diagrams/separate-ui-microkernel.png}
+    \caption{Microkernel architecture distributed by technical partitions.}
+    \label{fig:3-tier-microkernel}
+\end{figure}
+
+The presentation layer runs on a frontend such as a web or mobile application.
+It is possible that the presentation layer could have its own set of plug-ins.
+The business and persistence logic run on a backend server and have their own set of plug-ins.
+The database runs on a separate database server, and typically does not have any plug-ins from the application's perspective.
+
+\subsection{Alternative Contracts}
+
+Figure \ref{fig:interface} was an example interface that could be used if plug-ins were invoked directly within the core system.
+This is possible if the plug-ins are implemented within the application or are loaded as code modules at run time (e.g. via jar or dll files).
+
+There may be times when plug-ins are external services used by the core system.
+In those situations communication is via some communication protocol.
+Remote method invocation would still allow the core system to use a compiled interface.
+Registration of components would become a little more complicated,
+as the core system would need to a communication interface to be notified of the availability of plug-ins.
+
+More commonly, the communication protocol will be some other mechanism (e.g. REST, as shown in figure \ref{fig:rest-microkernel}).
+In this case, the registry needs to record more information than just the name and interface of a plug-in.
+The registry will need information about the communication pathway (e.g. URL of the REST endpoint).
+It will also need details about the data structure passed to the plug-in and returned by the plug-in.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[trim=38 168 19 45,clip,width=0.75\textwidth]{diagrams/rest-microkernel.png}
+    \caption{Microkernel architecture -- separate plug-in services with REST communication.}
+    \label{fig:rest-microkernel}
+\end{figure}
+
+\subsection{Plug-in Databases}
+
+As mentioned in the discussion of principle \ref{independent-plug-in}, plug-ins should not use the core system's data directly.
+The core system should pass to the plug-in any data that it needs.
+For sophisticated plug-ins, they may need their own persistent storage.
+They should not request the core system to manage this.
+Rather, these plug-ins should maintain their own databases, as shown in figure \ref{fig:plug-in-dbs}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[trim=39 81 24 50,clip,width=0.85\textwidth]{diagrams/plug-in-databases.png}
+    \caption{Microkernel architecture with plug-ins maintaining their own databases.}
+    \label{fig:plug-in-dbs}
+\end{figure}
+
+\subsection{Non-Standard Interfaces}
+
+Principles \ref{std-intf} and \ref{domain-intf} indicate that each domain, or the entire core system, should use a single plug-in interface.
+This is not always possible when the plug-ins are services provided by external agencies.
+In these situations you would use the \link{adapter design pattern}{https://refactoring.guru/design-patterns/adapter}
+to isolate the external service's interface from the core system.
+To do this, you would implement a plug-in that is the adapter that then uses the external service.
+From the core system's perspective, your plug-in is just like any other plug-in.
 
 
 \section{Conclusion}
 
-%A pipeline architecture is a good choice for data processing when interactivity is not a concern.
-%Conceptually pipelines are very simple.
-%Following the principles of a pipeline architecture will deliver a modular system which supports high reuse.
+The microkernel architecture is a suitable option for systems were extensibility is a key quality attribute.
+Following the microkernel design principles will lead to a design where the core system and plug-ins are not affected by changes to each other.
+Existing plug-ins can be replaced and new plug-ins added with no impact on the core system.
