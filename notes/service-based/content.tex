@@ -89,7 +89,7 @@ For example, the ProductPurchasing service for an on-line store can manage the e
 If the product is no longer available or payment fails, the service can rollback the transaction to ensure data integrity.
 
 
-\section{Design Considerations}
+\section{Design Considerations}\label{sec:design-considerations}
 
 A service-based architecture is typically used for medium-sized systems.
 This is because the user interface interacts with all services through their APIs.
@@ -138,7 +138,7 @@ Figure \ref{fig:db-logical-partitioning} is an example of shared persistent obje
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=38 37 20 44,clip,width=0.61\textwidth]{diagrams/db-logical-partitioning.png}
+    \includegraphics[trim=37 37 20 44,clip,width=0.61\textwidth]{diagrams/db-logical-partitioning.png}
     \caption{Database logical partitioning example.}
     \label{fig:db-logical-partitioning}
 \end{figure}
@@ -169,29 +169,117 @@ Auditing services may also need to use domain services.
 In more sophisticated environments, services may be shared across different systems.
 
 
-\section{Variations}
+\section{Extensions}
+
+There are a few common variations of the service-based architecture to consider.
+
+\subsection{Separate Databases}
+
+The first variation  we will consider is to have separate databases for each service.
+This extends the idea of logical partitioning your database, as described in section \ref{sec:design-considerations}.
+Figure \ref{fig:separate-dbs} shows a few options of how this can be implemented.
 
 \begin{figure}[h!]
-    \centering
-    \includegraphics[trim=38 48 20 44,clip,width=0.65\textwidth]{diagrams/separate-dbs.png}
+    \begin{adjustwidth}{-5mm}{-5mm}
+        \centering
+        \includegraphics[trim=39 42 18 48,clip,width=0.92\paperwidth]{diagrams/separate-dbs.png}
+    \end{adjustwidth}
     \caption{Separate databases example.}
     \label{fig:separate-dbs}
 \end{figure}
 
-\todo{Describe variations with unique UIs for domains and some shared across domains.\\
-Describe variation with independent databases for domains and a shared db.}
+In figure \ref{fig:separate-dbs}, there is a shared database that contains the entity data that is shared across services.
+Service 1 and 2 are deployed on separate servers but share a single database server that hosts different tables for each service.
+Service 3 has communicates with its own database server that hosts its tables.
+Service 4 uses a database that is running on the same server as the service.
+
+Each of these approaches have their own advantages and disadvantages.
+A key consideration is whether a service has enough unique data to make it worth creating a separate database for just the service.
+If most data is shared between services, it may be easier to implement the system with just a single shared database.
+If there is some data that is unique to some services, a single database server
+with either logical partitioning of the data or even indepedent database services,
+may provide enough performance for the system.
+A separate database server for some or all services provides greater flexibility for scaling,
+if database performance is likely to become a bottleneck for the service.
+Running an independent database on the same server as the service provides easier communication with the database
+and may suit cases where an independent database is useful but it is not large enough to warrant to run on its own server.
+
+\subsection{Separate User Interfaces}
+
+A similar variation can be applied to the user interface, so that there are separate user interfaces for some services.
+This allows separate interfaces to be implemented for different user interface domains
+(e.g. standard users, power users, administrators, ...).
+Figure \ref{fig:separate-uis} shows some options of how this can be implemented.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[trim=40 42 19 45,clip,width=0.9\textwidth]{diagrams/separate-uis.png}
+    \caption{Separate user interfaces example.}
+    \label{fig:separate-uis}
+\end{figure}
+
+In figure \ref{fig:separate-uis}, there is one user interface that interacts with two services,
+like the single interface in the general structure shown in figure \ref{fig:service-based-arch}.
+There are then two interfaces that interact with service 3.
+A benefit of the service API is that it allows multiple interfaces to be implemented to work with the backend services.
+
+\subsection{API Layer}
+
+It is possible to place an API layer between the user interface and the services,
+as shown in figure \ref{fig:api-layer}.
+The API layer is a reverse proxy or gateway that provides access to the services,
+while hiding details of the services.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[trim=39 37 21 42,clip,width=0.85\textwidth]{diagrams/api-layer.png}
+    \caption{API layer separating the user interface from services.}
+    \label{fig:api-layer}
+\end{figure}
+
+If any domain services are used by external systems, a reverse proxy hides the internal network structure of your system's architecture.
+This extra layer of abstraction means that you can expose a different interface to external systems than to internal systems.
+This can help deliver the security principle of least privilege.
+
+The API layer allows the implementation of \emph{cross-cutting} concerns to be separated from the user interface.
+For example security policies, user access logging, or service discovery could be implemented in the API layer.
+
+Service discovery allows new services to be registered and provides a mechanism for clients to ``discover'' the new services.
+The API layer would provide an interface that allows services to be registered, including information about their interface.
+The API layer would also provide an interface to clients that allows them to query what services are available
+and to retrieve an interface that the client can use to access the service through the API layer.
+
+The API layer can also perform load balancing by delegating service requests to different servers running the same domain service.
 
 
-\section{Extensions}
+\section{Service Oriented Architecture}
 
-\todo{Describe API layer between UI and domain services. Summarise the idea of it being a reverse proxy or gateway.
-https://www.l7defense.com/cyber-security/api-gateway-vs-reverse-proxy/
-Summarise uses of this approach.
-Use the idea of service discovery to lead into an intro about SOA (and critique of its commonly poor implementations).}
+Service Oriented Architecture (SOA) is an extension of service-based architecture.
+In SOA, each service implements a single business process and provides one or more interfaces that allow access to its functionality.
+The primary purpose of the API layer is to provide a robust service discovery platform and to implement security policies.
+Systems are implemented by integrating a set of services to deliver the required functionality.
+Consequently, the user interface is part of the system being implemented and not part of the service architecture.
+SOA requires each service to be independent of the others, including very low data coupling.
+Typically in SOA, each service would have its own database.
+
+SOA sounds like a good idea, but in practice many organisations made compromises that neutered much of the expected benefits.
+Business processes are often not perfectly independent and there is often data dependencies between processes.
+If these dependencies are not managed well, the services are not independent.
+This results in services having to be used together, which reduces their reusability and composability.
+
+Another common issue was a poor service discovery implementation.
+One problem was that the mechanism to discover new services required too much knowledge about the services.
+This results in the clients needing to know the services, before they can discover them.
+Another problem was poor interface design, that caused dependencies on some implementation details of the services.
+
+Microservices were designed to deliver the promised benefits of SOA without some of the implementation issues.
+In particular, microservices deliver much smaller elements of functionality, reducing the possibility of tight coupling between services.
+There are challenges in designing and delivering microservices to achieve the benefits.
+These will be explored later in the course.
 
 
 \section{Conclusion}
 
-%The microkernel architecture is a suitable option for systems were extensibility is a key quality attribute.
-%Following the microkernel design principles will lead to a design where the core system and plug-ins are not affected by changes to each other.
-%Existing plug-ins can be replaced and new plug-ins added with no impact on the core system.
+Service-based architecture is an approach to designing a distributed system that is not too complex.
+Domain services provide natural modularity and deployability characteristics in the architecture design.
+Well designed service APIs improve the encapsulation and hide implementation details of the services.
