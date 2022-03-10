@@ -222,23 +222,23 @@ So let's try and access that url, hmm.
 That's strange. Something has gone wrong.
 
 \section{Security Groups}
-As you'll recall from the practical in week one.
+As you will recall from the practical in week one.
 An important part of setting up the EC2 instance was configuring the security group to allow traffic from port 80 to reach the instance.
 Configuring the security group was built into the process with the GUI configuration.
 When configuring with Terraform, security groups and their attachment to EC2 instances are separate resources.
 Refer back to the Terraform documentation for details or,
 as is normally quicker, \href{https://www.google.com/search?q=terraform+aws+security+group}{Google ``terraform aws security group''}.
 
-First, let's create an appropriate security group.
+First, let us create an appropriate security group.
 Recall the in the GUI configuration,
 ingress SSH access (port 22) and all egress%
 \footnote{Ingress and egress in networking just means incoming and outgoing respectively.}
 traffic was automatically configured and we just added ingress port 80.
 In Terraform the whole state must be configured so we specify two
 \texttt{ingress} blocks one for HTTP (port 80) and one for SSH access (port 22).%
-\footnote{We won't actually need SSH access as all the server configuration is done when the machine is provisioned thanks to the \texttt{user\_data},
-but we'll try to recreate the instance from the week one practical exactly.}
-Additionally, we'll create egress for all outgoing traffic.
+\footnote{We do not actually need SSH access as all the server configuration is done when the machine is provisioned thanks to the \texttt{user\_data},
+but we will try to recreate the instance from the week one practical exactly.}
+Additionally, we will create egress for all outgoing traffic.
 
 \begin{code}[language=terraform]{}
 resource "aws_security_group" "hextris-server" {
@@ -277,7 +277,7 @@ Note the following:
 
 You may now apply the changes to create this new security group resource.
 
-Next, we'll attach the security group to the EC2 instance.
+Next, we will attach the security group to the EC2 instance.
 Return to the \texttt{aws\_instance.hextrix-server} resource
 and include the following line:
 
@@ -304,7 +304,7 @@ This file can, and should be, version controlled and subject to the same quality
 It also means that if we want to redeploy hextris at any point,
 we can easily just run the IaC to deploy it.
 
-To try this out, let's first take everything down.
+To try this out, let us first take everything down.
 We can do this with:
 \bash{terraform destroy}
 
@@ -317,7 +317,7 @@ Now go ahead and do apply the changes to bring everything back:
 
 Confirm that this brings the website back exactly as before (with a different IP address).
 You can now start any lab you want and almost instantly spin back up the website you've configured.
-That's the beauty of Infrastructure as Code!
+That is the beauty of Infrastructure as Code!
 
 Hint: destroy everything again before you leave.
 
@@ -332,7 +332,7 @@ Hint: destroy everything again before you leave.
 Regions are the physical locations of AWS data centres.
 When applying terraform, the changes are being made to one region at a time.
 In our case we specified the region \texttt{us-east-1}.
-Often you don't need to deploy to more than one region, however,
+Often you do not need to deploy to more than one region, however,
 it can help decrease latency and reduce risk from a major disaster.
 Generally, pick a region and stick with it,
 we've picked \texttt{us-east-1} because it's the least expensive.
@@ -352,7 +352,7 @@ Essentially minimising the risk that multiple availability zones would fail at o
 \paragraph{VPC}
 Virtual Private Clouds, or VPCs,
 are virtual networks under your control,
-if you've managed a regular network before it should be familiar.
+if you have managed a regular network before it should be familiar.
 VPCs are contained within one region but are spread across multiple availability zones.
 
 
