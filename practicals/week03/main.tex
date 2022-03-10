@@ -1,5 +1,7 @@
 \documentclass{csse4400}
 
+% \teachermodetrue
+
 \usepackage{languages}
 
 \title{Deploying with Terraform}
@@ -153,14 +155,19 @@ We'll use the \texttt{user\_data} field which configures commands to run when la
 First we need a script to provision the server, if we combine all our commands from the last practical, we'll produce this script:
 
 \begin{code}[language=bash]{deploy.sh}
-yum install httpd
+#!/bin/bash
+yum install -y httpd
 systemctl enable httpd
 systemctl start httpd
 
-yum install git
+yum install -y git
 cd /var/www/html
 git clone https://github.com/Hextris/hextris .  
 \end{code}
+
+\teacher{The hash bang is required.}
+
+\teacher{Don't forget the -y on yum install}
 
 Now we can add the following field to our terraform resource.
 It uses the terraform \texttt{file} function to load the contents of a file named \texttt{deploy.sh} relative to the terraform directory.
@@ -215,42 +222,138 @@ So let's try and access that url, hmm.
 That's strange. Something's gone wrong.
 
 \section{Security Groups}
+As you'll recall from the practical in week one.
+An important part of setting up the EC2 instance was configuring the security group to allow traffic from port 80 to reach the instance.
+Configuring the security group was built into the process with the GUI configuration.
+When configuring with terraform, security groups and their attachment to EC2 instances are separate resources.
+Refer back to the terraform documentation for details or,
+as is normally quicker, \href{https://www.google.com/search?q=terraform+aws+security+group}{Google ``terraform aws security group''}.
 
-% \section{AWS Networking}
-% \todo{Perhaps this should be covered in an AWS terminology cheat sheet?}
-% When we last deployed an EC2 instance,
-% the AWS Console guided us through a number of steps
-% such as creating a security group, configuring a subnet for the security group, etc.
-% Let's try and get a grasp on how the AWS network works so we can solve our networking issue.
+First, let's create an appropriate security group.
+Recall the in the GUI configuration,
+ingress SSH access (port 22) and all egress%
+\footnote{Ingress and egress in networking just means incoming and outgoing respectively.}
+traffic was automatically configured and we just added ingress port 80.
+In terraform the whole state must be configured so we specify two
+\texttt{ingress} blocks one for HTTP (port 80) and one for SSH access (port 22).%
+\footnote{We won't actually need SSH access as all the server configuration is done when the machine is provisioned thanks to the \texttt{user\_data},
+but we'll try to recreate the instance from the week one practical exactly.}
+Additionally, we'll create egress for all outgoing traffic.
 
-% \paragraph{AWS Regions}
-% Regions are the physical locations of AWS data centres.
-% When applying terraform, the changes are being made to one region at a time.
-% In our case we specified the region \texttt{us-east-1}.
-% Often you don't need to deploy to more than one region, however,
-% it can help decrease latency and reduce risk from a major disaster.
-% Generally, pick a region and stick with it,
-% we've picked \texttt{us-east-1} because it's the least expensive.
+\begin{code}[language=terraform]{}
+resource "aws_security_group" "hextris-server" {
+  name = "hextris-server"
+  description = "Hextris HTTP and SSH access"
 
-% \begin{figure}[ht]
-% \includegraphics[width=\textwidth]{images/aws_regions}
-% \caption{AWS Regions as of March 2020 \cite{aws-regions}}
-% \end{figure}
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-% \paragraph{Availability Zones}
-% An AWS Region will consist of availability zones, normally named with letters.
-% For example, the AWS Region located in Sydney, \texttt{ap-southeast-2} has three availability zones:
-% \texttt{ap-southeast-2a}, \texttt{ap-southeast-2b}, and \texttt{ap-southeast-2c}.
-% An availability zone is a collection of resources which run on separate power supplies and networks.
-% Essentially minimising the risk that multiple availability zones would fail at once.
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-% \paragraph{VPC}
-% Virtual Private Clouds, or VPCs,
-% are virtual networks under your control,
-% if you've managed a regular network before it should be familiar.
-% VPCs are contained within one region but are spread across multiple availability zones.
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+\end{code}
 
-% \bibliographystyle{ieeetr}
-% \bibliography{references}
+Note the following:
+\begin{itemize}
+  \item \texttt{from\_port} and \texttt{to\_port} are the start and end of a range of ports rather than incoming or outgoing. In this example our range is 80-80.
+  \item \texttt{protocol} set to -1 is a special flag to indicate all protocols.
+  \item Explaining \texttt{cidr} is outside the scope of the course, but the specified block above means to apply to all IP addresses.
+\end{itemize}
+
+You may now apply the changes to create this new security group resource.
+
+Next, we'll attach the security group to the EC2 instance.
+Return to the \texttt{aws\_instance.hextrix-server} resource
+and include the following line:
+
+\begin{code}[language=terraform]{}
+security_groups = [aws_security_group.hextris-server.name]
+\end{code}
+
+Note that EC2 instances can have multiple security groups.
+Once again notice the structure of resource identifiers in AWS.
+
+% Now if we try to apply or plan these changes,
+% we'll noticed that the change of security group forces replacement.
+% TODO: I don't actually know why it does this.
+
+Now apply the changes.
+If you now try to access via the IP address
+(the IP address may have changed),
+you should be able to view the hextris website.
+
+\section{Tearing Down}
+
+One of the important features of Infrastructure as Code (IaC) is all the configuration we just did is stored in a file.
+This file can, and should be, version controlled and subject to the same quality rules of code files.
+It also means that if we want to redeploy Hextris at any point,
+we can easily just run the IaC to deploy it.
+
+To try this out, let's first take everything down.
+We can do this with:
+\bash{terraform destroy}
+
+You should be prompted to confirm that you want to destroy all of the resources in the state.
+Once terraform has finished taking everything down,
+confirm that you can no longer access the website and that the AWS console says the instances have been destroyed.
+
+Now go ahead and do apply the changes to bring everything back:
+\bash{terraform apply}
+
+Confirm that this brings the website back exactly as before (with a different IP address).
+You can now start any lab you want and almost instantly spin back up the website you've configured.
+That's the beauty of Infrastructure as Code!
+
+Hint: destroy everything again before you leave.
+
+\bibliographystyle{ieeetr}
+\bibliography{references}
+
+\appendix
+
+% \teacher{
+\section{AWS Networking Terminology}
+\paragraph{AWS Regions}
+Regions are the physical locations of AWS data centres.
+When applying terraform, the changes are being made to one region at a time.
+In our case we specified the region \texttt{us-east-1}.
+Often you don't need to deploy to more than one region, however,
+it can help decrease latency and reduce risk from a major disaster.
+Generally, pick a region and stick with it,
+we've picked \texttt{us-east-1} because it's the least expensive.
+
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{images/aws_regions}
+\caption{AWS Regions as of March 2020 \cite{aws-regions}}
+\end{figure}
+
+\paragraph{Availability Zones}
+An AWS Region will consist of availability zones, normally named with letters.
+For example, the AWS Region located in Sydney, \texttt{ap-southeast-2} has three availability zones:
+\texttt{ap-southeast-2a}, \texttt{ap-southeast-2b}, and \texttt{ap-southeast-2c}.
+An availability zone is a collection of resources which run on separate power supplies and networks.
+Essentially minimising the risk that multiple availability zones would fail at once.
+
+\paragraph{VPC}
+Virtual Private Clouds, or VPCs,
+are virtual networks under your control,
+if you've managed a regular network before it should be familiar.
+VPCs are contained within one region but are spread across multiple availability zones.
+
 
 \end{document}
