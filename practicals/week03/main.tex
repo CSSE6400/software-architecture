@@ -22,15 +22,15 @@ This week our goal is to get experience using an Infrastructure as Code tool, sp
 to deploy a service to AWS.
 Specifically, this week you need to:
 \begin{itemize}
-    \item Authenticate terraform to use the AWS learner lab.
-    \item Configure a single server website in terraform and deploy.
-    \item Create a terraform module for deploy arbitrary single server websites.
+    \item Authenticate Terraform to use the AWS learner lab.
+    \item Configure a single server website in Terraform and deploy.
+    \item Create a Terraform module for deploying arbitrary single server websites.
 \end{itemize}
 
 \section{Using Terraform in AWS Leaner Labs}
 Following the steps from the week one practical, start a learner lab in AWS Academy.
-For this practical, you don't need to create any resources in the AWS Console.
-The console can be used to verify that terraform has correctly provisioned resources.
+For this practical, you do not need to create any resources in the AWS Console.
+The console can be used to verify that Terraform has correctly provisioned resources.
 
 \begin{enumerate}
 \item Once the learner lab has started, click on `AWS Details' to display information about the lab.
@@ -38,9 +38,9 @@ The console can be used to verify that terraform has correctly provisioned resou
 \includegraphics[width=0.7\textwidth]{images/aws-details}
 
 \item Click on the first `Show' button next to `AWS CLI' which will display a text block starting with \texttt{[default]}.
-\item Create a directory for this weeks practical.
+\item Create a directory for this week's practical.
 \item Within that directory create a \texttt{credentials} file and copy the contents of the text block into the file.
-\textbf{Don't share this file contents --- don't commit it}.
+\textbf{Do not share this file contents --- do not commit it}.
 \item Create a \texttt{main.tf} file in the same directory with the following contents:
 \begin{code}[language=terraform]{main.tf}
 terraform {
@@ -66,11 +66,11 @@ The \texttt{provider} clock configures the AWS provider, instructing it which re
 
 This command will create a \texttt{.terraform} directory which stores providers and a provider lock file, \texttt{.terraform.lock.hcl}.
 
-\item To verify that we've setup terraform correctly, use \texttt{terraform plan}.
+\item To verify that we have setup Terraform correctly, use \texttt{terraform plan}.
 \bash{terraform plan}
 
 As we currently have no resources configured, it should find that no changes are required.
-Note that this doesn't ensure our credentials are correctly configured as terraform has no reason to try authenticating yet.
+Note that this does not ensure our credentials are correctly configured as Terraform has no reason to try authenticating yet.
 
 \end{enumerate}
 
@@ -78,13 +78,13 @@ Note that this doesn't ensure our credentials are correctly configured as terraf
 If you followed the default instructions in the week one practical, you would have manually deployed the hextris game.
 Now we'll try to deploy hextris using terraform.
 
-First, we'll need to create an EC2 instance resource.
+First, we will need to create an EC2 instance resource.
 The AWS provider calls this resource an \link{\texttt{aws\_instance}}{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance}.
 Get familiar with the documentation page.
-Most terraform providers have reasonable documentation, reading the argument reference section helps to understand what a resource is capable of.
+Most Terraform providers have reasonable documentation, reading the argument reference section helps to understand what a resource is capable of.
 
-We'll start off with the basic information for the resource.
-We configured it to use a specific AMI and chose the \texttt{t2.micro} size.
+We will start off with the basic information for the resource.
+We configured it to use a specific Amazon Machine Instance (AMI) and chose the \texttt{t2.micro} size.
 Refer back to the week one practical sheet for a refresher.
 Add the following basic resource to \texttt{main.tf}:
 
@@ -99,8 +99,8 @@ resource "aws_instance" "hextris-server" {
 }      
 \end{code}
 
-Let's create this server.
-\texttt{terraform apply} will first do \texttt{terraform plan} and prompt us to confirm if we want to apply to changes.
+To create the server, invoke
+\texttt{terraform apply} will first do \texttt{terraform plan} and prompt us to confirm if we want to apply changes.
 
 \bash{terraform apply}
 
@@ -148,9 +148,9 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 \end{code}
 
 You can now check in the AWS Console that an EC2 instance with the name \texttt{hextris} has been created.
-Now we've got a server, we should try to configure it to contain hextris.
-We'll use the \texttt{user\_data} field which configures commands to run when launching the instance.
-First we need a script to provision the server, if we combine all our commands from the last practical, we'll produce this script:
+Now we have got a server, we should try to configure it to contain hextris.
+We will use the \texttt{user\_data} field which configures commands to run when launching the instance.
+First we need a script to provision the server, if we combine all our commands from the last practical, we will produce this script:
 
 \begin{code}[language=bash]{deploy.sh}
 yum install httpd
@@ -162,8 +162,8 @@ cd /var/www/html
 git clone https://github.com/Hextris/hextris .  
 \end{code}
 
-Now we can add the following field to our terraform resource.
-It uses the terraform \texttt{file} function to load the contents of a file named \texttt{deploy.sh} relative to the terraform directory.
+Now we can add the following field to our Terraform resource.
+It uses the Terraform \texttt{file} function to load the contents of a file named \texttt{deploy.sh} relative to the terraform directory.
 The contents of that file is passed to the \texttt{user\_data} field.
 
 \begin{code}[language=terraform]{}
@@ -171,22 +171,22 @@ user_data = file("${path.module}/deploy.sh")
 \end{code}
 
 If you run the \texttt{terraform plan} command now,
-you'll notice that terraform has identified that this change will require creating a new EC2 instance.
-Where possible, terraform will try to update a resource in-place but since this changes how an instance is started, it needs to be replaced.
+you will notice that Terraform has identified that this change will require creating a new EC2 instance.
+Where possible, Terraform will try to update a resource in-place but since this changes how an instance is started, it needs to be replaced.
 Go ahead and apply the changes.
 
 Now, in theory\footnote{hint}, we should have deployed hextris to an EC2 instance.
 But how do we access that instance?
 We \textsl{could} go to the AWS Console and find the public IP address.
-However, it turns out that terraform already knows the public IP address.
-In fact, if you open the terraform state file (\texttt{terraform.tfstate}),
+However, it turns out that Terraform already knows the public IP address.
+In fact, if you open the Terraform state file (\texttt{terraform.tfstate}),
 you should be able to find it hidden away in there.
-But we don't want to go hunting through this file all the time.
-Instead we'll use the \texttt{output} keyword.
+But we do not want to go hunting through this file all the time.
+Instead we will use the \texttt{output} keyword.
 
 We can specify certain attributes as `output' attributes.
 Output attributes are printed to the terminal when the module is invoked directly
-but as we'll see later, they can also be used by other terraform configuration files.
+but as we will see later, they can also be used by other terraform configuration files.
 
 \begin{code}[language=terraform]{main.tf}
 output "hextris-url" {
@@ -196,10 +196,10 @@ output "hextris-url" {
 
 This creates a new output attribute, \texttt{hextris-url},
 which references the \texttt{public\_ip} attribute of our \texttt{hextris-server} resource.
-Note that resources in terraform are addressed by the resource type (\texttt{aws\_instance})
+Note that resources in Terraform are addressed by the resource type (\texttt{aws\_instance})
 followed by the name of the resource (\texttt{hextris-server}).
 
-If you plan or apply the changes it should tell you the public IP address of the instance resource.
+If you plan or apply the changes, it should tell you the public IP address of the instance resource.
 \bash{terraform plan}
 
 \begin{code}[language=terraform-plan]{}
@@ -207,12 +207,12 @@ aws_instance.hextris-server: Refreshing state... [id=i-043a61ff86aa272e0]
 
 Changes to Outputs:
   + hextris-url = "3.82.225.65"
-
-You can apply this plan to save these new output values to the Terraform state, without changing any real infrastructure.  
 \end{code}
 
+You can apply this plan to save these new output values to the Terraform state, without changing any real infrastructure.  
+
 So let's try and access that url, hmm.
-That's strange. Something's gone wrong.
+That's strange. Something has gone wrong.
 
 \section{Security Groups}
 
