@@ -20,4 +20,4 @@ tlmgr install datenumber
 tlmgr install thmtools
 tlmgr install cjk
 tlmgr install wrapfig
-tlmgr install marvosym
+tlmgr install tabto
