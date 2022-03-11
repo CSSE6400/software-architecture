@@ -66,7 +66,7 @@ New plug-ins can be tested independently and then integrated into the system for
 
 There is usually a single standard interface between the core system and the plug-ins for a domain.
 The interface defines the methods that the core system can invoke, data passed to the plug-in, and data returned from the plug-in.
-The plug-in component implements the interface and delegates responsibilities within the component to deliver its behaviour.
+A plug-in component implements the interface and delegates responsibilities within the component to deliver its behaviour.
 
 Figure \ref{fig:interface} is an example of a possible interface for the pay adjusment calculation plug-ins.
 Each pay adjustment plug-in returns a \texttt{MonetaryAmount} indicating the amount by which the employee's base pay is to be adjusted in the pay period.
@@ -301,7 +301,7 @@ Rather, these plug-ins should maintain their own databases, as shown in figure \
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=39 81 24 50,clip,width=0.85\textwidth]{diagrams/plug-in-databases.png}
+    \includegraphics[trim=38 81 24 50,clip,width=0.85\textwidth]{diagrams/plug-in-databases.png}
     \caption{Microkernel architecture with plug-ins maintaining their own databases.}
     \label{fig:plug-in-dbs}
 \end{figure}
@@ -312,8 +312,16 @@ Principles \ref{std-intf} and \ref{domain-intf} indicate that each domain, or th
 This is not always possible when the plug-ins are services provided by external agencies.
 In these situations you would use the \link{adapter design pattern}{https://refactoring.guru/design-patterns/adapter}
 to isolate the external service's interface from the core system.
-To do this, you would implement a plug-in that is the adapter that then uses the external service.
-From the core system's perspective, your plug-in is just like any other plug-in.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[trim=38 58 20 45,clip,width=0.85\textwidth]{diagrams/adapter-plug-in.png}
+    \caption{Adapter plug-ins to work with third party services.}
+    \label{fig:adapter}
+\end{figure}
+
+As shown in figure \ref{fig:adapter}, an adapter plug-in is implemented that manages communication with the external service.
+From the core system's perspective, the external system is just like any other plug-in.
 
 
 \section{Conclusion}
