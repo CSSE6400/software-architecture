@@ -1,10 +1,10 @@
 \title{Containers}
 \author{Brae Webb}
-\date{\week{4}}
+\date{\week{3}}
 
 \maketitle
 
-\todo{Motivate better \& work to docker from containers}
+%\todo{Motivate better \& work to docker from containers}
 
 \begin{quote}{Vidiu Platon}
 I don't care if it works on your machine! We are not shipping your machine!
@@ -13,13 +13,13 @@ I don't care if it works on your machine! We are not shipping your machine!
 \section{Introduction}
 As developers, we often find ourselves relying on some magical tools and technologies.
 Version control, operating systems, databases, and containers, to name a few.
-Containers, and specifically, docker, are magical tools which have gained wide-spread industry adoption.
-Over the past decade docker has enabled some fanciful architectures and developer workflows.
+Containers, and specifically, Docker, are magical tools which have gained wide-spread industry adoption.
+Over the past decade Docker has enabled some fanciful architectures and developer workflows.
 Docker is the proposed solution to the age-old programmer proverb, ``it works on my machine!''.
-However, before we subscribe to that belief, let's see how docker actually works to learn what it is, and what it is not.
+However, before we subscribe to that belief, let's see how Docker actually works to learn what it is, and what it is not.
 
 \section{History and Fundamentals}
-Relative to other tools in the magical suite, docker is new on the scene.
+Relative to other tools in the magical suite, Docker is new on the scene.
 Docker was first made available publicly in 2013 at PyCon.\footnote{\url{https://www.youtube.com/watch?v=wW9CAH9nSLs}}
 Pitched to deliver the isolation benefits of Virtual Machines (VMs) while maintaining efficient execution.
 Virtual machines themselves are a much older invention, dating back to the 1960s, around the time that UQ was having it's first computer installed%
@@ -90,51 +90,52 @@ Of course, this process puts great strain on the real hardware and as such, VMs 
 Unlike virtual machines, containers do not run on virtual hardware,
 instead, containers run on the operating system of the host machine.
 The obvious advantage of this is containers run much more efficiently than virtual machines.
-Containers however, manage to remain isolated and it is at this point that we should explain how docker actually works.
+Containers however, manage to remain isolated and it is at this point that we should explain how Docker actually works.
 Docker is built upon two individually fascinating technologies; namespaces, and layered filesystems.
 
 \subsection{Namespaces}
-The first technology, namespaces, is built into the linux kernel.
-Linux namespaces were first introduced into the kernel in 2002, inspired by the concept introduced by the Plan 9 operating system from Bell Labs in the 1980s.
+The first technology, namespaces, is built into the Linux kernel.
+Linux namespaces were first introduced into the kernel in 2002,
+inspired by the concept introduced by the \link{Plan 9}{https://p9f.org/} operating system from Bell Labs in the 1980s.
 Namespaces enable the partitioning and thus, isolation, of various concepts managed and maintained by an operating system.
 Initially namespaces were implemented to allow isolated filesystems (the so-called `mount' namespace).
 Eventually, as namespaces were expanded to include process isolation, network isolation, and user isolation,
 the ability to mimic an entirely new isolated machine was realised; containers were born%
 .\footnote{Of course, containers in a rudamentry form existed before introduction to the linux kernel but we have to start somewhere. \url{https://blog.aquasec.com/a-brief-history-of-containers-from-1970s-chroot-to-docker-2016}}
 
-Namespaces provide a mechanism to create an isolated environment within your current OS.
+Namespaces provide a mechanism to create an isolated environment within your current operating system.
 The creation of such an isolated environment with namespaces has been made quite easy --- you can create an isolated namespace with just a series of bash commands.
-Niklas Dz{\"o}sch's talk `docker without docker', uses just 84 lines of Go code (which docker itself is written in),
-to create, well, docker without docker.\footnote{\url{https://www.youtube.com/watch?v=7H__eF6hvWg}}
-But namespaces are just the first technology which enables docker.
+Niklas Dz{\"o}sch's talk `Docker without Docker', uses just 84 lines of Go code (which Docker itself is written in),
+to create, well, Docker without Docker.\footnote{\url{https://www.youtube.com/watch?v=7H__eF6hvWg}}
+But namespaces are just the first technology which enables Docker.
 How do you pre-populate these isolated environments with everything you need to run a program?
-To see what's in the isolated environment, we would run \texttt{ls} which, oh, requires the \texttt{ls} binary.
+To see what is in the isolated environment, we would run \texttt{ls} which, oh, requires the \texttt{ls} binary.
 Furthermore, to even consider running a command we need a shell to type it in, so, oh, we should also have a \texttt{bash} binary.
-And so on until, oh, finally, we have a linux kernel at least%
-!\footnote{You might be asking yourself, wait but I have a Windows operating system and I can still run docker, what gives? The answer, ironically enough, a virtual machine!}
+And so on until, oh, finally, we have a Linux kernel at least%
+!\footnote{You might be asking yourself, wait but I have a Windows operating system and I can still run Docker, what gives? The answer, ironically enough, is a virtual machine!}
 
 \subsection{Layered Filesystem}
-A core principle of unix operating systems is that everything is a file.
-Naturally then, if we want to start using a isolated environment,
+A core principle of Unix operating systems is that everything is a file.
+Naturally then, if we want to start using an isolated environment,
 all we need to do is copy in all the files which together form an operating system, right?
 Well, yes, kind of.
-In principle this is all you need do but this would hardly enable the popularity docker enjoys today.
+In principle this is all you need do but this would hardly enable the popularity Docker enjoys today.
 
-Say that you want to send your coworker a docker container which has nginx (a tool for routing web traffic)
+Say that you want to send your coworker a Docker container which has nginx (a tool for routing web traffic)
 setup in just the way you need to pass incoming traffic to various components of your application.
-Let's assume that you've setup nginx in ubuntu.
-All you would need to do is zip up all the files which compose the ubuntu OS (an impressively small 188MB)
+Let's assume that you have setup nginx in Ubuntu.
+All you would need to do is zip up all the files which compose the Ubuntu operating system (an impressively small 188MB),
 then all the files installed by nginx (about 55MB) and finally all the configuration files which you have modified,
 somewhere in the order of 1000 bytes or 1 KB.
-In total you're sending your coworker about 243MBs worth of data, less than a gigabyte, so they aren't too upset.
+In total you are sending your coworker about 243MBs worth of data, less than a gigabyte, so they are not too upset.
 
-Now once we've finished developing our application and we're ready to package it up and send it to the world.
-Rather than trying to support every known OS, we bundle all our services in docker containers,
+Now once we have finished developing our application and we are ready to package it up and send it to the world.
+Rather than trying to support every known operating system, we bundle all our services in Docker containers,
 one for nginx, one for mysql, one for our web application, etc, etc.
-If your applications containers are as popular as nginx, this means one \textsl{billion} downloads of your container.
-At a size of 243MBs, you've contributed 243 \textsl{petabytes} to the worlds collective bandwidth usage, and that's just your nginx container.
+If your applications containers are as popular as nginx, this means one \textit{billion} downloads of your container.
+At a size of 243MBs, you have contributed 243 \textit{petabytes} to the world's collective bandwidth usage, and that is just your nginx container.
 
-Dockers success over other containerization applications comes from the way it avoids this looming data disaster.
+Docker's success over other containerisation applications comes from the way it avoids this looming data disaster.
 A concept known as the layered, or overlayed, or the stacked filesystem solves the problem.
 First proposed in the early 1990s, layered filesystems enable layers of immutable files to be stacked below a top-level writable system.
 This has the effect of producing a seemingly mutable (or writable) filesystem while never actually modifying the collection of immutable files.
@@ -186,37 +187,37 @@ This gives the appearance of one homogeneous filesystem.
 \end{figure}
 
 Docker uses this technique to reduce the amount of duplicated files.
-If you have docker containers which run nginx, mysql, and python but all containers run on ubuntu,
-then your computer will only need to store one copy of the ubuntu filesystem.
-Each container will store the changes to the base OS required to install each application and project that layer over the immutable ubuntu filesystem.
+If you have Docker containers which run nginx, MySQL, and Python but all containers run on Ubuntu,
+then your computer will only need to store one copy of the Ybuntu filesystem.
+Each container will store the changes to the base operating system required to install each application and project that layer over the immutable Ubuntu filesystem.
 
 \subsection{Summary}
-While docker itself only came out in 2013, the two primary technologies which it is composed of; namespaces, and the layered filesystem;
+While Docker itself only came out in 2013, the two primary technologies which it is composed of, namespaces and the layered filesystem,
 were around since the early 1990s.
 Docker combines these technologies to enable applications to run in an isolated environment which can be efficiently replicated across different host computers.
-The reproducablity of docker containers and the fact that they are so light weight makes them an ideal target for two important aspects of modern development;
+The reproducablity of Docker containers and the fact that they are so light weight makes them an ideal target for two important aspects of modern development;
 developers simulating production environments locally, and duplicating production machines to scale for large loads of traffic.
 
 
 \section{Docker FROM scratch}
-Now that we understand the fundamentals of how docker works, let's start building our very first docker container.
-To follow along, you will need to have docker installed on your
-computer\footnote{\url{https://docs.docker.com/get-docker/}} and have access to basic unix command line
-applications.\footnote{For windows users, I would recommend Windows Subsystem for Linux}
+Now that we understand the fundamentals of how Docker works, let's start building our very first Docker container.
+To follow along, you will need to have Docker installed on your
+computer\footnote{\url{https://docs.docker.com/get-docker/}} and have access to basic Unix command line
+applications.\footnote{For windows users, we recommend Windows Subsystem for Linux.}
 
-To start with, we'll write a \texttt{Dockerfile} which builds a docker image without an operating system and just prints `Hello World'
+To start with, we will write a \texttt{Dockerfile} which builds a Docker image without an operating system and just prints `Hello World'
 \cite{docker-from-scratch}.
-The docker `code' is written in a \texttt{Dockerfile} which is then `compiled' into a docker image and finally run as a docker container.
+The Docker `code' is written in a \texttt{Dockerfile} which is then `compiled' into a Docker image and finally run as a Docker container.
 The first command in your \texttt{Dockerfile} should always be \texttt{FROM}.
-This command tells docker what immutable filesystem we want to start from, often, this will be your chosen operating environment.
-In this exercise, since we don't want an operating system, we start with \texttt{FROM scratch},
-a no-op instruction that tells docker to start with an empty filesystem.
+This command tells Docker what immutable filesystem we want to start from, often, this will be your chosen operating environment.
+In this exercise, since we do not want an operating system, we start with \texttt{FROM scratch},
+a no-op instruction that tells Docker to start with an empty filesystem.
 
 Let's get something in this container.
-For this, we'll use the \texttt{COPY} command which copies files from the host machine (your computer) into the container.
-For now, we'll write \texttt{COPY hello-world /}, which says to copy a file from the current directory named \texttt{hello-world} into the root directory (\texttt{/})
+For this, we will use the \texttt{COPY} command which copies files from the host machine (your computer) into the container.
+For now, we will write \texttt{COPY hello-world /}, which says to copy a file from the current directory named \texttt{hello-world} into the root directory (\texttt{/})
 of the container.
-We don't yet have a \texttt{hello-world} file but we can worry about that later.
+We do not yet have a \texttt{hello-world} file but we can worry about that later.
 Finally, we use the \texttt{CMD} command to tell the container what to do when it is run.
 This should be the command which starts your application.
 
@@ -225,15 +226,15 @@ This should be the command which starts your application.
 \end{shaded*}
 
 
-Next, we'll need a minimal hello world program.
-Unfortunately, we'll have to use C here as better programming languages have a bit too much overhead.
+Next, we will need a minimal hello world program.
+Unfortunately, we will have to use C here as better programming languages have a bit too much overhead.
 For everyone who has done CSSE2310, this should be painfully familiar, create a \texttt{main} function, print hello world, with a new line, and return 0.
 
 \begin{shaded*}
 \lstinputlisting[language=C,style=clang]{containers/from-scratch/hello-world.c}
 \end{shaded*}
 
-Let's try running this container.\hint{Try to guess if this is going to work, why? why not?}
+Let's try running this container.\hint{Try to guess if this is going to work. Why? Why not?}
 
 First, the hello world program needs to be compiled into a binary file.
 
@@ -245,8 +246,8 @@ First, the hello world program needs to be compiled into a binary file.
 \end{lstlisting}
 \end{shaded*}
 
-Next we'll use the \texttt{Dockerfile} to build a docker image and run that image.
-Images are stored centrally for a user account so to identify the image, we need to tag it when it is built, we'll use `hello'.
+Next we will use the \texttt{Dockerfile} to build a Docker image and run that image.
+Images are stored centrally for a user account so to identify the image, we need to tag it when it is built, we will use `hello'.
 
 \begin{shaded*}
 \begin{lstlisting}[language=shell]
@@ -256,11 +257,11 @@ Images are stored centrally for a user account so to identify the image, we need
 \end{lstlisting}
 \end{shaded*}
 
-Unless this is dockers unique way of saying hello world, something has gone terribly wrong.
-Here we're illustrating the power of docker isolation as well as the difficulty of not having an operating system.
-This very simple hello world program still relies on other libraries in the OS, libraries which aren't available in the empty docker container.
+Unless this is Docker's unique way of saying hello world, something has gone terribly wrong.
+Here we are illustrating the power of Docker isolation as well as the difficulty of not having an operating system.
+This very simple hello world program still relies on other libraries in the operating system, libraries which are not available in the empty Docker container.
 \texttt{ldd} tells us exactly what \texttt{hello-world} depends on.
-The hello world program can be statically compiled so that it doesn't depend on any libraries \cite{static-hello-world}.
+The hello world program can be statically compiled so that it does not depend on any libraries \cite{static-hello-world}.
 
 \begin{shaded*}
 \begin{lstlisting}[language=shell]
@@ -277,31 +278,31 @@ The hello world program can be statically compiled so that it doesn't depend on 
 \end{lstlisting}
 \end{shaded*}
 
-Now we have a docker image built from scratch, without an operating system, which can say `Hello World'!
+Now we have a Docker image built from scratch, without an operating system, which can say `Hello World'!
 \begin{extra}
-If you're interested in exploring in more depth, try using the `\texttt{docker image inspect hello}'
+If you are interested in exploring in more depth, try using the `\texttt{docker image inspect hello}'
 and `\texttt{docker history hello}' commands.
 \end{extra}
 
-\todo{A standard use case of docker}
+%\todo{A standard use case of docker}
 
-\todo{A complicated use case of docker}
+%\todo{A complicated use case of docker}
 
 
-\todo{
-\section{Best Practices}
-
-Order is important: least to most frequently changing content.
-
-If using COPY, be specific.
-
-Identify cachable units (useful?).
-
-Don't install things which you don't need.
-Don't include debugging tools.
-Cleanup after installation.
-
-Use existing images.
-
-Don't use latest.
-}
+%\todo{
+%\section{Best Practices}
+%
+%Order is important: least to most frequently changing content.
+%
+%If using COPY, be specific.
+%
+%Identify cachable units (useful?).
+%
+%Don't install things which you don't need.
+%Don't include debugging tools.
+%Cleanup after installation.
+%
+%Use existing images.
+%
+%Don't use latest.
+%}
