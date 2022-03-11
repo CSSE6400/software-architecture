@@ -23,13 +23,11 @@ This week we are looking into architectures which
 follow the pipeline architectural style.
 Specifically, this week we will:
 \begin{enumerate}
-    \item Cover the basic concepts of a pipeline architecture.
-    \item Explore a few interesting aspects of the way the 
-        Bourne Again Shell (bash) is implemented and why it is suitable for the 
-        pipeline style.
+    \item Briefly recap the concepts of pipeline architectures.
+    \item Explore the advantages of using bash as a well-implemented pipeline architecture using the Knuth/McIlroy example.
+    \item Explore whether compilers are a suitable pipeline architecture.
     \item Briefly look at one of the primary modern applications of the pipeline style,
         MapReduce.
-    \item Explore how the traditional pipeline architecture of a compiler has evolved.
 \end{enumerate}
 
 \section{Case Study: Compilers}
@@ -134,7 +132,7 @@ Below are the generic types of the \textsl{map} and \textsl{reduce} functions in
 \begin{code}[language=lambda]{}
 map : (type$_1$ -> type$_2$) -> type$_1 Seq$ -> type$_2 Seq$
 map $f$ $xs$
-reduce : (type$_1$ -> type$_1$ -> type$_1$) -> type$_1 Seq$ -> type$_1$ -> type$_1 Seq$
+reduce : (type$_2$ -> type$_1$ -> type$_2$) -> type$_1 Seq$ -> type$_2$ -> type$_2$
 reduce $f$ $xs$ $initial$
 \end{code}
 
@@ -148,11 +146,11 @@ If you're unfamiliar with this notation, the rough English translation is:
         The return type of the \textsl{map} function is a sequence of elements of type $\tau_2$.
     \item[reduce] The parameters of the \textsl{reduce} function are:
         \begin{enumerate}[label=(\alph*)]
-            \item A function, $f$, which takes two parameters both of type $\tau_1$ and returns a type $\tau_1$.
+            \item A function, $f$, which takes two parameters, the first of type $\tau_2$ is the current accumulator value, the second of type $\tau_1$ is the current value in the input sequence, and returns a $\tau_2$, the new accumulator value.
             \item A sequence of elements of type $\tau_1$.
-            \item An initial accumulator value of type $\tau_1$
+            \item An initial accumulator value of type $\tau_2$
         \end{enumerate}
-        The return type of the \textsl{reduce} function is a sequence of elements of type $\tau_1$.
+        The return type of the \textsl{reduce} function is the type $\tau_2$.
 \end{description}
 
 The code snippet below uses the $map$ and $reduce$ functions
@@ -166,25 +164,26 @@ contents = read("assignment.py")
 
 # filter relevant lines by rebuilding the list
 contents = reduce(lambda xs x -> 
-                    if x.contains("f***")
+                      if x.contains("hack")
                         then x + xs
                         else xs,
-                  contents)
+                    contents,
+                    [])
 
 # use map to count occurrences of word
-contents = map(lambda line -> line.count("f***"), contents)
+contents = map(lambda line -> line.count("hack"), contents)
 
 # use reduce to sum list of counts
 contents = reduce(lambda total curr -> total + curr, contents, 0)
 
-write("anger.txt", contents)
+write("code-quality.txt", contents)
 \end{code}
 
 So by design, code written in this pattern can process data simultaneously.
 Tools such as \link{Hadoop}{https://hadoop.apache.org/} are able to take advantage of this to distribute computation automatically.
 
 \begin{extra}
-Using the terminology of a pipeline architecture, what filters do the \textsl{map} and \textsl{reduce} operators correspond to?
+Using the terminology of a pipeline architecture, what filters do the \textsl{map} and \textsl{reduce} operators roughly correspond to?
 \end{extra}
 
 \begin{extra}
