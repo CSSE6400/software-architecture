@@ -1,0 +1,110 @@
+\documentclass{csse4400}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows}
+
+\usepackage{float}
+
+\usepackage{enumitem}
+
+\usepackage{languages}
+
+\title{Containers}
+\author{Brae Webb}
+
+\date{\week{3}}
+\begin{document}
+
+\maketitle
+
+\section{Before Class}
+\begin{itemize}
+    \item Ensure that you have \textbf{Docker installed} prior to class.
+    \item Preferably read the Containers lecture note \cite{container-notes}.
+\end{itemize}
+
+\section{Brief}
+This week we are getting our hands on using containers.
+Specifically we will:
+\begin{enumerate}
+    \item Check our installation with the \texttt{hello-world} image.
+    \item Manage our local docker images.
+    \item Build a Docker image from a \texttt{Dockerfile}.
+    \item Run the Docker image interactively.
+    \item Publish the Docker image.
+\end{enumerate}
+
+\section{Hello World}
+To ensure that our installation of Docker is working as expected,
+we'll run the \texttt{hello-world} image.
+The \texttt{hello-world} image is an 
+\link{official Docker image}{https://hub.docker.com/search?q=&type=image&image_filter=official}
+that simply prints out ``Hello from Docker!''.
+It is similar to the \texttt{Hello FROM scratch} we looked at in the lecture notes.
+
+\bash{docker run hello-world}
+
+\section{Exploring Local Images}
+We'll look at a few commands to explore our local images.
+
+\paragraph{List all local Docker images}
+
+\bash{docker images}
+
+\paragraph{Remove local image}
+
+\bash{docker rmi -f hello-world}
+
+\paragraph{Clean up unused images}
+
+\bash{docker image prune -af}
+
+\section{Creating an image}
+
+We can create images to run tools which run in an isolated environment.
+For this exercise,
+we will create a \texttt{Dockerfile} to build an image with
+\link{Advanced Normalization Tools (ANTs)}{https://github.com/ANTsX/ANTs}
+installed.
+
+\codefile[language=docker]{Dockerfile}{code/Dockerfile}
+
+Once the image has been specified in a \texttt{Dockerfile},
+we can use the \texttt{docker build} command to run the commands and produce an image.
+Run the following in the same directory as the \texttt{Dockerfile}.
+
+\bash{docker build -t ants:latest -f Dockerfile .}
+
+Note that if the tag \texttt{ants} is given \texttt{:latest} will be appended automatically.
+Likewise, if the file is named \texttt{Dockerfile} then the \texttt{-f Dockerfile} flag can be dropped as Docker will automatically search for a \texttt{Dockerfile}.
+Check that the image has been created:
+
+\bash{docker images}
+
+Now we are ready to run the image.
+When running with the \texttt{-it} flag,
+Docker will create an interactive terminal inside the container and connect it to the current shell.
+You should notice that the shell prompt will change.
+
+\bash{docker run -it ants:latest}
+
+Now you can inspect the image,
+note that the current directory has all the binaries of ANTs.
+If you inspect other directories you'll find all your normal files are inaccessible.
+
+You can exit the interactive container at any time by running the \texttt{exit} command to exit the shell within the container and return to the shell on your host machine.
+
+\bash{exit}
+
+\section{Publishing the container}
+\dots
+
+% \section{Going further}
+% One of the trickier aspects of configuring containers is configuring an appropriate build environment for a tool.
+% In the previous exercise we simply downloaded all the binaries for 
+
+\bibliographystyle{ieeetr}
+\bibliography{ours}
+
+\end{document}
