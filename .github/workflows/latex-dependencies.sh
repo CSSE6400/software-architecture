@@ -1,5 +1,5 @@
 #!/bin/bash
-# Install latex depdendencies
+# Install latex dependencies
 
 tlmgr update --self
 tlmgr install cabin
