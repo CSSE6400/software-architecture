@@ -25,3 +25,4 @@ tlmgr install multirow
 tlmgr install xltabular
 tlmgr install ltablex
 tlmgr install pdflscape
+tlmgr install accsupp
