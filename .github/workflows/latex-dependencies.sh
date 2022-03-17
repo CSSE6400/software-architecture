@@ -21,3 +21,8 @@ tlmgr install thmtools
 tlmgr install cjk
 tlmgr install wrapfig
 tlmgr install tabto-ltx
+tlmgr install multirow
+tlmgr install xltabular
+tlmgr install ltablex
+tlmgr install pdflscape
+tlmgr install accsupp
