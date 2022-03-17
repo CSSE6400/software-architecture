@@ -1,4 +1,6 @@
 \documentclass{slide}
+
+\usepackage{changepage}
 % \usepackage{pgfpages}
 
 % \setbeameroption{show notes on second screen}
@@ -13,10 +15,46 @@
 \maketitle
 
 \definition{Distributed System}{A system with multiple components located on different machines that communicate and coordinate actions in order to appear as a single coherent system to the end-user.}
+\note{Introduce idea of distributed systems and then move on to service-based being an simple approach.}
 
 \point[Quote]{A distributed system is one in which the failure of a computer you didn't even know existed can render your own computer unusable.\\
--- Leslie Lamport}
-\note{Emphasise quality attributes and how architectural styles deliver those attributes.}
+ ~~~~~ -- Leslie Lamport [Turing Award, 2013]}
+
+\definition{Service-Based Architecture}{System is partitioned into business domains that are deployed as distributed services.
+Functionality is delivered through a user interface that interacts with the domain services.}
+\note{Explain why this leads to a fairly simple distributed architecture.}
+
+\begin{frame}{Service-Based Architecture}
+    \begin{adjustwidth}{-10mm}{-10mm}
+        \centering
+        \includegraphics[trim=39 43 19 44,clip,width=0.97\paperwidth]{../../notes/service-based/diagrams/general-service-based-arch.png}
+    \end{adjustwidth}
+\end{frame}
+
+\begin{frame}{Terminology}
+    \vspace{1mm}
+    {\LARGE
+    \begin{description}
+        \item[User Interface] Provides access to system functionality
+        \vspace{3mm}
+        \item[Services] Implement functionality for a single, independent business process
+        \vspace{3mm}
+        \item[Service APIs] Communication mechanism between UI and each service
+        \vspace{3mm}
+        \item[Database] Stores persistent data for the system
+    \end{description}
+    }
+\end{frame}
+\note[itemize]{
+    \item Explain that the Service APIs are communication protocols and data formats, not just a Java-style interface.
+    \item Usually all Service APIs use the same communication protocol (e.g. REST).
+}
+
+\definition{Façade Design Pattern}{Provide a simple, abstract interface to use a service domain's functionality.}
+\note{Summarise Façade Design Pattern and mention its from the GoF book.}
+
+\todo{Example REST API? Issue of failures in distributed systems?
+Show service architecture for Sahara and summarise parallel flows through services. Aside about stateless services and possible multi-threaded web pages (e.g. JSF).}
 
 \begin{frame}{Microkernel Architecture}
 Failure is the defining difference between distributed and local programming, so you have to design distributed systems with the expectation of failure. Imagine asking people, "If the probability of something happening is one in 1013, how often would it happen?" Common sense would be to answer, "Never." That is an infinitely large number in human terms. But if you ask a physicist, she would say, "All the time. In a cubic foot of air, those things happen all the time."
@@ -29,29 +67,6 @@ So if I never receive a response, how do I know which of those two results happe
 \note[itemize]{
     \item Monolith -- Commonly use method invocation to communicate with plug-ins
     \item Other message passing protocols may be used
-}
-
-\definition{Registry}{Tracks which plug-ins are available to the core system and how to access them.}
-\note[itemize]{
-    \item Monolith -- Registry can be simply plug-in name and reference to delegate object
-    \item More detail about communication protocol and data structure required for other message passing approaches
-}
-
-\begin{frame}{Loading Plug-ins}
-    \vspace{1mm}
-    {\huge
-    \begin{description}
-        \item[Static Loading] when application starts
-        \vspace{3mm}
-        \item[Dynamic Loading] as needed at run-time
-        \vspace{3mm}
-        \item[Registry] designed for the selected strategy
-    \end{description}
-    }
-\end{frame}
-\note[itemize]{
-    \item Dynamic loading requires a plug-in registration and de-registration interface
-    \item Could mention that one of the reasons for JARs in Java was to allow dynamic loading of classes
 }
 
 \questionanswer{Can you think of a \highlight{microkernel archiecture}?}{Web Browser?}
@@ -75,18 +90,6 @@ The only dependency on the core system is through the plug-in interface.}
 
 \questionanswer{Does a plug-in architecture equate to a microkernel archiecture?}{What about \highlight{IntelliJ}?}
 \note{Not really a microkernel, just a large IDE that allows plug-ins.}
-
-\begin{frame}{Plug-ins with Separate Databases}
-    \begin{itemize}
-        \LARGE\item Plug-ins cannot access core system data
-        \begin{itemize}
-            \Large\item Core system may pass data to the plug-in
-        \end{itemize}
-        \LARGE\item Plug-ins may have their own persistent data
-    \end{itemize}
-    \vspace{1cm}
-    \includegraphics[trim=38 81 24 50,clip,width=\textwidth]{../../notes/microkernel/diagrams/plug-in-databases.png}
-\end{frame}
 
 \begin{frame}{Plug-ins as External Services}
     \begin{itemize}
