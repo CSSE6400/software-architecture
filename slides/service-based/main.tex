@@ -1,6 +1,7 @@
 \documentclass{slide}
 
 \usepackage{changepage}
+\usepackage{tabto}
 % \usepackage{pgfpages}
 
 % \setbeameroption{show notes on second screen}
@@ -48,124 +49,75 @@ Functionality is delivered through a user interface that interacts with the doma
 \note[itemize]{
     \item Explain that the Service APIs are communication protocols and data formats, not just a Java-style interface.
     \item Usually all Service APIs use the same communication protocol (e.g. REST).
+    \item Also point out that messages between the UI and services will typically be asynchronous.
 }
 
-\definition{Façade Design Pattern}{Provide a simple, abstract interface to use a service domain's functionality.}
-\note{Summarise Façade Design Pattern and mention its from the GoF book.}
-
-\todo{Example REST API? Issue of failures in distributed systems?
-Show service architecture for Sahara and summarise parallel flows through services. Aside about stateless services and possible multi-threaded web pages (e.g. JSF).}
-
-\begin{frame}{Microkernel Architecture}
-Failure is the defining difference between distributed and local programming, so you have to design distributed systems with the expectation of failure. Imagine asking people, "If the probability of something happening is one in 1013, how often would it happen?" Common sense would be to answer, "Never." That is an infinitely large number in human terms. But if you ask a physicist, she would say, "All the time. In a cubic foot of air, those things happen all the time."
-
-When you design distributed systems, you have to say, "Failure happens all the time." So when you design, you design for failure. It is your number one concern. What does designing for failure mean? One classic problem is partial failure. If I send a message to you and then a network failure occurs, there are two possible outcomes. One is that the message got to you, and then the network broke, and I just didn't get the response. The other is the message never got to you because the network broke before it arrived.
-
-So if I never receive a response, how do I know which of those two results happened? I cannot determine that without eventually finding you. The network has to be repaired or you have to come up, because maybe what happened was not a network failure but you died. How does this change how I design things? For one thing, it puts a multiplier on the value of simplicity. The more things I can do with you, the more things I have to think about recovering from.
- -- https://www.artima.com/articles/designing-distributed-systems
-\end{frame}
+\definition{API Abstraction Principle}{Services should provide an API that hides implementation details.}
 \note[itemize]{
-    \item Monolith -- Commonly use method invocation to communicate with plug-ins
-    \item Other message passing protocols may be used
+    \item Each service publishes its own API.
+    \item Hides service implementation details, reducing coupling between UI and service.
+    \item Makes it easier to reuse service across systems or by supporting service (e.g. auditing).
 }
 
-\questionanswer{Can you think of a \highlight{microkernel archiecture}?}{Web Browser?}
+\definition{Façade Design Pattern}{Provide a simple, abstract interface to use a service domain's functionality.
+A component within the service coordinates how to deliver the requested functionality with the service's internal components.}
+\note{Summarise Façade Design Pattern and how it is used in a service-based architecture. Mention its from the GoF book.}
+
+\definition{Independent Service Principle}{Services should be independent, with no dependencies on other services.}
 \note[itemize]{
-    \item Eclipse
-    \item Operating Systems
-    \begin{itemize}
-        \item Some Unix variants
-        \item Zircon - Google OS kernel
-        \item Nintendo Switch OS
-    \end{itemize}
-    \item Insurance Claims Processing
-    \item Payroll
-    \item WordPress
+    \item Explain consequences of dependencies between services.
+    \item Services can't easily be deployed separately if they depend on other services.
+    \item They would require interfaces between services, increasing coupling.
 }
 
-\definition{Independent Plug-in Principle}{Plug-ins should be independent, with no dependencies on other plug-ins.
-The only dependency on the core system is through the plug-in interface.}
-
-\definition{Standard Interface Principle}{There should be a single interface that defines how the core system uses plug-ins.}
-
-\questionanswer{Does a plug-in architecture equate to a microkernel archiecture?}{What about \highlight{IntelliJ}?}
-\note{Not really a microkernel, just a large IDE that allows plug-ins.}
-
-\begin{frame}{Plug-ins as External Services}
-    \begin{itemize}
-        \LARGE\item Need communication protocol
-        \LARGE\item Registry records communication contract
-        \begin{itemize}
-            \Large\item e.g. URL of the REST endpoint \& data passed to it
-        \end{itemize}
-    \end{itemize}
-    \vspace{1cm}
-    \includegraphics[trim=38 167 19 45,clip,width=\textwidth]{../../notes/microkernel/diagrams/rest-microkernel.png}
-\end{frame}
+\questionanswer{What are the consequences of having a shared database?}{Increased \highlight{data coupling}.}
 \note[itemize]{
-    \item May be deployed on same or separate infrastructure
-    \item Allows broad range of communication protocols
+    \item If a row of a database is locked and another service wants to use it, it is blocked. Losing efficiency benefits of a distributed system.
+    \item If one service changes the structure of its persistent data, all services using that data need to be updated and tested.
+    \item If one service changes how it uses persistent data, all other services using the same data need to be retested.
 }
 
-\begin{frame}{Adapting Non-Conforming Interfaces}
-    \includegraphics[trim=38 58 20 45,clip,width=\textwidth]{../../notes/microkernel/diagrams/adapter-plug-in.png}
-\end{frame}
-\note{Introduce \emph{adapter} design pattern as approach to manage 3rd party services as plug-ins}
-
-\begin{frame}
-    \vspace{4mm}
-    \begin{columns}[t]
-    \column<1->{0.5\textwidth}
-        \centering
-        \LARGE Technical Partitioning
-        \begin{figure}
-            \centering
-            \includegraphics[trim=30 50 142 45,clip,width=0.35\textheight]{diagrams/technical-partitioning.png}
-        \end{figure}
-    \column<2->{0.5\textwidth}
-        \centering
-        \LARGE Domain Partitioning
-        \begin{figure}
-            \centering
-            \includegraphics[trim=38 50 19 45,clip,width=\textwidth]{diagrams/domain-partitioning.png}
-        \end{figure}
-    \end{columns}
-\end{frame}
-\note[itemize]{
-    \item Summarise differences between technical and domain partitioning
-    \item Review layered architecture as technical partitioning
-    \begin{itemize}
-        \item Emphasise it is not the only way to perform technical partitioning
-    \end{itemize}
-    \item Example of on-line store partitioned into domains
-}
-
-\questionanswer{Is the microkernel architecture suited to \highlight{technical} or \highlight{domain} partitioning?}
-{Core system can be partitioned either way.}
-
-\begin{frame}{Domain Standard Interfaces}
-    \vspace{3mm}
+\begin{frame}{Logical Partitioning of Persistent Data}
     \centering
-    \includegraphics[trim=38 42 23 42,clip,width=1.25\textheight]{../../notes/microkernel/diagrams/domain-microkernel.png}
+    \includegraphics[trim=37 37 20 44,clip,width=0.8\textwidth]{../../notes/service-based/diagrams/db-logical-partitioning.png}
 \end{frame}
 \note[itemize]{
-    \item Each domain can have its own plug-in interface
-    \item Some domains may share a plug-in interface
+    \item Define a minimal set of shared persistent objects.
+    \item Create a shared library to access these objects.
+    \item Changes to shared persistent objects are restricted as they require changes to other services.
+    \item Each service may have its own persistent objects stored in tables that are not shared with other services.
 }
 
-\begin{frame}{Distributed Microkernel}
-    \begin{itemize}
-        \LARGE\item Partitions in the core system can be distributed
-        \begin{itemize}
-            \Large\item Technical or domain partitions
-            \Large\item Plug-ins could also be distributed
-        \end{itemize}
-    \end{itemize}
-    \vspace{3mm}
-    \centering
-    \includegraphics[trim=39 138 19 43,clip,width=0.7\textwidth]{../../notes/microkernel/diagrams/separate-ui-microkernel.png}
+\begin{frame}{Separate Databases}
+        \centering
+        \includegraphics[trim=39 42 18 48,clip,width=0.9\textwidth]{../../notes/service-based/diagrams/separate-dbs.png}
 \end{frame}
-\note{Comment on additional complexity}
+\note{Discuss options of separate DB servers, share DBs on one server, DBs embedded in application.}
+
+\begin{frame}{Separate UIs}
+        \centering
+        \includegraphics[trim=40 42 19 45,clip,width=\textwidth]{../../notes/service-based/diagrams/separate-uis.png}
+\end{frame}
+\note[itemize]{
+    \item UI Platform could be desktop, web or mobile app.
+    \item This allows multiple concurrent users, even through one user interface.
+}
+
+\todo{
+Example REST API?\\
+Issue of failures in distributed systems?\\
+Show service architecture for Sahara and summarise parallel flows through services.\\
+Aside about stateless services and possible multi-threaded web pages (e.g. JSF).
+}
+
+%\begin{frame}{Failure Issues}
+%Failure is the defining difference between distributed and local programming, so you have to design distributed systems with the expectation of failure. Imagine asking people, "If the probability of something happening is one in 1013, how often would it happen?" Common sense would be to answer, "Never." That is an infinitely large number in human terms. But if you ask a physicist, she would say, "All the time. In a cubic foot of air, those things happen all the time."
+%
+%When you design distributed systems, you have to say, "Failure happens all the time." So when you design, you design for failure. It is your number one concern. What does designing for failure mean? One classic problem is partial failure. If I send a message to you and then a network failure occurs, there are two possible outcomes. One is that the message got to you, and then the network broke, and I just didn't get the response. The other is the message never got to you because the network broke before it arrived.
+%
+%So if I never receive a response, how do I know which of those two results happened? I cannot determine that without eventually finding you. The network has to be repaired or you have to come up, because maybe what happened was not a network failure but you died. How does this change how I design things? For one thing, it puts a multiplier on the value of simplicity. The more things I can do with you, the more things I have to think about recovering from.
+% -- https://www.artima.com/articles/designing-distributed-systems
+%\end{frame}
 
 \begin{frame}{Pros \& Cons}
     \vspace{1mm}
