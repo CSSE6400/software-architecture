@@ -1,6 +1,8 @@
 \documentclass{slide}
 \usepackage{tikz}
 \usetikzlibrary{snakes}
+\usetikzlibrary{intersections}
+\usetikzlibrary{shapes.geometric}
 
 \usepackage{languages}
 
@@ -22,6 +24,12 @@
 
 \maketitle
 
+\note[itemize]{
+    \item Do a quick poll.
+    \item Who has heard the term IaC before this course?
+    \item Who has used IaC before this course?
+}
+
 \point[Infrastructure as Code]{How did we get here?}
 
 \point[Pre-2000]{The \highlight{Iron Age}}
@@ -37,6 +45,8 @@
 \end{center}
 }
 
+\note{Developer only had a few machines --- so few the machines often got fun names.}
+
 \point[Introducing...]{The \highlight{Cloud Age}}
 
 \point[The Cloud Age]{
@@ -45,7 +55,17 @@
 \end{center}
 }
 
+\note[itemize]{
+    \item Summarise: things got complicated quickly, we need more hardware and it's easier to provision.
+    \item Largely thanks to virtualization --- no physical activity for a new machine.
+}
+
 \point[When faced with complexity]{Automate it!}
+
+\note[itemize]{
+    \item We have too much to manage to do it manually.
+    \item We're about to start enumerating automation techniques.
+}
 
 \begin{frame}{The larger story}
 
@@ -99,6 +119,8 @@
 \end{center}
 }
 
+\note{IC often thought of as the right-hand side but includes all.}
+
 \begin{frame}[fragile]
 \begin{code}[language=bash]{}
 #!/bin/bash
@@ -111,6 +133,8 @@ INST=$(aws ec2 run-instances --security-group-ids "$SG" \
          --instance-type t2.micro)
 \end{code}
 \end{frame}
+
+\note{Using aws CLI to create EC2 access like the practical.}
 
 \begin{frame}[fragile]
 \begin{code}[language=python]{}
@@ -131,6 +155,9 @@ def create_instance():
 \end{code}
 \end{frame}
 
+\note{Using aws python library (boto3).}
+
+
 \begin{frame}[fragile]
 \begin{code}[language=terraform]{}
 resource "aws_instance" "hextris-server" {
@@ -150,9 +177,18 @@ resource "aws_security_group" "hextris-server" {
 \end{code}
 \end{frame}
 
+\note{Finally, terraform.}
+
 \question{Notice anything different?}
 
+\note[itemize]{
+    \item Prompting for declaritive.
+    \item Might notice verbosity.
+}
+
 \point[The \textsl{main} difference]{Imperative vs. Declaritive}
+
+\note{IC is heading towards a more declaritive paradigm.}
 
 \point[Infrastructure Code]{
 \Large
@@ -164,16 +200,34 @@ resource "aws_security_group" "hextris-server" {
 \end{itemize}
 }
 
+\note{Summarising what we've already covered.}
+
 \point[Typo?]{Infrastructure Code $\neq$ Infrastructure \highlight{as} Code}
+
+\note[itemize]{
+    \item Mention that this distinction is ours.
+    \item Real world unfortunately mixes the two.
+}
 
 \definition{Infrastructure as Code}%
 {Following the same \highlight{good coding practices} to manage Infrastructure Code as standard code.}
 
 \point[Warning!]{Infrastructure as Code still \highlight{early} and quite \highlight{bad}.}
 
+\note[itemize]{
+    \item Code reuse is low.
+    \item Importing existing resources is non-trivial.
+    \item Refactoring is painful.
+    \item State management can be tricky.
+}
+
 \question{What are \highlight{good coding practices}?}
 
+\note{Ask the class.}
+
 \point[Good Coding Practice \#1]{\highlight{Everything} as code}
+
+\note{A practice we do but barely discuss in `regular' programming because it doesn't make sense not to do it.}
 
 \begin{frame}[fragile]
 \begin{code}[language=shell]{}
@@ -187,6 +241,8 @@ cp -r output/* artifacts/
 \only<2>{\bash{cp: directory artifacts does not exist}}
 \end{frame}
 
+\note{An example of relying on external state in `regular' programming.}
+
 \begin{frame}[fragile]
 \begin{code}[language=terraform]{}
 resource "aws_instance" "hextris-server" {
@@ -196,6 +252,8 @@ resource "aws_instance" "hextris-server" {
 }
 \end{code}
 \end{frame}
+
+\note{Draw a parallel to the bash example and this, which relies on `sg-6400' existing.}
 
 \begin{frame}[fragile]
 \begin{code}[language=terraform]{}
@@ -216,12 +274,19 @@ resource "aws_security_group" "hextris-server" {
 \end{code}
 \end{frame}
 
+\note{The better approach.}
+
 \point[Everything as code avoids]{
 Configuration drift
 }
 
 \point[Configuration drift creates]{
 Snowflakes
+}
+
+\note[itemize]{
+    \item Snowflakes: magical machines that `just work' and everyone is afraid to touch.
+    \item Snowflake because they're unique and easy to break because no one knows how it works.
 }
 
 \point[Benefits]{
@@ -247,6 +312,8 @@ Snowflakes
 \end{enumerate}
 }
 
+\note{Automatically applying or checking IC is in sync means the main branch is consistent with reality.}
+
 \point[Good Coding Practice \#4]{Code Reuse}
 
 \point[Benefits]{
@@ -257,6 +324,83 @@ Snowflakes
 }
 
 \point[Good Coding Practice \#5]{Testing}
+
+\begin{frame}{Test Pyramid}
+    \begin{center}
+    \begin{tikzpicture}
+    \coordinate (A) at (-5,0) {};
+    \coordinate (B) at ( 5,0) {};
+    \coordinate (C) at (0,7) {};
+    \draw[name path=AC] (A) -- (C);
+    \draw[name path=BC] (B) -- (C);
+    \foreach \y/\A in {0/Unit Testing,2/Integration Testing,4/End-to-end Testing} {
+        \path[name path=horiz] (A|-0,\y) -- (B|-0,\y);
+        \draw[name intersections={of=AC and horiz,by=P},
+                name intersections={of=BC and horiz,by=Q}] (P) -- (Q)
+            node[midway,above] {\A};
+    }
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\note[itemize]{
+    \item Traditional test pyramid.
+    \item Unit testing relies of isolated testing.
+    \item But\dots isolated testing doesn't make \textsl{much} sense for IaC.
+}
+
+\begin{frame}{IaC Test Pyramid}
+    \begin{center}
+    \begin{tikzpicture}
+    \coordinate (A) at (-4,2) {};
+    \coordinate (B) at ( 4,2) {};
+    \coordinate (C) at (0,7) {};
+    \draw[name path=AC] (A) -- (C);
+    \draw[name path=BC] (B) -- (C);
+    \foreach \y/\A in {2/Integration Testing,4/End-to-end Testing} {
+        \path[name path=horiz] (A|-0,\y) -- (B|-0,\y);
+        \draw[name intersections={of=AC and horiz,by=P},
+                name intersections={of=BC and horiz,by=Q}] (P) -- (Q)
+            node[midway,above] {\A};
+    }
+    \node at (-2,1.5) [rectangle,draw,minimum height = 1cm,,minimum width = 2cm] (validate) {validate};
+    \node at (2,1.5) [rectangle,draw,minimum height = 1cm,,minimum width = 2cm] (compliance) {compliance};
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{code}[language=go]{}
+func TestTerraformAwsInstance(t *testing.T) {
+    terraformOptions := terraform.WithDefault(t, &terraform.Options{
+        TerraformDir: "../week03/",
+    })
+
+    defer terraform.Destroy(t, terraformOptions)
+    terraform.InitAndApply(t, terraformOptions)
+
+    publicIp := terraform.Output(t, terraformOptions, "public_ip")
+    url := fmt.Sprintf("http://%s:8080", publicIp)
+
+    http_helper.HttpGetWithCustomValidation(t, url, nil, 200, 
+        func(code, resp) { code == 200 &&
+                             strings.Contains(resp, "hextris")})
+}
+\end{code}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{code}[language=Gherkin]{}
+Feature: Define AWS Security Groups
+
+Scenario: Only selected ports should be publicly open
+    Given I have AWS Security Group defined
+    When it contains ingress
+    Then it must only have tcp protocol and port 22,443 for 0.0.0.0/0
+\end{code}
+\end{frame}
+
+\note{An example of compliance testing.}
 
 \point[Benefits]{
 \begin{enumerate}
