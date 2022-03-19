@@ -208,3 +208,6 @@
 %     {\color{primary}\insertframenumber}{\color{secondary}/\inserttotalframenumber}%
 %     \vspace{40pt}%
 % }
+
+% Remove cluttered notes formatting
+\setbeamertemplate{note page}{\vfill\Large\insertnote\vfill}

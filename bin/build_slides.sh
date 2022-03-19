@@ -15,6 +15,15 @@ for folder in ${REPO_ROOT}/slides/*; do
             exit 1
         fi
         cp ./out/main.pdf "${REPO_ROOT}/dist/slides/$(basename $folder).pdf"
+        # Cleanup build artifacts
+        latexmk -c
+        # Build presenter version with flags enabled
+        latexmk -halt-on-error -usepretex 
+        if [ $? -ne 0 ]; then
+            echo "error: $(basename $folder) slides failed to build presenter version"
+            exit 1
+        fi
+        cp ./out/main.pdf "${REPO_ROOT}/dist/slides/$(basename $folder)-presenter.pdf"
         popd
     fi
 done
