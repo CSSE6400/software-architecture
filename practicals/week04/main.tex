@@ -106,7 +106,76 @@ Today we will be using it to run a small application locally that is a webserver
 
 \subsection{Locally}
 
+\begin{code}[language=docker]{Dockerfile}
+FROM ubuntu:21.10
+RUN apt-get update \
+        && DEBIAN_FRONTEND=noninteractive apt install -y \
+            php \
+            php-mysql \
+            php-xml \
+            php-curl \
+            curl \
+            git \
+            unzip
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+COPY . /app
+WORKDIR /app
+RUN composer install
+CMD ["php", "artisan", "serve", "--host=0.0.0.0"]
+\end{code}
+
 \todo{ .. write the docker compose file. }
+
+\begin{code}[language=docker-compose]{main.tf}
+version: '3.3'
+services:
+  backend:
+    image: ghcr.io/csse6400/todo-app:latest
+    restart: always
+    ports:
+      - '8000:8000'
+    environment:
+      APP_ENV: 'local'
+      APP_KEY: 'base64:8PQEPYGlTm1t3aqWmlAw/ZPwCiIFvdXDBjk3mhsom/A='
+      APP_DEBUG: 'true'
+      LOG_LEVEL: 'debug'
+\end{code}
+
+\todo{Include photo showing that we couldnt connect to DB}
+
+\begin{code}[language=docker-compose]{main.tf}
+version: '3.3'
+services:
+  db:
+    image: mysql:8-debian
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'todoapp'
+      MYSQL_USER: 'todoapp'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+
+  backend:
+    image: ghcr.io/csse6400/todo-app:latest
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - '8000:8000'
+    environment:
+      APP_ENV: 'local'
+      APP_KEY: 'base64:8PQEPYGlTm1t3aqWmlAw/ZPwCiIFvdXDBjk3mhsom/A='
+      APP_DEBUG: 'true'
+      LOG_LEVEL: 'debug'
+      DB_CONNECTION: 'mysql'
+      DB_HOST: 'db'
+      DB_PORT: '3306'
+      DB_DATABASE: 'todoapp'
+      DB_USERNAME: 'todoapp'
+      DB_PASSWORD: 'password'
+\end{code}
 
 \subsubsection{Optional Exercise: Fixing the container}
 
