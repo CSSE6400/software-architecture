@@ -175,7 +175,7 @@
 }
 
 % Warning
-\definecolor{warning}{RGB}{255, 255, 0}
+\definecolor{warning}{RGB}{255, 204, 0}
 \newcommand\warning[1]{
     \begin{tcolorbox}[title=Warning,colframe=warning]
     #1

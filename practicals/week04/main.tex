@@ -19,6 +19,10 @@
 \caption{A map of data storage techniques from Designing Data-Intensive Applications \cite{data-intensive}.}
 \end{figure}
 
+\warning{
+  This document is still a work in progress.
+}
+
 \section{This Week}
 This week our goal is to:
 \begin{itemize}
@@ -127,14 +131,11 @@ RUN composer install
 CMD ["php", "artisan", "serve", "--host=0.0.0.0"]
 \end{code}
 
-\todo{ .. write the docker compose file. }
-
 \begin{code}[language=docker-compose]{main.tf}
 version: '3.3'
 services:
   backend:
     image: ghcr.io/csse6400/todo-app:latest
-    restart: always
     ports:
       - '8000:8000'
     environment:
@@ -160,7 +161,6 @@ version: '3.3'
 services:
   db:
     image: mysql:8-debian
-    restart: always
     environment:
       MYSQL_DATABASE: 'todoapp'
       MYSQL_USER: 'todoapp'
@@ -171,7 +171,6 @@ services:
 
   backend:
     image: ghcr.io/csse6400/todo-app:latest
-    restart: always
     depends_on:
       - db
     ports:
@@ -189,6 +188,26 @@ services:
       DB_PASSWORD: 'password'
 \end{code}
 
+\begin{code}[language=shell,numbers=none]{}
+  $ docker-compose up
+  Starting p2_db_1 ... done
+  Starting p2_backend_1 ... done
+  Attaching to p2_db_1, p2_backend_1
+  db_1       | 2022-03-20 08:11:55+00:00 [Note] [Entrypoint]: Entrypoint ....
+  db_1       | 2022-03-20 08:11:55+00:00 [Note] [Entrypoint]: Switching t....
+  db_1       | 2022-03-20 08:11:55+00:00 [Note] [Entrypoint]: Entrypoint ....
+  db_1       | 2022-03-20T08:11:55.438996Z 0 [System] [MY-010116] [Server....
+  db_1       | 2022-03-20T08:11:55.445261Z 1 [System] [MY-013576] [InnoDB....
+  backend_1  | Starting Laravel development server: http://0.0.0.0:8000
+  db_1       | 2022-03-20T08:11:55.535803Z 1 [System] [MY-013577] [InnoDB....
+  db_1       | 2022-03-20T08:11:55.673757Z 0 [Warning] [MY-010068] [Serve....
+  db_1       | 2022-03-20T08:11:55.673784Z 0 [System] [MY-013602] [Server....
+  db_1       | 2022-03-20T08:11:55.674810Z 0 [Warning] [MY-011810] [Serve....
+  db_1       | 2022-03-20T08:11:55.684729Z 0 [System] [MY-010931] [Server....
+  db_1       | 2022-03-20T08:11:55.684756Z 0 [System] [MY-011323] [Server....
+  backend_1  | [Sun Mar 20 08:11:55 2022] PHP 8.0.8 Development Serv....
+\end{code}
+
 \todo{ Going to 127.0.0.1:8000/api/v1/todo will show an error page }
 
 \includegraphics[width=\textwidth]{images/missing-tables}
@@ -204,19 +223,84 @@ Seeded:  Database\Seeders\TodoSeeder (6.56ms)
 Database seeding completed successfully.
 \end{code}
 
-\subsubsection{Optional Exercise: Fixing the container}
+\subsubsection{Exercise: Migrations at startup}
 
-In a typical application you dont want to have to enable debug and access an endpoint which is broken inorder
-to run the database migrations. One way for us to fix this is to run the database migrations when our application starts.
-Luckily for us the application we have is based off of Laravel which has a cli which can do this for us.
+So far when we run this application we have to perform the database migrations manually. To help us get up and running
+we are going to make a small modification to pre run the migrations when are web app starts. First we need to have a look
+at how the container is set to launch by default. In the Dockerfile attached at the start of the prac we see that we have
+defined the command to run on the last line with the CMD directive.
 
-\todo{
-  Walk through building a new container with a script that runs the migrations first.
+\begin{code}[language=docker]{Dockerfile}
+  FROM ubuntu:21.10
+  ... 
+  ... 
+  ...
+  CMD ["php", "artisan", "serve", "--host=0.0.0.0"]
+\end{code}
+
+\info{
+  When working with docker it can get confusing around the networking aspects. In this application I have specified
+  that the server must listen on all network interfaces ( 0.0.0.0 ). Without this flag the default is 127.0.0.1 which
+  even though its the localhost the forwarded traffic through the docker container would never reach it.
 }
+
+This command launches the laravel development server and listens on all interfaces on the host. We are going to override
+this in our docker-compose file so that we run the migrations then start the server. Add the following line to the 
+docker-compose.yml that you have been developing during the prac.
+
+\begin{code}[language=docker-compose]{}
+  command: sh -c "sleep 30 && php artisan migrate:refresh --seed && php artisan serve --host=0.0.0.0"
+\end{code}
+
+This new command does the following:
+
+\begin{itemize}
+  \item Waits for the database to be ready in a simple way.
+  \item Runs the migrations and seeds the database, as we have seen earlier.
+  \item Starts the development server as the container originally did.
+\end{itemize}
+
+Example: redacted version of goal docker-compose.yml attached below.
+
+\begin{code}[language=docker-compose]{docker-compose.yml}
+  version: '3.3'
+  services:
+    db:
+      ...
+  
+    backend:
+      ...
+      environment:
+        ...
+      command: sh -c "sleep 10 && php artisan migrate:refresh --seed && php artisan serve --host=0.0.0.0"
+\end{code}
+
+Now when we launch the docker-compose we can see that our migrations were run in the output.
+
+\begin{code}[language=shell,numbers=none]{}
+  $ docker-compose up
+  ...
+  ...
+  backend_1  | Rolling back: 2022_03_19_041557_create_todos_table
+  backend_1  | Rolled back:  2022_03_19_041557_create_todos_table (8.28ms)
+  backend_1  | Migrating: 2022_03_19_041557_create_todos_table
+  backend_1  | Migrated:  2022_03_19_041557_create_todos_table (11.55ms)
+  backend_1  | Seeding: Database\Seeders\TodoSeeder
+  backend_1  | Seeded:  Database\Seeders\TodoSeeder (44.77ms)
+  backend_1  | Database seeding completed successfully.
+  backend_1  | Starting Laravel development server: http://0.0.0.0:8000
+  backend_1  | [Sun Mar 20 12:08:41 2022] PHP 8.0.8 Development Server (http://0.0.0.0:8000) started
+\end{code}
+
+We can also bake this into the container by extending the original, it is fairly common to see projects
+in the wild that run a init script when the container launches. An exercise left for the reader is to 
+build upon the provided docker container but create an init script.
 
 \subsection{AWS}
 
-\todo{ .. write the terraform to deploy instead. }
+\warning{
+  This section is still being developed.
+}
 
 \bibliographystyle{ieeetr}
 \bibliography{books}
