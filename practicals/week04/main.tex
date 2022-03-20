@@ -42,21 +42,50 @@ For a more in-depth treatment of data storage models that is outside the scope o
 see the \textit{Designing Data-Intensive Applications} book \cite{data-intensive}.
 
 \section{Relational Storage}
+
+Relational databases are the types which you will have been exposed too the most in your University career.
+These databases are exceptional useful with modeling the real world which is a highly connected environment.
+The data model that is suggested for this type of storage is a normalised approach where data duplication should 
+be reduced.
+
+
+Some popular offerings are below:
+
 \begin{itemize}
   \item MySQL/MariaDB [ Amazon RDS / Amazon Aurora ].
   \item Postgres [ Amazon RDS / Amazon Aurora ].
 \end{itemize}
 
+The AWS specific offerings of these services come in two differnt types, we have the traditional approach of
+server capacity ( x cores, y ram ) and we have a serverless approach. The serverless approach is a more dynamic
+database that can scale to large amounts of load when needed though at a cost per request.
+
   \subsection{ORM}
-  Just mentioning the relational-object mismatch.
+  ORM or Object Relational Mapping is a fairly common tool for programmers to use to make developing with 
+  databases much smoother. One fairly prevelant example of this is SQLAlchemy which is a very widly used 
+  database abstraction for python. With the power of SQLAlchemy we can move above the SQL dialect and perform
+  actions using standard python code.
+
+  The benefits of ORMs are the ability to use the power of the programming language we are using instead of having
+  large blocks of SQL text within our source code. The disadvantages come in when we need to do specific SQL work
+  or where the abstractions cost is greater than the benefits.
 
 \section{Wide-Column Storage}
+
+Wide-Column databases are a form of NoSQL or Non-Relational datastores. In these datastores the data model design 
+is focused more on having efficent queries at the cost of data duplication. A warning to the reader that these models
+are not flexible after creation, it is much easier to answer a new usecase in a relational model than a NoSQL model.
+
   \begin{itemize}
     \item Apache Cassandra [ Amazon Keyspaces for Cassandra ].
     \item Apache HBase.
   \end{itemize}
 
 \section{Key-Value Storage}
+
+Key-Value stores are very popular for cache or remote config usecases, some of the most notable are Redis and 
+Memcached. These stores allow efficent lookup of values and are usually running in-memory.
+
 \begin{itemize}
   \item Redis [ Amazon ElastiCache for Redis ].
   \item Memcached [ Amazon ElastiCache for Memcached].
@@ -65,20 +94,35 @@ see the \textit{Designing Data-Intensive Applications} book \cite{data-intensive
 \end{itemize}
 
 \section{Time Series Storage}
+
+Timeseries databases are highly focused storage which is tailed to retrieiving results by timestamp ranges.
+Many implementations also take advatange of the data model to allow efficent rollover of data and partitioning.
+One of the most popular timeseries databases is Prometheus which is used to store monitoring metrics.
+
 \begin{itemize}
   \item Amazon Timestream.
   \item TimescaleDB ( Postgres + Addon ).
   \item Prometheus.
+  \item InfluxDB.
 \end{itemize}
 
 \section{Document Storage}
+
+Document databases are a subset of NoSQL databases with a focus on a flexible data model. MongoDB for instance 
+allows the user to store JSON documents and perform queries on those documents.
+
 \begin{itemize}
   \item MongoDB.
   \item Apache CouchDB.
   \item Amazon DocumentDB.
+  \item Amazon DynamoDB.
 \end{itemize}
 
 \section{Graph Storage}
+
+Graph Databases are relational storage with a few enhancements to allow fast neighbour lookups. These databases also
+allow the implementing of Graph algorithms to query data.
+
 \begin{itemize}
   \item Amazon Neptune.
   \item Neo4J.
@@ -88,7 +132,7 @@ see the \textit{Designing Data-Intensive Applications} book \cite{data-intensive
 \section{Working with Docker}
 
 So far in the course we have introduced docker as a means to package software to make it easier to work with and deploy.
-Today we will be using it to run a small application locally that is a webserver + a database.
+Today we will be using it to run a small application locally that is a webserver + a relational database.
 
 \info{
     You will need to have docker and docker-compose installed for this practical.
