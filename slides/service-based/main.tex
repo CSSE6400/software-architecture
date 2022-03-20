@@ -112,7 +112,37 @@ A component within the service coordinates how to deliver the requested function
     \item Order Personnel \& Payment Provider added to this example.
 }
 
-\todo{Slide to introduce domain services for Sahara example.}
+\begin{frame}{On-line Store Service Domains}
+    \vspace{1mm}
+    {\LARGE
+    \begin{description}
+        \item[Browsing] Customers can find products \& add to cart
+        \item[Purchasing] Customers can purchase products in cart
+        \item[Fulfilment] Customers \& staff can track order fulfilment
+        \item[Account Management] Customers can manage their account details
+        \item[Inventory Management] Staff can view stock levels and order new stock
+    \end{description}
+    }
+\end{frame}
+\note[itemize]{
+    \item Mention that service-based architectures are based on domain partitioning.
+    \item Could provide examples of fulfilment, and inventory management activities.
+    \item Customer's tracking order, staff generating pick lists and packaging details.
+    \item Generating reports on stock levels and product popularity. Ordering new stock.
+}
+
+\point[Partitioning]{Services are defined by domain partitioning.}
+
+\begin{frame}{Coarse Services}
+    \vspace{1mm}
+    {\LARGE
+    \begin{itemize}
+        \item Domains are large, coarse-grained services
+        \item Each service will have an internal architecture
+        \item Technical or domain partitioning may be done internally
+    \end{itemize}
+    }
+\end{frame}
 
 \begin{frame}{Sahara: On-line Store Container Diagram}
     \begin{adjustwidth}{-5mm}{-5mm}
@@ -129,7 +159,7 @@ A component within the service coordinates how to deliver the requested function
 \begin{frame}{Sahara: Product Browsing Component Diagram}
     \begin{adjustwidth}{-10mm}{-10mm}
         \centering
-        \includegraphics[trim=190 240 230 200,clip,width=0.97\paperwidth]{diagrams/sahara-component-browse.png}
+        \includegraphics[trim=190 200 230 200,clip,width=0.97\paperwidth]{diagrams/sahara-component-browse.png}
     \end{adjustwidth}
 \end{frame}
 \note[itemize]{
@@ -137,7 +167,27 @@ A component within the service coordinates how to deliver the requested function
     \item Product Browsing Façade provides the Service API.
 }
 
-\todo{REST API for Product Browsing?}
+\begin{frame}{Product Browsing Service API}
+    \vspace{1mm}
+    {\LARGE
+    \begin{description}
+        \item[Search] https://api.sahara.com/v1/search?keywords=...
+        \item[Browse] https://api.sahara.com/v1/browse?category=...
+        \item[Add to Cart] https://api.sahara.com/v1/cart
+    \end{description}
+    \vspace{4mm}
+    \begin{itemize}
+        \item JSON to pass data
+        \item JSF action controller handles request
+    \end{itemize}
+    }
+\end{frame}
+\note[itemize]{
+    \item Search \& Browse are GET requests passing parameters.
+    \item Add to Cart is a POST request passing product id and quantity to be added to cart.
+    \item Authentication needs to be part of requests.
+    \item API Versioning shown in URIs.
+}
 
 \begin{frame}{Sahara: Deployment Diagram}
     \begin{adjustwidth}{-5mm}{-5mm}
@@ -150,31 +200,84 @@ A component within the service coordinates how to deliver the requested function
     \item This allows multiple concurrent users, even through one user interface.
 }
 
-\todo{
-Issue of failures in distributed systems?\\
-Show service architecture for Sahara and summarise parallel flows through services.\\
-Aside about stateless services and possible multi-threaded web pages (e.g. JSF).\\
-Comment about Services being domain partitioning, but Service internals may be technical or domain paritioned.
+\begin{frame}{Sahara: Concurrent Access}
+    \begin{adjustwidth}{-5mm}{-5mm}
+        \centering
+        \includegraphics[trim=1 0 1 5,clip,width=0.935\paperwidth]{diagrams/sahara-concurrency.png}
+    \end{adjustwidth}
+\end{frame}
+\note[itemize]{
+    \item Emphasise many users from different UIs accessing distributed services concurrently.
+    \item Point out that this require \& REST require stateless services.
 }
 
-%\begin{frame}{Failure Issues}
+\questionanswer{What happens if a service goes down?}
+{Need to manage timeouts, retries, graceful failure, \dots}
+\note[itemize]{
+    \item Some of this can be managed by infrastructure, which requires monitoring systems.
+    \item Some issues are harder to deal with due to coarse service domains.
+    \item Some of this needs to be managed within the application.
+}
+
+\begin{frame}{Consider Network Failure}
+    \vspace{1mm}
+    {\LARGE
+    If customer tried to add product to cart:
+    \begin{itemize}
+        \item What happens if Product Browsing didn't receive it?
+        \item What happens if UI didn't get a response?
+        \item What happens if Database wasn't updated?
+    \end{itemize}
+    }
+\end{frame}
+
+%Failure Issues
 %Failure is the defining difference between distributed and local programming, so you have to design distributed systems with the expectation of failure. Imagine asking people, "If the probability of something happening is one in 1013, how often would it happen?" Common sense would be to answer, "Never." That is an infinitely large number in human terms. But if you ask a physicist, she would say, "All the time. In a cubic foot of air, those things happen all the time."
 %
 %When you design distributed systems, you have to say, "Failure happens all the time." So when you design, you design for failure. It is your number one concern. What does designing for failure mean? One classic problem is partial failure. If I send a message to you and then a network failure occurs, there are two possible outcomes. One is that the message got to you, and then the network broke, and I just didn't get the response. The other is the message never got to you because the network broke before it arrived.
 %
 %So if I never receive a response, how do I know which of those two results happened? I cannot determine that without eventually finding you. The network has to be repaired or you have to come up, because maybe what happened was not a network failure but you died. How does this change how I design things? For one thing, it puts a multiplier on the value of simplicity. The more things I can do with you, the more things I have to think about recovering from.
 % -- https://www.artima.com/articles/designing-distributed-systems
-%\end{frame}
+
+\begin{frame}{API Layer}
+    \centering
+    \includegraphics[trim=39 37 21 42,clip,width=0.75\textwidth]{../../notes/service-based/diagrams/api-layer.png}
+\end{frame}
+
+\begin{frame}{API Layer Advantages}
+    \vspace{1mm}
+    {\LARGE
+    \begin{itemize}
+        \item Acts as a reverse proxy or gateway to services
+        \vspace{2mm}
+        \item Hides internal network structure
+        \vspace{4mm}
+        \item Easier to implement \emph{cross-cutting} concerns
+        \begin{itemize}
+            \Large\item e.g. security policies
+        \end{itemize}
+        \vspace{2mm}
+        \item Allows service discovery
+        \begin{itemize}
+            \Large\item Interface to register service
+            \Large\item Clients can find out what services are available
+        \end{itemize}
+    \end{itemize}
+    }
+\end{frame}
 
 \begin{frame}{Pros \& Cons}
     \vspace{1mm}
-    {\huge
+    {\LARGE
     \begin{description}
-        \item[Simplicity] Core system \& Plug-in interface \tabto{15em}\includegraphics[width=10mm]{../../shared/images/thumbs-up.png}
-        \item[Extensibility] Plug-ins \tabto{15em}\includegraphics[width=10mm]{../../shared/images/thumbs-up.png}
-        \item[Interoperability] Plug-ins \tabto{15em}\includegraphics[width=10mm]{../../shared/images/thumbs-up.png}
-        \item[Scalability] \tabto{15em}\includegraphics[trim=22 19 22 15,clip,width=10mm]{../../shared/images/thumbs-down.png}
-        \item[Reliability] \tabto{15em}\includegraphics[trim=22 19 22 15,clip,width=10mm]{../../shared/images/thumbs-down.png}
+        \item[Simplicity] For a distributed system \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Modularity] Services \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Extensibility] New services \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Deployability] Independent services \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Testability] Independent services \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Reliability] Independent services \tabto{15em}\includegraphics[trim=57 145 70 85,clip,width=8mm]{../../shared/images/neutral.png}
+        \item[Interoperability] Service APIs \tabto{15em}\includegraphics[trim=57 145 70 85,clip,width=8mm]{../../shared/images/neutral.png}
+        \item[Scalability] Coarse-grained services\tabto{15em}\includegraphics[trim=22 19 22 12,clip,width=8mm]{../../shared/images/thumbs-down.png}
     \end{description}
     }
 \end{frame}
