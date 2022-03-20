@@ -166,6 +166,22 @@
     \end{tcolorbox}
 }
 
+% Info
+\definecolor{info}{RGB}{135, 206, 235}
+\newcommand\info[1]{
+    \begin{tcolorbox}[title=Info,colframe=info]
+    #1
+    \end{tcolorbox}
+}
+
+% Warning
+\definecolor{warning}{RGB}{255, 255, 0}
+\newcommand\warning[1]{
+    \begin{tcolorbox}[title=Warning,colframe=warning]
+    #1
+    \end{tcolorbox}
+}
+
 % Defintion
 \newcounter{definition}[part]
 \newenvironment{definition}[1][]

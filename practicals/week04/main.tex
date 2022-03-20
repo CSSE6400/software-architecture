@@ -24,6 +24,8 @@ This week our goal is to:
 \begin{itemize}
   \item explore the various techniques developers use to store data; and
   \item look at the storage options implementing these techniques on the AWS platform.
+  \item run a small application using docker that requires a database.
+  \item deploy a small application that requires a database in AWS using Terraform.
 \end{itemize}
 
 \section{Introduction}
@@ -37,45 +39,88 @@ see the \textit{Designing Data-Intensive Applications} book \cite{data-intensive
 
 \section{Relational Storage}
 \begin{itemize}
-  \item Roll your own box.
-  \item Amazon RDS.
-  \item Amazon Aurora.
+  \item MySQL/MariaDB [ Amazon RDS / Amazon Aurora ].
+  \item Postgres [ Amazon RDS / Amazon Aurora ].
 \end{itemize}
 
   \subsection{ORM}
   Just mentioning the relational-object mismatch.
 
-  \subsection{Wide-Column Storage}
+\section{Wide-Column Storage}
   \begin{itemize}
-    \item Amazon Keyspaces (for Apache Cassandra)
+    \item Apache Cassandra [ Amazon Keyspaces for Cassandra ].
+    \item Apache HBase.
   \end{itemize}
 
 \section{Key-Value Storage}
 \begin{itemize}
-  \item Roll your own box.
+  \item Redis [ Amazon ElastiCache for Redis ].
+  \item Memcached [ Amazon ElastiCache for Memcached].
   \item Amazon DynamoDB.
-  \item Amazon ElastiCache.
   \item Amazon MemoryDB for Redis.
 \end{itemize}
 
-  \subsection{Time Series Storage}
-  \begin{itemize}
-    \item Amazon Timestream.
-  \end{itemize}
-
+\section{Time Series Storage}
+\begin{itemize}
+  \item Amazon Timestream.
+  \item TimescaleDB ( Postgres + Addon ).
+  \item Prometheus.
+\end{itemize}
 
 \section{Document Storage}
 \begin{itemize}
-  \item Roll your own.
+  \item MongoDB.
+  \item Apache CouchDB.
   \item Amazon DocumentDB.
 \end{itemize}
 
 \section{Graph Storage}
 \begin{itemize}
   \item Amazon Neptune.
+  \item Neo4J.
+  \item Janus Graph.
 \end{itemize}
 
+\section{Working with Docker}
 
+So far in the course we have introduced docker as a means to package software to make it easier to work with and deploy.
+Today we will be using it to run a small application locally that is a webserver + a database.
+
+\info{
+    You will need to have docker and docker-compose installed for this practical.
+    Installation will depend on your operating system.
+
+    \begin{itemize}
+      \item docker compose: https://docs.docker.com/compose/install/
+      \item docker engine: https://docs.docker.com/get-docker/
+    \end{itemize}
+    
+    We also recommend installing the vscode docker plugin or the equlivant tools in IntelliJ IDEs.
+}
+
+\notice{
+    For terminal examples in this section, lines that begin with a \$ indicate a line which you should 
+    type while the other lines are example output that you should expect. Not all of the output is captured 
+    in the examples to save on space.  
+}
+
+\subsection{Locally}
+
+\todo{ .. write the docker compose file. }
+
+\subsubsection{Optional Exercise: Fixing the container}
+
+In a typical application you dont want to have to enable debug and access an endpoint which is broken inorder
+to run the database migrations. One way for us to fix this is to run the database migrations when our application starts.
+Luckily for us the application we have is based off of Laravel which has a cli which can do this for us.
+
+\todo{
+  Walk through building a new container with a script that runs the migrations first.
+}
+
+\subsection{AWS}
+
+\todo{ .. write the terraform to deploy instead. }
 
 \bibliographystyle{ieeetr}
 \bibliography{books}
