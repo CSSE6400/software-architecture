@@ -19,10 +19,6 @@
 \caption{A map of data storage techniques from Designing Data-Intensive Applications \cite{data-intensive}.}
 \end{figure}
 
-\warning{
-  This document is still a work in progress.
-}
-
 \section{This Week}
 This week our goal is to:
 \begin{itemize}
@@ -40,6 +36,13 @@ the choice of data storage model can have a profound impact on our software's co
 In this practical, we want to take a superficial exploration our island of data storage models.
 For a more in-depth treatment of data storage models that is outside the scope of this course,
 see the \textit{Designing Data-Intensive Applications} book \cite{data-intensive}.
+
+\teacher{
+  Discuss the following differnt storage technologies and mention some usecases of when you 
+  would choose each one. Provider are some popular implementations of each.\\
+
+  Aim for no more than 30 minutes of discussion.
+}
 
 \section{Relational Storage}
 
@@ -72,6 +75,10 @@ database that can scale to large amounts of load when needed though at a cost pe
 
 \section{Wide-Column Storage}
 
+\teacher{
+  Examples of big apps that depend on this technology is Netflix \url{https://netflixtechblog.com/netflixs-viewing-data-how-we-know-where-you-are-in-house-of-cards-608dd61077da}.
+}
+
 Wide-Column databases are a form of NoSQL or Non-Relational datastores. In these datastores the data model design 
 is focused more on having efficent queries at the cost of data duplication. A warning to the reader that these models
 are not flexible after creation, it is much easier to answer a new usecase in a relational model than a NoSQL model.
@@ -94,6 +101,10 @@ Memcached. These stores allow efficent lookup of values and are usually running 
 \end{itemize}
 
 \section{Time Series Storage}
+
+\teacher{
+  Some to mention here is that relations are usually not utilised between tables in timeseries databases.
+}
 
 Timeseries databases are highly focused storage which is tailed to retrieiving results by timestamp ranges.
 Many implementations also take advatange of the data model to allow efficent rollover of data and partitioning.
@@ -120,6 +131,12 @@ allows the user to store JSON documents and perform queries on those documents.
 
 \section{Graph Storage}
 
+\teacher{
+  If you havnt experienced graph databases, a good usecase is ``recommendation systems'', which use the connected
+  nature of items to figure out what to suggest to a person. Another example is the \url{https://neo4j.com/blog/analyzing-panama-papers-neo4j/}
+  Panama Papers.
+}
+
 Graph Databases are relational storage with a few enhancements to allow fast neighbour lookups. These databases also
 allow the implementing of Graph algorithms to query data.
 
@@ -134,6 +151,11 @@ allow the implementing of Graph algorithms to query data.
 So far in the course we have introduced docker as a means to package software to make it easier to work with and deploy.
 Today we will be using it to run a small application locally that is a webserver + a relational database.
 
+\begin{figure}[h]
+  \includegraphics[width=\textwidth]{images/todoapp}
+\caption{Sample Todo App made by Brae Webb}
+\end{figure}
+
 \info{
     You will need to have docker and docker-compose installed for this practical.
     Installation will depend on your operating system.
@@ -146,6 +168,11 @@ Today we will be using it to run a small application locally that is a webserver
     We also recommend installing the vscode docker plugin or the equlivant tools in IntelliJ IDEs.
 }
 
+\teacher{
+  Wait for students to get docker-compose installed, they should have docker from their tutorials but
+  some may be missing it.
+}
+
 \notice{
     For terminal examples in this section, lines that begin with a \$ indicate a line which you should 
     type while the other lines are example output that you should expect. Not all of the output is captured 
@@ -154,8 +181,13 @@ Today we will be using it to run a small application locally that is a webserver
 
 \subsection{Locally}
 
+\teacher{
+  Mention that the dockerfile exists but no need to get the repo. We will not be building the container 
+  ourselves. Instead use one that is published on the github, shown further down in the docker-compose.
+}
+
 We will be using a container that is built from the Dockerfile descibed below which can be found here: 
-\url{https://github.com/CSSE6400/todo-app/blob/main/backend/Dockerfile}. []
+\url{https://github.com/CSSE6400/todo-app/blob/main/backend/Dockerfile}.
 
 \begin{code}[language=docker]{Dockerfile}
 FROM ubuntu:21.10
@@ -175,7 +207,19 @@ RUN composer install
 CMD ["php", "artisan", "serve", "--host=0.0.0.0"]
 \end{code}
 
-\begin{code}[language=docker-compose]{main.tf}
+Our goal for today is to have a running instance of the Todo App locally including the database. To get 
+started we need to make a new directory for our work and create a Docker compose file.
+
+\begin{code}[language=shell,numbers=none]{}
+  $ mkdir prac4 && cd prac4
+  $ touch docker-compose.yml
+\end{code}
+
+Docker Compose is a small helper utility that allows us to more easily run docker applications without 
+needing to remember a lot of command line parameters. Instead we define how we want our docker container to 
+run through a YAML config file. Insert the following into your docker-compose.yml file.
+
+\begin{code}[language=docker-compose]{docker-compose.yml}
 version: '3.3'
 services:
   backend:
@@ -189,6 +233,15 @@ services:
       LOG_LEVEL: 'debug'
 \end{code}
 
+\teacher{
+  Feel free to show students dockerhub and where on github this container is stored. URL for 
+  this container is here \url{https://github.com/CSSE6400/todo-app/pkgs/container/todo-app}
+}
+
+A few things to point out in the file. We have defined a single service called backend which uses a premade 
+docker image from ghcr.io/csse6400/todo-app with the tag of latest. We then have exposed this onto our 
+machine on port 8000 and have passed a few environment variables. \lstinline{docker-compose up}.
+
 \begin{code}[language=shell,numbers=none]{}
   $ docker-compose up
   Creating network "p1_default" with the default driver
@@ -198,7 +251,20 @@ services:
   backend_1  | [Sun Mar 20 07:56:23 2022] PHP 8.0.8 Development Server (http://0.0.0.0:8000) started
 \end{code}
 
+Now we head to our browser and go to \url{http://127.0.0.1:8000}, you should be presented 
+with the following screen.
+
+\includegraphics[width=\textwidth]{images/app-missing-db}
+
+To investigate this error lets hit one of the endpoints for our api. Head over to 
+\url{http://127.0.0.1:8000/api/v1/todo} which should list all the todos. Once we reach that page 
+we have a clearer idea of whats gone wrong. The page you should see is shown below and the quick 
+summary is that our App is complaining that we havnt given it a database.
+
 \includegraphics[width=\textwidth]{images/missing-db}
+
+To fix this lets add a popular relation database MySQL to our docker-compose file. Edit 
+your docker compose file to match as shown below.
 
 \begin{code}[language=docker-compose]{main.tf}
 version: '3.3'
@@ -232,6 +298,16 @@ services:
       DB_PASSWORD: 'password'
 \end{code}
 
+Now we have two services for our app and we have added a few more enviroment 
+variables for our backend to know how to connect to the database. The database 
+host variable uses a feature of docker where you can refer to other services by 
+their name. This makes it easy for us to setup communication between these two
+services.
+
+From the same shell lets re run our containers, you may need to CNTRL+C to stop
+the current running containers. Once they have shutdown you can run the up command 
+again.
+
 \begin{code}[language=shell,numbers=none]{}
   $ docker-compose up
   Starting p2_db_1 ... done
@@ -252,9 +328,20 @@ services:
   backend_1  | [Sun Mar 20 08:11:55 2022] PHP 8.0.8 Development Serv....
 \end{code}
 
-\todo{ Going to 127.0.0.1:8000/api/v1/todo will show an error page }
+Now when we go to \url{http://127.0.0.1:8000/api/v1/todo} we see a differnt error 
+message. This error is complaining that we have a database that we can connect to 
+but the todos table doesnt exist.
 
 \includegraphics[width=\textwidth]{images/missing-tables}
+
+To populate the database our application comes with database migration files. One way 
+would be to click the ``RUN MIGRATIONS'' button shown on the error page but we 
+want to pre populate our database with some dummy data aswell.
+
+To do this we are going to jump into the running container and execute the migrations 
+ourselves. Start by opening a new terminal so that we can leave the docker containers running.
+In this new terminal go to the same directory that we were just in and run the following 
+command \lstinline[language=shell]{$ docker-compose exec backend php artisan migrate:fresh --seed}
 
 \begin{code}[language=shell,numbers=none]{}
 $ docker-compose exec backend php artisan migrate:fresh --seed
@@ -266,6 +353,21 @@ Seeding: Database\Seeders\TodoSeeder
 Seeded:  Database\Seeders\TodoSeeder (6.56ms)
 Database seeding completed successfully.
 \end{code}
+
+Now with this run we can check back at our webapp and you should see a fully 
+functional todo app.
+
+\includegraphics[width=\textwidth]{images/todoapp}
+
+\info{
+  These migrations are performed by Laravel which is a popular PHP web framework.
+  In the database it has created a table to keep track of which migrations have 
+  already been run so that it will skip them latter. To enable this functionality you 
+  will have to edit migrate:fresh to just migrate.\\
+
+  For a production instance you would also typically remove the --seed parameter as 
+  you do not want to insert dummy data into your production database.
+}
 
 \subsubsection{Exercise: Migrations at startup}
 
