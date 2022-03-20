@@ -106,6 +106,9 @@ Today we will be using it to run a small application locally that is a webserver
 
 \subsection{Locally}
 
+We will be using a container that is built from the Dockerfile descibed below which can be found here: 
+\url{https://github.com/CSSE6400/todo-app/blob/main/backend/Dockerfile}. []
+
 \begin{code}[language=docker]{Dockerfile}
 FROM ubuntu:21.10
 RUN apt-get update \
@@ -141,7 +144,16 @@ services:
       LOG_LEVEL: 'debug'
 \end{code}
 
-\todo{Include photo showing that we couldnt connect to DB}
+\begin{code}[language=shell,numbers=none]{}
+  $ docker-compose up
+  Creating network "p1_default" with the default driver
+  Creating p1_backend_1 ... done
+  Attaching to p1_backend_1
+  backend_1  | Starting Laravel development server: http://0.0.0.0:8000
+  backend_1  | [Sun Mar 20 07:56:23 2022] PHP 8.0.8 Development Server (http://0.0.0.0:8000) started
+\end{code}
+
+\includegraphics[width=\textwidth]{images/missing-db}
 
 \begin{code}[language=docker-compose]{main.tf}
 version: '3.3'
@@ -175,6 +187,21 @@ services:
       DB_DATABASE: 'todoapp'
       DB_USERNAME: 'todoapp'
       DB_PASSWORD: 'password'
+\end{code}
+
+\todo{ Going to 127.0.0.1:8000/api/v1/todo will show an error page }
+
+\includegraphics[width=\textwidth]{images/missing-tables}
+
+\begin{code}[language=shell,numbers=none]{}
+$ docker-compose exec backend php artisan migrate:fresh --seed
+Dropped all tables successfully.
+Migration table created successfully.
+Migrating: 2022_03_19_041557_create_todos_table
+Migrated:  2022_03_19_041557_create_todos_table (7.55ms)
+Seeding: Database\Seeders\TodoSeeder
+Seeded:  Database\Seeders\TodoSeeder (6.56ms)
+Database seeding completed successfully.
 \end{code}
 
 \subsubsection{Optional Exercise: Fixing the container}
