@@ -1,6 +1,6 @@
 \documentclass{csse4400}
 
-% \teachermodetrue
+\teachermodetrue
 
 \usepackage{languages}
 
@@ -22,35 +22,33 @@
 \section{This Week}
 This week our goal is to:
 \begin{itemize}
-  \item explore the various techniques developers use to store data; and
-  \item look at the storage options implementing these techniques on the AWS platform.
-  \item run a small application using docker that requires a database.
-  \item deploy a small application that requires a database in AWS using Terraform.
+  \item explore the various techniques developers use to store data;
+  \item investigate the storage options implementing these techniques on the AWS platform;
+  \item run a small application using docker that requires a database; and
+  \item deploy the application in AWS using Terraform.
 \end{itemize}
 
 \section{Introduction}
 Unfortunately, to build interesting software we often need to store and use data.
-The storage of data introduces a number of challenges to designing, creating, and maintaining our software.
+The storage of data introduces a number of challenges when designing, creating, and maintaining our software.
 However, not all data storage techniques are created equal;
 the choice of data storage model can have a profound impact on our software's complexity and maintainability.
-In this practical, we want to take a superficial exploration our island of data storage models.
+In this practical, we want to take a superficial exploration of our island of data storage models.
 For a more in-depth treatment of data storage models that is outside the scope of this course,
-see the \textit{Designing Data-Intensive Applications} book \cite{data-intensive}.
+see Chapter 2 of the \textit{Designing Data-Intensive Applications} book \cite{data-intensive}.
 
 \teacher{
-  Discuss the following differnt storage technologies and mention some usecases of when you 
-  would choose each one. Provider are some popular implementations of each.\\
+  Discuss the following different storage technologies and mention some use cases of when you would choose each one.
+  Discuss some popular implementations of each.\\
 
   Aim for no more than 30 minutes of discussion.
 }
 
 \section{Relational Storage}
 
-Relational databases are the types which you will have been exposed too the most in your University career.
-These databases are exceptional useful with modeling the real world which is a highly connected environment.
-The data model that is suggested for this type of storage is a normalised approach where data duplication should 
-be reduced.
-
+Relational databases what have been exposed to the most in your University career --- think MySQL, Postgres, Oracle DB, etc.
+This type of database is good at modelling the real world which is often a highly connected environment.
+% The data model that is suggested for this type of storage is a normalised approach where data duplication should be reduced.
 
 Some popular offerings are below:
 
@@ -59,19 +57,19 @@ Some popular offerings are below:
   \item Postgres [ Amazon RDS / Amazon Aurora ].
 \end{itemize}
 
-The AWS specific offerings of these services come in two differnt types, we have the traditional approach of
-server capacity ( x cores, y ram ) and we have a serverless approach. The serverless approach is a more dynamic
+The AWS offerings of these services come in two different types, we have the traditional approach of
+server capacity ( x cores, y ram ) and we have a server-less approach.
+The server-less approach is a more dynamic
 database that can scale to large amounts of load when needed though at a cost per request.
 
   \subsection{ORM}
-  ORM or Object Relational Mapping is a fairly common tool for programmers to use to make developing with 
-  databases much smoother. One fairly prevelant example of this is SQLAlchemy which is a very widly used 
-  database abstraction for python. With the power of SQLAlchemy we can move above the SQL dialect and perform
-  actions using standard python code.
+  Object Relational Mapping (ORM) is a fairly common tool for programmers to use to make developing with databases smoother.
+  One fairly prevalent example of this is SQLAlchemy which is a very widely used 
+  database abstraction for python.
+  SQLAlchemy allows us to move to a higher level of abstraction than SQL queries and perform database actions using standard python code.
 
-  The benefits of ORMs are the ability to use the power of the programming language we are using instead of having
-  large blocks of SQL text within our source code. The disadvantages come in when we need to do specific SQL work
-  or where the abstractions cost is greater than the benefits.
+  The benefits of ORMs are the ability to model database objects in our existing programming language instead of having large blocks of SQL text within our source code.
+  The disadvantages come in when we need to do specific SQL work or where the abstractions cost is greater than the benefits.
 
 \section{Wide-Column Storage}
 
@@ -79,9 +77,11 @@ database that can scale to large amounts of load when needed though at a cost pe
   Examples of big apps that depend on this technology is Netflix \url{https://netflixtechblog.com/netflixs-viewing-data-how-we-know-where-you-are-in-house-of-cards-608dd61077da}.
 }
 
-Wide-Column databases are a form of NoSQL or Non-Relational datastores. In these datastores the data model design 
-is focused more on having efficent queries at the cost of data duplication. A warning to the reader that these models
-are not flexible after creation, it is much easier to answer a new usecase in a relational model than a NoSQL model.
+Wide-Column databases are a form of NoSQL or non-relational data stores.
+In these data stores the data model design 
+is focused more on having efficient queries at the cost of data duplication.
+A warning to the reader that these models
+are not flexible after creation, it is much easier to answer a new use case in a relational model.
 
   \begin{itemize}
     \item Apache Cassandra [ Amazon Keyspaces for Cassandra ].
@@ -90,8 +90,8 @@ are not flexible after creation, it is much easier to answer a new usecase in a 
 
 \section{Key-Value Storage}
 
-Key-Value stores are very popular for cache or remote config usecases, some of the most notable are Redis and 
-Memcached. These stores allow efficent lookup of values and are usually running in-memory.
+Key-Value stores are very popular for cache or remote config use cases, some of the most notable are Redis and Memcached.
+These stores allow efficient lookup of values via keys and are usually stored in-memory.
 
 \begin{itemize}
   \item Redis [ Amazon ElastiCache for Redis ].
@@ -106,9 +106,9 @@ Memcached. These stores allow efficent lookup of values and are usually running 
   Some to mention here is that relations are usually not utilised between tables in timeseries databases.
 }
 
-Timeseries databases are highly focused storage which is tailed to retrieiving results by timestamp ranges.
-Many implementations also take advatange of the data model to allow efficent rollover of data and partitioning.
-One of the most popular timeseries databases is Prometheus which is used to store monitoring metrics.
+Time series databases are highly focused storage which is tailed to retrieving results by timestamp ranges.
+Many implementations also take advantage of the data model to allow efficient rollover of data and partitioning.
+One of the most popular time series databases is Prometheus which is used to store monitoring metrics.
 
 \begin{itemize}
   \item Amazon Timestream.
@@ -119,8 +119,9 @@ One of the most popular timeseries databases is Prometheus which is used to stor
 
 \section{Document Storage}
 
-Document databases are a subset of NoSQL databases with a focus on a flexible data model. MongoDB for instance 
-allows the user to store JSON documents and perform queries on those documents.
+Document databases are a subset of NoSQL databases with a focus on a flexible data model.
+MongoDB for instance allows the user to store JSON documents and perform queries on those documents.
+One advantage of document databases is that they match a programmers existing mental model of storing data in formats such as JSON.
 
 \begin{itemize}
   \item MongoDB.
