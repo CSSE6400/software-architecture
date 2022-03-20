@@ -16,29 +16,76 @@ machine configuration and stack configuration.
     Infrastructure includes compute, storage, and networking resources.
 \end{description}
 
-Infrastructure includes compute, storage, and networking resources.
 In a sense, machine configuration is a subset of the stack configuration, however,
-stack configuration is a higher level of abstraction.
-In this course, when we refer to infrastructure as code,
-we are primarily discussing the stack configuration.
-Section \ref{sec:machine-config} discusses how infrastructure as code can also be used to manage machine configuration.
+stack configuration tend to focus on a higher level of abstraction.
+In this course, our focus when looking at Infrastructure as Code (IaC) is \textsl{stack configuration}.
+We rely on containerization tools, such as docker, to fill the hole left by the lack of treatment of machine configuration.
 
 \section{Brief History}
-Infrastructure as Code (IaC) began to take hold in the software community thanks to the uptake of virtualization.
 In the `Iron Age' of computing, installing a new server was rate limited by how quickly you could shop for and order a new physical machine.
-Once the machine arrived at your company, some number of weeks after the purchase,
-someone was tasked with setting it up, configuring it to talk to other machines, installing the software it needed.
-Compared to the weeks it takes to aquire the machine, a day of configuration is not so bad.
+Once the machine arrived at your company,
+some number of weeks after the purchase,
+someone was tasked with setting it up,
+configuring it to talk to other machines,
+and installing the all software it needed.
+Compared to the weeks it takes to acquire the machine,
+a day of configuration is not so bad.
+Furthermore, because so much physical effort was needed to provision a new machine,
+a single developer would only be responsible for a few machines.
+
 With virtualization one physical machine can be the home of numerous virtual machines.
 Each one of these machines requires configuration.
-Now, with new machines available within minutes a day of configuring is out of the question.
+Now, with new machines available within minutes and no physical labour involved,
+spending a day of configuring is out of the question
+--- introducing: \textsl{infrastructure code}.
 
-Infrastructure as code can be simple.
-A shell script which installs dependencies is infrastructure as code.
-Such a shell script would be an imperative implementation of infrastructure as code.
-In a pinch, this works fine but it is more common to use a declarative variant.
-Declarative IaC is a specification of our ideal world.
-We specify our idealized world and our IaC tool shapes the real world to match.
+\begin{definition}[Infrastructure Code]
+Code that provisions and manages infrastructure resources.
+\end{definition}
 
-\section{Stack Configuration}
+\begin{definition}[Infrastructure Resources]
+Compute resources, networking resources, and storage resources.
+\end{definition}
 
+Infrastructure code arose to ease the burden of the increased complexity where each developer configured and maintained many more machines.
+Infrastructure code can often be simple.
+A shell script which installs dependencies is infrastructure code.
+There's an assortment of infrastructure code out in the world today, ranging from simple shell scripts up to more sophisticated tools such as Ansible and Terraform.
+
+\begin{figure}[ht]
+    \centering
+    \begin{tikzpicture}[
+        snake=zigzag,line before snake=5mm,line after snake=5mm
+      ]
+      \draw (0,0) -- (2,0);
+      \draw[snake] (2,0) -- (4,0);
+      \draw (4,0) -- (5,0);
+      \draw[snake] (5,0) -- (7,0);
+  
+      \foreach \x in {0,1,5,7} \draw (\x cm,3pt) -- (\x cm,-3pt);
+  
+       \draw (0,0) node[below=3pt] {Shell scripts} node[above=3pt] {};
+       \draw (1,0) node[below=3pt] {} node[above=3pt] {Python scripts};
+       \draw (3,0) node[below=3pt] {} node[above=3pt] {};
+       \draw (4,0) node[below=3pt] {} node[above=3pt] {};
+       \draw (5,0) node[below=3pt] {Ansible} node[above=3pt] {};
+       \draw (6,0) node[below=3pt] {} node[above=3pt] {};
+       \draw (7,0) node[below=3pt] {} node[above=3pt] {Terraform};
+    \end{tikzpicture}
+\end{figure}
+
+
+\section{Infrastructure as Code}
+
+\begin{definition}[Infrastructure as Code]
+Following the same good coding practices to manage Infrastructure Code as standard code.
+\end{definition}
+
+\subsection{Good Coding Practices}
+\begin{itemize}
+    \item Everything as Code
+    \item Version Control %\todo{Discuss remote state in here --- won't cover in lecture}
+    \item Automation
+    \item Code Reuse
+    \item Testing
+\end{itemize}
