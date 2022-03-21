@@ -459,19 +459,133 @@ An exercise left for the reader is to build upon the provided docker container b
   This section is still being developed.
 }
 
+Now we have a locally running Todo App let's move to AWS.
+To get started let's jump into the lab environment and have a look at AWS RDS which is an AWS managed database service.
+
+\teacher{
+  Give students time to start the labs, could take up to 10 minutes.
+}
+
+To get to the RDS service either search it or browse Services -> Database -> RDS as shown below.
+
+\begin{figure}[H]
 \includegraphics[width=\textwidth]{images/aws_1}
+\end{figure}
+
+Now we are in the management page for all our database instances,
+for today we just want to get a small instance running to explore the service.
+Head to ``DB Instances (0/40)''.
+
+\begin{figure}[H]
 \includegraphics[width=\textwidth]{images/aws_2}
+\end{figure}
+
+This page should appear familar as it's very similar to the AWS EC2 instance page.
+Let us create a new database by hitting the ``Create Database'' button.
+
+\begin{figure}[H]
 \includegraphics[width=\textwidth]{images/aws_3}
+\end{figure}
+
+\warning{
+  In the next section we cannot use the Easy Create method as it tries to create a IAM account which is not allowed in the labs.
+  Going forward we would typically do this using terraform so we can easily avoid these restrictions.
+}
+
+\teacher{
+  Feel free to talk about the other offerings here, but make sure to flame Oracle and Microsoft SQL Server.
+  A good thing to point out is the Amazon Aurora which is the serverless version of RDS.
+}
+
+We will be creating a standard database so select standard and MySQL.
+We will use version 8 to match the local version.
+
+\begin{figure}[H]
 \includegraphics[width=\textwidth]{images/db1}
-\includegraphics[width=\textwidth]{images/db2}
-\includegraphics[width=\textwidth]{images/db3}
-\includegraphics[width=\textwidth]{images/db4}
-\includegraphics[width=\textwidth]{images/db5}
-\includegraphics[width=\textwidth]{images/db6}
-\includegraphics[width=\textwidth]{images/db7}
-\includegraphics[width=\textwidth]{images/db8}
-\includegraphics[width=\textwidth]{images/aws_4}
-\includegraphics[width=\textwidth]{images/aws_5}
+\end{figure}
+
+For today we are going to use ``Free Tier'' but in the future,
+you may wish to explore the different deployment options.
+Please peruse the available different options.
+
+\teacher{
+  Walk through what Multi-AZ means aka Multiple Availability Zones.
+}
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{images/db2}
+\end{figure}
+
+Now we need to name our database and create credentials to connect via.
+Please enter a reasonable password and keep this aside for later.
+We will need it for our local docker-compose file.
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{images/db3}
+\end{figure}
+
+We will use the default class type, t2.micro, which should be sufficient for this practical.
+
+\teacher{
+  May want to mention that burstable is not recommended for consistantly used databases.
+  Usually DBs are memory focused and thus the standard or memory optimised are used.
+}
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{images/db4}
+\end{figure}
+
+For storage we will leave all the default options.
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{images/db5}
+\end{figure}
+
+In connectivity we need to make sure our instance is publicly available.
+Usually you don't want to expose your databases publicly and, would instead, have a web server sitting between in-front.
+But for today we will be running that web server locally so for convenience we need public access.
+
+When selecting public access as yes we have to create a new Security Group,
+give this Security Group a sensible name.
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{images/db6}
+\end{figure}
+
+We will leave the authentication as password based but we need to expand the ``Additional configuration''.
+Fill in the ``Initial Database Name'' section to be ``todoapp'',
+this is similar to what we had in the Docker Compose.
+
+The other options here are to do with the parameters used to start the database, it is uncommon to have to change these but this is where
+any settings you would pass in via cli to the db would be set.
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{images/db7}
+\end{figure}
+
+Now we can click create which will take some time.
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{images/db8}
+\end{figure}
+
+Depending on your database it may take 10 to 30minutes to create, the larger and more complicated the setup the longer it usually takes.
+The database will also do a initial backup when its created.
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{images/aws_4}
+\end{figure}
+
+When the database has finished being created you can select it to view the configuration and details. In this menu we also see the 
+endpoint address which we will need to copy into our docker compose file.
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{images/aws_5}
+\end{figure}
+
+So with the database all ready to do lets get started on running our app. First thing to do is to stop any running instances you have 
+and then delete the database service from the docker compose. Now we want to edit the host and credentials to match what we input into 
+AWS. Below is an example of my configuration.
 
 \begin{code}[language=docker-compose]{docker-compose.yml}
   version: '3.3'
@@ -479,7 +593,7 @@ An exercise left for the reader is to build upon the provided docker container b
     backend:
       image: ghcr.io/csse6400/todo-app:latest
       ports:
-        - '80:8000'
+        - '8000:8000'
       environment:
         APP_ENV: 'local'
         APP_KEY: 'base64:8PQEPYGlTm1t3aqWmlAw/ZPwCiIFvdXDBjk3mhsom/A='
@@ -493,6 +607,9 @@ An exercise left for the reader is to build upon the provided docker container b
         DB_PASSWORD: 'MyVerySecurePassword'
       command: sh -c "sleep 10 && php artisan migrate:refresh --seed && php artisan serve --host=0.0.0.0"
 \end{code}
+
+Now we can run \lstinline[]{$ docker-compose up}. This will take a lot longer than before, the reason behind this is that 
+by default our lab is running in the US and it takes a lot longer to communicate to a DB half way across the world.
 
 \begin{code}[language=shell,numbers=none]{}
   $ docker-compose up
@@ -509,6 +626,8 @@ An exercise left for the reader is to build upon the provided docker container b
   backend_1  | Starting Laravel development server: http://0.0.0.0:8000
   backend_1  | [Mon Mar 21 04:45:34 2022] PHP 8.0.8 Development Server (http://0.0.0.0:8000) started
 \end{code}
+
+We can now also browse the app as before but with just a lot more lag.
 
 \bibliographystyle{ieeetr}
 \bibliography{books}
