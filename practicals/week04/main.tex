@@ -471,6 +471,44 @@ An exercise left for the reader is to build upon the provided docker container b
 \includegraphics[width=\textwidth]{images/db7}
 \includegraphics[width=\textwidth]{images/db8}
 \includegraphics[width=\textwidth]{images/aws_4}
+\includegraphics[width=\textwidth]{images/aws_5}
+
+\begin{code}[language=docker-compose]{docker-compose.yml}
+  version: '3.3'
+  services:
+    backend:
+      image: ghcr.io/csse6400/todo-app:latest
+      ports:
+        - '80:8000'
+      environment:
+        APP_ENV: 'local'
+        APP_KEY: 'base64:8PQEPYGlTm1t3aqWmlAw/ZPwCiIFvdXDBjk3mhsom/A='
+        APP_DEBUG: 'true'
+        LOG_LEVEL: 'debug'
+        DB_CONNECTION: 'mysql'
+        DB_HOST: 'todoapp-manual.cwf1cdgoxzax.us-east-1.rds.amazonaws.com'
+        DB_PORT: '3306'
+        DB_DATABASE: 'todoapp'
+        DB_USERNAME: 'todoapp'
+        DB_PASSWORD: 'MyVerySecurePassword'
+      command: sh -c "sleep 10 && php artisan migrate:refresh --seed && php artisan serve --host=0.0.0.0"
+\end{code}
+
+\begin{code}[language=shell,numbers=none]{}
+  $ docker-compose up
+  Creating network "remote_default" with the default driver
+  Creating remote_backend_1 ... done
+  Attaching to remote_backend_1
+  backend_1  | Migration table not found.
+  backend_1  | Migration table created successfully.
+  backend_1  | Migrating: 2022_03_19_041557_create_todos_table
+  backend_1  | Migrated:  2022_03_19_041557_create_todos_table (612.48ms)
+  backend_1  | Seeding: Database\Seeders\TodoSeeder
+  backend_1  | Seeded:  Database\Seeders\TodoSeeder (13,930.36ms)
+  backend_1  | Database seeding completed successfully.
+  backend_1  | Starting Laravel development server: http://0.0.0.0:8000
+  backend_1  | [Mon Mar 21 04:45:34 2022] PHP 8.0.8 Development Server (http://0.0.0.0:8000) started
+\end{code}
 
 \bibliographystyle{ieeetr}
 \bibliography{books}
