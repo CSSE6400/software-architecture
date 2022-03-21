@@ -453,7 +453,7 @@ We can also bake this into the container by extending the original,
 it is fairly common to see projects in the wild that run a init script when the container launches.
 An exercise left for the reader is to build upon the provided docker container by including an init script.
 
-\subsection{AWS}
+\subsection{AWS - Manual}
 
 \warning{
   This section is still being developed.
@@ -556,8 +556,10 @@ We will leave the authentication as password based but we need to expand the ``A
 Fill in the ``Initial Database Name'' section to be ``todoapp'',
 this is similar to what we had in the Docker Compose.
 
-The other options here are to do with the parameters used to start the database, it is uncommon to have to change these but this is where
-any settings you would pass in via cli to the db would be set.
+\teacher{
+The other options here are to do with the parameters used to start the database,
+it is uncommon to have to change these but this is where any settings you would pass in via cli to the db would be set.
+}
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/db7}
@@ -569,23 +571,25 @@ Now we can click create which will take some time.
   \includegraphics[width=\textwidth]{images/db8}
 \end{figure}
 
-Depending on your database it may take 10 to 30minutes to create, the larger and more complicated the setup the longer it usually takes.
+Depending on your database it may take 10 to 30minutes to create,
+the larger and more complicated the setup the longer it usually takes.
 The database will also do a initial backup when its created.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/aws_4}
 \end{figure}
 
-When the database has finished being created you can select it to view the configuration and details. In this menu we also see the 
-endpoint address which we will need to copy into our docker compose file.
+When the database has finished being created you can select it to view the configuration and details.
+In this menu we also see the endpoint address which we will need to copy into our docker compose file.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/aws_5}
 \end{figure}
 
-So with the database all ready to do lets get started on running our app. First thing to do is to stop any running instances you have 
-and then delete the database service from the docker compose. Now we want to edit the host and credentials to match what we input into 
-AWS. Below is an example of my configuration.
+So with the database all ready to go, let's get started on running our app.
+First thing to do is to stop any running instances you have and then delete the database service from the docker compose.
+Now we want to edit the host and credentials to match what we input into AWS.
+Below is an example of my configuration.
 
 \begin{code}[language=docker-compose]{docker-compose.yml}
   version: '3.3'
@@ -608,8 +612,9 @@ AWS. Below is an example of my configuration.
       command: sh -c "sleep 10 && php artisan migrate:refresh --seed && php artisan serve --host=0.0.0.0"
 \end{code}
 
-Now we can run \lstinline[]{$ docker-compose up}. This will take a lot longer than before, the reason behind this is that 
-by default our lab is running in the US and it takes a lot longer to communicate to a DB half way across the world.
+Now we can run \lstinline[]{$ docker-compose up}.
+This will take a lot longer than before,
+the reason behind this is that by default our lab is running in the US and it takes a lot longer to communicate to a DB half way across the world.
 
 \begin{code}[language=shell,numbers=none]{}
   $ docker-compose up
@@ -628,6 +633,60 @@ by default our lab is running in the US and it takes a lot longer to communicate
 \end{code}
 
 We can now also browse the app as before but with just a lot more lag.
+
+\subsection{AWS - Terraform}
+
+Now that we have explored the old school way lets join the 21st century and configure this using IaC.
+
+\begin{code}[language=terraform]{main.tf}
+resource "aws_db_instance" "todoapp-terraform" {
+  allocated_storage      = 20
+  max_allocated_storage  = 1000
+  engine                 = "mysql"
+  engine_version         = "8.0.27"
+  instance_class         = "db.t2.micro"
+  name                   = "todoapp"
+  username               = "todoapp"
+  password               = "foobarbaz"
+  parameter_group_name   = "default.mysql8.0"
+  skip_final_snapshot    = true
+  vpc_security_group_ids = [aws_security_group.todoapp-terraform.id]
+  publicly_accessible    = true
+
+  tags = {
+    Name = "todoapp-terraform"
+  }
+}
+
+resource "aws_security_group" "todoapp-terraform" {
+  name        = "todoapp-terraform"
+  description = "Allow inbound MySQL traffic"
+
+  ingress {
+    from_port        = 3306
+    to_port          = 3306
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Name = "todoapp-terraform"
+  }
+}
+\end{code}
+
+
+\warning{
+  This section is still being developed.
+}
 
 \bibliographystyle{ieeetr}
 \bibliography{books}
