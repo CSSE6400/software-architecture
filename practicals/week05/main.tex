@@ -29,6 +29,10 @@ This week our goal is to:
   \item configure the static website to communicate with the EC2 backend.
 \end{itemize}
 
+\teacher{
+    As with last week, spend approximately the first 30 minutes exploring concepts.
+}
+
 \section{Communication}
 This week we have started to explore the world of distributed systems.
 The world relies (heavily) on distributed systems,
@@ -146,15 +150,43 @@ softarch.writeTo(output);
 \end{code}
 
 \section{Application Programming Interfaces}
-\begin{itemize}
-    \item XML-RPC
-    \item SOAP
-    \item REST
-    \item JSON-RPC
-    \item Maybe OData?
-    \item GraphQL
-    \item gRPC
-\end{itemize}
+\subsection{XML-RPC}
+\subsection{SOAP}
+\subsection{REST}
+\subsection{JSON-RPC}
+\subsection{GraphQL}
+\subsection{gRPC}
+
+\section{Deploying a Todo Part Two}
+
+In the practical last week we deployed a very simple todo application.
+Recall that we deployed a database and an EC2 instance which acted as a docker container.
+The EC2 instance was responsible for:
+\begin{enumerate}
+  \item allowing users to download the client-side HTML and Javascript frontend; and
+  \item providing a REST API the client talked to in order to access persistent data.
+\end{enumerate}
+This means that each time the client opens the website they will need to download the frontend and make all subsequent requests to the same instance.
+This doesn't scale well.
+In this practical, we will make one simple change that helps increase our capacity.
+
+The todo application was built using a simple layered architecture.
+\begin{enumerate}
+  \item The client-side (or presentation layer) is developed in \link{Elm}{https://elm-lang.org/} which compiles into static HTML and JavaScript.
+  \item The presentation layer communicates with a \link{Laravel}{https://laravel.com/} persistence layer via a REST API.
+  \item The persistence layer in turn communicates with a \link{MySQL}{https://www.mysql.com/} database layer.
+\end{enumerate}
+
+We have already deployed the database layer separately from the presentation and persistence layer.
+Now, we want to deploy the service which serves the presentation layer separately from the persistence layer.
+Since our presentation layer is static,
+we can take advantage of the AWS S3 service.
+AWS S3 is scalable, which means that we don't have to worry about manually scaling our frontend serving (and can focus on the challenging of backend scaling).
+
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{diagrams/deployment}
+\caption{Desired deployment diagram of the todo application.}
+\end{figure}
 
 \bibliographystyle{ieeetr}
 \bibliography{books,ours}
