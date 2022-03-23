@@ -86,6 +86,58 @@
 	morestring=[b]'
 }
 
+\colorlet{punct}{red!60!black}
+\definecolor{background}{HTML}{EEEEEE}
+\definecolor{delim}{RGB}{20,105,176}
+\colorlet{numb}{magenta!60!black}
+
+\lstdefinelanguage{json}{
+    showstringspaces=false,
+    breaklines=true,
+    literate=
+      {:}{{{\color{punct}{:}}}}{1}
+      {,}{{{\color{punct}{,}}}}{1}
+      {\{}{{{\color{delim}{\{}}}}{1}
+      {\}}{{{\color{delim}{\}}}}}{1}
+      {[}{{{\color{delim}{[}}}}{1}
+      {]}{{{\color{delim}{]}}}}{1},
+}
+
+% https://github.com/aytchell/latex-listings-protobuf/blob/master/protobuf/lang.sty
+\lstdefinelanguage{protobuf}{%
+    sensitive=true,%
+    morecomment=[l]{//},%
+    morecomment=[s]{/*}{*/},%
+    morestring=[b]{"},%
+    % For the keywords of Protocol Buffers
+    % see https://developers.google.com/protocol-buffers/docs/proto
+    morekeywords={enum,oneof,map,syntax,public,import,option,package,message,%
+        group,optional,required,repeated,default,reserved,extend,extensions,%
+        to,max,service,rpc,returns,true,false},%
+    % Basic types
+    % see https://developers.google.com/protocol-buffers/docs/proto#scalar
+    morekeywords=[2]{%
+        double,float,int32,int64,uint32,uint64,sint32,sint64,%
+        fixed32,fixed64,sfixed32,sfixed64,bool,string,bytes},%
+    % Options
+    % taken from 'google/protobuf/descriptor.proto'
+    morekeywords=[3]{%
+        % Generic Options
+        deprecated, uninterpreted_option,%
+        % File Options
+        java_package,java_outer_classname,java_multiple_files,%
+        java_generate_equals_and_hash,java_string_check_utf8,optimize_for,%
+        go_package,cc_generic_services,java_generic_services,%
+        py_generic_services,cc_enable_arenas,obj_class_prefix,%
+        csharp_namespace,%
+        % Message Options
+        message_set_wire_format,no_standard_descriptor_accessor,map_entry,%
+        % Field Options
+        ctype, packed,jstype,lazy,weak,%
+        % Enum Options
+        allow_alias}%
+}
+
 \newcommand{\bash}[1]{
 \begin{shaded*}
 \begin{lstlisting}[language=shell]^^J
