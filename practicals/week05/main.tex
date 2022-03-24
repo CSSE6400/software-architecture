@@ -26,7 +26,7 @@ This week our goal is to:
 \begin{itemize}
   \item explore the various techniques developers use to communicate between distributed systems;
   \item deploy a static website on an S3 bucket; and
-  \item configure the static website to communicate with the EC2 backend.
+  \item configure the static website to communicate with an EC2 backend.
 \end{itemize}
 
 \teacher{
@@ -36,13 +36,14 @@ This week our goal is to:
 \section{Communication}
 This week we have started to explore the world of distributed systems.
 The world relies (heavily) on distributed systems,
-there is no machine in the world powerful enough to process the requests Google receives every second.
-We need to have many hundreds of machines working seamlessly together.
+there is no machine in the world powerful enough to process the requests Google receives every second%
+\footnote{Current estimates are that Google requires over a million servers}.
+Even systems of a much smaller scale can still need many hundreds or thousands of machines working seamlessly together.
 This inter-machine teamwork requires machines to know how to talk to each other.
 For the practical this week we will look at APIs as a mechanism for communication.
 
 \section{Data Formats}
-When engaging in communication we wish to exchange information.
+Communication requires an exchange of information.
 On computer systems information is stored at runtime in memory as primitive data which your programming language can interpret;
 bytes, integers, strings, etc.
 In object-oriented languages,
@@ -81,12 +82,11 @@ and as a result APIs built around XML as a data format are becoming less common.
 \subsection{JSON}
 JavaScript Object Notation (JSON) is quickly replacing XML as the data format used in APIs.
 As you will note, it is more succinct and communicates the important points to a human reader better.
-Although the popularity of JSON is largely due to the compatibility with JavaScript which has taken over web development.
+The popularity of JSON is largely due to its compatibility with JavaScript which has taken over web development.
 JSON is the map-esque data type in JavaScript.
-Detractors of JSON claim that it's main disadvantage over XML is that it lacks a schema.
+Detractors of JSON claim that its main disadvantage compared to XML is that it lacks a schema.
 However, \link{schemas are possible in JSON}{https://json-schema.org/},
-they are optional,
-just as in XML but much less used than XML.
+they are optional, just as in XML, but are used much less than in XML.
 
 \begin{code}[language=json]{csse6400.json}
 {
@@ -133,12 +133,12 @@ message Course {
 \end{code}
 
 Protobufs differ from XML, JSON, and MessagePack via their method of integration.
-In all other examples,
-your language would have a library to encode and decode the data format into and out of your languages type system.
+In the previous examples,
+your language would have a library to encode and decode the data format into and out of your language's type system.
 With protobuf, an external tool, \textsl{protoc},
 takes the schema and generates a model of the schema in your target language.
 This gives every language a native method to interact with the data format,
-it often means that developers don't need to be aware of the underlying encoding.
+it often means that developers do not need to be aware of the underlying encoding.
 
 \begin{code}[language=java]{csse6400.java}
 Course softarch = Course.newBuilder()
@@ -167,7 +167,7 @@ The EC2 instance was responsible for:
   \item providing a REST API the client talked to in order to access persistent data.
 \end{enumerate}
 This means that each time the client opens the website they will need to download the frontend and make all subsequent requests to the same instance.
-This doesn't scale well.
+This does not scale well.
 In this practical, we will make one simple change that helps increase our capacity.
 
 The todo application was built using a simple layered architecture.
@@ -181,7 +181,7 @@ We have already deployed the database layer separately from the presentation and
 Now, we want to deploy the service which serves the presentation layer separately from the persistence layer.
 Since our presentation layer is static,
 we can take advantage of the AWS S3 service.
-AWS S3 is scalable, which means that we don't have to worry about manually scaling our frontend serving (and can focus on the challenging of backend scaling).
+AWS S3 is scalable, which means that we do not have to worry about manually scaling our frontend serving (and can focus on the challenge of backend scaling).
 
 \begin{figure}[ht]
 \includegraphics[width=\textwidth]{diagrams/deployment}
