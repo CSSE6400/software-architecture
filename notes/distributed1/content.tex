@@ -1,18 +1,79 @@
-\title{Distributed Computing I}
+\title{Distributed Systems I}
 \author{Brae Webb}
 \date{\week{5}}
 
 \maketitle
 
 \section{Introduction}
+We have started looking at distributing our applications.
+Service-based architectures distribute business processes such that each process is deployed on a separate physical machine \cite{service-based-notes}.
+The distributed machines act as if they are the one system,
+so service-based architectures are our first look at distributed systems.
+Deploying services independently reduces the complexity of deployment,
+however, it starts to introduce a new range of complexity.
+
+\begin{definition}[Distributed System]
+A system with multiple components located on \textsl{different machines} that communicate and coordinate actions in order to \textsl{appear as a single coherent system} to the end-user.
+\end{definition}
 
 \section{Reliable Software}
+We want, and in some cases, need, our software to be \textsl{reliable}.
+Our motivation for reliable software ranges from live or death situations all the way to finance motivations.
+At the extreme end we have radiation therapy machines exposing patients to too much radiation and causing fatalities \cite{therac}.
+On the less extreme end,
+we have reliability we have outages from Facebook causing \$60 million of lost revenue \cite{facebook-outage}.
+Regardless of the motivation,
+we need reliable software.
+But what does it mean for software to be reliable?
 
 \subsection{Fault Tolerance}
+In an ideal world we would produce fault-proof software,
+where we define a fault as something going wrong.
+Unfortunately, we live in an extremely non-ideal world.
+Faults are a major part of our software world.
+If we could develop bug-free software,
+hardware would still fail on us.
+If we could invent perfect always operational hardware,
+then we would still be subject to \link{cosmic bit flipping}{https://www.youtube.com/watch?v=AaZ_RSt0KP8}.
+
+Instead, we learnt long ago that fault tolerance is the best way to develop reliable software.
+John von Neumann was one of the first to integrate the notion of building fault tolerance to develop hardware systems in the 1950s \cite{neumann-faults}.
+Fault tolerance systems are systems which are designed to be able to recover in the event of a fault.
+By anticipating faults, rather than putting our heads in the sand,
+we can develop much more reliable software.
+
+A part of this philosophy is to write defensive software which anticipates the \textsl{likely} software logic faults (bugs).
+The \textsl{likely} modifier is important here,
+if we write paranoid code which has no trust of other systems,
+our code will become incredibly complex and ironically more bug prone quickly.
+Instead, use heuristics and experience to anticipate systems which are likely to fail and place fault guards around such systems.
+
+Aside from software logic faults,
+we have catastrophic software faults and hardware faults.
+These cause the software or hardware to become unusable.
+This occurs in practice far often than you might expect.
+How should we tolerate this type of fault?
 
 \subsection{Distributing Risk}
+For faults which cause a system to become unusable we can't simply program around it.
+We need a mechanism for recovering from the fault without relying on the system to work at all as expected.
+One recovery approach is to duplicate and distribute the original system.
+If we duplicate our software across two machines then we have halved our risk of the system going completely down.
+If we replicate our software across thousands of machines then the likelihood of a complete system failure due to a hardware failure is negligible.
+Google doesn't go down over a hardware failure.
+We can imagine that the Google servers have many hardware failures in a week but this doesn't cause an outage.
+
+So we have one very important motivation for creating distributed systems,
+to ensure that our software system is \textsl{reliable}.
 
 \section{Distributed Architecture}
+
+\begin{itemize}
+    \item The simplest distributed architecture $=$ horizontally scaling immutable isolated machines.
+    \item This rarely happens in real world.
+    \item Instead we need need to have systems which talk.
+    \item This communicate introduces all sorts of vulnerabilities.
+\end{itemize}
 
 % \subsection{Communication happens}
 
@@ -33,4 +94,10 @@
 
 \subsection{The Network is Homogeneous}
 
-\section{Auto-scaling}
+\section{Modern Scaling}
+
+\subsection{Health-checks}
+
+\subsection{Auto-scaling}
+
+\subsection{Load-balancing}
