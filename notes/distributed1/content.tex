@@ -38,21 +38,21 @@ It can be easy to forget given the wide-spread usage and demand for distributed 
 %     Server B completes the request but fails to respond letting Server A know.
 %     Server A might interpret this as Server B not receiving the message and sends a duplicated message.
 % \end{itemize}
-Let us investigate some logical fallacies that make distributed systems more complicated and less appealing than they initially appear.
+Let us investigate some logical fallacies that make distributed systems more complicated and less appealing than they might initially appear.
 
 \begin{definition}[Fallacy]
 Something that is believed or assumed to be true but is not.
 \end{definition}
 
 \section{Fallacies of Distributed Computing}
-The first four fallacies of distributed computing were introduced by Bill Joy and Dave Lyon and were introduced as `The Fallacies of Networked Computing' \cite{four-fallacies}.
+The first four fallacies of distributed computing were introduced by Bill Joy and Dave Lyon and called `The Fallacies of Networked Computing' \cite{four-fallacies}.
 Peter Deutsh introduced three more fallacies and named the collection `The Fallacies of Distributed Computing' \cite{eight-fallacies}.
-James Gosling (lead developer of Java) then introduced a final eighth fallacy \cite{four-fallacies}.
+James Gosling (lead developer of Java) later introduced a final eighth fallacy \cite{four-fallacies}.
 We omit the eighth fallacy as its relevance to the concerns of modern developers has deteriorated.
 
 \subsection{The Network is Reliable}
 The first fallacy assures us that the network is reliable.
-Developers like to believe that this is a fact which can be relied upon but networks are not reliable.
+Developers like to believe that this is a fact which can be relied upon but networks are certainly not reliable.
 They are more reliable than they use to be but they are far from reliable.
 
 Often we are quite capable of remembering this requirement in obviously unreliable contexts.
@@ -61,24 +61,24 @@ it is easy enough to remember that the mobile will occasionally leave the WiFi a
 Developers can often get the client-server connection correct but neglect server-server connections,
 assuming they are reliable.
 
-When building distributed systems which need to communicate with one another,
-we assume that the connection between servers will always be reliable.
+When building distributed systems which need to communicate with each other,
+we often assume that the connection between servers will always be reliable.
 However, even in the most tightly controlled network we can not guarantee that no packets will be dropped.
 It is important to remember that the reliability of network communication is a fallacy and that we need to build-in error handling between any two machines.
 We will see later in our distributed systems series that processing network errors can be extremely challenging.\footnote{\url{https://youtu.be/IP-rGJKSZ3s}}
 
 \subsection{Latency is Zero}
 This course is being run in Australia,
-no one who is taking this course in Australia should believe this fallacy.
-Again, this fallacy doesn't exist with client-server communication,
-we are all intimately familiar with buffering videos.
+no one who is taking this course in Australia \textsl{should} believe this fallacy.
+Again, this fallacy doesn't exist as much with client-server communication,
+we are all intimately familiar with having videos buffer.
 
 This fallacy still lingers with server-server communication.
-Each time an architect makes a call to distribute components onto different machines,
-we make a trade-off,
-we are making a non-trivial performance sacrifice.
+Each time an architect makes a decision to distribute components onto different machines,
+they make a trade-off,
+they are making a non-trivial performance sacrifice.
 If you are designing a system with distributed calls,
-ensure that you know the performance characteristics of the network.
+ensure that you know the performance characteristics of the network and deem the performance trade-offs acceptable.
 
 \subsection{Bandwidth is Infinite}
 Similar to the previous fallacy,
@@ -94,31 +94,31 @@ However, when working at scale,
 it is important to be mindful to not be wasteful with the size of data communicated internally.
 Externally bandwidth usage comes at the cost of the end-user and the budget.
 End-users suffer when bandwidth usage of an application is high,
-not all users have access to high bandwidth connections, particularly developing nations.
-There is also a cost on the developers end as most infrastructure providers charge for external bandwidth usage.
+not all users have access to high bandwidth connections, particularly those in developing nations.
+There is also a cost on the developers end as infrastructure providers charge for external bandwidth usage.
 
 \subsection{The Network is Secure}
 Developers occasionally assume that VPCs, firewalls, security groups, etc. ensure security.
 This is not the case.
 The moment a machine is connected to the internet it is vulnerable to a whole range of attacks.
-Known and unknown vulnerabilities enable access bypassing existing infrastructure.
+Known and unknown vulnerabilities enable access bypassing network security infrastructure.
 Injection attacks are still prominent;
-if a distributed system doesn't have multiple authentication checkpoints then an injection attack to one insecure machine can compromise the entire system.
+if a distributed system doesn't have multiple authentication checkpoints then an injection attack on one insecure machine can compromise the entire system.
 We tend to incorrectly assume we can trust the machines within our network,
-this is the essence of the fallacy.
+and this trust is a fallacy.
 
 \subsection{The Topology Never Changes}
 
 \subsection{There is Only One Administrator}
-This is a challenge which is encountered infrequently but it is worth pointing out.
+This is a fallacy which is encountered infrequently but it is worth pointing out.
 Imagine you have an application deployed on AWS.
 To prevent an overly eager graduate developer from taking down your application,
 your build pipeline doesn't run on the weekend.
 Sunday afternoon you start getting bug reports.
 Users online are unhappy.
 Your manager is unhappy.
-You check the build logs,
-there have been no new deployments from Saturday.
+You check the logs,
+there have been no new deployments since Friday.
 Worse still you can access the application and it works fine.
 Who do you contact?
 AWS? The users? Your ISP? Your users ISP's?
@@ -126,15 +126,15 @@ Who is the mythical sysadmin to solve all your problems?
 There isn't one; it is important to account for and plan for that.
 When things start failing can you deploy to a different AWS region?
 Can you deploy to a different hosting provider?
-Can you deploy parts of your application on-premises?
+Can you deploy parts of your application on-premise?
 Likewise we need to be aware of this fallacy when trying to resolve less drastic failures, for example, high latency, permission errors, etc.
 
 \subsection{Transport Cost is Zero}
-When architecting a system it can easy to get carried away with building the beautiful distributed, modular, extensible systems.
-However, we need to remember that this costs money.
+When architecting a system it can easy to get carried away with building beautiful distributed, modular, extensible systems.
+However, we need to be mindful that this costs money.
 Distributed systems cost far more than monolithic applications.
 Each RPC or REST request translates to costs.
-We should also mention that under-utilized machines services run on cost money.
+We should also mention that under-utilized machines cost money.
 Distributing our application services can seem like a beautiful deployment solution but if you are running 10 different service machines for an application with 100 users,
 you are burning money both hosting the machines and communicating between them. 
 
@@ -147,7 +147,7 @@ and how we can use distributed systems to create more reliable software.
 
 \subsection{Reliable Software}
 We want, and in some cases, need, our software to be \textsl{reliable}.
-Our motivation for reliable software ranges from live or death situations all the way to finance motivations.
+Our motivation for reliable software ranges from life or death situations all the way to financial motivations.
 At the extreme end we have radiation therapy machines exposing patients to too much radiation and causing fatalities \cite{therac}.
 On the less extreme end,
 we have outages from Facebook causing \$60 million of lost revenue \cite{facebook-outage}.
@@ -160,42 +160,42 @@ In an ideal world we would produce fault-proof software,
 where we define a fault as something going wrong.
 Unfortunately, we live in an extremely non-ideal world.
 Faults are a major part of our software world.
-If we could develop bug-free software,
+Even if we could develop bug-free software,
 hardware would still fail on us.
 If we could invent perfectly operating hardware,
-then we would still be subject to \link{cosmic bit flipping}{https://www.youtube.com/watch?v=AaZ_RSt0KP8}.
+we would still be subject to \link{cosmic bit flipping}{https://www.youtube.com/watch?v=AaZ_RSt0KP8}.
 
 Instead, we learnt long ago that fault tolerance is the best way to develop reliable systems.
 John von Neumann was one of the first to integrate the notion of fault tolerance to develop reliable hardware systems in the 1950s \cite{neumann-faults}.
-Fault tolerance systems are systems which are designed to be able to recover in the event of a fault.
+Fault tolerant systems are designed to be able to recover in the event of a fault.
 By anticipating faults, rather than putting our heads in the sand,
 we can develop much more reliable software.
 
 A part of this philosophy is to write defensive software which anticipates the \textsl{likely} software logic faults (bugs).
 The \textsl{likely} modifier is important here,
 if we write paranoid code which has no trust of other systems,
-our code will become incredibly complex and ironically more bug prone quickly.
+our code will become incredibly complex and ironically more bug prone.
 Instead, use heuristics and past experience to anticipate systems which are likely to fail and place guards around such systems.
 
 Aside from software logic faults,
 we have catastrophic software faults and hardware faults.
 These types of faults cause the software or hardware to become unusable.
-This occurs in practice far often than you might expect.
+This occurs in practice far more often than you might expect.
 Hard disks have a 10 to 50 year mean time to failure \cite{data-intensive}.
 We would only need 1,000 disks to have one die every 10 days.
 How should we tolerate this type of fault?
 
 \subsection{Distributing Risk}
-For faults which cause a system to become unusable we can not simply program around it.
+For faults which cause a system to become unusable we can not program around it.
 We need a mechanism for recovering from the fault without relying on the system to work at all as expected.
-One recovery approach is to duplicate and distribute the original system.
+One approach is to duplicate and distribute the original system.
 If we duplicate our software across two machines then we have halved our risk of the system going completely down.%
 \footnote{In a simple ideal world.}
 If we replicate our software across thousands of machines then the likelihood of a complete system failure due to a hardware failure is negligible.
 Google doesn't go down over a hardware failure.
-We can imagine that the Google servers have many hardware failures in a day but this doesn't cause an outage.
+We can imagine that the Google servers have many hardware failures per day but this doesn't cause an outage.
 
-So we have one very important motivation for creating distributed systems,
+This gives us one very important motivation for creating distributed systems,
 to ensure that our software system is \textsl{reliable}.
 
 % \section{Distributed Architecture}
@@ -217,7 +217,7 @@ Finally, let us shallowly explore the ways cloud platforms can offer us reliable
 \subsection{Auto-scaling}
 Auto-scaling is a feature offered by many cloud platforms which allows dynamic provisioning of compute instances.
 Kubernetes is a non-cloud platform specific tool which also offers auto-scaling.
-Auto-scaling provisioning is specified by a scaling policy which a developer configures to specify when new instances are required, and when existing instances are no longer required.
+Auto-scaling is specified by a scaling policy which a developer configures to specify when new instances are required, and when existing instances are no longer required.
 
 
 \section{Modern Scaling}
