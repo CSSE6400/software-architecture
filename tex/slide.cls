@@ -180,6 +180,14 @@
     }
 }
 
+\newcommand{\image}[2][width=\textwidth]{
+    \begin{frame}
+        \begin{center}
+            \includegraphics[#1]{#2}
+        \end{center}
+    \end{frame}
+}
+
 % Bibliography styling
 \setbeamertemplate{bibliography item}[text]
 \setbeamercolor{bibliography item}{fg=primary}
