@@ -1,4 +1,4 @@
-@startuml deployment
+@startuml S3Deployment
 
 left to right direction
 
@@ -14,11 +14,16 @@ left to right direction
 !includeurl AWSPuml/AWSCommon.puml
 !includeurl AWSPuml/Database/RDS.puml
 !includeurl AWSPuml/Compute/EC2.puml
+!includeurl AWSPuml/NetworkingContentDelivery/CloudFront.puml
+!includeurl AWSPuml/Compute/EC2AutoScaling.puml
+!includeurl AWSPuml/NetworkingContentDelivery/ElasticLoadBalancing.puml
 !includeurl AWSPuml/Storage/SimpleStorageService.puml
 ' make orange
 AddContainerTag("AWS", $borderColor="#ff9900", $bgColor="#ffffff", $fontColor="#000000")
 
 ' LAYOUT_WITH_LEGEND()
+
+hide stereotype
 
 Deployment_Node(machine, "Your machine") {
   Deployment_Node(browser, "Your browser") {
@@ -27,9 +32,20 @@ Deployment_Node(machine, "Your machine") {
 }
 
 Deployment_Node(aws, "AWS") {
+  Deployment_Node(cloudfront, "CloudFront", $sprite="CloudFront,color=#ff9900", $tags="AWS") {
+  
+  }
+
+  Deployment_Node(lb, "Load Balancer", $sprite="EC2AutoScaling,color=#ff9900", $tags="AWS") {
+
+  }
+
+  Deployment_Node(scale, "Auto-scaling Group", "Desired Capacity: 2", $sprite="EC2AutoScaling,color=#ff9900", $tags="AWS") {
   Deployment_Node(ec2, EC2, $sprite="EC2,color=#ff9900", $tags="AWS") {
     Container(todoback, "Todo Backend", "PHP 8 Laravel", "Handles REST API requests", $sprite="laravel")
   }
+  }
+
   Deployment_Node(rds, RDS, $sprite="RDS,color=#ff9900", $tags="AWS") {
     Container(tododb, "Todo Database", "MySQL Database", "Stores todo application data.", $sprite="mysql")
   }
@@ -37,7 +53,15 @@ Deployment_Node(aws, "AWS") {
     Container(todofront, "Todo Frontend", "HTML and Javascript", "Serves static files to the user.", $sprite="javascript")
   }
 }
-Rel(todofront, todopage, "Serves HTML and Javascript")
-Rel(todopage, todoback, "REST requests")
-BiRel(todoback, tododb, "Reads from and writes to")
+
+Rel(lb, todoback, "Route Requests")
+
+Rel(todopage, cloudfront, "Application Interaction", "HTTP")
+
+Rel(cloudfront, todofront, "Content Request", "Endpoint: /")
+Rel(cloudfront, lb, "REST Request", "Endpoint: /api/v1")
+
+' Rel(todofront, cloudfront, "Serves HTML and Javascript")
+' Rel(todopage, todoback, "REST requests")
+Rel(todoback, tododb, "Reads from and writes to")
 @enduml

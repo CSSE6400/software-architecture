@@ -154,25 +154,127 @@ softarch.writeTo(output);
 \end{code}
 
 \section{Application Programming Interfaces}
+It is worth being aware of a few of the common API paradigms available.
+We outline a few but note that in this course we will primarily focus on REST APIs.
+This is only an indication that they are better understood by course staff,
+not their superiority.
+
 \subsection{XML-RPC}
+XML-RPC was one of the first API standards.
+It is a Remote Procedure Call (RPC) based API which communicates via XML.
+It is not a commonly used standard anymore.
+
 \subsection{SOAP}
+After XML-RPC came SOAP.
+SOAP was impactful for service-oriented (now microservice) architectures but has largely fallen out of favor in-place of REST APIs.
+We do not cover SOAP in any meaningful depth due to it's increasing irrelevance and complexity.
+
 \subsection{REST}
+REST is not a standard like SOAP once was,
+instead REST is an architectural style guided by a set of architectural constraints that allows us to build flexible APIs.
+
+In this course we do not dive too deep into the architectural style and instead opt for a more surface level understanding.
+It is a common mistake for people to refer to REST as a HTTP based web service API,
+they are different.
+In this course we chose to embrace this mistake and often refer to a HTTP based web service API when saying REST.
+
+\noindent An example of this type of API might be:
+\begin{description}
+  \item[GET /api/v1/todo] List all tasks todo
+  \item[POST /api/v1/todo] Create a task todo
+  \item[GET /api/v1/todo/{id}] List all details about a certain task
+  \item[PUT /api/v1/todo/{id}] Update the fields of an existing task
+  \item[DELETE /api/v1/todo/{id}] Delete a specific task
+\end{description}
+
 \subsection{JSON-RPC}
+A JSON RPC is another RPC based API based around communication via JSON.
+When deciding whether to use an RPC-based API or a REST/SOAP based API,
+the common distinction to make is that RPC APIs should be action based, i.e. I want to do X.
+Whereas REST/SOAP APIs are Create Read Update Delete (CRUD) based for providing a interface to mutable data.
+
 \subsection{GraphQL}
+GraphQL is a query language which allows more dynamic querying of data than REST based APIs.
+You can create nested queries and specify the fields you want to receive in response.
+GraphQL APIs are well-suited for building APIs designed for developers to consume but when dealing with rigid inter-service based request,
+REST APIs are generally preferable.
+
 \subsection{gRPC}
+Another RPC framework, gRPC has started gaining a lot of attention since its first release in 2016.
+gRPC is based on protobuf communication standard.
+In addition to a more type-safe system,
+gRPC based APIs provide authentication and streaming mechanisms.
 
 \section{Deploying a Todo Part Two}
 
 In the practical last week we deployed a very simple todo application.
-Recall that we deployed a database and an EC2 instance which acted as a docker container.
-The EC2 instance was responsible for:
+Recall that we deployed a MySQL database on RDS and an EC2 instance which acted as a Docker container.
+The Docker container connected to the database and handled CRUD requests via a REST API.
+The Docker container was also responsible for serving static content.
+In this practical, we will explore two approaches to better scale our application.
+We assume that you have last weeks practical setup in Terraform, if not, do that now.
+
+\warning{
+  The Docker image from last week has moved to
+  
+  \texttt{ghcr.io/csse6400/todo-app:combined-latest}
+}
+
+\subsection{Scaling EC2}
+As we've now seen in the lectures,
+cloud platforms such as AWS offer useful techniques for scaling our systems.
+Our first task for the practical will be to use an auto-scaling group and a load balancer to double our compute capacity.
+Our desired deployment diagram is shown in Figure \ref{fig:scale}.
+
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{diagrams/ScaleDeployment}
+\caption{Desired deployment diagram of the todo application using auto-scaling and a load balancer.}
+\label{fig:scale}
+\end{figure}
+
+In order to give you practice developing Terraform independently,
+we will not distribute Terraform configuration for this exercise.
+Instead we will provide an outline of what is required with links as appropriate.
+
+\begin{enumerate}
+  \item We need to tell the auto-scaling group how to create new instances.
+  We will want to use \link{launch templates}{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template}.
+  \info{
+    You may find this module helpful: \url{https://github.com/CSSE6400/terraform/tree/main/template}.
+    It creates a launch template based on a Docker image similar to the custom module last week.
+    Note that the security group list will need to specify security group ids rather than security group names as in the previous module.
+  }
+  \item We need an \link{auto-scaling group}{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group} with a desired capacity of two.
+  \item We need a \link{load balancer}{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb}.
+  A load balancer needs to be in subnets in at least two different availability zones.
+  A list of all subnets in the default VPC can be created using the following:
+  \begin{code}[language=terraform]{}
+data "aws_subnet_ids" "nets" {
+  vpc_id = aws_security_group.todoapp-backend.vpc_id
+}
+  \end{code}
+  \warning{Do not forget to attach an appropriate security group to the load balancer.}
+  \item We need a \link{load balancer target group}{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group}.
+  \item We need a \link{load balancer listener}{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener} to direct traffic to our load balancer target group.
+  \item Finally, we can use an \link{auto-scaling attachment}{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_attachment} to attach our load balancer target group to our auto-scaling group.
+\end{enumerate}
+
+\subsection{Distributing Static Serving \& Caching}
+
+\info{
+  This section will gradually offer less guidance,
+  eventually leaving you to discover the final implementation completely independently.
+  We recommend that you try and get as far as you can on your own and ask a tutor when stuck.
+  It is important that you can deploy AWS resources via Terraform unassisted for the assignment (and your future careers).
+}
+
+The EC2 instance is responsible for:
 \begin{enumerate}
   \item allowing users to download the client-side HTML and Javascript frontend; and
   \item providing a REST API the client talked to in order to access persistent data.
 \end{enumerate}
 This means that each time the client opens the website they will need to download the frontend and make all subsequent requests to the same instance.
 This does not scale well.
-In this practical, we will make one simple change that helps increase our capacity.
 
 The todo application was built using a simple layered architecture.
 \begin{enumerate}
@@ -188,9 +290,89 @@ we can take advantage of the AWS S3 service.
 AWS S3 is scalable, which means that we do not have to worry about manually scaling our frontend serving (and can focus on the challenge of backend scaling).
 
 \begin{figure}[ht]
-\includegraphics[width=\textwidth]{diagrams/deployment}
+\includegraphics[width=\textwidth]{diagrams/SimpleS3Deployment}
 \caption{Desired deployment diagram of the todo application.}
 \end{figure}
+
+\subsection{Deploying EC2 \& RDS}
+Our current Docker image combines static serving with the REST API.
+Now, we want to update the version of our EC2 instances so that it does not also serve static HTML pages.
+To do this,
+update your docker image to be \textsl{v0.9.1} instead of \textsl{combined-latest},
+i.e. \texttt{ghcr.io/csse6400/todo-app:v0.9.1}
+If you try to access this updated EC2 instance, 
+you should be prompted with `Hey!, if you see this page then the ALB probably isnt working :('.
+
+\subsection{Deploying an S3 Bucket}
+We now want to deploy our static HTML to an S3 bucket.
+Our single HTML file for the web application is released via GitHub releases, available here:
+
+\noindent\texttt{https://github.com/CSSE6400/todo-app/releases/download/v0.9.1/index.html}
+
+\noindent The following steps provide an outline for deploying the static website to S3.
+
+\begin{enumerate}
+  \item Terraform bucket names much be unique lowercase and without special characters.
+  
+  \url{https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string}
+
+  \item A bucket must be made publicly available.
+  
+  \url{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_acl}
+
+  \item Remote resources can be gathered via the \texttt{http} data source in terraform: 
+  
+  \url{https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http}
+
+  \item The static HTML page must be uploaded to the bucket.
+  
+  \url{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_object}
+
+  \item The uploaded HTML must be configured as a website.
+  
+  \url{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_website_configuration}
+\end{enumerate}
+
+\noindent Once you are getting permission denied,
+attach the policy below to allow access using \link{\texttt{s3\_bucket\_policy}}{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy}
+
+\begin{code}[language=terraform]{}
+data "aws_iam_policy_document" "website_policy" {
+  statement {
+    actions = [
+      "s3:GetObject"
+    ]
+    principals {
+      identifiers = ["*"]
+      type = "AWS"
+    }
+    effect = "Allow"
+    resources = [
+      "arn:aws:s3:::${aws_s3_bucket.frontend-bucket.id}/*"
+    ]
+  }
+}
+\end{code}
+
+This should give you an S3 bucket which, when accessed,
+will fail to connect to the backend with a 404.
+This occurs because it is looking on the S3 bucket server for the backend.
+
+One approach to this problem would be to configure the frontend to know which server to talk to for the backend.
+The approach we will take is to place the EC2 instance and S3 bucket behind a CloudFront service.
+This will allow them to share the same domain name and provide better caching mechanisms.
+Our desired state is shown in Figure \ref{fig:s3deployment}.
+
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{diagrams/S3Deployment}
+\caption{Desired deployment diagram of the todo application using CloudFront to route requests.}
+\label{fig:s3deployment}
+\end{figure}
+
+That is all from us,
+the implementation of the CloudFront service in from of your S3 Bucket and Load Balancer is now up to you to discover.
+This type of deep-dive into the Terraform documentation will be extremely useful for your upcoming assignment.
+Best of luck!
 
 \bibliographystyle{ieeetr}
 \bibliography{books,ours}

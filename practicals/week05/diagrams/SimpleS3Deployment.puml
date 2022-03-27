@@ -1,0 +1,55 @@
+@startuml SimpleS3Deployment
+
+left to right direction
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!include DEVICONS/laravel.puml
+!include DEVICONS/javascript.puml
+!include DEVICONS/mysql.puml
+!include DEVICONS/chrome.puml
+
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v11.1/dist
+!includeurl AWSPuml/AWSCommon.puml
+!includeurl AWSPuml/Database/RDS.puml
+!includeurl AWSPuml/Compute/EC2.puml
+!includeurl AWSPuml/Compute/EC2AutoScaling.puml
+!includeurl AWSPuml/NetworkingContentDelivery/ElasticLoadBalancing.puml
+!includeurl AWSPuml/Storage/SimpleStorageService.puml
+' make orange
+AddContainerTag("AWS", $borderColor="#ff9900", $bgColor="#ffffff", $fontColor="#000000")
+
+hide stereotype
+
+' LAYOUT_WITH_LEGEND()
+
+Deployment_Node(machine, "Your machine") {
+  Deployment_Node(browser, "Your browser") {
+    Container(todopage, "Todo App", "HTML and JavaScript", "Provides the functionality of the Todo App to the user.", $sprite="chrome")
+  }
+}
+
+Deployment_Node(aws, "AWS") {
+  Deployment_Node(lb, "Load Balancer", $sprite="EC2AutoScaling,color=#ff9900", $tags="AWS") {
+
+  }
+
+  Deployment_Node(scale, "Auto-scaling Group", "Desired Capacity: 2", $sprite="EC2AutoScaling,color=#ff9900", $tags="AWS") {
+  Deployment_Node(ec2, EC2, $sprite="EC2,color=#ff9900", $tags="AWS") {
+    Container(todoback, "Todo Backend", "PHP 8 Laravel", "Handles REST API requests", $sprite="laravel")
+  }
+  }
+  Deployment_Node(rds, RDS, $sprite="RDS,color=#ff9900", $tags="AWS") {
+    Container(tododb, "Todo Database", "MySQL Database", "Stores todo application data.", $sprite="mysql")
+  }
+  Deployment_Node(s3, S3, $sprite="SimpleStorageService,color=#ff9900", $tags="AWS") {
+    Container(todofront, "Todo Frontend", "HTML and Javascript", "Serves static files to the user.", $sprite="javascript")
+  }
+}
+Rel(todopage, lb, "REST requests", "HTTP")
+Rel(lb, todoback, "Route Requests")
+
+Rel(todofront, todopage, "Serves HTML and Javascript")
+BiRel(todoback, tododb, "Reads from and writes to")
+@enduml
