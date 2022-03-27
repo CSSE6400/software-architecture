@@ -7,6 +7,9 @@
 
 \usepackage{languages}
 
+% \usepackage{pgfpages}
+% \setbeameroption{show notes on second screen}
+
 \title{Distributed Computing I}
 \subtitle{CSSE6400}
 \author{Brae Webb}
@@ -24,6 +27,8 @@
 \begin{document}
 
 \maketitle
+
+\note{Lecture Goal: Balance a healthy love-hate relationship with distributed systems}
 
 \point[Previously in CSSE6400\dots]{
     Service-based Architecture
@@ -72,7 +77,7 @@
     }
 \end{frame}
 
-\note{This condition on simplicity is doing a lot of work}
+\note{This condition is doing a lot of work}
 
 \begin{frame}{Previously in CSSE6400\dots}
     \vspace{1mm}
@@ -101,11 +106,7 @@
 
 \image{diagrams/Success}
 
-\note{An expected interaction}
-
 \image{diagrams/SendDrop}
-
-\note{Packet gets lost on way to CardService}
 
 \image{diagrams/SendDropResend}
 
@@ -189,10 +190,13 @@ while (retry and retries < MAX_RETIRES)
 
 \point[Remember]{Distributed systems are often \highlight{not your friend}.}
 
+\note{Can often introduce more problems than they solve}
+
 \point[When you need to, prove it]{
     \centering \youtubevideo{images/isabelle-thumb}{https://youtube.com/watch?v=7w4KC6i9Yac}
 }
 
+\note{Programming Research Group at Oxford in 1982}
 
 \begin{frame}{Previously in CSSE6400\dots}
     \vspace{1mm}
@@ -214,11 +218,13 @@ while (retry and retries < MAX_RETIRES)
     }
 \end{frame}
 
-\question{What makes software \highlight{unreliable}?}
+\question{What makes software \highlight{reliable}?}
+
+\note{Perhaps software that always works?}
 
 \point[`Working' software]{Satisfies the functional requirements}
 
-\definition{Reliable Software}{Continues to work correctly, even when things go wrong.}
+\definition{Reliable Software}{Continues to work, even when things go wrong.}
 
 \definition{Fault}{Something goes wrong.}
 
@@ -245,6 +251,13 @@ while (retry and retries < MAX_RETIRES)
 
 \image[width=\textheight]{diagrams/Sahara}
 
+\note[itemize]{
+    \item Why is this software somewhat reliable?
+    \item Any individual service can go down and the rest still work.
+    \item Can we do better?
+    \item Can a service go down but have that service still work?
+}
+
 \begin{frame}{Previously in CSSE6400\dots}
     \vspace{1mm}
     {\LARGE
@@ -270,17 +283,17 @@ while (retry and retries < MAX_RETIRES)
 \point[Auto-scaling Terminology]{
 \Large
 \begin{description}[<+->]
-    \item[Auto-scaling group] A collection of instances managed by auto-scaling.
-    \item[Capacity] Amount of instances in an auto-scaling group.
-    \item[Desired Capacity] Amount of instances we should have in an auto-scaling group.
+    \item[Auto-scaling group] A \highlight{collection of instances} managed by auto-scaling.
+    \item[Capacity] Amount of instances \highlight{currently} in an auto-scaling group.
+    \item[Desired Capacity] Amount of instances \highlight{we want to have} in an auto-scaling group.
     \item[Scaling Policy] How to determine the desired capacity.
-    \item[Minimum/Maximum Capacity] Hard limits on the minimal and maximum amount of instances.
+    \item[Minimum/Maximum Capacity] \highlight{Hard limits} on the minimal and maximum amount of instances.
 \end{description}
 }
 
 \point[What we really want]{
     \Large
-    {\color{secondary}Desired Capacity} Amount of \highlight{healthy} instances we should have in an auto-scaling group.
+    {\color{secondary}Desired Capacity} Amount of \highlight{healthy} instances we want to have in an auto-scaling group.
 }
 
 \point[Health check]{
@@ -291,15 +304,25 @@ while (retry and retries < MAX_RETIRES)
 
 \image[width=\textheight]{diagrams/Sahara}
 
+\note{Product service keeps going down}
+
 \image{diagrams/ProductIsolate}
+
+\note{We might expect product service to have a much higher load than other services}
 
 \image{diagrams/ProductEC2}
 
 \image{diagrams/ProductScale}
 
+\note{Use an auto-scaling group to replicate the service}
+
 \image{diagrams/ProductScaleReal}
 
+\note{What's the problem?}
+
 \image[width=\textheight]{diagrams/ProductScaleLB}
+
+\note{Traffic was all sent through the one instance, load balancer routes to all}
 
 \image[width=\textheight]{diagrams/SaharaScaled}
 
@@ -311,6 +334,8 @@ while (retry and retries < MAX_RETIRES)
     \item[Scalability] \only<4->{Auto-scaling and load balancing allows \highlight{individual services to scale}. However, the \highlight{database is a bottle-neck}.}  
 \end{description}
 \end{frame}
+
+\note{\highlight{database is a bottle-neck} is foreshadowing}
 
 % \definition{Distributed Computing}{Multiple software components that are on multiple computers, but run as a single system}
 
