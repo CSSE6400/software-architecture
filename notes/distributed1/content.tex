@@ -108,6 +108,13 @@ We tend to incorrectly assume we can trust the machines within our network,
 and this trust is a fallacy.
 
 \subsection{The Topology Never Changes}
+The topology of a network encompasses all of the network communication devices, including server instances.
+This includes routers, hubs, switches, firewalls, etc.
+Fortunately, in modern cloud computing we have more control over these network devices.
+Unfortunately, this control also gives us the ability to rapidly change the topology.
+The churn of network topologies in the cloud age makes us less likely to make previously common mistakes like relying on static IP addresses.
+However, we still need to be mindful of network changes.
+If network topology changes in such a way that latency is increased between machines then we might end up triggering application timeouts and rendering our application useless.
 
 \subsection{There is Only One Administrator}
 This is a fallacy which is encountered infrequently but it is worth pointing out.
@@ -219,10 +226,39 @@ Auto-scaling is a feature offered by many cloud platforms which allows dynamic p
 Kubernetes is a non-cloud platform specific tool which also offers auto-scaling.
 Auto-scaling is specified by a scaling policy which a developer configures to specify when new instances are required, and when existing instances are no longer required.
 
+Auto-scaling policies will specify a desired capacity which is how many instances should currently be running.
+The actual capacity is how many instances are currently running,
+this is different from the desired capacity as instances take time to spin up and down.
+The desired capacity can be based on metrics such as CPU usage, network usage, disk space, etc. configured via the scaling policy.
+We should also specify minimum and maximum capacity.
+Our minimum capacity prevents spinning down too many instances when load is low, 
+for example we don't want to have zero actual capacity as a user will need to wait for an instance to spin up to use the service.
+Likewise the maximum capacity prevents over-spending when load is high.
 
-\section{Modern Scaling}
+\subsection{Health Checks}
 
-\subsection{Health-checks}
-
+In addition to using auto-scaling to respond to dynamic load we can utilize health checks to ensure all running instances are functional.
+Health checks allow us to build reliable software.
+A health check is a user specified method for the auto-scaling to check an instance is healthy.
+When a health check identifies that an instance is not healthy it will spin the instance down and replace it with a new healthy instance.
 
 \subsection{Load-balancing}
+
+An auto-scaling group will allow us to automatically provision new instances based on specified metrics.
+In combination with health checks we can keep a healthy pool of the correct amount of instances.
+However, the question arises, how do we actually use these instances together?
+If we are accessing these instances via network connections we can use a load-balancer.
+A load-balancer is placed in front of an auto-scaling group.
+All traffic for a service is sent to the load-balancer and as the name implies,
+the load-balancer will balance the traffic sent to instances within the auto-scaling group.
+This allows a group of instances to assume the same end-point with the load-balancer forwarding traffic to individual instances.
+
+
+\section{Conclusion}
+We have revisited three of the important quality attributes of a service-based architecture.
+Namely; simplicity, reliability, and scalability.
+For simplicity we have seen that there are a number of challenges implicit with any distributed system.
+For reliability we have seen how using a distributed system can increase the reliability of a system.
+Finally, we have briefly looked at the techniques which make a distributed system more reliable and more scalable.
+Our treatment of scalability has only scratched the surface when scaling is just straight-forward replication of immutable machines.
+For the rest of the distributed systems series we will explore more complex versions of scaling.
