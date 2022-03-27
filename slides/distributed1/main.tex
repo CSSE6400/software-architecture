@@ -3,6 +3,9 @@
 
 \usetikzlibrary{arrows}
 
+\usepackage{tabto}
+
+\usepackage{languages}
 
 \title{Distributed Computing I}
 \subtitle{CSSE6400}
@@ -22,38 +25,194 @@
 
 \maketitle
 
+\point[Previously in CSSE6400\dots]{
+    Service-based Architecture
+}
+
+\note{Re-visiting service-based architectures from last lecture}
+
+\begin{frame}{Previously in CSSE6400\dots}
+    \vspace{1mm}
+    {\LARGE
+    \begin{description}
+        \item[Simplicity] For a distributed system \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Modularity] Services \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Extensibility] New services \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Deployability] Independent services \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Testability] Independent services \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Security] API layer \tabto{15em}\includegraphics[trim=57 145 70 85,clip,width=8mm]{../../shared/images/neutral.png}
+        \item[Reliability] Independent services \tabto{15em}\includegraphics[trim=57 145 70 85,clip,width=8mm]{../../shared/images/neutral.png}
+        \item[Interoperability] Service APIs \tabto{15em}\includegraphics[trim=57 145 70 85,clip,width=8mm]{../../shared/images/neutral.png}
+        \item[Scalability] Coarse-grained services\tabto{15em}\includegraphics[trim=22 19 22 12,clip,width=8mm]{../../shared/images/thumbs-down.png}
+    \end{description}
+    }
+\end{frame}
+
+\note{Concluded on these attributes}
+
+\begin{frame}{Previously in CSSE6400\dots}
+    \vspace{1mm}
+    {\LARGE
+    \begin{description}
+        \item[Simplicity] For a distributed system \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Reliability] Independent services \tabto{15em}\includegraphics[trim=57 145 70 85,clip,width=8mm]{../../shared/images/neutral.png}
+        \item[Scalability] Coarse-grained services\tabto{15em}\includegraphics[trim=22 19 22 12,clip,width=8mm]{../../shared/images/thumbs-down.png}
+    \end{description}
+    }
+\end{frame}
+
+\note{Let's revisit these attributes}
+
+\begin{frame}{Previously in CSSE6400\dots}
+    \vspace{1mm}
+    {\LARGE
+    \begin{description}
+        \item[Simplicity] \highlight{For a distributed system} \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+    \end{description}
+    }
+\end{frame}
+
+\note{This condition on simplicity is doing a lot of work}
+
+\begin{frame}{Previously in CSSE6400\dots}
+    \vspace{1mm}
+    {\LARGE
+    \begin{description}
+        \item[Simplicity] \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-down.png}
+    \end{description}
+    }
+\end{frame}
+
+\note{We'll look at a few reasons that distributed systems are \highlight{fundamentally} quite challenging}
+
+\question{What is a \highlight{fallacy}?}
+
+\definition{Fallacy}{
+    Something that is believed or assumed to be true but is not.
+}
+
+\point[A \textsl{few} reasons for complexity]{
+    The Fallacies of \highlight{Distributed Computing}
+}
+
+\note{Sun Microsystems in 1994, primarily accredited to Peter Deutsch (doy-ch)}
+
 \point[Fallacy \#1]{The network is reliable}
 
-\image{diagrams/working}
+\image{diagrams/Success}
 
-\image{diagrams/drop1}
+\note{An expected interaction}
 
-\image{diagrams/dropRecover}
+\image{diagrams/SendDrop}
 
-\image{diagrams/dropRecoverDos}
+\note{Packet gets lost on way to CardService}
 
-\image{diagrams/drop2}
+\image{diagrams/SendDropResend}
 
-\image{diagrams/drop2Recovery}
+\note{Solve it by resending it}
 
-\image{diagrams/drop2Fix}
+\image{diagrams/SendDropDos}
+
+\note{If the service goes down and all clients are re-trying, the service is in for a shock when it comes back, we solve this with \highlight{exponential backoff}}
+
+\begin{frame}[fragile]{Exponential backoff}
+\begin{code}[language=python,morekeywords={do}]{}
+retry = True
+do:
+    status = service.request()
+
+    if status != SUCCESS:
+        wait(2 ** retries)
+    else:
+        retry = False
+while (retry and retries < MAX_RETIRES)
+\end{code}
+\end{frame}
+
+\image{diagrams/ReceiveDrop}
+
+\image{diagrams/ReceiveDropResend}
+
+\note{Causes duplicate actions, problem for ordering/payments}
+
+\image{diagrams/ReceiveDropToken}
+
+\note{Use tokens to prevent duplicates.}
 
 \point[Fallacy \#2]{Latency is zero}
 
+\point[Network Statistics]{
+    \begin{description}[leftmargin=!,labelwidth=\widthof{Data}]
+        \item[Home to UQ] \only<2->{20.025ms}
+        \item[Home to us-east-1] \only<3->{249.296ms}
+        \item[EC2 to EC2] \only<4->{0.662ms}
+    \end{description}
+}
+
+\note{Be mindful when designing distributed systems. Network call much slower then local call.}
+
 \point[Fallacy \#3]{Bandwidth is infinite}
+
+\note{Similar to previous fallacy, be mindful, distributed calls clog up network.}
 
 \point[Fallacy \#4]{The network is secure}
 
+\image[width=\textheight]{diagrams/Sahara}
+
+\note{Authentication only occurs when entering Sahara data centre}
+
+\image[width=0.75\textheight]{diagrams/NetworkInjection}
+
+\note{Bad actor gets access via one insecure node, network is compromised. Practice defence in depth.}
+
 \point[Fallacy \#5]{The topology never changes}
+
+\note{Topology changes all the time, cloud has just made this easier. Don't rely on static IPs. Don't assume consistent latency.}
 
 \point[Fallacy \#6]{There is only one administrator}
 
+\point[Scenario]{
+\begin{itemize}[<+->]
+    \item Deployments are banned on the weekend.
+    \item Sunday night users start complaining.
+    \item There have been no deployments since Friday.
+    \item You can still access the system.
+    \item Who do you talk to?
+\end{itemize}
+}
+
+\note{Things spontaniously break. Who can help you?}
+
 \point[Fallacy \#7]{Transport cost is zero}
 
-\point[Fallacy \#8]{The network is homogeneous}
+\point[Remember]{Distributed systems are \highlight{hard}.}
+
+\point[Remember]{Distributed systems are often \highlight{not your friend}.}
+
+\point[When you need to, prove it]{
+    \centering \youtubevideo{images/isabelle-thumb}{https://youtube.com/watch?v=7w4KC6i9Yac}
+}
 
 
-\point[Focus]{Reliability}
+\begin{frame}{Previously in CSSE6400\dots}
+    \vspace{1mm}
+    {\LARGE
+    \begin{description}
+        \item[Simplicity] For a distributed system \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Reliability] Independent services \tabto{15em}\includegraphics[trim=57 145 70 85,clip,width=8mm]{../../shared/images/neutral.png}
+        \item[Scalability] Coarse-grained services\tabto{15em}\includegraphics[trim=22 19 22 12,clip,width=8mm]{../../shared/images/thumbs-down.png}
+    \end{description}
+    }
+\end{frame}
+
+\begin{frame}{Previously in CSSE6400\dots}
+    \vspace{1mm}
+    {\LARGE
+    \begin{description}
+        \item[Reliability] Independent services \tabto{15em}\includegraphics[trim=57 145 70 85,clip,width=8mm]{../../shared/images/neutral.png}
+     \end{description}
+    }
+\end{frame}
 
 \question{What makes software \highlight{unreliable}?}
 
@@ -65,9 +224,13 @@
 
 \quote[Howard and LeBlanc]{Death, taxes, and computer system failure are all inevitable to some degree.\\\highlight{Plan for the event.}}
 
-\point[Reliable software is]{Fault tolerant}
-    
+\point[Reliable software is]{Fault \highlight{tolerant}}
+
+\note{John von Neumann built fault tolerant hardware in the 50s.}
+
 \point[Problem]{Individual computers fail \highlight{all the time}}
+
+\note{10-50 years hard-drive lifetime. 10,000 disks will fail daily.}
 
 \point[Solution]{Spread the risk of faults over \highlight{multiple computers}}
 
@@ -76,34 +239,103 @@
     If you have software that works with \highlight{just one} computer,
     spreading the software over \highlight{two} computers \highlight{halves} the risk that your software will fail.
     \\[2em]
-    \only<2->{Adding \highlight{10} computers reduces the cuts the risk by \highlight{10}.}
+    \only<2->{Adding \highlight{100} computers reduces the cuts the risk by \highlight{100}.}
     \extra[3-]{Of course, there are other reasons you might want run software on multiple computers.}
 }
 
-\definition{Distributed Computing}{Multiple software components that are on multiple computers, but run as a single system}
+\image[width=\textheight]{diagrams/Sahara}
 
-\point[The Problem]{
-    \begin{center}
-    \begin{tikzpicture}
-        \node[circle,draw, minimum size=1cm] (A) at  (0,0) {Distributed};
-        \node[circle,draw, minimum size=1cm] (B) at  (8,0)  {Simplicity};
-        \draw[<->] (A) -- (B);
-    \end{tikzpicture}
-    \end{center}
+\begin{frame}{Previously in CSSE6400\dots}
+    \vspace{1mm}
+    {\LARGE
+    \begin{description}
+        \item[Simplicity] For a distributed system \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Reliability] Independent services \tabto{15em}\includegraphics[trim=57 145 70 85,clip,width=8mm]{../../shared/images/neutral.png}
+        \item[Scalability] Coarse-grained services\tabto{15em}\includegraphics[trim=22 19 22 12,clip,width=8mm]{../../shared/images/thumbs-down.png}
+    \end{description}
+    }
+\end{frame}
+
+\begin{frame}{Previously in CSSE6400\dots}
+    \vspace{1mm}
+    {\LARGE
+    \begin{description}
+        \item[Scalability] Coarse-grained services\tabto{15em}\includegraphics[trim=22 19 22 12,clip,width=8mm]{../../shared/images/thumbs-down.png}
+     \end{description}
+    }
+\end{frame}
+
+\question{Who has used \highlight{auto-scaling}?}
+
+\point[Auto-scaling Terminology]{
+\Large
+\begin{description}[<+->]
+    \item[Auto-scaling group] A collection of instances managed by auto-scaling.
+    \item[Capacity] Amount of instances in an auto-scaling group.
+    \item[Desired Capacity] Amount of instances we should have in an auto-scaling group.
+    \item[Scaling Policy] How to determine the desired capacity.
+    \item[Minimum/Maximum Capacity] Hard limits on the minimal and maximum amount of instances.
+\end{description}
 }
 
-\point{A lot of modern software development focuses on dealing with the \highlight{complexity} of distributed systems.}
-
-\question{What makes distributed computing complex?}
-
-\point{
-    \begin{itemize}
-        \item Faults
-        \item Asynchronous communication
-        \item Monitoring
-        \item And much more\dots
-    \end{itemize}
+\point[What we really want]{
+    \Large
+    {\color{secondary}Desired Capacity} Amount of \highlight{healthy} instances we should have in an auto-scaling group.
 }
+
+\point[Health check]{
+    User defined method to determine whether an instance is \highlight{healthy}.
+}
+
+\point[Auto-scaling]{An example}
+
+\image[width=\textheight]{diagrams/Sahara}
+
+\image{diagrams/ProductIsolate}
+
+\image{diagrams/ProductEC2}
+
+\image{diagrams/ProductScale}
+
+\image{diagrams/ProductScaleReal}
+
+\image[width=\textheight]{diagrams/ProductScaleLB}
+
+\image[width=\textheight]{diagrams/SaharaScaled}
+
+\begin{frame}{In Summary}
+\Large
+\begin{description}
+    \item[Simplicity] \only<2->{\highlight{Minimal network communication} (compared to other distributed systems), less impacted by fallacies.}
+    \item[Reliability] \only<3->{Traffic is spread to various services, still \highlight{partially operational} if one goes down. Auto-scaling allows for \highlight{basic replication}.}
+    \item[Scalability] \only<4->{Auto-scaling and load balancing allows \highlight{individual services to scale}. However, the \highlight{database is a bottle-neck}.}  
+\end{description}
+\end{frame}
+
+% \definition{Distributed Computing}{Multiple software components that are on multiple computers, but run as a single system}
+
+% \point[The Problem]{
+%     \begin{center}
+%     \begin{tikzpicture}
+%         \node[circle,draw, minimum size=1cm] (A) at  (0,0) {Distributed};
+%         \node[circle,draw, minimum size=1cm] (B) at  (8,0)  {Simplicity};
+%         \draw[<->] (A) -- (B);
+%     \end{tikzpicture}
+%     \end{center}
+% }
+
+% \point{A lot of modern software development focuses on dealing with the \highlight{complexity} of distributed systems.}
+
+% \question{What makes distributed computing complex?}
+
+% \point{
+%     \begin{itemize}
+%         \item Faults
+%         \item Asynchronous communication
+%         \item Monitoring
+%         \item And much more\dots
+%     \end{itemize}
+% }
 
 
 % \references{articles,books}
