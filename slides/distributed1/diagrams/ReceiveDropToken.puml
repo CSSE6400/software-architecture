@@ -1,4 +1,4 @@
-@startuml drop2Recovery
+@startuml ReceiveDropToken
 skinparam shadowing false
 skinparam ParticipantBorderColor black
 skinparam ArrowColor black
@@ -8,10 +8,11 @@ skinparam SequenceLifeLineBorderColor black
 
 autonumber
 WebClient -> CartService : HTTP POST api.sahara.com/v1/cart
+note left: Token: 3405691582
 CartService -> Database : Update cart
 CartService ->x WebClient : HTTP Response 200
 WebClient -> CartService : HTTP POST api.sahara.com/v1/cart
-CartService -> Database : Update cart
-CartService ->x WebClient : HTTP Response 200
+note left: Token: 3405691582
+CartService ->x WebClient : HTTP Response 409
 
 @enduml
