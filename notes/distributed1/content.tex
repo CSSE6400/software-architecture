@@ -28,7 +28,7 @@ A system with multiple components located on \textsl{different machines} that co
 
 \section{Simplicity}
 We said that a service-based architecture was simple `for a distributed system'.
-This stipulation is doing a lot of heavily lifting.
+This stipulation is doing a lot of heavy lifting.
 It can be easy to forget given the wide-spread usage and demand for distributed systems that they are not simple.
 % There is a range of complexity in ensuring that distributed systems work well together.
 % Let's brainstorm some intuitive reasons why getting two or more machines to work together might be challenging.
@@ -53,17 +53,17 @@ We omit the eighth fallacy as its relevance to the concerns of modern developers
 \subsection{The Network is Reliable}
 The first fallacy assures us that the network is reliable.
 Developers like to believe that this is a fact which can be relied upon but networks are certainly not reliable.
-They are more reliable than they use to be but they are far from reliable.
+They are more reliable than they used to be but they are far from reliable.
 
 Often we are quite capable of remembering this requirement in obviously unreliable contexts.
 For example, building a mobile application,
-it is easy enough to remember that the mobile will occasionally leave the WiFi and we should plan for that.
+it is easy enough to remember that the mobile will occasionally lose a WiFi connection and we should plan for that.
 Developers can often get the client-server connection correct but neglect server-server connections,
 assuming they are reliable.
 
 When building distributed systems which need to communicate with each other,
 we often assume that the connection between servers will always be reliable.
-However, even in the most tightly controlled network we can not guarantee that no packets will be dropped.
+However, even in the most tightly controlled network we cannot guarantee that no packets will be dropped.
 It is important to remember that the reliability of network communication is a fallacy and that we need to build-in error handling between any two machines.
 We will see later in our distributed systems series that processing network errors can be extremely challenging.\footnote{\url{https://youtu.be/IP-rGJKSZ3s}}
 
@@ -95,7 +95,7 @@ it is important to be mindful to not be wasteful with the size of data communica
 Externally bandwidth usage comes at the cost of the end-user and the budget.
 End-users suffer when bandwidth usage of an application is high,
 not all users have access to high bandwidth connections, particularly those in developing nations.
-There is also a cost on the developers end as infrastructure providers charge for external bandwidth usage.
+There is also a cost on the developers end, as infrastructure providers charge for external bandwidth usage.
 
 \subsection{The Network is Secure}
 Developers occasionally assume that VPCs, firewalls, security groups, etc. ensure security.
@@ -103,7 +103,7 @@ This is not the case.
 The moment a machine is connected to the internet it is vulnerable to a whole range of attacks.
 Known and unknown vulnerabilities enable access bypassing network security infrastructure.
 Injection attacks are still prominent;
-if a distributed system doesn't have multiple authentication checkpoints then an injection attack on one insecure machine can compromise the entire system.
+if a distributed system does not have multiple authentication checkpoints then an injection attack on one insecure machine can compromise the entire system.
 We tend to incorrectly assume we can trust the machines within our network,
 and this trust is a fallacy.
 
@@ -120,7 +120,7 @@ If network topology changes in such a way that latency is increased between mach
 This is a fallacy which is encountered infrequently but it is worth pointing out.
 Imagine you have an application deployed on AWS.
 To prevent an overly eager graduate developer from taking down your application,
-your build pipeline doesn't run on the weekend.
+your build pipeline does not run on the weekend.
 Sunday afternoon you start getting bug reports.
 Users online are unhappy.
 Your manager is unhappy.
@@ -141,7 +141,7 @@ When architecting a system it can easy to get carried away with building beautif
 However, we need to be mindful that this costs money.
 Distributed systems cost far more than monolithic applications.
 Each RPC or REST request translates to costs.
-We should also mention that under-utilized machines cost money.
+We should also mention that under-utilised machines cost money.
 Distributing our application services can seem like a beautiful deployment solution but if you are running 10 different service machines for an application with 100 users,
 you are burning money both hosting the machines and communicating between them. 
 
@@ -199,11 +199,11 @@ One approach is to duplicate and distribute the original system.
 If we duplicate our software across two machines then we have halved our risk of the system going completely down.%
 \footnote{In a simple ideal world.}
 If we replicate our software across thousands of machines then the likelihood of a complete system failure due to a hardware failure is negligible.
-Google doesn't go down over a hardware failure.
-We can imagine that the Google servers have many hardware failures per day but this doesn't cause an outage.
+Google does not go down over a hardware failure.
+We can imagine that Google servers have many hardware failures per day but this does not cause an outage.
 
 This gives us one very important motivation for creating distributed systems,
-to ensure that our software system is \textsl{reliable}.
+to ensure that our software system is \textit{reliable}.
 
 % \section{Distributed Architecture}
 
@@ -217,7 +217,7 @@ to ensure that our software system is \textsl{reliable}.
 % \subsection{Communication happens}
 
 \section{Scalability}
-Thus far we have foreshadowed a number of the complexity inherit to distributed systems,
+Thus far we have foreshadowed a number of the complexities inherit to distributed systems,
 we have also reasoned that somewhat counter-intuitively distributing our system can offer us greater overall reliability.
 Finally, let us shallowly explore the ways cloud platforms can offer us reliable systems via replication.
 
@@ -232,15 +232,15 @@ this is different from the desired capacity as instances take time to spin up an
 The desired capacity can be based on metrics such as CPU usage, network usage, disk space, etc. configured via the scaling policy.
 We should also specify minimum and maximum capacity.
 Our minimum capacity prevents spinning down too many instances when load is low, 
-for example we don't want to have zero actual capacity as a user will need to wait for an instance to spin up to use the service.
+for example we do not want to have zero actual capacity as a user will need to wait for an instance to spin up to use the service.
 Likewise the maximum capacity prevents over-spending when load is high.
 
 \subsection{Health Checks}
 
-In addition to using auto-scaling to respond to dynamic load we can utilize health checks to ensure all running instances are functional.
+In addition to using auto-scaling to respond to dynamic load we can utilise health checks to ensure all running instances are functional.
 Health checks allow us to build reliable software.
-A health check is a user specified method for the auto-scaling to check an instance is healthy.
-When a health check identifies that an instance is not healthy it will spin the instance down and replace it with a new healthy instance.
+A health check is a user specified method for the auto-scaling to check if an instance is healthy.
+When a health check identifies that an instance is not healthy, it will spin the instance down and replace it with a new healthy instance.
 
 \subsection{Load-balancing}
 
