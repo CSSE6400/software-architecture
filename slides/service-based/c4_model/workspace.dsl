@@ -1,3 +1,4 @@
+# Downloaded from structurizr workspace.
 workspace "Sahara eCommerce" "An example Service-Based Architecture." {
     model {
         # Actors
