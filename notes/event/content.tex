@@ -6,45 +6,33 @@
 
 \section{Introduction}
 
-Event-driven is an asychronous architectural style.
+Event-driven is an asynchronous\footnote{Asynchronous means that actions can take place in parallel.} architectural style.
 It reacts to events, which is different to the common view of many systems that respond to requests.
-In the Sahara eCommerce example, a customer \emph{requests} to view a product's details.
+The service-based architecture example for the Sahara eCommerce system is designed to process requests.
+A customer \emph{requests} to view a product's details through a REST API and receives a response with the result.
 Similarly, a customer adding a product to their shopping cart is another request.
+
 An event could be a scenario where Sahara held auctions and customers could bid for products.
-Receiving a bid is an \emph{event} to which the system needs to respond.
-Multiple customers could be bidding on the same item at the same time.
-Each could make bids of different amounts.
-The system needs to respond to a bid event by comparing it to other bids received at the same time to determine which is the highest bid.
+A customer would send a message to the Sahara eCommerce system initiating the \emph{event} of making a bid.
+Upon receiving the bid event, the system would process the bid.
+This would involve checking the bid against the current high bid and dealing with multiple customers bidding on the same item at the same time.
+Each customer's bid may be for different amounts.
+The system needs to determine the new high bid, and if there were concurrent bids, which is the highest bid.
+The system would then notify all bidders of the new high bid.
 
-It provides good support for delivering quality attributes of modularlity, availability, deployability, and simplicity (in the context of a distributed system).
-The key characteristic of a service-based architecture is that it uses domain partitioning, and each domain becomes its own distributed service.
-This partitioning provides high-level modularisation that helps ensure the domain partitions are independent of each other.
-The distribution of domains means that multiple instances of a service can be made available through a load balancer,
-providing better availability and some level of scalability.
+Events provide a mechanism to manage asynchronous communication.
+An event is sent to be handled, and the sender can continue with other tasks while the event is being processed.
+If necessary, the handler can send a message back to the sender indicating the result of the event processing.
 
-Many medium-sized bespoke systems\footnote{\emph{Bespoke systems} are custom designed and built for a single organisation.}
-are built using a service-based architecture.
-For example, an on-line store might be partitioned into services such as ProductBrowsing,
-ProductPurchasing, ProductFulfilment, InventoryManagement, and CustomerAccountManagement.
-Each of these could be independent distributed services that use a shared database.
-
-\vspace{2mm}
-\begin{definition}[Service-based Architecture]
-    The system is partitioned into business domains that are deployed as distributed services.\\
-    Functionality is delivered through a user interface that interacts with the domain services.
-\end{definition}
-
-\begin{figure}[h!]
-    \begin{adjustwidth}{-7.5mm}{-7.5mm}
-        \centering
-        \includegraphics[trim=39 43 19 44,clip,width=0.95\paperwidth]{diagrams/general-service-based-arch.png}
-    \end{adjustwidth}
-    \caption{Service-based architecture -- general structure.}
-    \label{fig:service-based-arch}
-\end{figure}
+There are two basic approaches to implementing an event-driven architecture.
+The terminology is that these are different \emph{topologies}, as they have different high-level structures.
+The \emph{broker topology} is the simpler of the two and is optimised for performance, responsiveness, scalability, extensibility, and low coupling.
+The \emph{mediator topology} is more complex but is designed to provide reliability, process control, and error handling.
 
 
-\section{Terminology}
+\section{Broker Topology}
+
+\subsection{Terminology}
 
 The service-based architecture consists of four elements.
 The \emph{user interface}, \emph{services}, \emph{service APIs}, and \emph{database}, as shown in figure \ref{fig:service-based-arch}.
@@ -119,13 +107,13 @@ For example, the ProductPurchasing service domain may have components for the in
 payment and inventory adjustment. Payment would use an API to process payment through a financial service gateway.
 Figure \ref{fig:service-partitions} provides an example of the structure for both technical and domain partitioning of a service.
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[trim=38 38 19 45,clip,width=\textwidth]{diagrams/service-partitions.png}
-    \vspace{-10pt}
-    \caption{Partitioning options for a service domain.}
-    \label{fig:service-partitions}
-\end{figure}
+%\begin{figure}[h!]
+%    \centering
+%    \includegraphics[trim=38 38 19 45,clip,width=\textwidth]{diagrams/service-partitions.png}
+%    \vspace{-10pt}
+%    \caption{Partitioning options for a service domain.}
+%    \label{fig:service-partitions}
+%\end{figure}
 
 Consequences of a shared database are increased data coupling between the services and lower testability.
 Increased data coupling means that if one service changes its persistent data,
@@ -141,16 +129,6 @@ Changes may only occur after consideration of the consequences to all services.
 A variation is to not only have shared persistent objects,
 but other persistent objects that are only shared with a subset of services.
 
-Each service may have its own set of persistent objects and corresponding database tables.
-These are independent of other services, so there are no external consequences to changing these within a service.
-Figure \ref{fig:db-logical-partitioning} is an example of shared persistent objects and a service with its own persistent objects.
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[trim=37 37 20 44,clip,width=0.61\textwidth]{diagrams/db-logical-partitioning.png}
-    \caption{Database logical partitioning example.}
-    \label{fig:db-logical-partitioning}
-\end{figure}
 
 \section{Service-Based Principles}
 There are a couple of principles which should be maintained when designing a service-based architecture
@@ -188,14 +166,14 @@ The first variation  we will consider is to have separate databases for each ser
 This extends the idea of logical partitioning your database, as described in section \ref{sec:design-considerations}.
 Figure \ref{fig:separate-dbs} shows a few options of how this can be implemented.
 
-\begin{figure}[h!]
-    \begin{adjustwidth}{-5mm}{-5mm}
-        \centering
-        \includegraphics[trim=39 42 18 48,clip,width=0.92\paperwidth]{diagrams/separate-dbs.png}
-    \end{adjustwidth}
-    \caption{Separate databases example.}
-    \label{fig:separate-dbs}
-\end{figure}
+%\begin{figure}[h!]
+%    \begin{adjustwidth}{-5mm}{-5mm}
+%        \centering
+%        \includegraphics[trim=39 42 18 48,clip,width=0.92\paperwidth]{diagrams/separate-dbs.png}
+%    \end{adjustwidth}
+%    \caption{Separate databases example.}
+%    \label{fig:separate-dbs}
+%\end{figure}
 
 In figure \ref{fig:separate-dbs}, there is a shared database that contains the entity data that is shared across services.
 Service 1 and 2 are deployed on separate servers but share a single database server that hosts different tables for each service.
@@ -212,79 +190,6 @@ A separate database server for some or all services provides greater flexibility
 if database performance is likely to become a bottleneck for the service.
 Running an independent database on the same server as the service provides easier communication with the database
 and may suit cases where an independent database is useful but it is not large enough to warrant to run on its own server.
-
-\subsection{Separate User Interfaces}
-
-A similar variation can be applied to the user interface, so that there are separate user interfaces for some services.
-This allows separate interfaces to be implemented for different user interface domains
-(e.g. standard users, power users, administrators, ...).
-Figure \ref{fig:separate-uis} shows some options of how this can be implemented.
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[trim=40 42 19 45,clip,width=0.9\textwidth]{diagrams/separate-uis.png}
-    \caption{Separate user interfaces example.}
-    \label{fig:separate-uis}
-\end{figure}
-
-In figure \ref{fig:separate-uis}, there is one user interface that interacts with two services,
-like the single interface in the general structure shown in figure \ref{fig:service-based-arch}.
-There are then two interfaces that interact with service 3.
-A benefit of the service API is that it allows multiple interfaces to be implemented to work with the backend services.
-
-\subsection{API Layer}
-
-It is possible to place an API layer between the user interface and the services,
-as shown in figure \ref{fig:api-layer}.
-The API layer is a reverse proxy or gateway that provides access to the services,
-while hiding details of the services.
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[trim=39 37 21 42,clip,width=0.85\textwidth]{diagrams/api-layer.png}
-    \caption{API layer separating the user interface from services.}
-    \label{fig:api-layer}
-\end{figure}
-
-If any domain services are used by external systems, a reverse proxy hides the internal network structure of your system's architecture.
-This extra layer of abstraction means that you can expose a different interface to external systems than to internal systems.
-This can help deliver the security principle of least privilege.
-
-The API layer allows the implementation of \emph{cross-cutting} concerns to be separated from the user interface.
-For example security policies, user access logging, or service discovery could be implemented in the API layer.
-
-Service discovery allows new services to be registered and provides a mechanism for clients to ``discover'' the new services.
-The API layer would provide an interface that allows services to be registered, including information about their interface.
-The API layer would also provide an interface to clients that allows them to query what services are available
-and to retrieve an interface that the client can use to access the service through the API layer.
-
-The API layer can also perform load balancing by delegating service requests to different servers running the same domain service.
-
-
-\section{Service Oriented Architecture}
-
-Service Oriented Architecture (SOA) is an extension of service-based architecture.
-In SOA, each service implements a single business process and provides one or more interfaces that allow access to its functionality.
-The primary purpose of the API layer is to provide a robust service discovery platform and to implement security policies.
-Systems are implemented by integrating a set of services to deliver the required functionality.
-Consequently, the user interface is part of the system being implemented and not part of the service architecture.
-SOA requires each service to be independent of the others, including very low data coupling.
-Typically in SOA, each service would have its own database.
-
-SOA sounds like a good idea, but in practice many organisations made compromises that neutered much of the expected benefits.
-Business processes are often not perfectly independent and there is often data dependencies between processes.
-If these dependencies are not managed well, the services are not independent.
-This results in services having to be used together, which reduces their reusability and composability.
-
-Another common issue was a poor service discovery implementation.
-One problem was that the mechanism to discover new services required too much knowledge about the services.
-This results in the clients needing to know the services, before they can discover them.
-Another problem was poor interface design, that caused dependencies on some implementation details of the services.
-
-Microservices were designed to deliver the promised benefits of SOA without some of the implementation issues.
-In particular, microservices deliver much smaller elements of functionality, reducing the possibility of tight coupling between services.
-There are challenges in designing and delivering microservices to achieve the benefits.
-These will be explored later in the course.
 
 
 \section{Conclusion}
