@@ -35,7 +35,7 @@ This week our goal is to:
 }
 
 \warning{
-  \textbf{DELETE LAST WEEKS RDS INSTANCES}
+  \textbf{DELETE LAST WEEK'S RDS INSTANCES}
 }
 
 \section{Communication}
@@ -56,12 +56,12 @@ primitive data is wrapped up into useful packages: objects.
 If we want this information to escape the confines of our programming language runtime,
 we need to package it up in a language-independent format.
 For a format to be language-independent we just need many languages to implement an encoding and decoding mechanism for the format.
-We have a number of language-independent formats available but a few defacto standards.
+We have several language-independent formats available but a few defacto standards.
 
 \subsection{XML}
 Extensible Markup Language (XML) is one of the most widely used language-independent formats.
 The use cases of XML are extensive,
-it's the \link{foundation for many popular utilities}{https://en.wikipedia.org/wiki/List_of_XML_markup_languages},
+it is the \link{foundation for many popular utilities}{https://en.wikipedia.org/wiki/List_of_XML_markup_languages},
 such as SVG file formats, SAML authentication, RSS feeds, and ePub books.
 
 \begin{code}[language=xml]{csse6400.xml}
@@ -167,8 +167,8 @@ It is not a commonly used standard anymore.
 
 \subsection{SOAP}
 After XML-RPC came SOAP.
-SOAP was impactful for service-oriented (now microservice) architectures but has largely fallen out of favor in-place of REST APIs.
-We do not cover SOAP in any meaningful depth due to it's increasing irrelevance and complexity.
+SOAP was impactful for service-oriented (now microservices) architectures but has largely fallen out of favour in-place of REST APIs.
+We do not cover SOAP in any meaningful depth due to its increasing irrelevance and complexity.
 
 \subsection{REST}
 REST is not a standard like SOAP once was,
@@ -197,12 +197,12 @@ Whereas REST/SOAP APIs are Create Read Update Delete (CRUD) based for providing 
 \subsection{GraphQL}
 GraphQL is a query language which allows more dynamic querying of data than REST based APIs.
 You can create nested queries and specify the fields you want to receive in response.
-GraphQL APIs are well-suited for building APIs designed for developers to consume but when dealing with rigid inter-service based request,
+GraphQL APIs are well-suited for building APIs designed for developers to consume but when dealing with rigid inter-service based requests,
 REST APIs are generally preferable.
 
 \subsection{gRPC}
 Another RPC framework, gRPC has started gaining a lot of attention since its first release in 2016.
-gRPC is based on protobuf communication standard.
+gRPC is based on the protobuf communication standard.
 In addition to a more type-safe system,
 gRPC based APIs provide authentication and streaming mechanisms.
 
@@ -213,7 +213,7 @@ Recall that we deployed a MySQL database on RDS and an EC2 instance which acted 
 The Docker container connected to the database and handled CRUD requests via a REST API.
 The Docker container was also responsible for serving static content.
 In this practical, we will explore two approaches to better scale our application.
-We assume that you have last weeks practical setup in Terraform, if not, do that now.
+We assume that you have last week's practical setup in Terraform, if not, do that now.
 
 \warning{
   The Docker image from last week has moved to
@@ -222,7 +222,7 @@ We assume that you have last weeks practical setup in Terraform, if not, do that
 }
 
 \subsection{Scaling EC2}
-As we've now seen in the lectures,
+As we have now seen in the lectures,
 cloud platforms such as AWS offer useful techniques for scaling our systems.
 Our first task for the practical will be to use an auto-scaling group and a load balancer to double our compute capacity.
 Our desired deployment diagram is shown in Figure \ref{fig:scale}.
@@ -234,7 +234,7 @@ Our desired deployment diagram is shown in Figure \ref{fig:scale}.
 \end{figure}
 
 In order to give you practice developing Terraform independently,
-we will not distribute Terraform configuration for this exercise.
+we will not distribute a Terraform configuration for this exercise.
 Instead we will provide an outline of what is required with links as appropriate.
 
 \begin{enumerate}
@@ -272,7 +272,7 @@ data "aws_subnet_ids" "nets" {
 The EC2 instance is responsible for:
 \begin{enumerate}
   \item allowing users to download the client-side HTML and Javascript frontend; and
-  \item providing a REST API the client talked to in order to access persistent data.
+  \item providing a REST API the client talks to in order to access persistent data.
 \end{enumerate}
 This means that each time the client opens the website they will need to download the frontend and make all subsequent requests to the same instance.
 This does not scale well.
@@ -302,7 +302,7 @@ To do this,
 update your docker image to be \textsl{v0.9.1} instead of \textsl{combined-latest},
 i.e. \texttt{ghcr.io/csse6400/todo-app:v0.9.1}
 If you try to access this updated EC2 instance, 
-you should be prompted with `Hey!, if you see this page then the ALB probably isnt working :('.
+you should be prompted with `Hey!, if you see this page then the ALB probably isn't working :('.
 
 \subsection{Deploying an S3 Bucket}
 We now want to deploy our static HTML to an S3 bucket.
@@ -313,7 +313,7 @@ Our single HTML file for the web application is released via GitHub releases, av
 \noindent The following steps provide an outline for deploying the static website to S3.
 
 \begin{enumerate}
-  \item Terraform bucket names much be unique lowercase and without special characters.
+  \item Terraform bucket names must be unique lowercase and without special characters.
   
   \url{https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string}
 
@@ -334,7 +334,7 @@ Our single HTML file for the web application is released via GitHub releases, av
   \url{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_website_configuration}
 \end{enumerate}
 
-\noindent Once you are getting permission denied,
+\noindent Once you get a permission denied error,
 attach the policy below to allow access using \link{\texttt{s3\_bucket\_policy}}{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy}
 
 \begin{code}[language=terraform]{}
@@ -356,7 +356,7 @@ data "aws_iam_policy_document" "website_policy" {
 \end{code}
 
 This should give you an S3 bucket which, when accessed,
-will fail to connect to the backend with a 404.
+will fail to connect to the backend with a 404 error.
 This occurs because it is looking on the S3 bucket server for the backend.
 
 One approach to this problem would be to configure the frontend to know which server to talk to for the backend.
@@ -371,7 +371,7 @@ Our desired state is shown in Figure \ref{fig:s3deployment}.
 \end{figure}
 
 That is all from us,
-the implementation of the CloudFront service in from of your S3 Bucket and Load Balancer is now up to you to discover.
+the implementation of the CloudFront service in front of your S3 Bucket and Load Balancer is now up to you to discover.
 This type of deep-dive into the Terraform documentation will be extremely useful for your upcoming assignment.
 Best of luck!
 
