@@ -62,7 +62,7 @@ resource "aws_security_group" "todoapp-database" {
 module "todoapp-backend" {
   source = "git::https://github.com/CSSE6400/terraform//container"
   
-  image = "ghcr.io/csse6400/todo-app:latest"
+  image = "ghcr.io/csse6400/todo-app:combined-latest"
   instance_type = "t2.micro"
   environment = {
     APP_ENV="local"
