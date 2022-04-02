@@ -34,13 +34,15 @@
 \end{center}
 }
 
-\point[Things start going wrong]{What is the likely cause?}
+\question{What is the \highlight{problem}?}
 
 \point[Database]{
 \begin{center}
 \includegraphics[width=\textheight]{diagrams/FocusDB}
 \end{center}
 }
+
+\point[Disclaimer]{This is \highlight{not} a database course.}
 
 
 %%%%%%%%%%%%%%%
@@ -90,13 +92,113 @@
     \highlight{Synchronous} vs. \highlight{Asynchronous}
 }
 
-\point[When things go wrong]{
-    Handling outages
+\point[Synchronous propagation]{
+    Writes must propagate to \highlight{all followers} before being successful.
 }
 
-\point{Follower failure}
+\point[Synchronous propagation]{
+    \highlight{Any} replica goes down, \highlight{all} replicas are un-writable.
+}
 
-\point{Leader failure}
+\point[Synchronous propagation]{
+    Writes must \highlight{wait} for propagation to all replicas.
+}
+
+\point[Asynchronous propagation]{
+    Writes \highlight{don't} have to \highlight{wait} for propagation.
+}
+
+\point[Asynchronous propagation]{
+    If the leader goes down before propagating, the \highlight{write is lost}.
+}
+
+\point[Asynchronous propagation]{
+    Replicas can have out-dated or \textsl{stale} data.
+}
+
+\todo{There could be content here about handling node failures}
+
+% \point[When things go wrong]{
+%     Handling outages
+% }
+
+% \point{Follower failure}
+
+% \point{Leader failure}
+
+\point[The time taken for replicas to update their stale data is]{Replication Lag}
+
+\point[Eventually, all replicas must become consistent]{
+    The system is \highlight{eventually consistent}
+}
+
+\point{Read-your-writes Consistency}
+
+\point{Monotonic Reads}
+
+\point{Consistent Prefix Reads}
+
+\point{Solving Replication Lag}
+
+\point{Multi-leader Replication}
+
+\image[height=\textheight]{diagrams/MultiLeader}
+
+\point[Multi-leader Replication]{Use Cases}
+
+\note[itemize]{
+    \item Multiple datacenters
+    \item Offline writing
+}
+
+\point[Multi-leader Replication]{Problems}
+
+\point[Parallel writes introduce]{Write conflicts}
+
+\point[Where possible]{Avoid write conflicts}
+
+\point[Where impossible]{Convergence}
+
+\note[itemize]{
+    \item Unique ID of writes
+    \item Unique ID of replicas
+    \item Simple merging strategies
+    \item Explicit handling of conflicts
+}
+
+\point[Cutting Edge]{Automatic Conflict Resolution}
+
+\point{Leaderless Replication}
+
+\note[itemize]{Dynamo-style}
+
+\image{diagrams/Leaderless}
+
+\point[How are changes propagated?]{
+    \begin{itemize}
+        \item Read Repair
+        \item Anti-entropy Process
+    \end{itemize}
+}
+
+\questionanswer{How do a know it is consistent?}{Quorum Reads and Writes}
+
+\todo{An example}
+
+\definecolor{eq1}{RGB}{227, 206, 116}
+\definecolor{eq2}{RGB}{227, 116, 137}
+
+\point[Quorum Consistency]{
+\begin{equation*}
+\textcolor{eq1}{w} + \textcolor{eq2}{r} > \textcolor{focus}{n}
+\end{equation*}
+\Large
+\begin{description}
+    \item[$\textcolor{focus}{n}$] total replicas
+    \item[$\textcolor{eq1}{w}$] amount of replicas to {\color{eq1}\textsl{write}} to
+    \item[$\textcolor{eq2}{r}$] amount of replicas to {\color{eq2}\textsl{read}} from
+\end{description}
+}
 
 %%%%%%%%%%%%%%%%
 % Partitioning %
