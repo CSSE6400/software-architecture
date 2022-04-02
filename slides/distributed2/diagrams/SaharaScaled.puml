@@ -1,0 +1,91 @@
+@startuml SaharaScaled
+
+' left to right direction
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!include DEVICONS/laravel.puml
+!include DEVICONS/javascript.puml
+!include DEVICONS/mysql.puml
+!include DEVICONS/chrome.puml
+
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v11.1/dist
+!includeurl AWSPuml/AWSCommon.puml
+!includeurl AWSPuml/Database/RDS.puml
+!includeurl AWSPuml/Compute/EC2.puml
+!includeurl AWSPuml/Compute/EC2AutoScaling.puml
+!includeurl AWSPuml/NetworkingContentDelivery/ElasticLoadBalancing.puml
+!includeurl AWSPuml/Storage/SimpleStorageService.puml
+' make orange
+AddContainerTag("AWS", $borderColor="#ff9900", $bgColor="#ffffff", $fontColor="#000000")
+
+AddContainerTag("browser", $bgColor="#bcddfc", $fontColor="#000000")
+AddContainerTag("database", $bgColor="#ccfddd", $fontColor="#000000", $borderColor="#cccccc")
+
+skinparam roundcorner 20
+skinparam Padding 20
+
+
+UpdateElementStyle(node, $borderColor="#cccccc", $fontColor="#5c5c5c")
+UpdateElementStyle(container, $bgColor="#5388cb")
+
+hide stereotype
+
+
+Deployment_Node(computer, "Customers Computer", "Deployment Node: MS Windows, Apple MacOS or Linux") {
+    Deployment_Node(browser, "Web Browser", "Deployment Node: Chrome, Firefox, Safari or Edge") {
+        Container(web_page, "Interactive Web Pages", "Container: JSF & JavaScript", "Provides the environment in which customers can view producsts.", $tags="browser")
+    }
+}
+
+Deployment_Node(sahara, "Sahara", "Deployment Node: Sahara eCommerce Data Centre") {
+
+    Deployment_Node(web_server, "Web Server", "Deployment Node: Ubuntu 20.04 LTS") {
+        Deployment_Node(apache, "Apache TomEE", "Deployment Node: Apache TomeEE 8.0") {
+            Container(web_application, "Web Application", "Container: J2EE Server", "Delivers web front-end for the on-line store.")
+        }
+    }
+
+    Deployment_Node(lb, "Load Balancer", $sprite="EC2AutoScaling,color=#ff9900", $tags="AWS") {
+
+    }
+
+    Deployment_Node(scale, "Auto-scaling Group", "Desired Capactiy: 4", $sprite="EC2AutoScaling,color=#ff9900", $tags="AWS") {
+    Deployment_Node(product_browsing_server, "Product Browsing Server", "Deployment Node: Ubuntu 20.04 LTS & Java 17 LTS") {
+        Container(product_browsing, "Product Browsing", "Container: Java", "Provides backend logic for browsing or searching for products.")
+    }
+    }
+
+    Deployment_Node(product_purchasing_server, "Product Purchasing Server", "Deployment Node: Ubuntu 20.04 LTS & Java 17 LTS") {
+        Container(product_purchasing, "Product Purchasing", "Container: Java", "Provides backend logic for purchasing products.")
+    }
+
+    Deployment_Node(customer_account_server, "Customer Account Server", "Deployment Node: Ubuntu 20.04 LTS & Java 17 LTS") {
+        Container(customer_account, "Customer Account Management", "Container: Java", "Provides backend logic for customer account management.")
+    }
+
+    Deployment_Node(product_fulfillment_server, "Product Fulfillment Server", "Deployment Node: Ubuntu 20.04 LTS & Java 17 LTS") {
+        Container(product_fulfillment, "Product Fulfillment", "Container: Java", "Provides backend logic for fulfilling products.")
+    }
+
+    Deployment_Node(application_database_server, "Application Database Server", "Deployment Node: Ubuntu 20.04 LTS") {
+        Deployment_Node(mysql, "MySQL Primary", "Deployment Node: MySQL 8.0") {
+            ContainerDb(db, "Application Database", "Container: MySQL", "Stores customer credentials, products, and orders.", $tags="database")
+        }
+    }
+}
+
+Rel_L(web_application, web_page, "Delivers content to the customers browser.", "HTTPS")
+Rel(web_application, lb, "Find & Retrieve Product Details", "RMI")
+Rel(lb, product_browsing, "Route Request")
+Rel(web_application, product_purchasing, "Purchase Products", "RMI")
+Rel(web_application, customer_account, "CRUD Customer Accounts", "RMI")
+Rel(web_application, product_fulfillment, "Query Order Status", "RMI")
+
+Rel(product_browsing, db, "Find Products", "JPA")
+Rel(product_purchasing, db, "Updates & Queries", "JPA")
+Rel(customer_account, db, "Updates & Queries", "JPA")
+Rel(product_fulfillment, db, "Updates", "JPA")
+
+@enduml

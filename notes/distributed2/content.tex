@@ -1,26 +1,218 @@
-\title{Distributed Computing II}
+\title{Distributed Systems II}
 \author{Brae Webb}
 \date{\week{6}}
 
 \maketitle
 
-\section{Scalable Software}
+\section{Introduction}
+In the previous course notes \cite{distributed1-notes} and lecture \cite{distributed1-slides} on distributed systems,
+we explored how to leverage distributed systems to increase the reliability and scalability of a system.
+Specifically, we saw that when working with stateless services which do not require persistent data,
+auto-scaling groups and load-balancers can be used to scale-out the service --- distributing the load to arbitrary copies of the service.
+In the lecture, we applied this technique to the product browsing service of our Sahara example,
+as illustrated in Figure \ref{fig:scaled-sahara}.
 
-\subsection{Scaling Up}
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.72\textwidth]{diagrams/SaharaScaled}
+\end{center}
+\caption{A service-based implementation of Sahara with stateless scaling techniques applied to the product browsing service.}
+\label{fig:scaled-sahara}
+\end{figure}
 
-\subsection{Scaling Out}
+One might correctly identify that by scaling the product browsing service,
+we have only increased the maximum load that the database can expect.
+The database becomes a major bottle-neck.
+We might attempt to scale-up the database,
+purchasing more powerful machines to host the database on,
+but this approach is limited.
 
-\section{Load Balancing}
+In this part of our distributed systems series,
+we look at how to scale stateful services which \textsl{do} require persistent data.
+We focus on state stored in a database and thus,
+how databases can be made more reliable and scalable.
+In these lecture notes we only outline the scope of our treatment of database scaling.
+For a detailed treatment of these topics,
+please refer to the Designing Data-Intensive Applications textbook \cite{data-intensive}.
 
 \section{Replication}
-\subsection{Leaders and Followers}
+Replication is the most straight-forward approach to scaling databases.
+In most applications,
+read operations occur much less frequently than write operations,
+in such cases replication can enable improved capacity for read operations whilst keeping the write capacity roughly equivalent.
+Replication involves creating complete database copies,
+called replicas,
+that reduce the load on any single replica.
+
+\subsection{Leader and Followers}
+The most common implementation of replication is leader-follower replication,
+fortunately, it is also the simplest.
+
+\begin{description}
+    \item[Leader] a replica that accepts write operations and define the order in which writes are applied.
+    \item[Follower] replicas are read-only copies of the data. 
+\end{description}
+
+\noindent
+When writes occur, they must be sent to the leader replica.
+Leader replicas propagate updates to all followers.
+Read operations may occur on any of the follower replicas.
+
+For our example,
+we might create two followers, or read replicas,
+of the Sahara database.
+As the product browsing service is likely to primarily perform read queries,
+it may send those requests to one of the read replicas.
+Write operations, which are likely to be the majority for the product purchasing service,
+must still be sent to the lead replica%
+\footnote{Realistically, queries would be forwarded based on their type rather than their service of origin.}.
+The resulting system might look like Figure \ref{fig:sahara-leader-follower}.
+
+\begin{figure}[H]
+    \begin{center}
+    \includegraphics[width=0.9\textwidth]{diagrams/LeaderFollowerSpread}
+    \end{center}
+    \caption{A leader-follower replication of the Sahara database.}
+    \label{fig:sahara-leader-follower}
+\end{figure}
+
+\subsubsection*{Replication Lag}
+
+For leader-follower replication to be practical,
+write updates from the leader to the followers need to be \textsl{asynchronous}%
+\footnote{We need not wait for writes to propagate to all followers before accepting that a write has succeeded}.
+However, asynchronous propagation introduces an entirely new suite of issues.
+If we do not wait for write updates to be propagated to all replicas,
+then there will be times where the data retrieved from a read replica will be out-dated, or \textsl{stale}.
+Eventually, all writes will be propagated to every read replica,
+so we call this an \textsl{eventually consistent} system.
+
+We have grown fairly accustomed to eventually consistent systems.
+Consider the last time you or a friend of yours updated their display picture.
+Did everyone start seeing the updated picture immediately, or,
+did it take a number of hours or even days to propagate through?
+Despite our increased exposure to eventually consistent systems,
+there are a few common practices to keep in mind when implementing such a system to preserve your users sanity.
+
+\begin{description}
+    \item[Read-your-writes Consistency] Ensures that the user who wrote the database change will always see their update reflected, though other users will still have to wait for the change to be propagated. This type of consistency avoids upsetting users and making them think they must redo their write.
+    \item[Monotonic Reads] Ensures that once a user reads the updated data, they do not later see the older version of the data, i.e. they don't travel back in time.
+    \item[Consistent Prefix Reads] Ensures that sequential writes are always read in the same order. Consider a Twitter feed, each post is a write. Consistent Prefix Reads guarantees that those readers do not see the posts out of order.
+\end{description}
 
 \subsection{Multi-leader Replication}
-\subsubsection{Conflict Resolution}
 
-\subsection{Leaderless}
+Leader-follower replications are sufficient for most use cases as reads often occur far more frequently than writes.
+However, there are situations where leader-follower replication is insufficient.
+For systems which need to be highly available,
+having a single point of failure,
+the leader replica, is not good enough.
+Likewise, for systems which need to be highly scalable,
+a write bottle-neck is also insufficient.
+For these situations, a multi-leader replication scheme may be appropriate.
+It is worth noting that multi-leader replications introduce complexity that often outweighs the value.
 
-\section{Partitioning/Sharding}
+\begin{figure}[ht]
+    \begin{center}
+    \includegraphics[width=0.8\textwidth]{diagrams/MultiLeader}
+    \end{center}
+    \caption{A multi-Leader replication of the Sahara database.}
+    \label{fig:sahara-multi-leader}
+\end{figure}
+
+For our example,
+we might naively introduce a system such as Figure \ref{fig:sahara-multi-leader}.
+Here we have introduced a second leader,
+and each leader has their own follower.
+This type of separation might make sense.
+We might find it beneficial to have a separate database replica in the warehouse which can be interacted with via the fulfillment service.
+Such a system would isolate the warehouse operations team from the potential latency of the external customer load.
+
+However, we now have a system where writes can occur in parallel.
+This can cause several problems.
+Consider a situation where the fulfillment center has noticed a defective \href{https://www.amazon.com.au/dp/B09LYDDDR1}{Nicholas Cage Reversible Pillow}.
+They promptly update their system to reflect the decreased stock.
+However, at around the same time,
+the CSSE6400 tutors placed a bulk order for all of Sahara's remaining stock.
+Both write operations appear successful to the fulfillment team and the tutors but a conflict has occurred --- this is known as a \textsl{write conflict},
+and it is a common problem in multi-leader replications. 
+
+\subsubsection*{Write Conflicts}
+Write conflicts occur when two or more leaders in a multi-leader replication have updates to the same piece of data,
+in relational systems this is normally the same table row.
+There are a few mechanisms for resolving write conflicts,
+but the recommended approach is to avoid conflicts altogether.
+Conflicts can be avoided by ensuring that a piece of data is only ever updated by the same leader,
+for example, we might implement that all Nicholas Cage related products are written to Leader Replica 1.
+
+If we are not fortunate enough to be in a situation where conflicts can be avoided,
+there are a few techniques we can use.
+
+\begin{itemize}
+    \item Assign IDs to writes, and decide which conflicting write to accept based on the ID via some strategy (i.e. highest ID). This results in lost data.
+    \item Assign an explicit priority to leader replicas. For example, if there is a merge we might accept Leader Replica 1 as the source of truth. This also results in lost data.
+    \item Merge the values together via some strategy. This works for data such as text documents but is inappropriate for stocks of products.
+    \item Application code resolution. As most conflict resolution is application dependent, many databases allow users to write code which can be executed on write of a conflict or read of a conflict to resolve the conflict, where appropriate our application could even ask the user to resolve the conflict.
+\end{itemize}
+
+\subsection{Leaderless Replication}
+
+Leaderless replication doesn't rely on writes being sent to and processed by a single designated leader, instead reads and writes may be sent to any of the database replicas.
+To accomplish this, leaderless databases introduce a few additional constraints on both read and writes operations to maintain relative consistency.
+
+A core aspect of leaderless replication is that clients need to duplicate both write and read operations to multiple replicas.
+This may be implemented by each client communicating directly with the database replicas,
+as in Figure \ref{fig:sahara-leaderless},
+or one of the replica nodes can act as a coordinator node and forward requests to other database replicas,
+as in Figure \ref{fig:sahara-leaderless-coordinator}.
+
+\begin{figure}[ht]
+    \begin{center}
+    \includegraphics[width=\textwidth]{diagrams/Leaderless}
+    \end{center}
+    \caption{A leaderless replication of the Sahara database.}
+    \label{fig:sahara-leaderless}
+\end{figure}
+
+\begin{figure}[ht]
+    \begin{center}
+    \includegraphics[width=0.6\textwidth]{diagrams/LeaderlessCoordinator}
+    \end{center}
+    \caption{A leaderless replication using a coordinator node of the Sahara database.}
+    \label{fig:sahara-leaderless-coordinator}
+\end{figure}
+
+In leaderless databases,
+any database node may go offline at any point and the system should continue to function, assuming only a few nodes go offline.
+This type of database gives us excellent reliability and scalability as we can keep adding extra replicas to increase our capacity.
+But how can we support this?
+
+\subsubsection*{Quorum}
+
+To support the extensibility of leaderless databases,
+we need to duplicate our read and write requests.
+As a simple example,
+take Figure \ref{fig:sahara-leaderless},
+we have three replicas of our database.
+When making a write request,
+if we send our write to just one replica then at most two replicas can have outdated data.
+Therefore when we read, we need to read from all three replicas to ensure one will have the most recent writes.
+If instead,
+we write to two replicas then at most one replica will have outdated data.
+Then we need only read from two replicas to ensure that at least one will have the most recent writes.
+
+To generalize, if we have a leaderless database of $n$ replicas,
+we need to satisfy that,
+$$
+w + r > n
+$$
+where $w$ is the amount of replicas to write to and $r$ is the amount of replicas to read from.
+By satisfying this equation we have quorum consistency,
+the set of writes and reads must overlap,
+which means that reading stale data is \textsl{unlikely}%
+\footnote{The cases where stale data can still be read are enumerated in M. Kleppmann \cite{data-intensive}.}.
+
+\section{Partitioning (Sharding)}
 
 \subsection{Partition by Primary Key}
 
