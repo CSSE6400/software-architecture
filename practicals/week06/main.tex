@@ -6,7 +6,7 @@
 
 \usepackage{languages}
 
-\title{Monitoring \& Queues}
+\title{Monitoring \& Streams}
 \author{Brae Webb}
 
 \date{\week{6}}
@@ -14,17 +14,24 @@
 
 \maketitle
 
+\begin{figure}[ht]
+  \href{https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/ch11.html}{
+    \includegraphics[width=\textwidth]{images/streams}
+  }
+\caption{A map of stream processing \cite{data-intensive}.}
+\end{figure}
+
 \section{This Week}
 This week our goal is to:
 \begin{itemize}
   \item investigate the various options to perform health-checks on services;
   \item explore the CloudWatch dashboard to monitor our services; and
-  \item deploy an application which processes requests asynchronously using SQS queues.
+  \item run a application which processes requests asynchronously using SQS queues.
 \end{itemize}
 
 
 \section{Health-checks}
-Health-checks are an way to determine whether or not a service is healthy.
+Health-checks are a way to determine whether or not a service is healthy.
 They are a core component to developing reliable and scalable systems.
 Health-checks are utilized by systems that manage collections of service instances,
 such as Kubernetes, Docker-compose, and of course, AWS Auto-scaling Groups.
@@ -51,20 +58,219 @@ When working with AWS it is important to understand what CloudWatch can be used 
 \info{
   For the cloud assignment,
   we will be be testing that your submission is able to handle an appropriate load.
-  You will be given notice of when this testing will occur.
+  We intend to be give notice of when this testing will occur.
   The use of CloudWatch to monitor your services and create alarms may give you the ability to manually recover from increased load and perform better in the assignment.
 }
 
 \subsection{Metrics}
+Metrics are at the core of CloudWatch.
+Metrics track important details about other AWS services often stored as time-series data.
+For example, EC2 instances store metrics such as CPU and Memory usage.
+While load balancers record metrics such as the amount of requests and amount of HTTP 200 responses.
 
-\subsection{Logging}
+Metrics help you to monitor and maintain services running on AWS.
+When combined with Dashboards they are a powerful way to overview your systems.
 
 \subsection{Alarms}
+CloudWatch alarms can be configured to perform certain actions based on metrics.
+For example, you may trigger an excessive amount of load balancer requests to increase the size of an auto-scaling group.
+Or trigger an RDS instance with too little disk space to notify database admin.
 
-\section{SQS Queues}
+\begin{code}[language=terraform]{}
+resource "aws_cloudwatch_metric_alarm" "monitor_alb" {
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  metric_name         = "RejectedConnectionCount"
+  namespace           = "AWS/ApplicationELB"
+  period              = "120"
+  statistic           = "Sum"
+  threshold           = "10"
+
+  dimensions = {
+    LoadBalancer = aws_lb.balancer.name
+  }
+
+  alarm_description = "Increase auto-scaling capacity when 10 requests are rejected due to capacity limits"
+  alarm_actions     = // increase auto-scaling group capacity.
+}
+
+resource "aws_cloudwatch_metric_alarm" "db_free_storage_space_warning" {
+  comparison_operator = "LessThanThreshold"
+  metric_name         = "FreeStorageSpace"
+  namespace           = "AWS/RDS"
+  period              = "120"
+  statistic           = "Sum"
+  threshold           = 10000000000 // 10 GB
+  alarm_description   = "Free space dropped below 10 GB"
+  alarm_actions       = // alert database adims
+}
+\end{code}
+
+\noindent The entrypoint for understanding which metrics are available is:
+
+\url{https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html}
+
+\subsection{Logging}
+CloudWatch comes with built-in logging for some services.
 
 
-% \bibliographystyle{ieeetr}
-% \bibliography{books,ours}
+\section{Streams}
+
+\teacher{
+    As with last week, spend approximately the first 30 minutes exploring concepts.
+}
+
+\subsection{Overview}
+
+\todo{
+  Talk about the advantages that streams give, including fan out, fan in, back pressure, isolation
+}
+
+\subsection{Data Model}
+
+\todo{ change to dot points}
+\subsubsection{SPSC}
+
+\subsubsection{SPMC}
+
+\subsubsection{MPSC}
+
+\subsubsection{MPMC}
+
+\subsection{Technologies}
+
+\info{
+  Below we only discuss external stream technologies but it is common to have streams within an application where concurrency is needed. 
+  Instead of dealing with concurrency using locking based methods like in CSSE2310, we can use streams to send data to the consumers that need to handle single writer usecases.
+}
+
+\subsubsection{AWS SQS}
+
+\subsubsection{AWS SNS}
+
+\subsubsection{AWS MQ / Apache ActiveMQ / RabbitMQ}
+
+\aside{Not available in the lab environments}
+
+\subsubsection{AWS MSK ( Managed Streaming for Apache Kafka )}
+
+\aside{Not available in the lab environments}
+
+\subsubsection{Redis}
+
+\aside{Not available in the lab environments}
+
+\section{Talking to the Simple Queue Service (SQS)}
+
+AWS provides the Simple Queue Service, SQS,
+which offers a simple and fully managed message queue service.
+There are two flavours of SQS to be aware of;
+the standard message queue, and the FIFO message queue.
+Standard message queues allow for greater scalability by providing higher through-put.
+However, standard message queues in SQS are not exactly queues,
+messages are not first in first out,
+they are best-effort ordered.
+The second flavour, FIFO message queues,
+guarantees that messages are First in First Out.
+
+\subsection{Terraform}
+
+\warning{
+    For terminal examples in this section,
+    lines that begin with a \$ indicate a line which you should type while the other lines are example output that you should expect.
+    Not all of the output is captured in the examples to save on space.  
+}
+
+Today we will be creating and experimenting with the two queue flavours of AWS SQS.
+We provide the Terraform to create these services below:
+
+\info{
+  If you have forgotten how to get started you will need to run the following commands in a local terminal.
+
+  \bash{
+    terraform init^^J
+    ...^^J
+    $ terraform plan^^J
+    ...^^J
+    $ terraform apply^^J
+    ...
+  }
+}
+
+\teacher{
+  In the below terraform it is pretty simple and relies a lot on defaults.
+  Though the FIFO name needs to have .fifo at the end, make sure to mention this.
+}
+
+\begin{code}[language=terraform, numbers=none]{}
+  terraform {
+    required_providers {
+      aws = {
+        source = "hashicorp/aws"
+        version = "~> 3.0"
+      }
+    }
+  }
+  
+  provider "aws" {
+    region = "us-east-1"
+    shared_credentials_file = "./credentials"
+  }
+  
+  resource "aws_sqs_queue" "our_first_mailbox" {
+    name                        = "csse6400_prac"
+  }
+  
+  resource "aws_sqs_queue" "our_first_fifo" {
+    name                        = "csse6400_prac.fifo"
+    fifo_queue                  = true
+    content_based_deduplication = true
+  }
+  
+  output "mailbox" {
+      value = aws_sqs_queue.our_first_mailbox.arn
+  }
+  
+  output "fifo" {
+      value = aws_sqs_queue.our_first_fifo.arn
+  }
+\end{code}
+
+Now that we have provisioned the queues we can have a look at them in the AWS Console.
+In the main AWS dashboard you can search for``SQS'' to find these queues.
+You should reach a page like this:
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{images/sqspanel}
+\end{figure}
+
+Like the EC2 and RDS dashboards before it, we can browse the differnt queues and see settings we have configured and metrics that are collected about thee q
+  
+\teacher{
+  Show the students the Monitoring Panel and Access Policy panel in particular.
+
+  \begin{itemize}
+    \item Monitoring: Messages Sent/Received
+    \item Monitoring: Empty Receives - This is the receiver getting nothing from polling. Costs \$ in the real world.
+    \item Policy: Not covering today but SQS is a public service, it is protected via AWS credentials. In real use cases you need to configure a Access Policy.
+  \end{itemize}
+}
+
+\subsection{SQS Standard}
+
+We have provided a small docker container for you to use with your queues to see the differnce between there implementations. 
+
+\todo{
+  Talk about what a SQS Standard is in terms of the info above.
+  Dont forget to mention that they arnt a QUEUE.
+}
+
+\subsection{SQS FIFO}
+
+\todo{
+  Talk about how these are classicalt queues in the sense that First-In First-Out is the correct term for a QUEUE.
+}
+
+\bibliographystyle{ieeetr}
+\bibliography{books,ours}
 
 \end{document}
