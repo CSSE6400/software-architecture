@@ -1,6 +1,6 @@
 \documentclass{csse4400}
 
-% \teachermodetrue
+\teachermodetrue
 
 \usepackage{float}
 
@@ -107,11 +107,21 @@ resource "aws_cloudwatch_metric_alarm" "db_free_storage_space_warning" {
 
 \noindent The entrypoint for understanding which metrics are available is:
 
-\url{https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html}
+\noindent \url{https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html}
 
 \subsection{Logging}
-CloudWatch comes with built-in logging for some services.
+CloudWatch offers a logging end-point.
+It can be utilized to log application data from EC2 instances.
+For example, if you run an nginx server on an EC2 instance,
+you can configure CloudWatch to process and store those logs.
+This feature can be quite helpful and can be extended to the log files of applications you build.
 
+In addition to being processing EC2 log files,
+CloudWatch comes with built-in logging for some services.
+For Lambda services it will log print statements or errors.
+For application load balancer,
+it will log detailed request information.
+These logs are incredibly helpful for debugging.
 
 \section{Streams}
 
@@ -243,7 +253,7 @@ You should reach a page like this:
   \includegraphics[width=\textwidth]{images/sqspanel}
 \end{figure}
 
-Like the EC2 and RDS dashboards before it, we can browse the differnt queues and see settings we have configured and metrics that are collected about thee q
+Like the EC2 and RDS dashboards before it, we can browse the queues settings and the metrics that are gathered about them.
   
 \teacher{
   Show the students the Monitoring Panel and Access Policy panel in particular.
@@ -255,9 +265,60 @@ Like the EC2 and RDS dashboards before it, we can browse the differnt queues and
   \end{itemize}
 }
 
-\subsection{SQS Standard}
+\subsection{Queue Cli}
 
-We have provided a small docker container for you to use with your queues to see the differnce between there implementations. 
+We have provided a small docker container for you to use with your queues to see the differnce between the implementations. First we must get our AWS credentials and prep our environment.
+
+With our learner lab grab the AWS credentials but instead of creating a credentials file we will be using environment variables.
+Make a folder for the practicle.
+
+\begin{code}[language=shell, numbers=none]{}
+$ mkdir queues && cd queues
+\end{code}
+
+Now we need to create an environment file for our docker container to read so that it can access AWS. Create a ``.env'' file in the current directory and edit the contents so that it looks similar to the below: The AWS keys will be from the credentials shown in your lab environment.
+
+\begin{code}[numbers=none]{}
+TERM=xterm-256color
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+AWS_SESSION_TOKEN=...
+\end{code}
+
+\begin{code}[numbers=none,keepspaces=true]{}
+$ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "test" --client-name "Client 1"
+
+
+  __________
+ |   \XX/   |
+ | T. \/ .T |      University of Queensland
+ | XX:  :XX |          Faculty of EAIT
+ T L' /\ 'J T
+  \  /XX\  /         CSSE6400 Queue Prac
+@\_ '____' _/@       csse6400.uqcloud.net
+\_X\_ __ _/X_/
+ \=/\----/\=/
+
+
+
+Unable to find a Queue by this name test
+\end{code}
+
+If your program shows the above then your ready to head to the next section :).
+  
+
+% \begin{code}[language=shell, numbers=none]{}
+% docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "hello" --sender
+% \end{code}
+
+% \begin{code}[language=shell, numbers=none]{}
+%   docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "hello" --sender
+% \end{code}
+  
+
+
+
+\subsection{SQS Standard}
 
 \todo{
   Talk about what a SQS Standard is in terms of the info above.
