@@ -6,7 +6,7 @@
 
 \usepackage{languages}
 
-\title{Monitoring \& Streams}
+\title{Monitoring \& Events}
 \author{Brae Webb}
 
 \date{\week{6}}
@@ -26,11 +26,18 @@ This week our goal is to:
 \begin{itemize}
   \item investigate the various options to perform health-checks on services;
   \item explore the CloudWatch dashboard to monitor our services; and
-  \item run a application which processes requests asynchronously using SQS queues.
+  \item run an application that processes events asynchronously using SQS.
 \end{itemize}
 
 
 \section{Health-checks}
+
+\teacher{
+  Here we really just want to highlight that health-checks are the way in which container managers determine 
+  whether or not to spin up or down an application.
+  We should note that custom health-checks can be implemented to give application-specific ways of judging health.
+}
+
 Health-checks are a way to determine whether or not a service is healthy.
 They are a core component to developing reliable and scalable systems.
 Health-checks are utilized by systems that manage collections of service instances,
@@ -50,6 +57,12 @@ Additionally health-checks can instruct auto-scaling groups to spin down unhealt
 % \subsection{Anomaly detection}
 
 \section{CloudWatch}
+
+\teacher{
+  Here we want to introduce them to the interface of CloudWatch.
+  If you have time to prep before perhaps run some service to show off logs.
+  This is just a brief overview with some strong hinting that they might want to acquaint themselves with CloudWatch when doing the scalablity assignment and potentially the project.
+}
 
 CloudWatch is the AWS solution for monitoring services.
 CloudWatch supports service metrics, logging, and alarms.
@@ -105,7 +118,7 @@ resource "aws_cloudwatch_metric_alarm" "db_free_storage_space_warning" {
 }
 \end{code}
 
-\info{
+\teacher{
   Dear Evan Hughes,
 
   Commit messages such as `THings are happening' and `Oppsie Whoopie' may be the breaking point of my sanity.
@@ -133,20 +146,35 @@ For application load balancer,
 it will log detailed request information.
 These logs are incredibly helpful for debugging.
 
-\section{Streams}
 
-\teacher{
-    As with last week, spend approximately the first 30 minutes exploring concepts.
-}
+\section{Event Processing}
+
+As we saw in the Event-Driven Architecture notes \cite{events-notes},
+event processing enable us to build highly scalable and extensible systems.
+In this weeks practical we will get our hands dirty with event processing using AWS SQS.
+SQS gives us a service which can act as an event broker.
 
 \subsection{Technologies}
 
-\info{
-  Below we only discuss external stream technologies but it is common to have streams within an application where concurrency is needed. 
-  Instead of dealing with concurrency using locking based methods like in CSSE2310, we can use streams to send data to the consumers that need to handle single writer usecases.
-}
+We should first discuss a few of our technology options for services which can be used in an Event-Driven Architecture.
+
+% \info{
+%   Below we only discuss external stream technologies but it is common to have streams within an application where concurrency is needed. 
+%   Instead of dealing with concurrency using locking based methods like in CSSE2310, we can use streams to send data to the consumers that need to handle single writer usecases.
+% }
 
 \subsubsection{AWS SQS}
+
+AWS provides the Simple Queue Service, SQS,
+which offers a simple and fully managed message queue service.
+There are two flavours of SQS to be aware of;
+the standard message queue, and the FIFO message queue.
+Standard message queues allow for greater scalability by providing higher through-put.
+However, standard message queues in SQS are not exactly queues,
+messages are not first in first out,
+they are best-effort ordered.
+The second flavour, FIFO message queues,
+guarantees that messages are First in First Out.
 
 \subsubsection{AWS SNS}
 
@@ -164,19 +192,6 @@ These logs are incredibly helpful for debugging.
 
 \section{Talking to the Simple Queue Service (SQS)}
 
-AWS provides the Simple Queue Service, SQS,
-which offers a simple and fully managed message queue service.
-There are two flavours of SQS to be aware of;
-the standard message queue, and the FIFO message queue.
-Standard message queues allow for greater scalability by providing higher through-put.
-However, standard message queues in SQS are not exactly queues,
-messages are not first in first out,
-they are best-effort ordered.
-The second flavour, FIFO message queues,
-guarantees that messages are First in First Out.
-
-\subsection{Terraform}
-
 \warning{
     For terminal examples in this section,
     lines that begin with a \$ indicate a line which you should type while the other lines are example output that you should expect.
@@ -184,7 +199,8 @@ guarantees that messages are First in First Out.
 }
 
 Today we will be creating and experimenting with the two queue flavours of AWS SQS.
-We provide the Terraform to create these services below:
+A standard queue, named \texttt{csse6400\_prac} and a FIFO queue, named \texttt{csse6400\_prac.fifo}.
+The Terraform code below can be used to create these two queues.
 
 \info{
   If you have forgotten how to get started you will need to run the following commands in a local terminal.
@@ -205,48 +221,49 @@ We provide the Terraform to create these services below:
 }
 
 \begin{code}[language=terraform, numbers=none]{}
-  terraform {
-    required_providers {
-      aws = {
-        source = "hashicorp/aws"
-        version = "~> 3.0"
-      }
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "~> 3.0"
     }
   }
-  
-  provider "aws" {
-    region = "us-east-1"
-    shared_credentials_file = "./credentials"
-  }
-  
-  resource "aws_sqs_queue" "our_first_mailbox" {
-    name                        = "csse6400_prac"
-  }
-  
-  resource "aws_sqs_queue" "our_first_fifo" {
-    name                        = "csse6400_prac.fifo"
-    fifo_queue                  = true
-    content_based_deduplication = true
-  }
-  
-  output "mailbox" {
-      value = aws_sqs_queue.our_first_mailbox.arn
-  }
-  
-  output "fifo" {
-      value = aws_sqs_queue.our_first_fifo.arn
-  }
+}
+
+provider "aws" {
+  region = "us-east-1"
+  shared_credentials_file = "./credentials"
+}
+
+resource "aws_sqs_queue" "our_first_mailbox" {
+  name                        = "csse6400_prac"
+}
+
+resource "aws_sqs_queue" "our_first_fifo" {
+  name                        = "csse6400_prac.fifo"
+  fifo_queue                  = true
+  content_based_deduplication = true
+}
+
+output "mailbox" {
+  value = aws_sqs_queue.our_first_mailbox.arn
+}
+
+output "fifo" {
+  value = aws_sqs_queue.our_first_fifo.arn
+}
 \end{code}
 
 Now that we have provisioned the queues we can have a look at them in the AWS Console.
-In the main AWS dashboard you can search for``SQS'' to find these queues.
+In the main AWS dashboard you can search for ``SQS'' to find these queues.
 You should reach a page like this:
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/sqspanel}
 \end{figure}
 
-Like the EC2 and RDS dashboards before it, we can browse the queues settings and the metrics that are gathered about them.
+Like the EC2 and RDS dashboards,
+we can browse the queue configurations and metrics.
   
 \teacher{
   Show the students the Monitoring Panel and Access Policy panel in particular.
@@ -258,12 +275,13 @@ Like the EC2 and RDS dashboards before it, we can browse the queues settings and
   \end{itemize}
 }
 
-\subsection{Queue Cli}
+\subsection{Queue Command-line Interface}
 
-We have provided a small docker container for you to use with your queues to see the differnce between the implementations. First we must get our AWS credentials and prep our environment.
+We have provided a small docker container for you to use with your queues to see the differnce between the implementations.
+First we must retrieve our AWS credentials and setup our environment.
 
 With our learner lab grab the AWS credentials but instead of creating a credentials file we will be using environment variables.
-Make a folder for the practicle.
+Make a folder for the practi.
 
 \begin{code}[language=shell, numbers=none]{}
 $ mkdir queues && cd queues
@@ -317,14 +335,77 @@ As we have stated above the ``Standard'' offering of SQS does not guarantee orde
 Assuming our terraform was created sucessfully we are going to create one publisher and one subscriber.
 
 \info{
-  For the rest of this practical you will require multiple terminals. Get these 
+  For the rest of this practical you will require multiple terminals. Make sure these are all in the same folder so we can reuse the .enf file. 
 }
+
+To create the subscriber run the following command:
+
+\begin{code}[numbers=none,keepspaces=true]{}
+  $ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1"
+\end{code}
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{images/stacksub}
+\end{figure}
+
+Now lets start a publisher in another terminal but keep both terminals on your screen if you have space.
+
+\begin{code}[numbers=none,keepspaces=true]{}
+  $ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1"
+\end{code}
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{images/stackpub}
+\end{figure}
+
+When the publisher connects to the Queue it is going to put 100 messages of increasing increment into the queue. On the subscriber we will be able to see the messages being received, an example is provided below:
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{images/stacksubdata}
+\end{figure}
+
+hopefully like our example you can see that some of the messages arrive out of order. Next add more publishers and subscribers and experiment with the differnt configurations. 
+
+\info{
+  When making multiple publishes you may want to change the client-name cli parameter so you can keep track of when the messages arrived at the subscribers.
+}
+
 
 \subsection{SQS FIFO}
+Now we will experiment with the FIFO based service offered by SQS. Like before we will start a subscriber but make sure the name of the queue matches the FIFO queue we created in terraform.
 
-\todo{
-  Talk about how these are classicalt queues in the sense that First-In First-Out is the correct term for a QUEUE.
+\begin{code}[numbers=none,keepspaces=true]{}
+  $ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1" --receive
+\end{code}
+
+Now lets start a publisher in another terminal but keep both terminals on your screen if you have space.
+
+\begin{code}[numbers=none,keepspaces=true]{}
+  $ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1"
+\end{code}
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{images/fifopub}
+\end{figure}
+
+On the subscriber we now see the messages arriving in order which is to be expected.
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{images/fifosub}
+\end{figure}
+
+If we re-run the publisher though we may not see any new messages make it to the consumer. This is because we have asked AWS to dedup messages where it can.
+
+\teacher{
+  Theres a cli param which prepends to the message to allow you to rerun if needed. It is --prepend "abcdef"
 }
+
+Again as before try experimenting with differnt publisher / subscriber configurations to see how they behave.
+
+\info{
+  When making multiple publishes you may want to change the client-name cli parameter so you can keep track of when the messages arrived at the subscribers.
+}
+
 
 \section{Optional Exercise: Worker Queues}
 
