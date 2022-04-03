@@ -18,7 +18,7 @@ Each event handler can be implemented in its own independent execution environme
 This allows each type of handler to be easily scaled to handle its load.
 Asynchronous communication means that event generators do not need to wait for the handler to process the event.
 Handlers can generate their own events to indicate what they have done.
-These events can be used to coordinate steps in a complex business process.
+These events can be used to coordinate steps in a business process.
 
 \begin{figure}[h!]
     \begin{adjustwidth}{-10mm}{-10mm}
@@ -39,11 +39,11 @@ This continues until the business process is completed.
 An auction system, as shown in figure \ref{fig:auction-architecture}, could be implemented as an event-driven architecture.
 \begin{itemize}[nosep]
     \item When a customer bids on an item, they initiate a bid \emph{event}.
-    \item Upon receiving the bid event, the event broker notifies the bid handler which checks the bid against the current high bid and determines the new high bid.
+    \item Upon receiving the bid event, the event broker notifies the bid handler, which checks the bid against the current high bid and determines the new high bid.
     \item The bid handler generates a new high bid event.
-    \item The event broker notifies the page update handler, which sends the new high bid to all pages displaying the item.
+    \item The event broker notifies the page update handler of the high bid event, which sends the new high bid to all pages displaying the item.
     \item The bid notification handler is also notified of the high bid event and it sends an email to the bidder with the result of their bid.
-    \item The rebid notification handler is also notified of the high bid event.
+    \item And, the rebid notification handler is also notified of the high bid event.
              If the previous high bidder is no longer the high bidder, they are sent an email asking if they would like to make another bid.
 \end{itemize}
 
@@ -108,7 +108,15 @@ or, for better abstraction and reduced coupling, the event broker may implement 
 
 The \emph{event handler cohesion principle} minimises the complexity of each handler,
 and improves the ability of the system to scale only the tasks that need additional computing resources.
-It also makes it easier to design each handler to be independent of the other handlers, reducing overall system coupling.
+
+\vspace{1mm}
+\begin{definition}[Event Handler Independence Principle]\label{def:independence}
+    Event handlers should not depend on the implementation of any other event handler.
+\end{definition}
+
+Dependencies between event handlers limit the processing throughput of the system,
+and increases the complexity of implementing event handlers.
+The only dependency should be the event that is processed by the event handler.
 
 \subsection{Extensibility}\label{sec:extensibility}
 
@@ -156,8 +164,10 @@ A more robust approach, which scales to very high traffic levels, is to federate
 This allows the façade and channels to be distributed across multiple nodes
 but provides an interface that the clients and event handlers can treat as a single access point.
 The complexity of implementing a federated computing system is beyond the scope of this course.
-There are several libraries (e.g. ActiveMQ or RabbitMQ)
-and cloud-computing platforms (e.g. AWS SQS, AWS MQ or Google Cloud Pub/Sub) that provide this functionality.
+There are several libraries (e.g. \link{ActiveMQ}{https://activemq.apache.org/} or \link{RabbitMQ}{https://www.rabbitmq.com/})
+and cloud-computing platforms (e.g. \link{AWS SQS}{https://aws.amazon.com/sqs/},
+\link{AWS MQ}{https://aws.amazon.com/amazon-mq/} or
+\link{Google Cloud Pub/Sub}{https://cloud.google.com/pubsub/docs/overview}) that provide this functionality.
 They can still be used when the system does not need to scale to a federated event broker,
 as they provide the underlying implementation for the event broker.
 
@@ -192,7 +202,7 @@ A federated event broker will further improve reliability by making it less like
 
 \subsection{Streams}
 
-An alternative to channels using queues to manage events is to use streams instead.
+An alternative to channels using queues to manage events, is to use streams instead.
 Event sources send events to the event broker and they are added to the appropriate stream.
 Each channel becomes a stream and events are added to the stream.
 The observer pattern is used where the channel is the subject and the event handlers are the observers.
@@ -219,12 +229,19 @@ Because streams store events permanently, data analysis of the system's behaviou
 Streams work well for social media platforms as monetisation of the platform depends on analysing user behaviour.
 If user generated events are stored permanently in streams, new analyses can be performed on past data.
 
-Streams also work well for \link{Internet of Things}{https://www.oracle.com/au/internet-of-things/what-is-iot/} (IoT) systems.
-An IoT system may generate a vast number of events.
-Streams make it more practical to process different events at an appropriate pace.
+Streams also work well for systems that generate a vast number of events,
+or that have a large number of event handlers.
+A health monitoring system, taking advantage of the \link{Internet of Things}{https://www.oracle.com/au/internet-of-things/what-is-iot/} (IoT),
+would be an example of such a system.
+There could be a very large number of monitoring devices that generate frequent events to notify the system of physiology changes.
+Streams make it practical to process different events at an appropriate pace.
 Some events may need almost immediate processing (e.g. a monitor reporting heart failure).
 Other events may need periodic processing (e.g. analysing patient blood pressure over a period of time).
-An IoT system may also have a large number of event handlers where some IoT devices process events.
+Streams can accept and store events and different event handlers can be optimised for how they process data in the stream.
+
+The health monitoring system would also have a large number of event handlers, because many devices would process some events
+(e.g. a heart rate display or a patient alarm).
+Streams have less overhead to manage their events, so can more easily cope with many event handlers retrieving events for processing. 
 
 Streams also enable \emph{event sourcing} as a persistence mechanism.
 Event sourcing stores every event, and its associated state, rather than storing and updating system state.
@@ -245,19 +262,6 @@ This makes it easier to analyse how the system is used and what changes happen t
 
 \section{Mediator Topology}
 
-The mediator topology extends the broker topology by adding an \emph{event mediator}.
-The event mediator manages the flow of events to implement the business process.
-There are six elements that make up the mediator topology.
-
-\begin{description}
-    \item[Initiating Event] starts the flow of events.
-    \item[Event Queue] holds initiating events sent to the event mediator.
-    \item[Event Mediator] coordinates sending events to the event handlers to implement a business process.
-    \item[Event Handler] accepts and processes events.
-    \item[Event Channel] holds events waiting to be processed by an event handler.
-    \item[Processing Event] sent by the event mediator to start the next step in the process.
-\end{description}
-
 \begin{figure}[h!]
     \begin{adjustwidth}{-10mm}{-10mm}
         \centering
@@ -267,12 +271,26 @@ There are six elements that make up the mediator topology.
     \label{fig:mediator-components}
 \end{figure}
 
+The mediator topology extends the broker topology by adding an \emph{event mediator}.
+The event mediator manages the flow of events to implement the business process.
+There are six elements that make up the mediator topology.
+
+\begin{description}
+    \item[Initiating Event] starts the flow of events.
+    \item[Event Queue] holds initiating events sent to the event mediator.
+    \item[Event Mediator] coordinates sending events to the event handlers to implement a business process.
+    \item[Processing Event] sent by the event mediator to start the next step in the process.
+    \item[Event Handler] accepts and processes events.
+    \item[Event Channel] holds events waiting to be processed by an event handler.
+\end{description}
+
 In figure \ref{fig:mediator-components}, the \emph{Client} sends the \emph{Initiating Event} to the \emph{Event Queue}.
 The \emph{Event Queue} notifies the \emph{Event Mediator} that an event has been enqueued.
 The \emph{Event Mediator} dequeues the next \emph{Initiating Event} and starts the business process to deliver the behaviour for that event.
 The \emph{Event Mediator} adds a \emph{Processing Event 1} to its channel.
 The channel notifies the event handlers listening for this type of event.
 The event handlers retrieve the event from the channel and process it.
+
 When an event handler finishes processing it does not send a processing event to the \emph{Event Mediator} to be handled.
 Rather, the event handler usually sends an asynchronous message to the \emph{Event Mediator} indicating that the handler has finished processing.
 When the \emph{Event Mediator} receives a completion message from an event handler,
@@ -283,6 +301,61 @@ Based on the result received from an event handler when it finishes processing a
 the mediator can decide which processing event to send next.
 This allows conditional or iterative logic to be implemented in the business process.
 Unlike the broker topology, which only has a sequential flow through the business logic based on event handlers sending new events when they finish processing.
+
+\subsection{Implementation}
+
+Commonly, the mediator topology will implement multiple event mediators.
+Each one deals with a subset of events.
+These are usually related to a particular part of the problem domain.
+For example, in the Sahara eCommerce system, there could be event mediators for:
+\begin{description}
+    \item[Customer Events] -- registering, updating profile, viewing order history, ...
+    \item[Browsing Events] -- searching, browsing by category, requesting product detail, ...
+    \item[Order Events] -- adding product to shopping cart, checking out, cancel order, ...
+    \item[Inventory Events] -- viewing inventory levels, reporting on popular products, ordering new stock, ...
+\end{description}
+This allows different mediators to be scaled independently, based on their load.
+It also improves reliability, as one mediator can fail but others can continue to operate.
+
+Like with the broker topology, there are many libraries and cloud-computing platforms that support implementing the mediator topology.
+Different libraries focus on different aspects of event coordination within the event mediator.
+
+If the event coordination and error handling that needs to be implemented are relatively simple,
+it is often easiest to implement the logic in code.
+Libraries such as \link{Apache Camel}{https://camel.apache.org/}
+or \link{Spring Integration}{https://spring.io/projects/spring-integration},
+provide the messaging infrastructure to support this type of implementation.
+
+If the event coordination and error handling are fairly complex,
+involving a lot of complex conditional processing or dynamic path determination with complex error handling,
+it is often easier to use a declarative DSL\footnote{Domain Specific Language} to implement the logic.
+One such language is \link{Business Process Execution Language}{https://www.oracle.com/technical-resources/articles/matjaz-bpel.html} (BPEL).
+It describes the steps involved in processing an event, along with error handling, multicasting and other features.
+Libraries such as Oracle's \link{BPEL Process Manager}{https://www.oracle.com/middleware/technologies/bpel-process-manager.html},
+provide infrastructure to support the description and execution of the process.
+
+BPEL is not suited to event coordination and error handling that may require human intervention, due to the long run times of this type of processing.
+A more sophisticated Business Process Management (BPM) execution engine may be more appropriate in this context.
+These engines use multiple DSLs to provide more sophisticated process automation.
+Libraries such as \link{jBPM}{https://www.jbpm.org/} provide the infrastructure that enable this type of event mediator implementation.
+
+\begin{figure}[h!]
+    \begin{adjustwidth}{-10mm}{-10mm}
+        \centering
+        \includegraphics[trim=195 195 195 195,clip,width=0.97\paperwidth]{diagrams/complex-mediator-components.png}
+    \end{adjustwidth}
+    \caption{Complex mediator topology.}
+    \label{fig:complex-mediator-components}
+\end{figure}
+
+Figure \ref{fig:complex-mediator-components} is an example of extending the idea of implementing multiple event mediators
+to have different types of mediators based on the complexity of the event.
+This is because most large systems will have a mix of simple and complex events, and some of the complex events may have long durations.
+It is usually more efficient in developer time and effort to apply different strategies for different types of events.
+Describing and verifying the process for a simple event using BPEL or a BPM execution engine
+may cost more developer effort than implementing the logic programmatically.
+To minimise coupling, the client still only sends initiating events to a single event queue.
+An event mediator retrieves the events from the event queue and classifies them, forwarding the events to the appropriate type of mediator.
 
 
 \section{Design Considerations}\label{sec:design-considerations}
