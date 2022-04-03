@@ -36,23 +36,46 @@ That may lead to the event handler generating a processing event to move to the 
 The processing event is sent to the central broker and is picked up by another event handler.
 This continues until the business process is completed.
 
+An auction system, as shown in figure \ref{fig:auction-architecture}, could be implemented as an event-driven architecture.
+\begin{itemize}[nosep]
+    \item When a customer bids on an item, they initiate a bid \emph{event}.
+    \item Upon receiving the bid event, the event broker notifies the bid handler which checks the bid against the current high bid and determines the new high bid.
+    \item The bid handler generates a new high bid event.
+    \item The event broker notifies the page update handler, which sends the new high bid to all pages displaying the item.
+    \item The bid notification handler is also notified of the high bid event and it sends an email to the bidder with the result of their bid.
+    \item The rebid notification handler is also notified of the high bid event.
+             If the previous high bidder is no longer the high bidder, they are sent an email asking if they would like to make another bid.
+\end{itemize}
+
+\begin{figure}[h!]
+    \begin{adjustwidth}{-10mm}{-10mm}
+        \centering
+        \includegraphics[trim=195 195 195 195,clip,width=0.95\paperwidth]{diagrams/auction-architecture.png}
+    \end{adjustwidth}
+    \caption{Auction bidding example event-driven architecture.}
+    \label{fig:auction-architecture}
+\end{figure}
+
 There are two basic approaches to implementing an event-driven architecture.
-The terminology is that these are different \emph{topologies}, as they have different high-level structures.
+They have different high-level structures or \emph{topologies}.
 The \emph{broker topology} is the simpler of the two and is optimised for performance, responsiveness, scalability, extensibility, and low coupling.
 The \emph{mediator topology} is more complex but is designed to provide reliability, process control, and error handling.
 
 
 \section{Broker Topology}
 
-The broker topology consists of four elements.
+The broker topology consists of five elements.
 
 \begin{description}
     \item[Initiating Event] starts the flow of events.
-    \item[Event Broker] has \emph{channels} that receive events waiting to be handled.
+    \item[Event Broker] has \emph{event channels} that receive events waiting to be handled.
+    \item[Event Channel] holds events waiting to be processed by an event handler.
     \item[Event Handler] accepts and processes events.
     \item[Processing Event] sent by an event handler when it has finished processing an event.
 \end{description}
 
+% Possibly extend the auction example to make this more concrete?
+% It will need to show events being ignored by system, and handlers not sending events at the end of processing.
 \begin{figure}[h!]
     \begin{adjustwidth}{-10mm}{-10mm}
         \centering
@@ -78,6 +101,7 @@ The consequence is that event sources need to send their events to the correct c
 For a simple broker topology, this could be by sending event messages directly to a channel
 or, for better abstraction and reduced coupling, the event broker may implement a façade that directs events to the correct channel.
 
+\vspace{1mm}
 \begin{definition}[Event Handler Cohesion Principle]\label{def:cohesion}
     Each event handler is a simple cohesive unit that performs a single processing task.
 \end{definition}
@@ -168,25 +192,97 @@ A federated event broker will further improve reliability by making it less like
 
 \subsection{Streams}
 
+An alternative to channels using queues to manage events is to use streams instead.
+Event sources send events to the event broker and they are added to the appropriate stream.
+Each channel becomes a stream and events are added to the stream.
+The observer pattern is used where the channel is the subject and the event handlers are the observers.
+When an event is added to a stream, the channel notifies all its observers that an event has been added.
+The event handlers then decide whether to retrieve the event and process it.
+
+The most important difference of using streams versus queues is that the events are stored permanently in the stream.
+Event handlers can process events at their own pace.
+Because the events are stored permanently, history is maintained.
+This allows the system to go back and redo past processing or for an audit to be conducted of what happened during processing.
+
+\subsection{Queues vs Streams}
+
+Queues work well when there are known steps in the business process being implemented.
+Queues ensure that all preceding events in the business process are completed before the next step.
+Queues can ensure that events are only processed once (known as ``exactly once'' semantics).
+An ecommerce website is an example of the type of system suited to using queues.
+This is because there is a fixed set of rules about which event handlers process which events.
+
+Streams work well when there are multiple event handlers responding to events,
+particularly when event handlers may choose to ignore some events based on various conditions.
+Streams mean that the event broker or channels do not need to be notified if an event handler wants to ignore an event.
+Because streams store events permanently, data analysis of the system's behaviour can be done by processing past events.
+Streams work well for social media platforms as monetisation of the platform depends on analysing user behaviour.
+If user generated events are stored permanently in streams, new analyses can be performed on past data.
+
+Streams also work well for \link{Internet of Things}{https://www.oracle.com/au/internet-of-things/what-is-iot/} (IoT) systems.
+An IoT system may generate a vast number of events.
+Streams make it more practical to process different events at an appropriate pace.
+Some events may need almost immediate processing (e.g. a monitor reporting heart failure).
+Other events may need periodic processing (e.g. analysing patient blood pressure over a period of time).
+An IoT system may also have a large number of event handlers where some IoT devices process events.
+
+Streams also enable \emph{event sourcing} as a persistence mechanism.
+Event sourcing stores every event, and its associated state, rather than storing and updating system state.
+This makes it easier to analyse how the system is used and what changes happen to the state over time.
+
+% Add example broker-based event-driven architecture for Sahara.
+%\subsection{Sahara Example}
+%
+%The service-based architecture example for the Sahara eCommerce system is designed to perform synchronous processing of requests.
+%A customer \emph{requests} to view a product's details through a REST API and receives a response with the result.
+%Similarly, a customer adding a product to their shopping cart is another request.
+%
+%Multiple customers could submit bids for the same item at almost the same time (e.g. bid sniping).
+%These bid events are queued to be processed in the order they are received.
+%This queuing mechanism allows event handlers to process messages that arrive faster than the handler can process them.
+%It assumes that the message load will reduce in time and that the event handler will process all messages in the queue.
 
 
-\subsection{Sahara Example}
+\section{Mediator Topology}
 
-The service-based architecture example for the Sahara eCommerce system is designed to perform synchronous processing of requests.
-A customer \emph{requests} to view a product's details through a REST API and receives a response with the result.
-Similarly, a customer adding a product to their shopping cart is another request.
+The mediator topology extends the broker topology by adding an \emph{event mediator}.
+The event mediator manages the flow of events to implement the business process.
+There are six elements that make up the mediator topology.
 
-Adding auctions to the Sahara eCommerce system is a simple example that benefits from an event-driven architecture.
-A customer sends a message to the Sahara eCommerce system initiating the \emph{event} of making a bid.
-Upon receiving the bid event, the system checks the bid against the current high bid and determines the new high bid.
-The system then generates a new high bid event.
-This event triggers actions in the system to update the high bid and notify the bidder of the result of their bid.
-It may also trigger an action to notify the previous high bidder that they are no longer the high bidder.
+\begin{description}
+    \item[Initiating Event] starts the flow of events.
+    \item[Event Queue] holds initiating events sent to the event mediator.
+    \item[Event Mediator] coordinates sending events to the event handlers to implement a business process.
+    \item[Event Handler] accepts and processes events.
+    \item[Event Channel] holds events waiting to be processed by an event handler.
+    \item[Processing Event] sent by the event mediator to start the next step in the process.
+\end{description}
 
-Multiple customers could submit bids for the same item at almost the same time (e.g. bid sniping).
-These bid events are queued to be processed in the order they are received.
-This queuing mechanism allows event handlers to process messages that arrive faster than the handler can process them.
-It assumes that the message load will reduce in time and that the event handler will process all messages in the queue.
+\begin{figure}[h!]
+    \begin{adjustwidth}{-10mm}{-10mm}
+        \centering
+        \includegraphics[trim=195 195 195 195,clip,width=0.97\paperwidth]{diagrams/mediator-components.png}
+    \end{adjustwidth}
+    \caption{Basic mediator topology.}
+    \label{fig:mediator-components}
+\end{figure}
+
+In figure \ref{fig:mediator-components}, the \emph{Client} sends the \emph{Initiating Event} to the \emph{Event Queue}.
+The \emph{Event Queue} notifies the \emph{Event Mediator} that an event has been enqueued.
+The \emph{Event Mediator} dequeues the next \emph{Initiating Event} and starts the business process to deliver the behaviour for that event.
+The \emph{Event Mediator} adds a \emph{Processing Event 1} to its channel.
+The channel notifies the event handlers listening for this type of event.
+The event handlers retrieve the event from the channel and process it.
+When an event handler finishes processing it does not send a processing event to the \emph{Event Mediator} to be handled.
+Rather, the event handler usually sends an asynchronous message to the \emph{Event Mediator} indicating that the handler has finished processing.
+When the \emph{Event Mediator} receives a completion message from an event handler,
+the mediator determines what is the next step in the process and sends a processing event to the appropriate channel to continue the logic.
+
+The event mediator allows the system to implement more sophisticated logic to implement the business process.
+Based on the result received from an event handler when it finishes processing an event,
+the mediator can decide which processing event to send next.
+This allows conditional or iterative logic to be implemented in the business process.
+Unlike the broker topology, which only has a sequential flow through the business logic based on event handlers sending new events when they finish processing.
 
 
 \section{Design Considerations}\label{sec:design-considerations}
