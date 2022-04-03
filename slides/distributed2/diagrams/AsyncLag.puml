@@ -1,4 +1,4 @@
-@startuml SyncVsAsync
+@startuml AsyncLag
 
 ' left to right direction
 
@@ -16,11 +16,14 @@ database Leader #ccfddd
 database Follower1 #ccfddd
 database Follower2 #ccfddd
 
-ProductBrowsing -> Leader : UPDATE products SET stock=4
+ProductBrowsing -> Leader : UPDATE products SET name=...
 Leader -> Follower1 : UPDATE
-Leader -> Follower2 : UPDATE
-Follower1 -> Leader : OK
+& Leader -> Follower2 : UPDATE
 Leader -> ProductBrowsing : OK
+activate Leader #DDCCFD
+Follower1 -> Leader : OK
 Follower2 -> Leader : OK
+deactivate Leader
+
 
 @enduml

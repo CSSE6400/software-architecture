@@ -1,0 +1,58 @@
+@startuml WriteConflict
+
+left to right direction
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Dynamic.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!include DEVICONS/laravel.puml
+!include DEVICONS/javascript.puml
+!include DEVICONS/mysql.puml
+!include DEVICONS/chrome.puml
+
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v11.1/dist
+!includeurl AWSPuml/AWSCommon.puml
+!includeurl AWSPuml/Database/RDS.puml
+!includeurl AWSPuml/Compute/EC2.puml
+!includeurl AWSPuml/Compute/EC2AutoScaling.puml
+!includeurl AWSPuml/NetworkingContentDelivery/ElasticLoadBalancing.puml
+!includeurl AWSPuml/Storage/SimpleStorageService.puml
+' make orange
+AddContainerTag("AWS", $borderColor="#ff9900", $bgColor="#ffffff", $fontColor="#000000")
+
+AddContainerTag("browser", $bgColor="#bcddfc", $fontColor="#000000")
+AddContainerTag("database", $bgColor="#ccfddd", $fontColor="#000000", $borderColor="#cccccc")
+
+skinparam roundcorner 20
+skinparam Padding 20
+skinparam NoteBorderColor transparent
+skinparam NoteBackgroundColor #FDDDCC
+' skinparam NoteFontColor white
+
+UpdateElementStyle(node, $borderColor="#cccccc", $fontColor="#5c5c5c")
+UpdateElementStyle(container, $bgColor="#5388cb")
+
+hide stereotype
+
+Person(staff, "Fulfillment Center", "")
+Person(tutors, "Evan", "")
+
+ContainerDb(db, "Leader Replica 1", "Container: MySQL", $tags="database")
+note right of db
+  |= product_id |= name |= stock |= price |
+  | 1234 | Nicholas Cage Reversable Pillow | 19 | $10.00 |
+  | 4321 | Lifelike Inflatable Elephant | 5 | $50.00 |
+end note
+
+ContainerDb(db2, "Leader Replica 2", "Container: MySQL", $tags="database")
+note right of db2
+  |= product_id |= name |= stock |= price |
+  | 1234 | Nicholas Cage Reversable Pillow | 0 | $10.00 |
+  | 4321 | Lifelike Inflatable Elephant | 5 | $50.00 |
+end note
+
+Rel(staff, db, "Decrease stock of product")
+Rel(tutors, db2, "Order 20 items")
+BiRel_R(db, db2, "Conflict resolution")
+
+@enduml

@@ -1,0 +1,62 @@
+@startuml PartitioningLB3
+
+' left to right direction
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!include DEVICONS/laravel.puml
+!include DEVICONS/javascript.puml
+!include DEVICONS/mysql.puml
+!include DEVICONS/chrome.puml
+
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v11.1/dist
+!includeurl AWSPuml/AWSCommon.puml
+!includeurl AWSPuml/Database/RDS.puml
+!includeurl AWSPuml/Compute/EC2.puml
+!includeurl AWSPuml/Compute/EC2AutoScaling.puml
+!includeurl AWSPuml/NetworkingContentDelivery/ElasticLoadBalancing.puml
+!includeurl AWSPuml/Storage/SimpleStorageService.puml
+' make orange
+AddContainerTag("AWS", $borderColor="#ff9900", $bgColor="#ffffff", $fontColor="#000000")
+
+AddContainerTag("browser", $bgColor="#bcddfc", $fontColor="#000000")
+AddContainerTag("database", $bgColor="#ccfddd", $fontColor="#000000", $borderColor="#cccccc")
+
+skinparam roundcorner 20
+skinparam Padding 20
+skinparam NoteBorderColor transparent
+skinparam NoteBackgroundColor #FDDDCC
+' skinparam NoteFontColor white
+
+UpdateElementStyle(node, $borderColor="#cccccc", $fontColor="#5c5c5c")
+UpdateElementStyle(container, $bgColor="#5388cb")
+
+hide stereotype
+
+Container(client, "Client", "")
+
+ContainerDb(db, "Student Database", "Partition 0", "Student ID ranges [s0000000-s1000000]", $tags="database")
+' note right of db
+'   |= student_id |= name |= ... |
+'   | s0746283 | Bobby Tables | ... |
+'   | ... | ... | ... |
+' end note
+
+ContainerDb(db2, "Student Database", "Partition 1", "Student ID ranges [s1000001-s2000000]", $tags="database")
+' note right of db2
+'   |= student_id |= name |= ... |
+'   | s1637285 | Brae Webb | ... |
+'   | ... | ... | ... |
+' end note
+
+ContainerDb(db3, "Student Database", "Partition 2", "Student ID ranges [s2000001-s3000000]", $tags="database")
+
+Rel(client, db3, "Query for data on s2134234")
+
+Lay_R(db, db2)
+Lay_R(db2, db3)
+Lay_U(db2, client)
+
+
+@enduml
