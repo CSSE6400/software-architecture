@@ -58,8 +58,8 @@ An auction system, as shown in figure \ref{fig:auction-architecture}, could be i
 
 There are two basic approaches to implementing an event-driven architecture.
 They have different high-level structures or \emph{topologies}.
-The \emph{broker topology} is the simpler of the two and is optimised for performance, responsiveness, scalability, extensibility, and low coupling.
-The \emph{mediator topology} is more complex but is designed to provide reliability, process control, and error handling.
+The \emph{broker topology} is the simpler of the two and is optimised for performance, responsiveness, scalability, extensibility, fault tolerance, and low coupling.
+The \emph{mediator topology} is more complex but is designed to provide process control, error handling, and recoverability.
 
 
 \section{Broker Topology}
@@ -214,7 +214,7 @@ Event handlers can process events at their own pace.
 Because the events are stored permanently, history is maintained.
 This allows the system to go back and redo past processing or for an audit to be conducted of what happened during processing.
 
-\subsection{Queues vs Streams}
+\subsection{Queues vs. Streams}
 
 Queues work well when there are known steps in the business process being implemented.
 Queues ensure that all preceding events in the business process are completed before the next step.
@@ -358,34 +358,91 @@ To minimise coupling, the client still only sends initiating events to a single 
 An event mediator retrieves the events from the event queue and classifies them, forwarding the events to the appropriate type of mediator.
 
 
-\section{Design Considerations}\label{sec:design-considerations}
+\section{Broker vs. Mediator Topologies}\label{sec:broker-vs-mediator}
 
-A service-based architecture is typically used for medium-sized systems.
+One way to think of the differences between the broker and mediator topologies is:
+\begin{description}
+    \item[Broker] is a \emph{dumb pipe}.
+    \item[Mediator] is a \emph{smart pipe}\footnote{This is a corruption of the original usage of ``smart'' pipes,
+    which was related to complex Enterprise Service Buses. Though, using BPEL processors or BPM engines is moving into the same territory of intelligence.}.
+\end{description}
 
+An event broker only provides a messaging service to notify event handlers of events.
+The broker does not control the logic of business process.
+Consequently, it cannot maintain any state related to the process.
+It also cannot perform any error handling if an error occurs in the middle of the process.
 
-\section{Service-Based Principles}
+An event mediator coordinates the implementation of the business process by sending events to start each step of the process.
+This allows a mediator to implement complex logic.
+This can include maintaining state for the process and performing error handling.
+In the auction example, once a bidder wins an auction they have to pay for the item.
+\emph{Pay for item} would be the initiating event to being the process of paying for the item.
+\emph{Notification sent} and \emph{order fulfilled} would be other events in the payment process.
+If the payment failed, the event mediator could store the state of the process
+and once payment was successfully processed it could restart the process.
 
-There are a couple of principles which should be maintained when designing a service-based architecture
-to produce a simple, maintainable, deployable and modular designs.
+A conceptual difference between the broker and mediator topologies is that the broker topology is a pure form of event handling.
+Events represent things that have happened.
+Once action has occurred, the event is published and event handlers react to it.
+In the auction system, events in a broker topology would be \emph{bid placed},
+\emph{new high bid}, \emph{payment started}, \emph{payment accepted}, \dots.
 
-\vspace{1mm}
-\begin{definition}[Independent Service Principle]\label{independent-service}
-    Services should be independent, with no dependencies on other services.
-\end{definition}
+The mediator topology is more like a command driven process.
+The events are commands sent by the event mediator to perform the next step in the business process.
+In the auction system, events in a mediator topology would be \emph{place bid},
+\emph{notify bidders}, \emph{notify previous high bidder}, \emph{pay for item}, \dots.
 
+Consequently, in the broker topology, because events represent actions that have occurred, some events can be ignored.
+In the mediator topology, because events are commands to perform the next step in the business process, they must be executed.
 
+\vspace{4mm}\noindent
+\textbf{Broker Advantages}
 
-\section{Extensions}
+\begin{itemize}
+    \item Greater scalability because the broker just distributes event notifications and does not have state,
+            it is easier to federate the broker to provide greater throughput.
+    \item Greater reliability because the broker does not coordinate the business process.
+            If the broker is federated and a broker compute node fails, another node can accept the next processing event and the process can continue.
+    \item Lower coupling because the only dependency between parts of the system are the events.
+\end{itemize}
 
-There are a few common variations of the service-based architecture to consider.
+\noindent
+\textbf{Mediator Advantages}
 
-\subsection{Separate Databases}
+\begin{itemize}
+    \item Allows for more complex business process logic and error handling.
+    \item Can store process state and restart a process after recovering from an error.
+\end{itemize}
 
-The first variation  we will consider is to have separate databases for each service.
+This is not to say that the mediator topology scales poorly, it is just easier to scale to extreme loads with the broker topology.
+The broker topology takes independence to the extreme to reduce coupling.
+To provide process control, the mediator topology requires some coupling between the event mediator and the event handlers.
+The trade-off to consider is whether the business process logic is complex enough that it is easier to implement with the mediator topology.
+
+Reliability versus recoverability is another trade-off to consider.
+If the event broker is federated and there are multiple instances of each event handler,
+it is extremely unlikely that some part of the system will fail and not be available.
+But, this does not deal with errors that occur within a business process.
+The event mediator can recover from errors and complete a business process.
+
+It is possible to have a hybrid architecture that uses both broker and mediator topologies.
+Event mediators can implement complex business processes in the system.
+Event brokers can handle events related to simpler business processes.
 
 
 \section{Conclusion}
 
-Service-based architecture is an approach to designing a distributed system that is not too complex.
-Domain services provide natural modularity and deployability characteristics in the architecture design.
-Well designed service APIs improve the encapsulation and hide implementation details of the services.
+Event-driven architecture enables delivering a highly scalable and extensible distributed system.
+Implementation is complex,
+though this is offset to a certain degree by the availability of libraries or services that implement much of the event broker or event mediator behaviour.
+The event handler cohesion and event handler independence principles help reduce the complexity of the event handlers.
+It is the event logic coordination, along with asynchronous communication and inevitable communication failures,
+that adds to the complexity of the architecture.
+
+Testing and debugging asynchronous communication is a difficult task.
+The scale of most event-driven architecture tends to exasperate this difficulty.
+
+The event-driven architecture can be combined with other architectural styles.
+This allows other architectures to take advantage of the scalability and responsiveness of the event-driven approach.
+Two architectures that commonly are combined with the event-driven architecture are space-based and microservices.
+They are not the only hybrid approaches, many other architectures use or borrow from event-driven (e.g. event-driven microkernel).
