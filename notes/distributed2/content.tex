@@ -212,13 +212,91 @@ the set of writes and reads must overlap,
 which means that reading stale data is \textsl{unlikely}%
 \footnote{The cases where stale data can still be read are enumerated in M. Kleppmann \cite{data-intensive}.}.
 
-\section{Partitioning (Sharding)}
+\section{Partitioning}
 
-\subsection{Partition by Primary Key}
+Partitioning involves distributing the contents of a database across multiple nodes.
+It differs from replication as nodes do not store complete copies of the database.
+Often partitioning is combined with replication to prevent the lost of data if one of the partitions fails.
+Partitioning is required when we have a large amount of data to store.
 
-\subsection{Partition by Secondary Index}
+When we start partitioning data onto multiple nodes,
+we need to consider how we decide which data belongs to which node.
+There are two primary approaches to this decision.
 
-\subsection{Re-balancing}
+\subsection*{Partition by Key Range}
+We assume that data is given a key,
+if a key-value database this is required,
+in relational databases the schema should specify a primary key column.
+One approach to partitioning is to divide the range of key values and partition based on that.
+Consider the UQ student database,
+the key would be the student ID.
+We can then partition the database based on student ID,
+say all student numbers between s0000000 and s1111111 are stored on partition 0,
+all numbers between s1111112 and s2222222 are stored on partition 1, etc.
+
+This approach appears practical,
+each partition has an equal share of database entires.
+However, as time goes on certain partitions become less used while others become very popular.
+We might imagine that at the moment,
+partitions 5 and 6 would be used far more frequently than partition 0.
+This is known as \textsl{skewed partitioning}.
+
+\subsection*{Partition by Hash}
+
+Consider hash maps,
+we use hashes of the keys to allocate values into buckets.
+A good hashing algorithm minimizes the amount of collision (a value stored in the same bucket).
+We can apply the same process to database partitioning,
+hashing the key of a record allows us to maximize the spread of partition usage.
+The disadvantage of partitioning by hash is that only queries by key are efficient,
+queries by ranges of keys are no longer efficient requiring all partitions to be queried.%
+\footnote{Databases such as Cassandra use compound primary keys to help resolve this issue.}
+
+\subsection*{Secondary Indexes}
+
+Databases often rely on secondary index to perform a range of useful queries.
+In our UQ student database example,
+a database field which is often useful to query might be the degree of a student record.
+We might want this query to run efficiently as schools could need to frequently query for these collections to implement their own services.
+
+The two approaches to this are local indexes and global indexes.
+In local indexes,
+each partition stores an index for their own partition of the data.
+In global indexes,
+a partition is assigned to manage a particular secondary index value.
+For example, partition 2 might store the index for all Bachelor of Software Engineering students.
+
+Local indexes allow efficient writing,
+as a write only has to update the index of the partition which it is writing to.
+However, it introduces slower reads as all partitions must be queried for their index.
+Global indexes slow down writing as all relevant partitions need to have their partition updated.
+Although it can increase read speeds as a query only needs to look at the relevant partitions.
+
+\subsection{Rebalancing}
+
+Over time some partitions may get more frequent use than others.
+We might also add or remove nodes.
+This can require the data to be rebalanced to update the range of values stored on any partition.
+Rebalancing can be an automated or a manual process.
+It is important to consider the effects of rebalancing automatically as they are costly operations and if incorrectly triggered automatically can greatly impact the performance of a database.
+
+\subsection{Routing}
+
+Much like auto-scaled stateless services,
+we need a way to route traffic that is fair.
+However, unlike stateless services,
+only one node of the system is capable of processing our request.
+We need a mechanism for choosing the appropriate node to send our request to.
+
+We might implement a naive load balancer which just balances the load regardless of the request.
+This load balancer is will send requests to the wrong nodes.
+In such a system, it is the responsibility of the node to forward the request to the node which is capable of answering the query.
+
+A more sophisticated solution would be to deploy a load balancer which is request aware.
+This load balancer can forward requests to the appropriate node.
+
+Finally, we might offload the problem to the client.
+Requiring that our database clients are aware of how to map their query to the appropriate node.
 
 \section{Transactions}
 
