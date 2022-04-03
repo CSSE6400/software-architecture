@@ -231,8 +231,8 @@ One approach to partitioning is to divide the range of key values and partition 
 Consider the UQ student database,
 the key would be the student ID.
 We can then partition the database based on student ID,
-say all student numbers between s0000000 and s1111111 are stored on partition 0,
-all numbers between s1111112 and s2222222 are stored on partition 1, etc.
+say all student numbers between \texttt{s0000000} and \texttt{s1000000} are stored on partition 0,
+all numbers between \texttt{s1000001} and \texttt{s2000000} are stored on partition 1, etc.
 
 This approach appears practical,
 each partition has an equal share of database entires.
@@ -300,4 +300,48 @@ Requiring that our database clients are aware of how to map their query to the a
 
 \section{Transactions}
 
-\subsection{ACID}
+All of the various failure cases and considerations when working with scalable databases can be overwhelming.
+The complexities of distributed databases make reasoning about the logic of our application challenging,
+which in turn leads to more bugs and faults.
+Fortunately, database developers have a technique to assist in this complexity and allow us to reason about our interactions with the database, \textsl{transactions}.
+
+Transactions bundle related groups of read/write operations together and guarantee useful properties.
+Traditionally, these properties are referred to as ACID properties, Atomicity, Consistency, Isolation, and Durability.
+
+\subsection{Atomicity}
+Atomicity guarantees that when performing multiple operations,
+if one operation cannot be completed successfully then the effects of all operations are aborted.
+For example,
+consider process purchasing.
+When purchasing a product we may wish to both update the stock of the product and reduce the funds of a customers account.
+If either of those operations occurred on their own,
+someone would be very unhappy.
+Atomicity guarantees that either all operations in a transaction succeed or none do.
+
+\subsection{Consistency}
+Consistency guarantees that any application specific invariants of the database are preserved by transactions.
+For example, we might introduce the invariant that the stock of an item cannot be below zero.
+This invariant must then be maintained by all transactions.
+
+\subsection{Isolation}
+Isolation allows transactions to pretend that they are the only operation performing on the data.
+Transactions appear to preform sequentially even though they may in reality be performing concurrently.
+This allows transactions to ignore a whole host of issues related to concurrency.
+
+\subsection{Durability}
+Durability provides a guarantee that once transactions are completed,
+their updates are preserved.
+In distributed databases this is often an assurance that the updated data has been copied to other machines.
+
+\section{Conclusion}
+
+Scaling out services that have persistent data requires far greater care than stateless services.
+We have seen approaches for coping with undue load on individual nodes via replication.
+We have seen approaches for handling greater volume of data than can be stored on a single machine via partitioning.
+We have noted that often one might want to combine the approaches of replication and partitioning for the one database system.
+Both of these techniques introduce a new range of complexity for programmers to deal with.
+In our final section we briefly introduced how transactions and the guarantees they provide can help developers in reasoning about their database interactions.
+
+This lecture note has been a very brief introduction into the topics of replication, partitioning, and transactions.
+The content has been structured around the Chapters 5, 6, and 7 of Designing Data-Intensive Applications \cite{data-intensive}.
+You are strongly encouraged to read these chapters of the book for a much more in-depth look at all of the topics covered.
