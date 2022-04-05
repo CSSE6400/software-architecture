@@ -1,5 +1,5 @@
 \title{Distributed Systems I}
-\author{Brae Webb}
+\author{Brae Webb \& Richard Thomas}
 \date{\week{5}}
 
 \maketitle
@@ -48,7 +48,6 @@ Something that is believed or assumed to be true but is not.
 The first four fallacies of distributed computing were introduced by Bill Joy and Dave Lyon and called `The Fallacies of Networked Computing' \cite{four-fallacies}.
 Peter Deutsh introduced three more fallacies and named the collection `The Fallacies of Distributed Computing' \cite{eight-fallacies}.
 James Gosling (lead developer of Java) later introduced a final eighth fallacy \cite{four-fallacies}.
-We omit the eighth fallacy as its relevance to the concerns of modern developers has deteriorated.
 
 \subsection{The Network is Reliable}
 The first fallacy assures us that the network is reliable.
@@ -57,7 +56,7 @@ They are more reliable than they used to be but they are far from reliable.
 
 Often we are quite capable of remembering this requirement in obviously unreliable contexts.
 For example, building a mobile application,
-it is easy enough to remember that the mobile will occasionally lose a WiFi connection and we should plan for that.
+it is easy enough to remember that the mobile will occasionally lose network access and we should plan for that.
 Developers can often get the client-server connection correct but neglect server-server connections,
 assuming they are reliable.
 
@@ -70,7 +69,7 @@ We will see later in our distributed systems series that processing network erro
 \subsection{Latency is Zero}
 This course is being run in Australia,
 no one who is taking this course in Australia \textsl{should} believe this fallacy.
-Again, this fallacy doesn't exist as much with client-server communication,
+Again, this fallacy does not exist as much with client-server communication,
 we are all intimately familiar with having videos buffer.
 
 This fallacy still lingers with server-server communication.
@@ -83,16 +82,16 @@ ensure that you know the performance characteristics of the network and deem the
 \subsection{Bandwidth is Infinite}
 Similar to the previous fallacy,
 the fallacy of infinite bandwidth is a plea for architects to be mindful and conservative in their system designs.
-We need to be mindful of the consumption of the internal and external consumption of bandwidth for our systems.
+We need to be mindful of the internal and external consumption of bandwidth for our systems.
 There are hard limits on bandwidth.
 A dubious statement from Wikipedia%
 \footnote{\url{https://en.wikipedia.org/wiki/Internet_in_Australia}: I cannot find a supporting reference, let me know if you are able.} %
-claims that Australia has a total transpacific bandwidth of around 704 GB/s.
+claims that Australia has a total trans-Pacific bandwidth of around 704 GB/s.
 
-Internally, data centers such as Amazon allow impressive bandwidths and it is therefore becoming less of a problem.
+Internally, data centres such as AWS allow impressive bandwidths and it is therefore becoming less of a problem.
 However, when working at scale,
 it is important to be mindful to not be wasteful with the size of data communicated internally.
-Externally bandwidth usage comes at the cost of the end-user and the budget.
+Externally, bandwidth usage comes at the cost of the end-user and the budget.
 End-users suffer when bandwidth usage of an application is high,
 not all users have access to high bandwidth connections, particularly those in developing nations.
 There is also a cost on the developers end, as infrastructure providers charge for external bandwidth usage.
@@ -101,7 +100,7 @@ There is also a cost on the developers end, as infrastructure providers charge f
 Developers occasionally assume that VPCs, firewalls, security groups, etc. ensure security.
 This is not the case.
 The moment a machine is connected to the internet it is vulnerable to a whole range of attacks.
-Known and unknown vulnerabilities enable access bypassing network security infrastructure.
+Known and unknown vulnerabilities enable access, bypassing network security infrastructure.
 Injection attacks are still prominent;
 if a distributed system does not have multiple authentication checkpoints then an injection attack on one insecure machine can compromise the entire system.
 We tend to incorrectly assume we can trust the machines within our network,
@@ -131,19 +130,34 @@ Who do you contact?
 AWS? The users? Your ISP? Your users ISP's?
 Who is the mythical sysadmin to solve all your problems?
 There isn't one; it is important to account for and plan for that.
-When things start failing can you deploy to a different AWS region?
+When things start failing, can you deploy to a different AWS region?
 Can you deploy to a different hosting provider?
 Can you deploy parts of your application on-premise?
 Likewise we need to be aware of this fallacy when trying to resolve less drastic failures, for example, high latency, permission errors, etc.
 
 \subsection{Transport Cost is Zero}
-When architecting a system it can easy to get carried away with building beautiful distributed, modular, extensible systems.
+When architecting a system it can be easy to get carried away with building beautiful distributed, modular, extensible systems.
 However, we need to be mindful that this costs money.
 Distributed systems cost far more than monolithic applications.
 Each RPC or REST request translates to costs.
 We should also mention that under-utilised machines cost money.
-Distributing our application services can seem like a beautiful deployment solution but if you are running 10 different service machines for an application with 100 users,
-you are burning money both hosting the machines and communicating between them. 
+Distributing our application services can seem like a beautiful deployment solution
+but if you are running 10 different service machines for an application with 100 users,
+you are burning money both hosting the machines and communicating between them.
+
+\subsection{Network is Homogeneous}
+This fallacy has gotten both better and worse over time.
+The network has become even more heterogeneous over time.
+There are more types of networks over which most systems need to operate.
+There are more communication protocols to consider when designing a distributed system.
+But, a judicious selection of a small set of standard protocols can hide this complexity.
+
+A simple example of this is accessing a system from a desktop computer with a wired connection to a router,
+from a laptop over WiFi, and from a phone over 5G,
+This system is obviously operating over a heterogeneous network,
+but if you have designed the system using standard communication protocols,
+the complexity of its heterogeneous network is hidden behind the layer of abstraction provided by the protocols.
+
 
 \section{Reliability}
 We said previously that a service-based distributed architecture was reasonably reliable as it had independent services which spreads the risk of fall-over.
@@ -193,14 +207,14 @@ We would only need 1,000 disks to have one die every 10 days.
 How should we tolerate this type of fault?
 
 \subsection{Distributing Risk}
-For faults which cause a system to become unusable we can not program around it.
+For faults which cause a system to become unusable we cannot program around it.
 We need a mechanism for recovering from the fault without relying on the system to work at all as expected.
 One approach is to duplicate and distribute the original system.
 If we duplicate our software across two machines then we have halved our risk of the system going completely down.%
 \footnote{In a simple ideal world.}
 If we replicate our software across thousands of machines then the likelihood of a complete system failure due to a hardware failure is negligible.
 Google does not go down over a hardware failure.
-We can imagine that Google servers have many hardware failures per day but this does not cause an outage.
+We know that Google servers have many hardware failures per day but this does not cause a system outage.
 
 This gives us one very important motivation for creating distributed systems,
 to ensure that our software system is \textit{reliable}.
