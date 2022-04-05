@@ -7,7 +7,7 @@
 \section{Introduction}
 In the previous course notes \cite{distributed1-notes} and lecture \cite{distributed1-slides} on distributed systems,
 we explored how to leverage distributed systems to increase the reliability and scalability of a system.
-Specifically, we saw that when working with stateless services which do not require persistent data,
+Specifically, we saw that when working with stateless services, which do not require persistent data,
 auto-scaling groups and load-balancers can be used to scale-out the service --- distributing the load to arbitrary copies of the service.
 In the lecture, we applied this technique to the product browsing service of our Sahara example,
 as illustrated in Figure \ref{fig:scaled-sahara}.
@@ -33,24 +33,22 @@ We focus on state stored in a database and thus,
 how databases can be made more reliable and scalable.
 In these lecture notes we only outline the scope of our treatment of database scaling.
 For a detailed treatment of these topics,
-please refer to the Designing Data-Intensive Applications textbook \cite{data-intensive}.
+please refer to the \textit{Designing Data-Intensive Applications} textbook \cite{data-intensive}.
 
 \section{Replication}
 Replication is the most straight-forward approach to scaling databases.
-In most applications,
-read operations occur much less frequently than write operations,
+In many applications, read operations occur much more frequently than write operations,
 in such cases replication can enable improved capacity for read operations whilst keeping the write capacity roughly equivalent.
-Replication involves creating complete database copies,
-called replicas,
+Replication involves creating complete database copies, called replicas,
 that reduce the load on any single replica.
 
 \subsection{Leader and Followers}
-The most common implementation of replication is leader-follower replication,
-fortunately, it is also the simplest.
+The most common implementation of replication is leader-follower replication.
+Fortunately, it is also the simplest.
 
 \begin{description}
-    \item[Leader] a replica that accepts write operations and define the order in which writes are applied.
-    \item[Follower] replicas are read-only copies of the data. 
+    \item[Leader] a replica that accepts write operations and defines the order in which writes are applied.
+    \item[Follower] replicas that are read-only copies of the data. 
 \end{description}
 
 \noindent
@@ -96,7 +94,7 @@ there are a few common practices to keep in mind when implementing such a system
 
 \begin{description}
     \item[Read-your-writes Consistency] Ensures that the user who wrote the database change will always see their update reflected, though other users will still have to wait for the change to be propagated. This type of consistency avoids upsetting users and making them think they must redo their write.
-    \item[Monotonic Reads] Ensures that once a user reads the updated data, they do not later see the older version of the data, i.e. they don't travel back in time.
+    \item[Monotonic Reads] Ensures that once a user reads the updated data, they do not later see the older version of the data, i.e. they do not travel back in time.
     \item[Consistent Prefix Reads] Ensures that sequential writes are always read in the same order. Consider a Twitter feed, each post is a write. Consistent Prefix Reads guarantees that those readers do not see the posts out of order.
 \end{description}
 
@@ -108,9 +106,9 @@ For systems which need to be highly available,
 having a single point of failure,
 the leader replica, is not good enough.
 Likewise, for systems which need to be highly scalable,
-a write bottle-neck is also insufficient.
+a write bottle-neck is inappropriate.
 For these situations, a multi-leader replication scheme may be appropriate.
-It is worth noting that multi-leader replications introduce complexity that often outweighs the value.
+It is worth noting that multi-leader replications introduce complexity that often outweighs their value.
 
 \begin{figure}[ht]
     \begin{center}
@@ -138,8 +136,8 @@ Both write operations appear successful to the fulfillment team and the tutors b
 and it is a common problem in multi-leader replications. 
 
 \subsubsection*{Write Conflicts}
-Write conflicts occur when two or more leaders in a multi-leader replication have updates to the same piece of data,
-in relational systems this is normally the same table row.
+Write conflicts occur when two or more leaders in a multi-leader replication update the same piece of data.
+In relational systems this is normally the same table row.
 There are a few mechanisms for resolving write conflicts,
 but the recommended approach is to avoid conflicts altogether.
 Conflicts can be avoided by ensuring that a piece of data is only ever updated by the same leader,
@@ -157,7 +155,8 @@ there are a few techniques we can use.
 
 \subsection{Leaderless Replication}
 
-Leaderless replication doesn't rely on writes being sent to and processed by a single designated leader, instead reads and writes may be sent to any of the database replicas.
+Leaderless replication does not rely on writes being sent to and processed by a single designated leader,
+instead reads and writes may be sent to any of the database replicas.
 To accomplish this, leaderless databases introduce a few additional constraints on both read and writes operations to maintain relative consistency.
 
 A core aspect of leaderless replication is that clients need to duplicate both write and read operations to multiple replicas.
@@ -201,7 +200,7 @@ If instead,
 we write to two replicas then at most one replica will have outdated data.
 Then we need only read from two replicas to ensure that at least one will have the most recent writes.
 
-To generalize, if we have a leaderless database of $n$ replicas,
+To generalise, if we have a leaderless database of $n$ replicas,
 we need to satisfy that,
 $$
 w + r > n
@@ -225,7 +224,7 @@ There are two primary approaches to this decision.
 
 \subsection*{Partition by Key Range}
 We assume that data is given a key,
-if a key-value database this is required,
+with a key-value database this is required,
 in relational databases the schema should specify a primary key column.
 One approach to partitioning is to divide the range of key values and partition based on that.
 Consider the UQ student database,
@@ -249,27 +248,25 @@ A good hashing algorithm minimizes the amount of collision (a value stored in th
 We can apply the same process to database partitioning,
 hashing the key of a record allows us to maximize the spread of partition usage.
 The disadvantage of partitioning by hash is that only queries by key are efficient,
-queries by ranges of keys are no longer efficient requiring all partitions to be queried.%
+queries by ranges of keys are no longer efficient as they require \emph{all} partitions to be queried.%
 \footnote{Databases such as Cassandra use compound primary keys to help resolve this issue.}
 
-\subsection*{Secondary Indexes}
+\subsection*{Secondary Indices}
 
 Databases often rely on secondary index to perform a range of useful queries.
 In our UQ student database example,
 a database field which is often useful to query might be the degree of a student record.
 We might want this query to run efficiently as schools could need to frequently query for these collections to implement their own services.
 
-The two approaches to this are local indexes and global indexes.
-In local indexes,
-each partition stores an index for their own partition of the data.
-In global indexes,
-a partition is assigned to manage a particular secondary index value.
+The two approaches to this are local or global indices.
+With local indices, each partition stores an index for their own partition of the data.
+With global indices, a partition is assigned to manage a particular secondary index value.
 For example, partition 2 might store the index for all Bachelor of Software Engineering students.
 
-Local indexes allow efficient writing,
-as a write only has to update the index of the partition which it is writing to.
+Local indices allow efficient writing,
+as a write only has to update the index of the partition to which it is writing.
 However, it introduces slower reads as all partitions must be queried for their index.
-Global indexes slow down writing as all relevant partitions need to have their partition updated.
+Global indices slow down writing as all relevant partitions need to have their partition updated.
 Although it can increase read speeds as a query only needs to look at the relevant partitions.
 
 \subsection{Rebalancing}
@@ -278,7 +275,8 @@ Over time some partitions may get more frequent use than others.
 We might also add or remove nodes.
 This can require the data to be rebalanced to update the range of values stored on any partition.
 Rebalancing can be an automated or a manual process.
-It is important to consider the effects of rebalancing automatically as they are costly operations and if incorrectly triggered automatically can greatly impact the performance of a database.
+It is important to consider the effects of rebalancing automatically as they are costly operations
+and if triggered at an inappropriate time they can greatly impact the performance of a database.
 
 \subsection{Routing}
 
@@ -286,7 +284,7 @@ Much like auto-scaled stateless services,
 we need a way to route traffic that is fair.
 However, unlike stateless services,
 only one node of the system is capable of processing our request.
-We need a mechanism for choosing the appropriate node to send our request to.
+We need a mechanism for choosing the appropriate node to which our request is sent.
 
 We might implement a naive load balancer which just balances the load regardless of the request.
 This load balancer is will send requests to the wrong nodes.
@@ -301,7 +299,7 @@ Requiring that our database clients are aware of how to map their query to the a
 \section{Transactions}
 
 All of the various failure cases and considerations when working with scalable databases can be overwhelming.
-The complexities of distributed databases make reasoning about the logic of our application challenging,
+The complexities of distributed databases make reasoning about the logic of an application challenging,
 which in turn leads to more bugs and faults.
 Fortunately, database developers have a technique to assist in this complexity and allow us to reason about our interactions with the database, \textsl{transactions}.
 
@@ -311,9 +309,8 @@ Traditionally, these properties are referred to as ACID properties, Atomicity, C
 \subsection{Atomicity}
 Atomicity guarantees that when performing multiple operations,
 if one operation cannot be completed successfully then the effects of all operations are aborted.
-For example,
-consider process purchasing.
-When purchasing a product we may wish to both update the stock of the product and reduce the funds of a customers account.
+For example, consider the purchasing process.
+When purchasing a product we may wish to both update the stock of the product and reduce the funds of a customer's account.
 If either of those operations occurred on their own,
 someone would be very unhappy.
 Atomicity guarantees that either all operations in a transaction succeed or none do.
@@ -340,8 +337,8 @@ We have seen approaches for coping with undue load on individual nodes via repli
 We have seen approaches for handling greater volume of data than can be stored on a single machine via partitioning.
 We have noted that often one might want to combine the approaches of replication and partitioning for the one database system.
 Both of these techniques introduce a new range of complexity for programmers to deal with.
-In our final section we briefly introduced how transactions and the guarantees they provide can help developers in reasoning about their database interactions.
+In our final section we briefly introduced how transactions, and the guarantees they provide, can help developers in reasoning about their database interactions.
 
 This lecture note has been a very brief introduction into the topics of replication, partitioning, and transactions.
-The content has been structured around the Chapters 5, 6, and 7 of Designing Data-Intensive Applications \cite{data-intensive}.
+The content has been structured around the Chapters 5, 6, and 7 of \textit{Designing Data-Intensive Applications} \cite{data-intensive}.
 You are strongly encouraged to read these chapters of the book for a much more in-depth look at all of the topics covered.
