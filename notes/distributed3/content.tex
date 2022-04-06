@@ -6,8 +6,9 @@
 
 \section{Introduction}
 
-In looking at distributed systems, we started from the perspective of Murphy's Law,
-\textit{if anything can go wrong it will}.
+In our introduction to distributed systems we described the fallacies of distributed systems \cite{distributed1-notes}.
+Some of these fallacies (e.g. the network is reliable, the network is secure and the topology never changes)
+apply Murphy's Law, \textit{if anything can go wrong it will}, to the context of distributed systems.
 We will now move on to O'Toole's Commentary, \textit{Murphy was an optimist}.
 
 Large distributed systems consist of thousands of computing platforms,
@@ -17,6 +18,73 @@ the system must be designed to cater for \emph{partial failure}.
 Even for small systems, some part will eventually fail,
 so fault handling must be part of the design.
 
+
+\section{Detecting Faults}
+
+We mentioned that, paradoxically, distributed systems can be more reliable than non-distributed systems
+because a distributed system spreads risk of failure over multiple machines \cite{distributed1-notes}.
+This is managed through health checks, load-balancing and auto-scaling.
+We have also described the use of transactions as a mechanism to deal with some potential failures
+that affect our storage of persistent data \cite{distributed2-notes}.
+
+The challenge, particularly when implementing health checks, is determining when a fault has occurred.
+Most distributed systems communicate over a TCP/IP network.
+This introduces a layer of uncertainty in trying to determine if a fault exists.
+A message sent over a TCP/IP network may not be delivered, or the response may not be received.
+Possible causes of either fault include the following.
+\begin{itemize}
+    \item The request sent to another service in the system may not have been delivered.
+    \item The request may be delayed and is waiting in a queue to be processed. (e.g. either the network or the service is overloaded).
+    \item The node running the service may have failed.
+    \item The service may be busy and has temporarily stopped responding.
+    \item The service may have processed the request and replied, but it has not been received.
+    \item The response may be delayed and will be received later.
+\end{itemize}
+
+There are some techniques that can be used to identify some faults, but they are not perfect.
+\begin{itemize}
+    \item If a compute node is running and reachable, but does not have a process listening on the destination port, the operating system should close or refuse the TCP connection. This should result in a RST or FIN packet being received by the message sender, with the caveat that the packet may be lost.
+    \item If a process crashes but the compute node is still running, a monitor program running on the node can report the failure to a health monitoring sub-system.
+    \item If a router knows that an IP address is not reachable, it can reply with a destination unreachable packet. But, the router has no additional ways of knowing if an address is not reachable as the rest of the system.
+    \item If the system is running on your own hardware, you may be able to query network switches to detect link failures.
+\end{itemize}
+
+In general, despite the techniques above, the application needs to have a strategy to detect faults
+and to decide whether to retry a request or that a node is dead.
+Fault handling has to be responsive in light of the uncertainty of the fault.
+A general strategy is to retry sending a message a certain number of times and having a time limit.
+If no response is received within the time limit the system will then decide that the node is dead,
+will spin up a new node, and remove the dead node from the load balancer's list of active nodes.
+
+The challenge with this strategy is deciding how many retry requests and how long to wait.
+Multiple retries can swamp an already overloaded node, reducing its performance even more or possibly leading to it crashing.
+In the first lecture on distributed systems we introduced exponential backoff as a mechanism to reduce the impact of retrying requests \cite{distributed1-slides}.
+For more information about this strategy, see the retry design pattern \cite{retry-pattern}.
+Simple exponential backoff can introduce peaks of load around the exponential delay.
+Jitter can be added to the delay to spread out these peaks \cite{backoff-jitter}.
+
+Determing how long to wait before deciding that a node is dead has its own challenges.
+If the system decides that a node is dead,
+then all clients who have sent messages to that node, and have not received a reply, will need to resend their messages to other nodes.
+Waiting too long reduces the system's responsiveness, as processes wait for a the dead node to reply.
+It may also reduce the system's overall performance as a backlog of requests need to be processed.
+
+Waiting too short a time may lead to prematurely declaring a node dead.
+If the node is declared dead but it is just responding slowly because of system load,
+then resending messages to other nodes increases the load on other nodes.
+This can lead to a cascading failure, where all nodes are overloaded to the point that they are all declared dead.
+There is an additional problem of declaring a node dead, which is just slow to respond.
+It will still be processing requests until it is shutdown, but those requests will be resent to other nodes.
+This leads to the possibility that some actions will be performed twice.
+
+One option to reduce the variability of message delays is to use UDP rather than TCP at the network level.
+UDP does not retransmit lost packets, which reduces the variability of transmission time.
+The drawback is that the system will need to manage more messages not being received,
+as it will not have the automated retransmission of packets provided by TCP.
+It depends on the type of system, which approach is more beneficial.
+If the system is transmitting financial data, the greater reliability of TCP probably outweighs the reduced message delay of UDP.
+Whereas a music streaming service will probably find that having less variability of delay is more beneficial than the reliability of TCP.
+(Receiving an audio packet, after it needed to be played, is pointless.)
 
 \section{Consensus}
 
