@@ -1,0 +1,108 @@
+\documentclass{csse4400}
+
+\usepackage{languages}
+
+\title{Coffee Shop}
+\author{Brae Webb}
+
+\date{\week{6}}
+\begin{document}
+
+\maketitle
+
+\section{Brief}
+
+This week we have introduced the concept of event-driven architectures.
+In this tutorial, we will explore and document a project which implements this type of architecture.
+
+\url{https://github.com/CSSE6400/scalable-coffee-shop}
+
+\noindent
+The project is an implementation of a coffee shop,
+implemented by 
+\href{https://github.com/sdaschner/scalable-coffee-shop}{Sebastian Daschner}.
+The coffee shop exposes a HTTP API which can be used to stock beans and place drink orders.
+
+Our goal is to run the software locally, begin exploring the implementation, and create a C4 diagram to serve as documentation.
+
+\section{Installation and Running}
+
+For the first 15 to 20 minutes of the tutorial,
+we will install the application.
+To install, we recommend that you use Docker Compose.
+The project has a \texttt{docker-compose.yml} configuration in the top-level folder.
+
+\bash{git clone https://github.com/CSSE6400/scalable-coffee-shop^^J
+\$ cd scalable-coffee-shop^^J
+\$ docker-compose up}
+
+Ideally this command will execute without error and start servicing requests as shown in the examples below.
+
+\info{
+The \texttt{docker-compose up} command produces a lot of interleaving output.
+If you need to debug why one particular service, e.g. the \texttt{beans} service,
+is not working, you can use the \texttt{logs} command to inspect it.
+
+\bash{docker-compose logs -f beans}
+}
+
+\begin{code}[language=bash]{}
+$ curl http://localhost:8002/beans/resources/beans -i -XPOST \
+    -H 'content-type: application/json' \
+    -d '{"beanOrigin": "Colombia", "amount": 10}'
+  
+  HTTP/1.1 204 No Content
+  X-Powered-By: Undertow/1
+  Server: WildFly/10
+  Date: Fri, 17 Nov 2017 20:49:26 GMT
+
+$ curl http://localhost:8002/beans/resources/beans
+{"Colombia":10}
+\end{code}
+
+\begin{code}[language=bash]{}
+$ curl http://localhost:8001/orders/resources/orders/ -i -XPOST \
+    -H 'Content-type: application/json' \
+    -d '{"beanOrigin": "Colombia", "coffeeType": "Espresso"}'
+  
+  HTTP/1.1 202 Accepted
+  Connection: keep-alive
+  X-Powered-By: Undertow/1
+  Server: WildFly/10
+  Location: http://localhost:8001/orders/resources/orders/c099c158-b748-4115-bed3-7b5dfff70771
+  Content-Length: 0
+  Date: Fri, 17 Nov 2017 20:51:16 GMT
+
+$ curl http://localhost:8001/orders/resources/orders/c099c158-b748-4115-bed3-7b5dfff70771
+{"status":"started","type":"espresso","beanOrigin":"Colombia"}
+\end{code}
+
+\section{Documentation}
+In the documentation assignment,
+you will have gained some experience with creating diagrams of software architecture.
+In the tutorial today,
+we will be using those skills to create documentation for the coffee shop application using diagrams.
+You can use your favourite diagram software for this task.
+For the tutorial, you should produce:
+
+\begin{enumerate}
+    \item A context diagram for the system.
+    \item A container diagram of the system.
+    \item A component diagram for at least the Kafka server.
+\end{enumerate}
+
+For reference on how event-driven architectures should look in C4, please refer to the Event Driven Architecture handout \cite{events-notes}.
+
+\info{
+    You do not need an in-depth understanding of Kafka to document the architecture.
+    For a simple introduction to the concepts of Kafka see the Hortonworks documentation \cite{kafka-basics}.
+    For a more in-depth look at how Kafka actually works,
+    read the article by Stopford \cite{kafka-in-depth}.
+}
+
+
+\clearpage
+\bibliographystyle{ieeetr}
+\bibliography{ours,coffee}
+
+\end{document}
