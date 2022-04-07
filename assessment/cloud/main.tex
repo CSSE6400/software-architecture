@@ -1,8 +1,9 @@
 \documentclass{csse4400}
 
 \usepackage{CJKutf8}
+\usepackage{languages}
 
-\title{Scalable Data Analysis}
+\title{Scalable Text-to-Speech}
 \author{Brae Webb}
 \date{Semester 1, 2022}
 
@@ -11,82 +12,98 @@
 
 \section*{Summary}
 In this assignment, you will demonstrate your ability to \textsl{design},
-\textsl{implement}, and \textsl{deploy} a web application which can handle a high load,
+\textsl{implement}, and \textsl{deploy} a web application that can process a high load,
 i.e. a scalable application.
-You'll be asked to deploy a tool where researchers upload text data (a \textsl{corpus}),
-your service will analyse the corpus and provide the researcher with information to assist them in understanding the corpus.
+You will be asked to deploy a tool that accepts text input and generates synthesized speech output.
 Specially you need to support:
 \begin{itemize}
-    \item Uploading a large corpus (order of gigabytes).
-    \item Perform analysis techniques on the data while remaining responsive to the user.
-    \item Present the results in a human-readable format, as well as making the results available via a pre-specified API.
+    \item Uploading and generating a large text input.
+    \item Generating speech output while remaining responsive to the user.
+    \item Access via a specified REST API for use by front-end interfaces.
 \end{itemize}
 
-Your service will need to be deployed to AWS and will undergo automated load-testing to ensure it meets the required scalability.
+Your service will be deployed to AWS and will undergo automated correctness and load-testing to ensure it meets the required scalability.
 
 \section{Introduction}
-The world today is full of data.
-For years, tech companies have been collecting data by default without having an immediate use for the data.
-The explosion of interest in fields such as AI and machine learning can be attributed to the availability of these large collections of data.
+Text-to-speech software supports accessibility,
+enables smart-home devices,
+and even breaks down language barriers.
+Unfortunately, text-to-speech is computationally intensive.
+While the technology has made great advances over the past few decades,
+many open-source implementations are still inefficient.
 
-\begin{figure}[ht]
-  \begin{center}
-\includegraphics[width=0.6\textwidth]{analysis-demand}
-  \end{center}\caption{Increasing demand for data analysts in the US \cite{data-analysis-shortage}.}
-\end{figure}
+\paragraph{Task}
+For this assignment,
+the University of Queensland is looking to convert all course content into speech.
+This will support visually impaired students in their studies.
+All course content from slack messages and blackboard announcements to text-books must be converted to speech.
+You will be responsible for designing and implementing this service for use across the entire university.
 
-\paragraph{Importance of Explainability}
-Something which is becoming increasingly apparent to machine learning researchers is the demand for machine learning models to be \textsl{explainable}.
-An interesting demonstration of what can go wrong without \textsl{explainability} is COVID-Net~\cite{covidnet}.
-Researchers explored the applicability of machine learning models to detecting COVID-19 from chest X-rays.
-The results were quite promising, the researchers were reportedly able to detect the virus with a high degree of accuracy.
-Unfortunately (or rather fortunately), later research utilizing explainability techniques indicated that the developed model takes shortcuts~\cite{covidnet-debunk}.
-They demonstrate that the results of the model are highly dependant on artefacts in the X-ray which indicate external factors.
-For example, the model may associate patients scanned with a portable X-ray with a higher likelihood of having the virus as it may indicate the severity of their situation.
+\paragraph{Requirements}
+As you might imagine,
+blackboard announcements occur frequently and should be translated in almost real time.
+While textbooks are set ahead of semester and may take several days to process.
+The university will experience peaks of usage.
+At the start of semester,
+instructors many set textbooks which need to be processed.
+The university will also experience usage lows over the summer holiday period when no translations will be required.
+The university is not willing to pay for the resources required during start of semester all year round.
+Your implementation must be able to scale dynamically based on the current amount of jobs to be processed.
 
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[width=0.8\textwidth]{covidnet-markers}
-  \end{center}
-  \caption{Experimental confirmation of insights from saliency maps and CycleGANs via radiograph modification~\cite{covidnet-debunk}.}
-\end{figure}
+% \section{Features}
 
-\paragraph{Your Task}
-For this assessment, you'll be assisting machine learning researchers in the development of a Exploratory Data Analysis (EDA)
-(sometimes called \textsl{pre-modelling explainability}) tool.
-Specifically, you will need to develop a web interface which allows researchers to upload text data which they wish to use for
-Natural Language Processing (NLP) research.
-Your software will perform a number of EDA techniques on the data and present the results to the researchers once complete.
-The challenge is that often NLP corpuses can be quite large.
-A researcher may upload Amazon's entire product review collection totalling 34GBs~\cite{amazon-reviews}.
-Your software is expected to remain available and usable to other users while that data is processing.
-
-\section{Features}
-You are expected to implement the following features to analyse the uploaded data.
-Features are given in order of increasing inefficiency for a computer,
-making scaling more challenging.
-Implementing only some of the listed features will still be worth marks, see the marking criteria at the end of the sheet.
-
-Calculate/compute and display the following:
-\begin{itemize}
-    \item the total size of the uploaded data;
-    \item the total amount of words;
-    \item aggregate statistics of the length of words;
-    \item a histogram of the length of words;
-    \item a word cloud of most frequently used words; and
-    \item TODO sentiment analysis.
-\end{itemize}
 
 \section{Interface}
-Based off Evan's solution.
+Your service will be utilised by almost every system in the university.
+It has been decided that every university services must support text-to-speech on the first Monday of semester two.
+An interface specification has already been developed and distributed to existing service owners,
+who are working hard to deliver support in their services.
+
+You must implement this interface exactly as described,
+the interface specification is available to all service owners online:
+\url{https://csse6400.uqcloud.net/assessment/alexa}
 
 \section{Submission}
+Your final solution will be committed to a GitHub repository.
+The repository \textbf{must} contain everything required to successfully deploy your application.
+You must include all of the following in the repository:
+\begin{itemize}
+  \item Your implementation of the service API, including the source code and a mechanism to build the service via Docker.
+  \item Terraform code that can provision your service from a fresh AWS learner lab.
+\end{itemize}
+
+\todo{
+  We need to think about how we want to require deployment.
+  If we assume that they will use containers to deploy we should give an example of using terraform to build, upload, and use a container as shown below.
+
+  We have a few options:
+  \begin{enumerate}
+    \item Require that deployment occurs via \texttt{terraform apply}
+    \item Require that deployment occurs via \texttt{./deploy.sh}
+    \item Require that sufficient deployment documentation is provided in the \texttt{README.md}
+  \end{enumerate}
+
+  I'm inclined to pick both 2 and 3 so that when 2 fails we can try 3.
+
+  We additionally need to specify the exact environment where we will run the deployment script.
+  This should be a container with Terraform and Docker (via mounting the host) and the AWS credentials and project mounted in the workdir.
+}
+
+\begin{code}{}
+resource "null_resource" "build_backend" {
+  provisioner "local-exec" {
+    command = "docker build -t backend ./backend"
+  }
+}
+
+
+\end{code}
 
 \section{Criteria}
 
 \section{Academic Integrity}
 
-\bibliographystyle{ieeetr}
-\bibliography{references}
+% \bibliographystyle{ieeetr}
+% \bibliography{references}
 
 \end{document}
