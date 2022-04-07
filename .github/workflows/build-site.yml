@@ -9,6 +9,7 @@ on:
       - Build Practicals
       - Build Tutorials
       - Build Slides
+      - Build API Interface Specification
     branches: [main]
     types: 
       - completed
@@ -73,6 +74,16 @@ jobs:
           path: assessment
 
       - run: cp -r ./assessment/assessment/assessment ./public
+
+      - name: Download specification
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: build-spec.yml
+          workflow_conclusion: success
+          branch: main
+          path: specification
+
+      - run: cp -r ./specification/cloud-spec ./public/assessment/alexa
 
       - name: Publish GH Pages
         if: github.ref == 'refs/heads/main'
