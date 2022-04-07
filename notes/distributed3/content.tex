@@ -19,18 +19,18 @@ Even for small systems, some part will eventually fail,
 so fault handling must be part of the design.
 
 
-\section{Detecting Faults}
+\section{Fault Handling}
 
 We mentioned that, paradoxically, distributed systems can be more reliable than non-distributed systems
 because a distributed system spreads risk of failure over multiple machines \cite{distributed1-notes}.
 This is managed through health checks, load-balancing and auto-scaling.
 We have also described the use of transactions as a mechanism to deal with some potential failures
-that affect our storage of persistent data \cite{distributed2-notes}.
+that affect storage of persistent data \cite{distributed2-notes}.
 
 The challenge, particularly when implementing health checks, is determining when a fault has occurred.
 Most distributed systems communicate over a TCP/IP network.
 This introduces a layer of uncertainty in trying to determine if a fault exists.
-A message sent over a TCP/IP network may not be delivered, or the response may not be received.
+A message sent over a TCP/IP network may not be delivered, may be delayed, or the response may not be received.
 Possible causes of either fault include the following.
 \begin{itemize}
     \item The request sent to another service in the system may not have been delivered.
@@ -41,6 +41,7 @@ Possible causes of either fault include the following.
     \item The response may be delayed and will be received later.
 \end{itemize}
 
+\noindent
 There are some techniques that can be used to identify some faults, but they are not perfect.
 \begin{itemize}
     \item If a compute node is running and reachable, but does not have a process listening on the destination port, the operating system should close or refuse the TCP connection. This should result in a RST or FIN packet being received by the message sender, with the caveat that the packet may be lost.
@@ -48,6 +49,8 @@ There are some techniques that can be used to identify some faults, but they are
     \item If a router knows that an IP address is not reachable, it can reply with a destination unreachable packet. But, the router has no additional ways of knowing if an address is not reachable as the rest of the system.
     \item If the system is running on your own hardware, you may be able to query network switches to detect link failures.
 \end{itemize}
+
+\subsection{Retry and Restart}
 
 In general, despite the techniques above, the application needs to have a strategy to detect faults
 and to decide whether to retry a request or that a node is dead.
@@ -63,7 +66,7 @@ For more information about this strategy, see the retry design pattern \cite{ret
 Simple exponential backoff can introduce peaks of load around the exponential delay.
 Jitter can be added to the delay to spread out these peaks \cite{backoff-jitter}.
 
-Determing how long to wait before deciding that a node is dead has its own challenges.
+Determining how long to wait before deciding that a node is dead has its own challenges.
 If the system decides that a node is dead,
 then all clients who have sent messages to that node, and have not received a reply, will need to resend their messages to other nodes.
 Waiting too long reduces the system's responsiveness, as processes wait for a the dead node to reply.
@@ -78,13 +81,48 @@ It will still be processing requests until it is shutdown, but those requests wi
 This leads to the possibility that some actions will be performed twice.
 
 One option to reduce the variability of message delays is to use UDP rather than TCP at the network level.
-UDP does not retransmit lost packets, which reduces the variability of transmission time.
+UDP does not retransmit lost packets, which helps reduces the variability of transmission time.
 The drawback is that the system will need to manage more messages not being received,
 as it will not have the automated retransmission of packets provided by TCP.
 It depends on the type of system, which approach is more beneficial.
 If the system is transmitting financial data, the greater reliability of TCP probably outweighs the reduced message delay of UDP.
 Whereas a music streaming service will probably find that having less variability of delay is more beneficial than the reliability of TCP.
 (Receiving an audio packet, after it needed to be played, is pointless.)
+
+\subsection{Timing Faults}
+We introduced the issue of write conflicts, when discussing multi-leader replication \cite{distributed2-notes}.
+The issue of determining order of events is applicable to more than just writing to a database.
+Any situation where event order is important across multiple services (e.g. message queues in an event driven architecture),
+will have similar issues to overcome.
+
+One intuitive strategy for dealing with some cases of determining event order,
+is to use a timestamp to record when the event was created.
+For write conflicts, the idea being that the most recent write is the correct value in the case of a write conflict.
+There are two problems with this strategy.
+It is likely that the clocks on the different machines will not be perfectly in sync.
+It is possible that the machine on which the last write was performed has a clock that is behind the machine with the previous write.
+If writes occur in close succession, it is probable that some writes will have timestamps indicating the wrong order of writes.
+
+Trying to synchronise clocks on different computers is difficult.
+Trying to synchronise using Network Time Protocol (NTP) is not reliable.
+Network transmission time means that two machines that access one NTP server at the same time
+are likely to get the time result after different lengths of network delays.
+The clocks on the two machines are also likely to lose or gain time at different rates after their times have been synchronised.
+There is a Precision Time Protocol (PTP) that can be used for synchronisation in under a microsecond \cite{ieee-1588},
+but it takes significant resources to implement in a system.
+
+Another problem is that computer clocks have finite precision.
+Two events can occur in close enough succession, even on the same machine, that they will end up having the same timestamp.
+
+There are a few strategies that can be applied to deal with determining the order of events, which do not rely on timestamps.
+Leslie Lamport, who was referred to in the service-based architecture lecture \cite{service-based-slides},
+suggested a strategy of using a logical clock to overcome issues of drift
+between real clocks on different computers \cite{LamportLeslie1978Tcat}.
+The key idea is that every message sent to a service includes the logical time at which it was sent.
+The receiver then adjusts its logical time to be later than when the message was sent.
+\textit{Designing Data Intensive Applications} describes these problems in great detail
+and suggests some solution options, with their attendant tradeoffs \cite{data-intensive}.
+
 
 \section{Consensus}
 
@@ -103,3 +141,19 @@ Idempotent
 \subsection{Linearizability}
 
 \subsection{CAP Theorem}
+
+
+\section{Conclusion}
+
+Designing reliable distributed systems is a complex, but manageable, process.
+These notes have introduced some of the less intuitive issues that arise in distributed systems
+and how to design the system to work in the presence of these issues.
+
+It is possible to go a step further and prove the correctness of distributed systems.
+This involves creating a model of the system and every service in the system.
+Assumptions about system behaviour can be stated within the model.
+The algorithms used to implement the system can be proven to work within the system model and its assumptions.
+Of course, if the assumptions are broken, then any proofs are invalid.
+\link{CSSE7610 Concurrency: Theory and Practice}{https://my.uq.edu.au/programs-courses/course.html?course_code=csse7610}
+provides the background knowledge required to perform these proofs
+and introduces some of the initial modelling techniques required for distributed systems.
