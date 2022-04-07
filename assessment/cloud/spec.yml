@@ -1,0 +1,51 @@
+swagger: "2.0"
+info:
+  description: "A text-to-speech service to provide improved accessibility to the University of Queensland's teaching content."
+  version: "0.1.0"
+  title: "Alexa WIP"
+host: "alexa.services.its.uq.edu.au"
+basePath: "/v1"
+tags:
+- name: "tts"
+  description: "Text-to-speech service"
+schemes:
+- "http"
+paths:
+  /request:
+    post:
+      tags:
+      - "tts"
+      summary: "Request speech for text"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Text request to generate"
+        required: true
+        schema:
+          $ref: "#/definitions/SpeechRequest"
+      responses:
+        "405":
+          description: "Invalid input"
+definitions:
+  SpeechRequest:
+    type: "object"
+    properties:
+      content:
+        type: "string"
+        example: "Hello, world!"
+      model:
+        type: "string"
+        description: "Text-to-speech model"
+        enum:
+          - tacotron
+          - tacotron2
+          - glow-tts
+          - speedy-speech
+          - align-tts
+          - fastpitch
+          - fastspeech
+          - vits
