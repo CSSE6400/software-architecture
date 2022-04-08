@@ -19,7 +19,7 @@ Even for small systems, some part will eventually fail,
 so fault handling must be part of the design.
 
 
-\section{Fault Handling}
+\section{Fault Handling}\label{sec:faults}
 
 We mentioned that, paradoxically, distributed systems can be more reliable than non-distributed systems
 because a distributed system spreads risk of failure over multiple machines \cite{distributed1-notes}.
@@ -31,7 +31,7 @@ The challenge, particularly when implementing health checks, is determining when
 Most distributed systems communicate over a TCP/IP network.
 This introduces a layer of uncertainty in trying to determine if a fault exists.
 A message sent over a TCP/IP network may not be delivered, may be delayed, or the response may not be received.
-Possible causes of either fault include the following.
+Possible causes of these faults include the following.
 \begin{itemize}
     \item The request sent to another service in the system may not have been delivered.
     \item The request may be delayed and is waiting in a queue to be processed. (e.g. either the network or the service is overloaded).
@@ -89,7 +89,7 @@ If the system is transmitting financial data, the greater reliability of TCP pro
 Whereas a music streaming service will probably find that having less variability of delay is more beneficial than the reliability of TCP.
 (Receiving an audio packet, after it needed to be played, is pointless.)
 
-\subsection{Timing Faults}
+\subsection{Timing Faults}\label{timing}
 We introduced the issue of write conflicts, when discussing multi-leader replication \cite{distributed2-notes}.
 The issue of determining order of events is applicable to more than just writing to a database.
 Any situation where event order is important across multiple services (e.g. message queues in an event driven architecture),
@@ -104,12 +104,12 @@ It is possible that the machine on which the last write was performed has a cloc
 If writes occur in close succession, it is probable that some writes will have timestamps indicating the wrong order of writes.
 
 Trying to synchronise clocks on different computers is difficult.
-Trying to synchronise using Network Time Protocol (NTP) is not reliable.
+Synchronising using Network Time Protocol (NTP) is not reliable.
 Network transmission time means that two machines that access one NTP server at the same time
 are likely to get the time result after different lengths of network delays.
 The clocks on the two machines are also likely to lose or gain time at different rates after their times have been synchronised.
-There is a Precision Time Protocol (PTP) that can be used for synchronisation in under a microsecond \cite{ieee-1588},
-but it takes significant resources to implement in a system.
+There is a Precision Time Protocol (PTP) that can be used for synchronisation of under a microsecond \cite{ieee-1588},
+but it takes significant resources to implement.
 
 Another problem is that computer clocks have finite precision.
 Two events can occur in close enough succession, even on the same machine, that they will end up having the same timestamp.
@@ -126,6 +126,12 @@ and suggests some solution options, with their attendant tradeoffs \cite{data-in
 
 \section{Consensus}
 
+In a distributed system, consensus is when a set of nodes in the system agree on some aspect of the system's state.
+Achieving consensus is a difficult problem, in light of the issues described in section \ref{sec:faults}.
+When designing a distributed system, you can take advantage of the abstraction of consensus to ignore the faults it handles.
+Abstractions like consensus and transactions \cite{distributed2-notes} make it easier to reason about the behaviour of a distributed system.
+In this section, we will look at how consensus can be implemented.
+
 \subsection{Behaving Nodes}
 Leaders \& Locks
 
@@ -135,12 +141,193 @@ Byzantine Generals Problem
 Idempotent
 
 \section{Consistency}
+Consistency is the simple idea that different parts of a system agree on the same value for a data element.
+Implementing consistency is much more complex than the idea, due to many of the faults that are described in section \ref{sec:faults}.
 
 \subsection{Eventual Consistency}
 
-\subsection{Linearizability}
+Eventual consistency is a \emph{weak} guarantee.
+What it guarantees is that all replicated versions of the database will eventually have consistent values for all data they store.
+The issue is the time it takes to synchronise data.
+It provides no guarantee of how long until reading a specific value from all replicated databases will return the same value.
+A read that occurs after a write, but which reads from a replica that has not been updated, will retrieve the old (\emph{stale}) value.
 
-\subsection{CAP Theorem}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[trim=55 152 358 17,clip,width=0.7\textwidth]{diagrams/eventual-consistency-seq.png}
+    \caption{Eventual consistency issues.}
+    \label{fig:eventual-consistency-seq}
+\end{figure}
+
+Figure \ref{fig:eventual-consistency-seq} demonstrates the synchronisation issue
+with an example of searching for a ``Nick Cage reversable pillow'' from the Sahara on-line store.
+The product database is replicated to two followers.
+Searches started after the product has been added to the store may still return that it is not available,
+until all replicas have been updated.
+
+This leads to the potential for subtle errors in the system logic.
+It is difficult to think about the consequences of retrieving stale data,
+as most programmers' intuition is based on the experience of modifying a value and always retrieving the new value.
+The system design needs to take into account that \emph{all} database reads are performed under the assumption that the value may be stale.
+Testing for errors caused by data not being consistent is difficult, as you have to force data inconsistencies.
+
+\subsection{Linearisability}
+
+Contrary to eventual consistency, linearisability is a \emph{strong} guarantee.
+A database system that implements linearisability provides an abstraction layer
+that allows clients who use the database to work as if there is only a single instance of the database,
+regardless of how many replicas have been deployed.
+This provides a simple interaction model that corresponds to expectations from non-distributed systems.
+
+Linearisability means that once a client has written data to the database,
+all clients who read the that data will see the same value, regardless of the replica from which they read the data.
+The challenge is implementing linearisability.
+
+\subsubsection{Application}
+
+Situations where linearisability can be useful include when uniqueness needs to be guaranteed.
+For example, when a customer registers as a member of the Sahara eCommerce system,
+they need a unique identifier.
+If two people attempt to register at the same time and select the same user id,
+the system needs to be able to linearise the requests to return an error message to one of the users.
+The same issue arises in banking applications.
+If a user transfers money from their account at the same time as an automated payment occurs,
+the account debit service may need to guarantee that the account balance does not become negative.
+It needs to be able to linearise these two operations and disallow one if it would result in a negative balance.
+
+In some situations, it is acceptable to not require linearisability of operations.
+If two customers order the last item of a product in the Sahara eCommerce system,
+the stakeholders and designers may decide that they will allow both orders to proceed.
+The resolution may be that when the fulfillment service or the warehouse discover that
+the product is out of stock, they generate an event that changes one of the customers' orders to become a backorder.
+
+The simplistic implementation of linearisability is to have a single database.
+This defeats the purpose of replicating a database to improve performance and reliability.
+
+\subsubsection{Single-Leader Replication}
+Single-leader replication can be implemented in such a way as to provide linearisability.
+This is implemented by only allowing reads to be from the leader or from followers that are synchronously updated by the leader.
+This means that the replicated databases can guarantee that all reads after a write will return the current value.
+
+Forcing all reads to be from the leader defeats one of the purposes of replicating a database,
+which is the performance benefit of performing queries on followers and only using the leader for update operations.
+Synchronous updates of at least some followers defeats the performance benefit of asynchronous communication,
+but at least allows queries on followers.
+Either of these approaches maintain the reliability advantage of replicating the database.
+
+An additional complication to implementing linearisable single-leader replication is determining which replica is the leader.
+A typical approach is to have a lock of some form that is acquired by the leader, and all other replicas are followers.
+Acquiring the lock tself must be a linearisable operation.
+If more than one replica believes it is the leader, it means that write behaviour cannot be linearisable.
+A coordination service, such as \link{etcd}{https://etcd.io/}, can be used to implement distributed locks in a linearisable fashion.
+
+\subsubsection{Multi-Leader Replication}
+Multi-leader replication cannot provide linearisability,
+without introducing so many constraints as to eliminate any benefit of using the approach in the first place.
+This is because multi-leader replication allows concurrent writes to multiple leaders,
+and the data is asynchronously replicated to the followers and other leaders.
+
+\subsubsection{Leaderless Replication}
+It is difficult to provide linearisability with leaderless replication.
+Quorum reads \cite{distributed2-notes} do not guarantee linearisability.
+With asynchronous communication and network delays it is possible for a write to start,
+but for a concurrent read to obtain stale data from all members of the quorum that were queried.
+This occurs when a read retrieves a value from a database that has not yet been written to,
+but after the write operation started and other databases were updated.
+The read obtains a consistently stale value, despite obtaining the data from a quorum of databases.
+
+It is possible to provide linearisability using strict quorums with leaderless replication.
+This comes at the cost of performance, just as it does with single-leader replication.
+Writes must read the state of a quorum of databases and obtain a lock on the value before performing the write.
+This allows the write to be performed synchronously.
+
+In leaderless replication, only basic read and write operations are linearisable.
+More sophisticated atomic operations or transactions require a consensus algorithm to be used to provide linearisability.
+
+\subsubsection{Consensus Algorithms}
+Consensus algorithms, such as XXXXXX, have some similarity to single-leader replication.
+Their internal implementations prevent stale replica data or having multiple leader nodes.
+The previously mentioned coordination service, etcd, implements its own consensus algorithm,
+that provides a key-value store that guarantees linearisability.
+
+\subsubsection{Consequences}
+Linearisability means that if some database replicas lose network connection to the rest of the system,
+they cannot process any requests.
+Writes cannot be made as they cannot be linearised.
+Reads connot be made as they may obtain stale data.
+
+Consequently, systems, or parts of systems, that require linearisability demonstrate lower availability due to potential network faults.
+This observation is known as the CAP theorem \cite{BrewerE2012Ctyl}.
+Distributed systems can have \emph{consistency} in the presence of network \emph{partitioning}.
+Or, they can have \emph{availability} in the presence of network \emph{partitioning}.
+The ideas have been around since the mid 1970's \cite{rfc677}, despite the much more recent reference to the CAP theorem.
+The prime value of the CAP theorem is how it influenced the development of NoSQL databases.
+
+\subsection{Causal Ordering}
+
+Linearisability is one approach to defining the order in which read and write operations are conceptually performed.
+It defines a \link{total order}{https://mathworld.wolfram.com/TotallyOrderedSet.html} on the operations.
+This means that operations can be compared to each other to determine which should be considered to have occurred first.
+Or, from the perspective of the linearisability abstraction, there are no concurrent operations on the database.
+
+Another approach to defining the order of operations is to define a \emph{partial} order based on causality.
+That is the ordering is based on one operation occurring before another (i.e. they are causally related),
+but other operations may be concurrent.
+A Git repository's history demonstrates causal dependencies.
+Within a single branch commits occur in sequential order.
+But, with multiple branches, development on each branch progresses in parallel with the others
+and commits may occur concurrently on different branches.
+
+Causal ordering is not as strict as linearisability, which in turn results in less performance cost to implement causal ordering.
+The issue is to capture causal dependencies.
+This requires a mechanism to determine which operation happened before another one.
+The consequence is that the operations must be performed in the same order on all replicas.
+If causal ordering is not required for some operations, they may occur concurrently
+and it does not matter if they execute in a different order on a replica.
+
+A single-leader replicated database can record an increasing sequence number with every write operation it records in its log.
+Followers can then read the log to execute writes in sequence number order.
+All followers will then be causally consistent with the leader.
+The drawback is that a single-leader cannot be scaled if asynchronous writes occur faster than it can process them.
+There is also the difficulty in handling the situation where the leader fails and selecting a new leader.
+
+\subsubsection{Lamport Timestamps}
+If the system does not have a single-leader, the logical clock approach mentioned in section \ref{timing} provides a mechanism to define causal ordering.
+This approach is called \emph{Lamport timestamps} \cite{LamportLeslie1978Tcat}.
+Each node has an id and counts the number of operations it has executed.
+The timestamp is a tuple (\emph{counterValue}, \emph{nodeID}).
+The \emph{nodeID} guarantees that every timestamp is unique, even if they have the same counter value.
+Every node stores the \emph{maximum} counter value it has seen so far.
+This maximum is passed in every request to another node.
+If a node receives a request or response with a maximum counter value greater than its own counter value,
+it increases its own counter to the new maximum.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[trim=60 189 450 35,clip,width=0.68\textwidth]{diagrams/lamport-timestamp-seq.png}
+    \caption{Lamport timestamps.}
+    \label{fig:lamport-timestamp-seq}
+\end{figure}
+
+In figure \ref{fig:lamport-timestamp-seq}, when \texttt{InventoryUpdater} sends message \texttt{4} to \texttt{ProductDB2},
+the message includes a parameter which is \texttt{InventoryUpdater}'s current maximum value, which is \texttt{1}.
+\texttt{ProductDB2}'s counter value is already \texttt{2},
+so it increases it to \texttt{3} and returns it as part of the Lamport timestamp to \texttt{InventoryUpdater}.
+\texttt{InventoryUpdater} records \texttt{3} as its new maximum value.
+When \texttt{InventoryUpdater} sends message \texttt{5} to \texttt{ProductDB1},
+the message includes \texttt{InventoryUpdater}'s maximum value of \texttt{3}.
+\texttt{ProductDB1}'s counter value was \texttt{1}, so it increases it to \texttt{4} and returns it to \texttt{InventoryUpdater}.
+
+Lamport timestamps define causal ordering for operations but they do not guarantee consistency when an operation is performed.
+If two orders were sent to \texttt{ProductDB1} and \texttt{ProductDB2} at the same time and there was only one item in stock,
+Lamport timestamps would provide a way to decide which order occurred first, but only after the orders were processed.
+
+To enforce a constraint that would not allow two orders for the last item in stock,
+there needs to be a mechanism to indicate when the order is completed.
+\emph{Total order broadcast} is one technique that does this.
+Messages are ordered by their delivery time, not when a result is returned.
+So, if a message has been received, another message cannot be performed before it.
+Coordination services, such as \link{etcd}{https://etcd.io/}, implement total order broadcast.
 
 
 \section{Conclusion}
