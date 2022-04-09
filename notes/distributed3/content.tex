@@ -132,6 +132,89 @@ When designing a distributed system, you can take advantage of the abstraction o
 Abstractions like consensus and transactions \cite{distributed2-notes} make it easier to reason about the behaviour of a distributed system.
 In this section, we will look at how consensus can be implemented.
 
+\subsection{Distributed Transactions}
+
+A distributed system that needs to enforce a transaction across multiple compute nodes
+needs a mechanism to gain consensus between all nodes participating in the transaction that it can be committed.
+This is called the \emph{atomic commit} problem, based on the idea of transaction atomicity from ACID \cite{distributed2-notes}.
+
+In a database, a distributed transaction may happen when the database is partitioned and data in different partitions are part of the transaction.
+It will also happen if the database has a secondary index on a different node to the primary index.
+Distributed transactions may also occur where events or messages are part of the transaction.
+An example of this is sending a message to a message queue, while storing data in a database.
+In the Sahara eCommerce system, when an order is placed it is stored in the order table in the database
+and a message is placed in the notification queue to notify the customer that the order has been successful.
+Storing the order may be a transaction in only a single database partition,
+but to ensure the notification message is only added to the queue if the order is successful requires a distributed transaction.
+
+\subsubsection{Two-Phase Commit}
+A two-phase commit algorithm is a type of consensus algorithm that solves the atomic commit problem.
+As the name implies, it splits the commit into two steps.
+There are better consensus algorithms, but two-phase commit is fairly simple and still commonly used.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[trim=55 70 420 30,clip,width=0.67\textwidth]{diagrams/2phase-commit-seq.png}
+    \caption{Two-phase commit.}
+    \label{fig:2pc-seq}
+\end{figure}
+
+A \emph{transaction manager} is introduced to coordinate the two-phase commit process.
+The database nodes that are part of the transaction are called \emph{participants}.
+
+The process starts when some part of the system (\texttt{Client} in figure \ref{fig:2pc-seq})
+requests to start a distributed transaction and receives a unique transaction identifier (\texttt{transId}).
+The client starts \emph{single-node} transactions on each, attaching the \texttt{transId} to the transaction.
+The client can perform multiple reads and writes as part of the transaction.
+
+When the client is ready to commit the transaction it notifies the \texttt{TransactionManager} to perform the commit.
+The \texttt{TransactionManager} sends a prepare message to all the participants.
+If a prepare message times out, or any participant reports a failure,
+the \texttt{TransactionManager} send an abort message to all participants and reports the failure to the client.
+
+When a participant receives the prepare message, it confirms that it can commit the transaction,
+regardless of any fault that may occur after replying to the prepare message.
+(i.e. The participant has saved all changes as part of this transaction in persistent memory.)
+The participant is no longer able to abort the transaction itself,
+it can only abort it now if it receives an abort message from the \texttt{TransactionManager}.
+In effect, it is a pseudo-commit.
+
+When the \texttt{TransactionManager} receives positive responses from all participants,
+it saves the commit decision to a persistent transaction log.
+This means that even if the \texttt{TransactionManager} fails, it can recover the decision.
+This is called the \emph{commit point}.
+If the \texttt{TransactionManager} decides to abort the transaction,
+it records the abort decision in the transaction log.
+
+After the commit point has been reached, the \texttt{TransactionManager} sends the commit message to all participants.
+This is an irreversible decision.
+If the commit message fails or times out, the \texttt{TransactionManager} must continue retrying the message
+until all participants report that they have commited the transaction.
+This means that even if a participant crashes before it performs the commit, it will complete the commit once the participant restarts.
+That was the reason for performing a pseudo-commit at the prepare stage,
+if necessary, the participant can recover and redo all steps that are part of the transaction leading up to the commit.
+
+If the \texttt{TransactionManager} fails during the commit process,
+it can recover and resend the commit messages to any participant that had not responded before the \texttt{TransactionManager} failed.
+If a participant had commited the transaction before the \texttt{TransactionManager} failed,
+it can ignore the new commit and just report that the commit was successful.
+
+A two-phase commit is called a \emph{blocking} atomic commit,
+as completion of the commit can take a long time if a participant or the \texttt{TransactionManager} fail.
+Even worse, if the transaction log on the \texttt{TransactionManager} or a participant are corrupted when they fail,
+this may lead to rows in the database never being unlocked.
+This usually requires manual intervention to decide whether to complete the commit or roll it back, to maintain atomicity.
+Some libraries that support two-phase commit can make an automated decision in this case,
+but the decision will probably break atomicity.
+
+Two-phase commit provides a simple abstraction that allows distributed systems to perform safe transactions.
+The drawback is that a blocking atomic commit is a significant performance cost.
+Even if the \texttt{TransactionManager}, and no participant, fails;
+rows across multiple database nodes are locked until the commit completes.
+If there is a failure, recovery can take a long time.
+For example, in MySQL it is reported that distributed transactions are ten times slower than single-node transactions \cite{distrib-mysql}.
+Consequently, most NoSQL databases and many cloud-based relational databases do not support distributed transactions.
+
 \subsection{Behaving Nodes}
 Leaders \& Locks
 
@@ -154,7 +237,7 @@ A read that occurs after a write, but which reads from a replica that has not be
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=55 152 358 17,clip,width=0.7\textwidth]{diagrams/eventual-consistency-seq.png}
+    \includegraphics[trim=60 152 330 18,clip,width=0.7\textwidth]{diagrams/eventual-consistency-seq.png}
     \caption{Eventual consistency issues.}
     \label{fig:eventual-consistency-seq}
 \end{figure}
@@ -304,7 +387,7 @@ it increases its own counter to the new maximum.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=60 189 450 35,clip,width=0.68\textwidth]{diagrams/lamport-timestamp-seq.png}
+    \includegraphics[trim=60 189 450 35,clip,width=0.67\textwidth]{diagrams/lamport-timestamp-seq.png}
     \caption{Lamport timestamps.}
     \label{fig:lamport-timestamp-seq}
 \end{figure}
@@ -319,8 +402,8 @@ the message includes \texttt{InventoryUpdater}'s maximum value of \texttt{3}.
 \texttt{ProductDB1}'s counter value was \texttt{1}, so it increases it to \texttt{4} and returns it to \texttt{InventoryUpdater}.
 
 Lamport timestamps define causal ordering for operations but they do not guarantee consistency when an operation is performed.
-If two orders were sent to \texttt{ProductDB1} and \texttt{ProductDB2} at the same time and there was only one item in stock,
-Lamport timestamps would provide a way to decide which order occurred first, but only after the orders were processed.
+If two orders are sent to \texttt{ProductDB1} and \texttt{ProductDB2} at the same time and there is only one item in stock,
+Lamport timestamps provide a way to decide which order occurred first, but only after the orders are processed.
 
 To enforce a constraint that would not allow two orders for the last item in stock,
 there needs to be a mechanism to indicate when the order is completed.
