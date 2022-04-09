@@ -2,8 +2,12 @@ swagger: "2.0"
 info:
   description: "A text-to-speech service to provide improved accessibility to the University of Queensland's teaching content."
   version: "0.1.0"
-  title: "Alexa WIP"
-host: "alexa.services.its.uq.edu.au"
+  title: "Chatterbox WIP"
+  contact:
+    name: CSSE6400
+    url: https://csse6400.uqcloud.net
+    email: noreply@uq.edu.au
+host: "chatterbox.services.its.uq.edu.au"
 basePath: "/v1"
 tags:
 - name: "tts"
@@ -11,41 +15,182 @@ tags:
 schemes:
 - "http"
 paths:
-  /request:
-    post:
-      tags:
-      - "tts"
-      summary: "Request speech for text"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Text request to generate"
-        required: true
-        schema:
-          $ref: "#/definitions/SpeechRequest"
+  /health:
+    get:
+      tags: ["tts"]
+      summary: "Query the health of the chatterbox service"
+      # produces:
+      #   - "application/json"
       responses:
-        "405":
-          description: "Invalid input"
+        "200":
+          description: "Service is healthy"
+        "503":
+          description: "Service is not healthy"
+  /text:
+    get:
+      tags: ["tts"]
+      summary: "List all generated audios"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "List of generated audios"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/TextResponse"
+            
+    post:
+      tags: ["tts"]
+      summary: "Request generation of a new text audio"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "body"
+          in: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/TextRequest"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/TextResponse"
+  /text/{id}:
+    parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: string
+    get:
+      tags: ["tts"]
+      summary: "Retrieve details about a text-to-speech request"
+      produces:
+        - "application/json"
+      
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/TextResponse"
+        "404":
+          description: "Unknown text-to-speech ID"
+    delete:
+      tags: ["tts"]
+      summary: "Delete a text-to-speech job"
+      responses:
+        "200":
+          description: "Resource successfully deleted"
+        "404":
+          description: "Unknown text-to-speech ID"
+  /model:
+    get:
+      tags: ["tts"]
+      summary: "List all available text-to-speech models"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "List of available text-to-speech models"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Models"
+  /model/{id}:
+    parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: string
+    get:
+      tags: ["tts"]
+      summary: "Retrieve details about a specified text-to-speech model"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: ""
 definitions:
-  SpeechRequest:
+  Models:
+    type: "string"
+    description: "Text-to-speech model"
+    enum:
+      - tacotron
+      - tacotron2
+      - glow-tts
+      - speedy-speech
+      - align-tts
+      - fastpitch
+      - fastspeech
+      - vits
+  Model:
+    type: "object"
+    properties: 
+      name:
+        $ref: "#/definitions/Models"
+      description: 
+        type: "string"
+        description: "A description of the model"
+        example: "EK1 en-rp tacotron2 by NMStoker"
+      author:
+        type: "string"
+        description: "Author of the model"
+        example: "Eren Gölge @erogol"
+      license:
+        type: "string"
+        description: ""
+        example: "CC BY-NC-ND 4.0"
+      url:
+        type: "string"
+        format: "uri"
+        example: "https://coqui.gateway.scarf.sh/v0.1.0/tts_models--en--ek1--tacotron2.zip"
+  TextRequest:
     type: "object"
     properties:
-      content:
+      message:
         type: "string"
-        example: "Hello, world!"
-      model:
+        example: "Hello, CSSE6400!"
+        description: "Content of the text request, synchronous requests must be between 1 and 280 characters. Asynchronous requests must be between 280 and 9001."
+      operation:
         type: "string"
-        description: "Text-to-speech model"
+        description: "Perform the request synchronously or asynchronously"
         enum:
-          - tacotron
-          - tacotron2
-          - glow-tts
-          - speedy-speech
-          - align-tts
-          - fastpitch
-          - fastspeech
-          - vits
+          - SYNC
+          - ASYNC
+      model:
+        $ref: "#/definitions/Models"
+  TextResponse:
+    allOf:
+      - type: "object"
+        properties:
+          id:
+            type: "string"
+            format: "uuid"
+            description: "Unique identifier of the text request"
+      - $ref: "#/definitions/TextRequest"
+      - type: "object"
+        properties:
+          status:
+            type: "string"
+            enum:
+              - PENDING
+              - COMPLETED
+              - FAILED
+          resource:
+            type: "string"
+            format: "uri"
+            description: "URL where the .wav file can be found, if the request is completed."
+            example: "https://presignedurldemo.s3.eu-west-2.amazonaws.com/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAJJWZ7B6WCRGMKFGQ%2F20180210%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20180210T171315Z&X-Amz-Expires=1800&X-Amz-Signature=12b74b0788aa036bc7c3d03b3f20c61f1f91cc9ad8873e3314255dc479a25351&X-Amz-SignedHeaders=host"
+          created_at:
+            type: "string"
+            format: "date-time"
+            example: "2022-04-01T00:43:29.111Z"
+          processed_at:
+            type: "string"
+            format: "date-time"
+            example: "2022-04-09T07:43:29.111Z"
+          error:
+            type: "object"
+
