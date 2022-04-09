@@ -89,6 +89,19 @@ If the system is transmitting financial data, the greater reliability of TCP pro
 Whereas a music streaming service will probably find that having less variability of delay is more beneficial than the reliability of TCP.
 (Receiving an audio packet, after it needed to be played, is pointless.)
 
+\subsubsection{Idempotency}
+Retrying operations introduces a potential complication.
+What happens if the receiving node received the message and processed it, but the response failed to be returned to the sender.
+The sender can retry the operation, but that may have an adverse effect on the receiver if it repeats the behaviour.
+
+One option is for each message to have an identifier.
+The receiver can decide that it has already processed the message and just return the result without processing it again.
+Or, if the operation will not have any adverse effect (e.g. it is a query returning a value), it can be processed again.
+
+The intent is that the server's state will be the same, regardless of whether it receives a message once or multiple times.
+This behaviour is called the \link{idempotent consumer pattern}
+{https://chrisrichardson.net/post/microservices/patterns/2020/10/16/idempotent-consumer.html}.
+
 \subsection{Timing Faults}\label{timing}
 We introduced the issue of write conflicts, when discussing multi-leader replication \cite{distributed2-notes}.
 The issue of determining order of events is applicable to more than just writing to a database.
@@ -123,105 +136,49 @@ The receiver then adjusts its logical time to be later than when the message was
 \textit{Designing Data Intensive Applications} describes these problems in great detail
 and suggests some solution options, with their attendant tradeoffs \cite{data-intensive}.
 
+\subsection{Byzantine Faults}\label{sec:byzantine}
 
-\section{Consensus}
+Byzantine\footnote{Byzantine carries a connotation of being an excessively complicated, intrigue filled and corrupt environment.
+This is probably a smear of the Byzantine Empire (\url{https://www.britannica.com/place/Byzantine-Empire}).}
+faults are those that are caused by nodes that `` lie''.
+Most distributed systems are implemented with the assumption that nodes are `` honest''.
+An honest node is one that provides responses which the system can assume are correct.
+Faults relate to the node not responding.
+A lying node is one whose response may not be correct.
+Two common scenarios of a lying node are if it sends confirmation of receipt of a message but loses the message,
+or if it sends contradictory data to different nodes.
 
-In a distributed system, consensus is when a set of nodes in the system agree on some aspect of the system's state.
-Achieving consensus is a difficult problem, in light of the issues described in section \ref{sec:faults}.
-When designing a distributed system, you can take advantage of the abstraction of consensus to ignore the faults it handles.
-Abstractions like consensus and transactions \cite{distributed2-notes} make it easier to reason about the behaviour of a distributed system.
-In this section, we will look at how consensus can be implemented.
+\subsubsection*{Byzantine Generals Problem}
+The Byzantine Generals Problem \cite{byzantine-generals} is a fictional scenario where several generals need to agree on a battle plan.
+Their armies are situated in different positions, so they can only communicate by sending messengers.
+These messengers can get delayed or lost (like packets in a network).
 
-\subsection{Distributed Transactions}
+To complicate their decision making process, some of the generals may be traitors,
+though most generals are loyal.
+Loyal generals will only send honest messages.
+Traitors may send dishonest messages or send messages disguised as coming from another general.
 
-A distributed system that needs to enforce a transaction across multiple compute nodes
-needs a mechanism to gain consensus between all nodes participating in the transaction that it can be committed.
-This is called the \emph{atomic commit} problem, based on the idea of transaction atomicity from ACID \cite{distributed2-notes}.
+The problem was proposed by Leslie Lamport as an analogy of some of the extreme faults that may exist in a distributed system.
+A Byzantine fault-tolerant system is one that continues to work correctly, even if some nodes are sending incorrect messages.
+This may be due to errors in the node itself or in the network connection.
+Data may be corrupted in storage or in transit, it may also be intercepted or spoofed by malicious attackers.
 
-In a database, a distributed transaction may happen when the database is partitioned and data in different partitions are part of the transaction.
-It will also happen if the database has a secondary index on a different node to the primary index.
-Distributed transactions may also occur where events or messages are part of the transaction.
-An example of this is sending a message to a message queue, while storing data in a database.
-In the Sahara eCommerce system, when an order is placed it is stored in the order table in the database
-and a message is placed in the notification queue to notify the customer that the order has been successful.
-Storing the order may be a transaction in only a single database partition,
-but to ensure the notification message is only added to the queue if the order is successful requires a distributed transaction.
+Most systems do not attempt to be Byzantine fault-tolerant, as the cost is often too high for the potential hazard.
+Stakeholders need to decide if the cost is warranted for a particular system.
+Flight control systems need to be Byazntine fault-tolerant.
+There are enough airplanes in the air at any one time that
+\link{cosmic ray bit flipping}{https://www.scienceabc.com/innovation/what-are-bit-flips-and-how-are-spacecraft-protected-from-them.html}
+is guaranteed to happen.
+The control systems need to deal with potentially critical sensor data being corrupted.
+Blockchain protocols are designed to allow mutually distrusting parties to agree on the result of a transaction.
+A blockchain network needs to assume that a hacker could breach the network.
 
-\subsubsection{Two-Phase Commit}
-A two-phase commit algorithm is a type of consensus algorithm that solves the atomic commit problem.
-As the name implies, it splits the commit into two steps.
-There are better consensus algorithms, but two-phase commit is fairly simple and still commonly used.
+Not catering for Byzantine faults does not mean that a system design should assume that all messages are correct.
+Simple error detection (e.g. checksums) should be used to catch corrupted data.
+Any user input should be santised before it is used as data in the system.
+These strategies do not handle subtler data corruption or persistent malicious attack,
+but they catch errors that should not propagate into the rest of the system.
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[trim=55 70 420 30,clip,width=0.67\textwidth]{diagrams/2phase-commit-seq.png}
-    \caption{Two-phase commit.}
-    \label{fig:2pc-seq}
-\end{figure}
-
-A \emph{transaction manager} is introduced to coordinate the two-phase commit process.
-The database nodes that are part of the transaction are called \emph{participants}.
-
-The process starts when some part of the system (\texttt{Client} in figure \ref{fig:2pc-seq})
-requests to start a distributed transaction and receives a unique transaction identifier (\texttt{transId}).
-The client starts \emph{single-node} transactions on each, attaching the \texttt{transId} to the transaction.
-The client can perform multiple reads and writes as part of the transaction.
-
-When the client is ready to commit the transaction it notifies the \texttt{TransactionManager} to perform the commit.
-The \texttt{TransactionManager} sends a prepare message to all the participants.
-If a prepare message times out, or any participant reports a failure,
-the \texttt{TransactionManager} send an abort message to all participants and reports the failure to the client.
-
-When a participant receives the prepare message, it confirms that it can commit the transaction,
-regardless of any fault that may occur after replying to the prepare message.
-(i.e. The participant has saved all changes as part of this transaction in persistent memory.)
-The participant is no longer able to abort the transaction itself,
-it can only abort it now if it receives an abort message from the \texttt{TransactionManager}.
-In effect, it is a pseudo-commit.
-
-When the \texttt{TransactionManager} receives positive responses from all participants,
-it saves the commit decision to a persistent transaction log.
-This means that even if the \texttt{TransactionManager} fails, it can recover the decision.
-This is called the \emph{commit point}.
-If the \texttt{TransactionManager} decides to abort the transaction,
-it records the abort decision in the transaction log.
-
-After the commit point has been reached, the \texttt{TransactionManager} sends the commit message to all participants.
-This is an irreversible decision.
-If the commit message fails or times out, the \texttt{TransactionManager} must continue retrying the message
-until all participants report that they have commited the transaction.
-This means that even if a participant crashes before it performs the commit, it will complete the commit once the participant restarts.
-That was the reason for performing a pseudo-commit at the prepare stage,
-if necessary, the participant can recover and redo all steps that are part of the transaction leading up to the commit.
-
-If the \texttt{TransactionManager} fails during the commit process,
-it can recover and resend the commit messages to any participant that had not responded before the \texttt{TransactionManager} failed.
-If a participant had commited the transaction before the \texttt{TransactionManager} failed,
-it can ignore the new commit and just report that the commit was successful.
-
-A two-phase commit is called a \emph{blocking} atomic commit,
-as completion of the commit can take a long time if a participant or the \texttt{TransactionManager} fail.
-Even worse, if the transaction log on the \texttt{TransactionManager} or a participant are corrupted when they fail,
-this may lead to rows in the database never being unlocked.
-This usually requires manual intervention to decide whether to complete the commit or roll it back, to maintain atomicity.
-Some libraries that support two-phase commit can make an automated decision in this case,
-but the decision will probably break atomicity.
-
-Two-phase commit provides a simple abstraction that allows distributed systems to perform safe transactions.
-The drawback is that a blocking atomic commit is a significant performance cost.
-Even if the \texttt{TransactionManager}, and no participant, fails;
-rows across multiple database nodes are locked until the commit completes.
-If there is a failure, recovery can take a long time.
-For example, in MySQL it is reported that distributed transactions are ten times slower than single-node transactions \cite{distrib-mysql}.
-Consequently, most NoSQL databases and many cloud-based relational databases do not support distributed transactions.
-
-\subsection{Behaving Nodes}
-Leaders \& Locks
-
-\subsection{Byzantine Faults}
-Byzantine Generals Problem
-
-Idempotent
 
 \section{Consistency}
 Consistency is the simple idea that different parts of a system agree on the same value for a data element.
@@ -254,6 +211,7 @@ as most programmers' intuition is based on the experience of modifying a value a
 The system design needs to take into account that \emph{all} database reads are performed under the assumption that the value may be stale.
 Testing for errors caused by data not being consistent is difficult, as you have to force data inconsistencies.
 
+\newpage
 \subsection{Linearisability}
 
 Contrary to eventual consistency, linearisability is a \emph{strong} guarantee.
@@ -287,7 +245,7 @@ the product is out of stock, they generate an event that changes one of the cust
 The simplistic implementation of linearisability is to have a single database.
 This defeats the purpose of replicating a database to improve performance and reliability.
 
-\subsubsection{Single-Leader Replication}
+\subsubsection{Single-Leader Replication}\label{sec:slr}
 Single-leader replication can be implemented in such a way as to provide linearisability.
 This is implemented by only allowing reads to be from the leader or from followers that are synchronously updated by the leader.
 This means that the replicated databases can guarantee that all reads after a write will return the current value.
@@ -300,7 +258,7 @@ Either of these approaches maintain the reliability advantage of replicating the
 
 An additional complication to implementing linearisable single-leader replication is determining which replica is the leader.
 A typical approach is to have a lock of some form that is acquired by the leader, and all other replicas are followers.
-Acquiring the lock tself must be a linearisable operation.
+Acquiring the lock itself must be a linearisable operation.
 If more than one replica believes it is the leader, it means that write behaviour cannot be linearisable.
 A coordination service, such as \link{etcd}{https://etcd.io/}, can be used to implement distributed locks in a linearisable fashion.
 
@@ -328,7 +286,7 @@ In leaderless replication, only basic read and write operations are linearisable
 More sophisticated atomic operations or transactions require a consensus algorithm to be used to provide linearisability.
 
 \subsubsection{Consensus Algorithms}
-Consensus algorithms, such as XXXXXX, have some similarity to single-leader replication.
+Consensus algorithms, which will be described in section \ref{sec:consensus}, have some similarity to single-leader replication.
 Their internal implementations prevent stale replica data or having multiple leader nodes.
 The previously mentioned coordination service, etcd, implements its own consensus algorithm,
 that provides a key-value store that guarantees linearisability.
@@ -346,7 +304,7 @@ Or, they can have \emph{availability} in the presence of network \emph{partition
 The ideas have been around since the mid 1970's \cite{rfc677}, despite the much more recent reference to the CAP theorem.
 The prime value of the CAP theorem is how it influenced the development of NoSQL databases.
 
-\subsection{Causal Ordering}
+\subsection{Causal Ordering}\label{sec:causal-order}
 
 Linearisability is one approach to defining the order in which read and write operations are conceptually performed.
 It defines a \link{total order}{https://mathworld.wolfram.com/TotallyOrderedSet.html} on the operations.
@@ -411,6 +369,172 @@ there needs to be a mechanism to indicate when the order is completed.
 Messages are ordered by their delivery time, not when a result is returned.
 So, if a message has been received, another message cannot be performed before it.
 Coordination services, such as \link{etcd}{https://etcd.io/}, implement total order broadcast.
+
+
+\section{Consensus}\label{sec:consensus}
+
+In a distributed system, consensus is when a set of nodes in the system agree on some aspect of the system's state.
+Achieving consensus is a difficult problem, in light of the issues described in section \ref{sec:faults}.
+When designing a distributed system, you can take advantage of the abstraction of consensus to ignore the faults it handles.
+Abstractions like consensus and transactions \cite{distributed2-notes} make it easier to reason about the behaviour of a distributed system.
+In this section, we will look at how consensus can be implemented.
+
+\subsection{Consensus Algorithms}
+
+Consensus is formally described as ``one or more nodes may \emph{propose} values,
+and the consensus algorithm \emph{decides} on one of those values.''
+For example, if multiple customers attempt to buy the last item that is in stock,
+each node handling a customer request proposes its customer as the purchaser.
+The consensus algorithm decides which customer becomes the purchaser.
+A consensus algorithm must satisfy the following properties \cite{cachin2011Distributed}.
+
+\begin{description}
+    \item[Uniform Agreement] All nodes must agree on the decision.
+    \item[Integrity] Nodes can only vote once.
+    \item[Validity] If the decision is the value $v$, then $v$ must have been proposed by a node.
+    \item[Termination] Every node that does not crash must decide on a value.
+\end{description}
+
+Uniform agreement and integrity are the keys to consensus.
+All participants must agree on the same decision, and once a participant agrees they cannot change their decision.
+Validity is a formal requirement to avoid nonsensical solutions (e.g. always agreeing to a null decision).
+Termination enforces fault tolerance.
+It requires that the consensus algorithm progresses towards a solution, and does not wait for permanently failed nodes.
+It essentially is saying that if some nodes fail,
+the other nodes must make a decision and reach consensus with those nodes that are still working.
+Any consensus algorithm requires at least a majority of the nodes trying to achieve consensus
+to remain functioning in order to assure termination \cite{chandra1996reliable}.
+Most implementations of consensus algorithms ensure that uniform agreement, integrity and validity are always met, 
+even if a majority of the nodes fail.
+This means that even in the worst case it will not result in the consensus algorithm making an invalid decision,
+it just means that it will not be able to achieve consensus and will not be able to process requests.
+
+Some commonly used consensus algorithms are Viewstamped Replication (VSR) \cite{vsr1988},
+Paxos \cite{paxos1998}, Raft \cite{raft2015}, and Zab \cite{zab2011}.
+You are not expected to be able to implement a consensus algorithm, as it is very challenging to implement correctly.
+You should be aware that consensus algorithms exist and then find a library or service that implements one that suits your scenario.
+For performance reasons, most consensus algorithms do not directly implement the formal model described above.
+They typically implement total order broadcast, as mentioned in section \ref{sec:causal-order}.
+It requires that messages are delivered exactly once, and in the same order, to all nodes.
+This provides a result equivalent to multiple rounds of consensus determining the order in which messages are sent.
+
+Most consensus algorithms assume that there are no Byzantine faults, which are described in section \ref{sec:byzantine}
+(e.g. a node sending contradictory messages to other nodes).
+It is possible to implement a consensus algorithm that can manage Byzantine faults,
+as long as fewer than one-third of the nodes generate Byzantine faults \cite{byzantine-tolerance-2002}.
+The details of how to do this are beyond the scope of this course.
+
+\subsection{Distributed Transactions}
+
+A distributed system that needs to enforce a transaction across multiple compute nodes
+needs a mechanism to gain consensus between all nodes participating in the transaction that it can be committed.
+This is called the \emph{atomic commit} problem, based on the idea of transaction atomicity from ACID \cite{distributed2-notes}.
+
+In a database, a distributed transaction may happen when the database is partitioned and data in different partitions are part of the transaction.
+It will also happen if the database has a secondary index on a different node to the primary index.
+Distributed transactions may also occur where events or messages are part of the transaction.
+An example of this is sending a message to a message queue, while storing data in a database.
+In the Sahara eCommerce system, when an order is placed it is stored in the order table in the database
+and a message is placed in the notification queue to notify the customer that the order has been successful.
+Storing the order may be a transaction in only a single database partition,
+but to ensure the notification message is only added to the queue if the order is successful requires a distributed transaction.
+
+\subsubsection{Two-Phase Commit}\label{sec:2pr}
+A two-phase commit algorithm is a type of consensus algorithm that solves the atomic commit problem.
+As the name implies, it splits the commit into two steps.
+There are better consensus algorithms, as described in section \ref{sec:consensus},
+but two-phase commit is fairly simple and still commonly used.
+It should be noted that a two-phase commit is a consensus algorithm
+but it does not satisfy the termination property, so it is not fault tolerant.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[trim=55 70 420 30,clip,width=0.67\textwidth]{diagrams/2phase-commit-seq.png}
+    \caption{Two-phase commit.}
+    \label{fig:2pc-seq}
+\end{figure}
+
+A \emph{transaction manager} is introduced to coordinate the two-phase commit process.
+The database nodes that are part of the transaction are called \emph{participants}.
+
+The process starts when some part of the system (\texttt{Client} in figure \ref{fig:2pc-seq})
+requests to start a distributed transaction and receives a unique transaction identifier (\texttt{transId}).
+The client starts \emph{single-node} transactions on each, attaching the \texttt{transId} to the transaction.
+The client can perform multiple reads and writes as part of the transaction.
+
+When the client is ready to commit the transaction it notifies the \texttt{TransactionManager} to perform the commit.
+The \texttt{TransactionManager} sends a prepare message to all the participants.
+If a prepare message times out, or any participant reports a failure,
+the \texttt{TransactionManager} send an abort message to all participants and reports the failure to the client.
+
+When a participant receives the prepare message, it confirms that it can commit the transaction,
+regardless of any fault that may occur after replying to the prepare message.
+(i.e. The participant has saved all changes as part of this transaction in persistent memory.)
+The participant is no longer able to abort the transaction itself,
+it can only abort it now if it receives an abort message from the \texttt{TransactionManager}.
+In effect, it is a pseudo-commit.
+
+When the \texttt{TransactionManager} receives positive responses from all participants,
+it saves the commit decision to a persistent transaction log.
+This means that even if the \texttt{TransactionManager} fails, it can recover the decision.
+This is called the \emph{commit point}.
+If the \texttt{TransactionManager} decides to abort the transaction,
+it records the abort decision in the transaction log.
+
+After the commit point has been reached, the \texttt{TransactionManager} sends the commit message to all participants.
+This is an irreversible decision.
+If the commit message fails or times out, the \texttt{TransactionManager} must continue retrying the message
+until all participants report that they have commited the transaction.
+This means that even if a participant crashes before it performs the commit, it will complete the commit once the participant restarts.
+That was the reason for performing a pseudo-commit at the prepare stage,
+if necessary, the participant can recover and redo all steps that are part of the transaction leading up to the commit.
+
+If the \texttt{TransactionManager} fails during the commit process,
+it can recover and resend the commit messages to any participant that had not responded before the \texttt{TransactionManager} failed.
+If a participant had commited the transaction before the \texttt{TransactionManager} failed,
+it can ignore the new commit and just report that the commit was successful.
+
+Many libraries implement two-phase commit.
+The Open Group defined the X/Open eXtended Architecture standard \cite{xa-std}, which most of these libraries follow.
+Many relational databases (e.g. MySQL, Postgres, Oracle, \dots) and message queues (e.g. ActiveMQ, IBM MQ, \dots)
+implement the standard.
+
+A two-phase commit is called a \emph{blocking} atomic commit,
+as completion of the commit can take a long time if a participant or the \texttt{TransactionManager} fail.
+Even worse, if the transaction log on the \texttt{TransactionManager} or a participant are corrupted when they fail,
+this may lead to rows in the database never being unlocked.
+This usually requires manual intervention to decide whether to complete the commit or roll it back, to maintain atomicity.
+Some libraries that support two-phase commit can make an automated decision in this case,
+but the decision will probably break atomicity.
+
+Two-phase commit provides a simple abstraction that allows distributed systems to perform safe transactions.
+The drawback is that a blocking atomic commit is a significant performance cost.
+Even if the \texttt{TransactionManager}, and no participant, fails;
+rows across multiple database nodes are locked until the commit completes.
+If there is a failure, recovery can take a long time.
+For example, in MySQL it is reported that distributed transactions are ten times slower than single-node transactions \cite{distrib-mysql}.
+Consequently, most NoSQL databases and many cloud-based relational databases do not support distributed transactions.
+
+\subsection{Leaders}
+
+Section \ref{sec:slr} mentions issues around choosing the leader for a single-leader replicated database.
+Some database systems allow the leader to be automatically elected.
+This allows single-leader replication to be fault tolerant as a new leader can be elected if the leader fails.
+This concept scales up to general consensus algorithms, which need a leader to achieve consensus.
+
+\emph{Epoch numbers} are used to manage this approach.
+The systems guarantee that there is only one leader per epoch, rather than there only ever being one leader.
+If there is no leader, or the current leader seems to be dead,
+a vote is conducted amongst the nodes trying to achieve consensus to elect a new leader.
+The election increments the epoch number.
+Each leader has its epoch number.
+If there is a conflict between leaders (e.g. a vote was conducted for a new leader when the previous leader was not dead),
+the leader with the higher epoch number wins as the new leader.
+
+Before a leader can decide on a value that has been proposed for consensus,
+it checks to see if there are any other leaders with a higher epoch number.
+It must obtain the results from this check from a quorum of nodes,
+otherwise the check fails.
 
 
 \section{Conclusion}
