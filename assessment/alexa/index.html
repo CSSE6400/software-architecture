@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Alexa WIP</title>
+  <title>Chatterbox WIP</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta charset="UTF-8" />
@@ -846,17 +846,102 @@ ul.nav-tabs {
   <script>
     // Script section to load models into a JS Var
     var defs = {}
-    defs["SpeechRequest"] = {
+    defs["Model"] = {
   "type" : "object",
   "properties" : {
-    "content" : {
+    "name" : {
+      "$ref" : "#/components/schemas/Models"
+    },
+    "description" : {
       "type" : "string",
-      "example" : "Hello, world!"
+      "description" : "A description of the model",
+      "example" : "EK1 en-rp tacotron2 by NMStoker"
+    },
+    "author" : {
+      "type" : "string",
+      "description" : "Author of the model",
+      "example" : "Eren Gölge @erogol"
+    },
+    "license" : {
+      "type" : "string",
+      "description" : "",
+      "example" : "CC BY-NC-ND 4.0"
+    },
+    "url" : {
+      "type" : "string",
+      "format" : "uri",
+      "example" : "https://coqui.gateway.scarf.sh/v0.1.0/tts_models--en--ek1--tacotron2.zip"
+    }
+  }
+};
+    defs["Models"] = {
+  "type" : "string",
+  "description" : "Text-to-speech model",
+  "enum" : [ "tacotron", "tacotron2", "glow-tts", "speedy-speech", "align-tts", "fastpitch", "fastspeech", "vits" ]
+};
+    defs["TextRequest"] = {
+  "type" : "object",
+  "properties" : {
+    "message" : {
+      "type" : "string",
+      "description" : "Content of the text request, synchronous requests must be between 1 and 280 characters. Asynchronous requests must be between 280 and 9001.",
+      "example" : "Hello, CSSE6400!"
+    },
+    "operation" : {
+      "type" : "string",
+      "description" : "Perform the request synchronously or asynchronously",
+      "enum" : [ "SYNC", "ASYNC" ]
     },
     "model" : {
+      "$ref" : "#/components/schemas/Models"
+    }
+  }
+};
+    defs["TextResponse"] = {
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/TextResponse_allOf"
+  }, {
+    "$ref" : "#/components/schemas/TextRequest"
+  }, {
+    "$ref" : "#/components/schemas/TextResponse_allOf_1"
+  } ]
+};
+    defs["TextResponse_allOf"] = {
+  "type" : "object",
+  "properties" : {
+    "id" : {
       "type" : "string",
-      "description" : "Text-to-speech model",
-      "enum" : [ "tacotron", "tacotron2", "glow-tts", "speedy-speech", "align-tts", "fastpitch", "fastspeech", "vits" ]
+      "description" : "Unique identifier of the text request",
+      "format" : "uuid"
+    }
+  }
+};
+    defs["TextResponse_allOf_1"] = {
+  "type" : "object",
+  "properties" : {
+    "status" : {
+      "type" : "string",
+      "enum" : [ "PENDING", "COMPLETED", "FAILED" ]
+    },
+    "resource" : {
+      "type" : "string",
+      "description" : "URL where the .wav file can be found, if the request is completed.",
+      "format" : "uri",
+      "example" : "https://presignedurldemo.s3.eu-west-2.amazonaws.com/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAJJWZ7B6WCRGMKFGQ%2F20180210%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20180210T171315Z&X-Amz-Expires=1800&X-Amz-Signature=12b74b0788aa036bc7c3d03b3f20c61f1f91cc9ad8873e3314255dc479a25351&X-Amz-SignedHeaders=host"
+    },
+    "created_at" : {
+      "type" : "string",
+      "format" : "date-time",
+      "example" : "2022-04-01T00:43:29.111Z"
+    },
+    "processed_at" : {
+      "type" : "string",
+      "format" : "date-time",
+      "example" : "2022-04-09T07:43:29.111Z"
+    },
+    "error" : {
+      "type" : "object",
+      "properties" : { }
     }
   }
 };
@@ -879,8 +964,26 @@ ul.nav-tabs {
             <li class="nav-fixed nav-header active" data-group="_"><a href="#api-_">API Summary</a></li>
 
                   <li class="nav-header" data-group="Tts"><a href="#api-Tts">API Methods - Tts</a></li>
-                    <li data-group="Tts" data-name="requestPost" class="">
-                      <a href="#api-Tts-requestPost">requestPost</a>
+                    <li data-group="Tts" data-name="healthGet" class="">
+                      <a href="#api-Tts-healthGet">healthGet</a>
+                    </li>
+                    <li data-group="Tts" data-name="modelGet" class="">
+                      <a href="#api-Tts-modelGet">modelGet</a>
+                    </li>
+                    <li data-group="Tts" data-name="modelIdGet" class="">
+                      <a href="#api-Tts-modelIdGet">modelIdGet</a>
+                    </li>
+                    <li data-group="Tts" data-name="textGet" class="">
+                      <a href="#api-Tts-textGet">textGet</a>
+                    </li>
+                    <li data-group="Tts" data-name="textIdDelete" class="">
+                      <a href="#api-Tts-textIdDelete">textIdDelete</a>
+                    </li>
+                    <li data-group="Tts" data-name="textIdGet" class="">
+                      <a href="#api-Tts-textIdGet">textIdGet</a>
+                    </li>
+                    <li data-group="Tts" data-name="textPost" class="">
+                      <a href="#api-Tts-textPost">textPost</a>
                     </li>
           </ul>
         </nav>
@@ -888,7 +991,7 @@ ul.nav-tabs {
       <div id="content">
         <div id="project">
           <div class="pull-left">
-            <h1>Alexa WIP</h1>
+            <h1>Chatterbox WIP</h1>
           </div>
           <div class="clearfix"></div>
         </div>
@@ -905,11 +1008,11 @@ ul.nav-tabs {
         <div id="sections">
                 <section id="api-Tts">
                   <h1>Tts</h1>
-                    <div id="api-Tts-requestPost">
-                      <article id="api-Tts-requestPost-0" data-group="User" data-name="requestPost" data-version="0">
+                    <div id="api-Tts-healthGet">
+                      <article id="api-Tts-healthGet-0" data-group="User" data-name="healthGet" data-version="0">
                         <div class="pull-left">
-                          <h1>requestPost</h1>
-                          <p>Request speech for text</p>
+                          <h1>healthGet</h1>
+                          <p>Query the health of the chatterbox service</p>
                         </div>
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
@@ -917,37 +1020,32 @@ ul.nav-tabs {
                         <p class="marked"></p>
                         <p></p>
                         <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/request</span></code></pre>
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/health</span></code></pre>
                         <p>
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-Tts-requestPost-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-Tts-requestPost-0-java">Java</a></li>
-                          <li class=""><a href="#examples-Tts-requestPost-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-Tts-requestPost-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-Tts-requestPost-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-Tts-requestPost-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-Tts-requestPost-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-Tts-requestPost-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-Tts-requestPost-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-Tts-requestPost-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-Tts-requestPost-0-python">Python</a></li>
-                          <li class=""><a href="#examples-Tts-requestPost-0-rust">Rust</a></li>
+                          <li class="active"><a href="#examples-Tts-healthGet-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Tts-healthGet-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Tts-healthGet-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Tts-healthGet-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Tts-healthGet-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Tts-healthGet-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Tts-healthGet-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Tts-healthGet-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Tts-healthGet-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Tts-healthGet-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Tts-healthGet-0-python">Python</a></li>
+                          <li class=""><a href="#examples-Tts-healthGet-0-rust">Rust</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-Tts-requestPost-0-curl">
-                            <pre class="prettyprint"><code class="language-bsh">curl -X POST \
- -H "Content-Type: application/json" \
- "http://alexa.services.its.uq.edu.au/v1/request" \
- -d '{
-  &quot;model&quot; : &quot;tacotron&quot;,
-  &quot;content&quot; : &quot;Hello, world!&quot;
-}'
+                          <div class="tab-pane active" id="examples-Tts-healthGet-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X GET \
+ "http://chatterbox.services.its.uq.edu.au/v1/health"
 </code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-Tts-requestPost-0-java">
+                          <div class="tab-pane" id="examples-Tts-healthGet-0-java">
                             <pre class="prettyprint"><code class="language-java">import org.openapitools.client.*;
 import org.openapitools.client.auth.*;
 import org.openapitools.client.model.*;
@@ -961,12 +1059,11 @@ public class TtsApiExample {
 
         // Create an instance of the API class
         TtsApi apiInstance = new TtsApi();
-        SpeechRequest body = ; // SpeechRequest | 
 
         try {
-            apiInstance.requestPost(body);
+            apiInstance.healthGet();
         } catch (ApiException e) {
-            System.err.println("Exception when calling TtsApi#requestPost");
+            System.err.println("Exception when calling TtsApi#healthGet");
             e.printStackTrace();
         }
     }
@@ -974,37 +1071,35 @@ public class TtsApiExample {
 </code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-Tts-requestPost-0-android">
+                          <div class="tab-pane" id="examples-Tts-healthGet-0-android">
                             <pre class="prettyprint"><code class="language-java">import org.openapitools.client.api.TtsApi;
 
 public class TtsApiExample {
     public static void main(String[] args) {
         TtsApi apiInstance = new TtsApi();
-        SpeechRequest body = ; // SpeechRequest | 
 
         try {
-            apiInstance.requestPost(body);
+            apiInstance.healthGet();
         } catch (ApiException e) {
-            System.err.println("Exception when calling TtsApi#requestPost");
+            System.err.println("Exception when calling TtsApi#healthGet");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-Tts-requestPost-0-groovy">
+  <div class="tab-pane" id="examples-Tts-healthGet-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-Tts-requestPost-0-objc">
+                            <div class="tab-pane" id="examples-Tts-healthGet-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">
 
 // Create an instance of the API class
 TtsApi *apiInstance = [[TtsApi alloc] init];
-SpeechRequest *body = ; // 
 
-// Request speech for text
-[apiInstance requestPostWith:body
-              completionHandler: ^(NSError* error) {
+// Query the health of the chatterbox service
+[apiInstance healthGetWithCompletionHandler: 
+              ^(NSError* error) {
     if (error) {
         NSLog(@"Error: %@", error);
     }
@@ -1012,13 +1107,11 @@ SpeechRequest *body = ; //
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tts-requestPost-0-javascript">
-                              <pre class="prettyprint"><code class="language-js">var AlexaWip = require('alexa_wip');
+                            <div class="tab-pane" id="examples-Tts-healthGet-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var ChatterboxWip = require('chatterbox_wip');
 
 // Create an instance of the API class
-var api = new AlexaWip.TtsApi()
-var body = ; // {SpeechRequest} 
-
+var api = new ChatterboxWip.TtsApi()
 var callback = function(error, data, response) {
   if (error) {
     console.error(error);
@@ -1026,14 +1119,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully.');
   }
 };
-api.requestPost(body, callback);
+api.healthGet(callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-Tts-requestPost-0-angular">
+                            <!--<div class="tab-pane" id="examples-Tts-healthGet-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-Tts-requestPost-0-csharp">
+                            <div class="tab-pane" id="examples-Tts-healthGet-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using Org.OpenAPITools.Api;
@@ -1042,20 +1135,19 @@ using Org.OpenAPITools.Model;
 
 namespace Example
 {
-    public class requestPostExample
+    public class healthGetExample
     {
         public void main()
         {
 
             // Create an instance of the API class
             var apiInstance = new TtsApi();
-            var body = new SpeechRequest(); // SpeechRequest | 
 
             try {
-                // Request speech for text
-                apiInstance.requestPost(body);
+                // Query the health of the chatterbox service
+                apiInstance.healthGet();
             } catch (Exception e) {
-                Debug.Print("Exception when calling TtsApi.requestPost: " + e.Message );
+                Debug.Print("Exception when calling TtsApi.healthGet: " + e.Message );
             }
         }
     }
@@ -1063,40 +1155,38 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tts-requestPost-0-php">
+                            <div class="tab-pane" id="examples-Tts-healthGet-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
 // Create an instance of the API class
 $api_instance = new OpenAPITools\Client\Api\TtsApi();
-$body = ; // SpeechRequest | 
 
 try {
-    $api_instance->requestPost($body);
+    $api_instance->healthGet();
 } catch (Exception $e) {
-    echo 'Exception when calling TtsApi->requestPost: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling TtsApi->healthGet: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tts-requestPost-0-perl">
+                            <div class="tab-pane" id="examples-Tts-healthGet-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::OPenAPIClient::Configuration;
 use WWW::OPenAPIClient::TtsApi;
 
 # Create an instance of the API class
 my $api_instance = WWW::OPenAPIClient::TtsApi->new();
-my $body = WWW::OPenAPIClient::Object::SpeechRequest->new(); # SpeechRequest | 
 
 eval {
-    $api_instance->requestPost(body => $body);
+    $api_instance->healthGet();
 };
 if ($@) {
-    warn "Exception when calling TtsApi->requestPost: $@\n";
+    warn "Exception when calling TtsApi->healthGet: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tts-requestPost-0-python">
+                            <div class="tab-pane" id="examples-Tts-healthGet-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import openapi_client
@@ -1105,23 +1195,1873 @@ from pprint import pprint
 
 # Create an instance of the API class
 api_instance = openapi_client.TtsApi()
-body =  # SpeechRequest | 
 
 try:
-    # Request speech for text
-    api_instance.request_post(body)
+    # Query the health of the chatterbox service
+    api_instance.health_get()
 except ApiException as e:
-    print("Exception when calling TtsApi->requestPost: %s\n" % e)</code></pre>
+    print("Exception when calling TtsApi->healthGet: %s\n" % e)</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tts-requestPost-0-rust">
+                            <div class="tab-pane" id="examples-Tts-healthGet-0-rust">
                               <pre class="prettyprint"><code class="language-rust">extern crate TtsApi;
 
 pub fn main() {
-    let body = ; // SpeechRequest
 
     let mut context = TtsApi::Context::default();
-    let result = client.requestPost(body, &context).wait();
+    let result = client.healthGet(&context).wait();
+
+    println!("{:?}", result);
+}
+</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Scopes</h2>
+                          <table>
+                            
+                          </table>
+
+                          <h2>Parameters</h2>
+
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3 id="examples-Tts-healthGet-title-200"></h3>
+                            <p id="examples-Tts-healthGet-description-200" class="marked"></p>
+                            <script>
+                              var responseTts200_description = `Service is healthy`;
+                              var responseTts200_description_break = responseTts200_description.indexOf('\n');
+                              if (responseTts200_description_break == -1) {
+                                $("#examples-Tts-healthGet-title-200").text("Status: 200 - " + responseTts200_description);
+                              } else {
+                                $("#examples-Tts-healthGet-title-200").text("Status: 200 - " + responseTts200_description.substring(0, responseTts200_description_break));
+                                $("#examples-Tts-healthGet-description-200").html(responseTts200_description.substring(responseTts200_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Tts-healthGet-200" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Tts-healthGet-200-wrapper" style='margin-bottom: 10px;'>
+                            </div>
+                            <h3 id="examples-Tts-healthGet-title-503"></h3>
+                            <p id="examples-Tts-healthGet-description-503" class="marked"></p>
+                            <script>
+                              var responseTts503_description = `Service is not healthy`;
+                              var responseTts503_description_break = responseTts503_description.indexOf('\n');
+                              if (responseTts503_description_break == -1) {
+                                $("#examples-Tts-healthGet-title-503").text("Status: 503 - " + responseTts503_description);
+                              } else {
+                                $("#examples-Tts-healthGet-title-503").text("Status: 503 - " + responseTts503_description.substring(0, responseTts503_description_break));
+                                $("#examples-Tts-healthGet-description-503").html(responseTts503_description.substring(responseTts503_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Tts-healthGet-503" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Tts-healthGet-503-wrapper" style='margin-bottom: 10px;'>
+                            </div>
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Tts-modelGet">
+                      <article id="api-Tts-modelGet-0" data-group="User" data-name="modelGet" data-version="0">
+                        <div class="pull-left">
+                          <h1>modelGet</h1>
+                          <p>List all available text-to-speech models</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/model</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Tts-modelGet-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Tts-modelGet-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Tts-modelGet-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Tts-modelGet-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Tts-modelGet-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Tts-modelGet-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Tts-modelGet-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Tts-modelGet-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Tts-modelGet-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Tts-modelGet-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Tts-modelGet-0-python">Python</a></li>
+                          <li class=""><a href="#examples-Tts-modelGet-0-rust">Rust</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Tts-modelGet-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X GET \
+ -H "Accept: application/json" \
+ "http://chatterbox.services.its.uq.edu.au/v1/model"
+</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Tts-modelGet-0-java">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.*;
+import org.openapitools.client.auth.*;
+import org.openapitools.client.model.*;
+import org.openapitools.client.api.TtsApi;
+
+import java.io.File;
+import java.util.*;
+
+public class TtsApiExample {
+    public static void main(String[] args) {
+
+        // Create an instance of the API class
+        TtsApi apiInstance = new TtsApi();
+
+        try {
+            array[Models] result = apiInstance.modelGet();
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling TtsApi#modelGet");
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Tts-modelGet-0-android">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.api.TtsApi;
+
+public class TtsApiExample {
+    public static void main(String[] args) {
+        TtsApi apiInstance = new TtsApi();
+
+        try {
+            array[Models] result = apiInstance.modelGet();
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling TtsApi#modelGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Tts-modelGet-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Tts-modelGet-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">
+
+// Create an instance of the API class
+TtsApi *apiInstance = [[TtsApi alloc] init];
+
+// List all available text-to-speech models
+[apiInstance modelGetWithCompletionHandler: 
+              ^(array[Models] output, NSError* error) {
+    if (output) {
+        NSLog(@"%@", output);
+    }
+    if (error) {
+        NSLog(@"Error: %@", error);
+    }
+}];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-modelGet-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var ChatterboxWip = require('chatterbox_wip');
+
+// Create an instance of the API class
+var api = new ChatterboxWip.TtsApi()
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.modelGet(callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Tts-modelGet-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Tts-modelGet-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using Org.OpenAPITools.Api;
+using Org.OpenAPITools.Client;
+using Org.OpenAPITools.Model;
+
+namespace Example
+{
+    public class modelGetExample
+    {
+        public void main()
+        {
+
+            // Create an instance of the API class
+            var apiInstance = new TtsApi();
+
+            try {
+                // List all available text-to-speech models
+                array[Models] result = apiInstance.modelGet();
+                Debug.WriteLine(result);
+            } catch (Exception e) {
+                Debug.Print("Exception when calling TtsApi.modelGet: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-modelGet-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+// Create an instance of the API class
+$api_instance = new OpenAPITools\Client\Api\TtsApi();
+
+try {
+    $result = $api_instance->modelGet();
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling TtsApi->modelGet: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-modelGet-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::OPenAPIClient::Configuration;
+use WWW::OPenAPIClient::TtsApi;
+
+# Create an instance of the API class
+my $api_instance = WWW::OPenAPIClient::TtsApi->new();
+
+eval {
+    my $result = $api_instance->modelGet();
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling TtsApi->modelGet: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-modelGet-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+
+# Create an instance of the API class
+api_instance = openapi_client.TtsApi()
+
+try:
+    # List all available text-to-speech models
+    api_response = api_instance.model_get()
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling TtsApi->modelGet: %s\n" % e)</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-modelGet-0-rust">
+                              <pre class="prettyprint"><code class="language-rust">extern crate TtsApi;
+
+pub fn main() {
+
+    let mut context = TtsApi::Context::default();
+    let result = client.modelGet(&context).wait();
+
+    println!("{:?}", result);
+}
+</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Scopes</h2>
+                          <table>
+                            
+                          </table>
+
+                          <h2>Parameters</h2>
+
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3 id="examples-Tts-modelGet-title-200"></h3>
+                            <p id="examples-Tts-modelGet-description-200" class="marked"></p>
+                            <script>
+                              var responseTts200_description = `List of available text-to-speech models`;
+                              var responseTts200_description_break = responseTts200_description.indexOf('\n');
+                              if (responseTts200_description_break == -1) {
+                                $("#examples-Tts-modelGet-title-200").text("Status: 200 - " + responseTts200_description);
+                              } else {
+                                $("#examples-Tts-modelGet-title-200").text("Status: 200 - " + responseTts200_description.substring(0, responseTts200_description_break));
+                                $("#examples-Tts-modelGet-description-200").html(responseTts200_description.substring(responseTts200_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Tts-modelGet-200" class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-Tts-modelGet-200-schema">Schema</a>
+                                </li>
+
+
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Tts-modelGet-200-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Tts-modelGet-200-schema">
+                                  <div id="responses-Tts-modelGet-schema-200" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "List of available text-to-speech models",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/Models"
+        }
+      }
+    }
+  }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Tts-modelGet-200-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Tts-modelGet-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Tts-modelGet-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Tts-modelIdGet">
+                      <article id="api-Tts-modelIdGet-0" data-group="User" data-name="modelIdGet" data-version="0">
+                        <div class="pull-left">
+                          <h1>modelIdGet</h1>
+                          <p>Retrieve details about a specified text-to-speech model</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/model/{id}</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Tts-modelIdGet-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Tts-modelIdGet-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Tts-modelIdGet-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Tts-modelIdGet-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Tts-modelIdGet-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Tts-modelIdGet-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Tts-modelIdGet-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Tts-modelIdGet-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Tts-modelIdGet-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Tts-modelIdGet-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Tts-modelIdGet-0-python">Python</a></li>
+                          <li class=""><a href="#examples-Tts-modelIdGet-0-rust">Rust</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Tts-modelIdGet-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X GET \
+ "http://chatterbox.services.its.uq.edu.au/v1/model/{id}"
+</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Tts-modelIdGet-0-java">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.*;
+import org.openapitools.client.auth.*;
+import org.openapitools.client.model.*;
+import org.openapitools.client.api.TtsApi;
+
+import java.io.File;
+import java.util.*;
+
+public class TtsApiExample {
+    public static void main(String[] args) {
+
+        // Create an instance of the API class
+        TtsApi apiInstance = new TtsApi();
+        String id = id_example; // String | 
+
+        try {
+            apiInstance.modelIdGet(id);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling TtsApi#modelIdGet");
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Tts-modelIdGet-0-android">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.api.TtsApi;
+
+public class TtsApiExample {
+    public static void main(String[] args) {
+        TtsApi apiInstance = new TtsApi();
+        String id = id_example; // String | 
+
+        try {
+            apiInstance.modelIdGet(id);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling TtsApi#modelIdGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Tts-modelIdGet-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Tts-modelIdGet-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">
+
+// Create an instance of the API class
+TtsApi *apiInstance = [[TtsApi alloc] init];
+String *id = id_example; //  (default to null)
+
+// Retrieve details about a specified text-to-speech model
+[apiInstance modelIdGetWith:id
+              completionHandler: ^(NSError* error) {
+    if (error) {
+        NSLog(@"Error: %@", error);
+    }
+}];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-modelIdGet-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var ChatterboxWip = require('chatterbox_wip');
+
+// Create an instance of the API class
+var api = new ChatterboxWip.TtsApi()
+var id = id_example; // {String} 
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully.');
+  }
+};
+api.modelIdGet(id, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Tts-modelIdGet-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Tts-modelIdGet-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using Org.OpenAPITools.Api;
+using Org.OpenAPITools.Client;
+using Org.OpenAPITools.Model;
+
+namespace Example
+{
+    public class modelIdGetExample
+    {
+        public void main()
+        {
+
+            // Create an instance of the API class
+            var apiInstance = new TtsApi();
+            var id = id_example;  // String |  (default to null)
+
+            try {
+                // Retrieve details about a specified text-to-speech model
+                apiInstance.modelIdGet(id);
+            } catch (Exception e) {
+                Debug.Print("Exception when calling TtsApi.modelIdGet: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-modelIdGet-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+// Create an instance of the API class
+$api_instance = new OpenAPITools\Client\Api\TtsApi();
+$id = id_example; // String | 
+
+try {
+    $api_instance->modelIdGet($id);
+} catch (Exception $e) {
+    echo 'Exception when calling TtsApi->modelIdGet: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-modelIdGet-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::OPenAPIClient::Configuration;
+use WWW::OPenAPIClient::TtsApi;
+
+# Create an instance of the API class
+my $api_instance = WWW::OPenAPIClient::TtsApi->new();
+my $id = id_example; # String | 
+
+eval {
+    $api_instance->modelIdGet(id => $id);
+};
+if ($@) {
+    warn "Exception when calling TtsApi->modelIdGet: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-modelIdGet-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+
+# Create an instance of the API class
+api_instance = openapi_client.TtsApi()
+id = id_example # String |  (default to null)
+
+try:
+    # Retrieve details about a specified text-to-speech model
+    api_instance.model_id_get(id)
+except ApiException as e:
+    print("Exception when calling TtsApi->modelIdGet: %s\n" % e)</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-modelIdGet-0-rust">
+                              <pre class="prettyprint"><code class="language-rust">extern crate TtsApi;
+
+pub fn main() {
+    let id = id_example; // String
+
+    let mut context = TtsApi::Context::default();
+    let result = client.modelIdGet(id, &context).wait();
+
+    println!("{:?}", result);
+}
+</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Scopes</h2>
+                          <table>
+                            
+                          </table>
+
+                          <h2>Parameters</h2>
+
+                            <div class="methodsubtabletitle">Path parameters</div>
+                            <table id="methodsubtable">
+                                <tr>
+                                  <th width="150px">Name</th>
+                                  <th>Description</th>
+                                </tr>
+                                  <tr><td style="width:150px;">id*</td>
+<td>
+
+
+    <div id="d2e199_modelIdGet_id">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+            </div>
+                <div class="inner required">
+                    Required
+                </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                            </table>
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3 id="examples-Tts-modelIdGet-title-200"></h3>
+                            <p id="examples-Tts-modelIdGet-description-200" class="marked"></p>
+                            <script>
+                              var responseTts200_description = ``;
+                              var responseTts200_description_break = responseTts200_description.indexOf('\n');
+                              if (responseTts200_description_break == -1) {
+                                $("#examples-Tts-modelIdGet-title-200").text("Status: 200 - " + responseTts200_description);
+                              } else {
+                                $("#examples-Tts-modelIdGet-title-200").text("Status: 200 - " + responseTts200_description.substring(0, responseTts200_description_break));
+                                $("#examples-Tts-modelIdGet-description-200").html(responseTts200_description.substring(responseTts200_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Tts-modelIdGet-200" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Tts-modelIdGet-200-wrapper" style='margin-bottom: 10px;'>
+                            </div>
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Tts-textGet">
+                      <article id="api-Tts-textGet-0" data-group="User" data-name="textGet" data-version="0">
+                        <div class="pull-left">
+                          <h1>textGet</h1>
+                          <p>List all generated audios</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/text</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Tts-textGet-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Tts-textGet-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Tts-textGet-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Tts-textGet-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Tts-textGet-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Tts-textGet-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Tts-textGet-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Tts-textGet-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Tts-textGet-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Tts-textGet-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Tts-textGet-0-python">Python</a></li>
+                          <li class=""><a href="#examples-Tts-textGet-0-rust">Rust</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Tts-textGet-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X GET \
+ -H "Accept: application/json" \
+ "http://chatterbox.services.its.uq.edu.au/v1/text"
+</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Tts-textGet-0-java">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.*;
+import org.openapitools.client.auth.*;
+import org.openapitools.client.model.*;
+import org.openapitools.client.api.TtsApi;
+
+import java.io.File;
+import java.util.*;
+
+public class TtsApiExample {
+    public static void main(String[] args) {
+
+        // Create an instance of the API class
+        TtsApi apiInstance = new TtsApi();
+
+        try {
+            array[TextResponse] result = apiInstance.textGet();
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling TtsApi#textGet");
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Tts-textGet-0-android">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.api.TtsApi;
+
+public class TtsApiExample {
+    public static void main(String[] args) {
+        TtsApi apiInstance = new TtsApi();
+
+        try {
+            array[TextResponse] result = apiInstance.textGet();
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling TtsApi#textGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Tts-textGet-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Tts-textGet-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">
+
+// Create an instance of the API class
+TtsApi *apiInstance = [[TtsApi alloc] init];
+
+// List all generated audios
+[apiInstance textGetWithCompletionHandler: 
+              ^(array[TextResponse] output, NSError* error) {
+    if (output) {
+        NSLog(@"%@", output);
+    }
+    if (error) {
+        NSLog(@"Error: %@", error);
+    }
+}];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textGet-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var ChatterboxWip = require('chatterbox_wip');
+
+// Create an instance of the API class
+var api = new ChatterboxWip.TtsApi()
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.textGet(callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Tts-textGet-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Tts-textGet-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using Org.OpenAPITools.Api;
+using Org.OpenAPITools.Client;
+using Org.OpenAPITools.Model;
+
+namespace Example
+{
+    public class textGetExample
+    {
+        public void main()
+        {
+
+            // Create an instance of the API class
+            var apiInstance = new TtsApi();
+
+            try {
+                // List all generated audios
+                array[TextResponse] result = apiInstance.textGet();
+                Debug.WriteLine(result);
+            } catch (Exception e) {
+                Debug.Print("Exception when calling TtsApi.textGet: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textGet-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+// Create an instance of the API class
+$api_instance = new OpenAPITools\Client\Api\TtsApi();
+
+try {
+    $result = $api_instance->textGet();
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling TtsApi->textGet: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textGet-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::OPenAPIClient::Configuration;
+use WWW::OPenAPIClient::TtsApi;
+
+# Create an instance of the API class
+my $api_instance = WWW::OPenAPIClient::TtsApi->new();
+
+eval {
+    my $result = $api_instance->textGet();
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling TtsApi->textGet: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textGet-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+
+# Create an instance of the API class
+api_instance = openapi_client.TtsApi()
+
+try:
+    # List all generated audios
+    api_response = api_instance.text_get()
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling TtsApi->textGet: %s\n" % e)</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textGet-0-rust">
+                              <pre class="prettyprint"><code class="language-rust">extern crate TtsApi;
+
+pub fn main() {
+
+    let mut context = TtsApi::Context::default();
+    let result = client.textGet(&context).wait();
+
+    println!("{:?}", result);
+}
+</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Scopes</h2>
+                          <table>
+                            
+                          </table>
+
+                          <h2>Parameters</h2>
+
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3 id="examples-Tts-textGet-title-200"></h3>
+                            <p id="examples-Tts-textGet-description-200" class="marked"></p>
+                            <script>
+                              var responseTts200_description = `List of generated audios`;
+                              var responseTts200_description_break = responseTts200_description.indexOf('\n');
+                              if (responseTts200_description_break == -1) {
+                                $("#examples-Tts-textGet-title-200").text("Status: 200 - " + responseTts200_description);
+                              } else {
+                                $("#examples-Tts-textGet-title-200").text("Status: 200 - " + responseTts200_description.substring(0, responseTts200_description_break));
+                                $("#examples-Tts-textGet-description-200").html(responseTts200_description.substring(responseTts200_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Tts-textGet-200" class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-Tts-textGet-200-schema">Schema</a>
+                                </li>
+
+
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Tts-textGet-200-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Tts-textGet-200-schema">
+                                  <div id="responses-Tts-textGet-schema-200" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "List of generated audios",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/TextResponse"
+        }
+      }
+    }
+  }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Tts-textGet-200-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Tts-textGet-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Tts-textGet-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Tts-textIdDelete">
+                      <article id="api-Tts-textIdDelete-0" data-group="User" data-name="textIdDelete" data-version="0">
+                        <div class="pull-left">
+                          <h1>textIdDelete</h1>
+                          <p>Delete a text-to-speech job</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="delete"><code><span class="pln">/text/{id}</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Tts-textIdDelete-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Tts-textIdDelete-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Tts-textIdDelete-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Tts-textIdDelete-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Tts-textIdDelete-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Tts-textIdDelete-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Tts-textIdDelete-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Tts-textIdDelete-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Tts-textIdDelete-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Tts-textIdDelete-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Tts-textIdDelete-0-python">Python</a></li>
+                          <li class=""><a href="#examples-Tts-textIdDelete-0-rust">Rust</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Tts-textIdDelete-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X DELETE \
+ "http://chatterbox.services.its.uq.edu.au/v1/text/{id}"
+</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Tts-textIdDelete-0-java">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.*;
+import org.openapitools.client.auth.*;
+import org.openapitools.client.model.*;
+import org.openapitools.client.api.TtsApi;
+
+import java.io.File;
+import java.util.*;
+
+public class TtsApiExample {
+    public static void main(String[] args) {
+
+        // Create an instance of the API class
+        TtsApi apiInstance = new TtsApi();
+        String id = id_example; // String | 
+
+        try {
+            apiInstance.textIdDelete(id);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling TtsApi#textIdDelete");
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Tts-textIdDelete-0-android">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.api.TtsApi;
+
+public class TtsApiExample {
+    public static void main(String[] args) {
+        TtsApi apiInstance = new TtsApi();
+        String id = id_example; // String | 
+
+        try {
+            apiInstance.textIdDelete(id);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling TtsApi#textIdDelete");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Tts-textIdDelete-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Tts-textIdDelete-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">
+
+// Create an instance of the API class
+TtsApi *apiInstance = [[TtsApi alloc] init];
+String *id = id_example; //  (default to null)
+
+// Delete a text-to-speech job
+[apiInstance textIdDeleteWith:id
+              completionHandler: ^(NSError* error) {
+    if (error) {
+        NSLog(@"Error: %@", error);
+    }
+}];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textIdDelete-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var ChatterboxWip = require('chatterbox_wip');
+
+// Create an instance of the API class
+var api = new ChatterboxWip.TtsApi()
+var id = id_example; // {String} 
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully.');
+  }
+};
+api.textIdDelete(id, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Tts-textIdDelete-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Tts-textIdDelete-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using Org.OpenAPITools.Api;
+using Org.OpenAPITools.Client;
+using Org.OpenAPITools.Model;
+
+namespace Example
+{
+    public class textIdDeleteExample
+    {
+        public void main()
+        {
+
+            // Create an instance of the API class
+            var apiInstance = new TtsApi();
+            var id = id_example;  // String |  (default to null)
+
+            try {
+                // Delete a text-to-speech job
+                apiInstance.textIdDelete(id);
+            } catch (Exception e) {
+                Debug.Print("Exception when calling TtsApi.textIdDelete: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textIdDelete-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+// Create an instance of the API class
+$api_instance = new OpenAPITools\Client\Api\TtsApi();
+$id = id_example; // String | 
+
+try {
+    $api_instance->textIdDelete($id);
+} catch (Exception $e) {
+    echo 'Exception when calling TtsApi->textIdDelete: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textIdDelete-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::OPenAPIClient::Configuration;
+use WWW::OPenAPIClient::TtsApi;
+
+# Create an instance of the API class
+my $api_instance = WWW::OPenAPIClient::TtsApi->new();
+my $id = id_example; # String | 
+
+eval {
+    $api_instance->textIdDelete(id => $id);
+};
+if ($@) {
+    warn "Exception when calling TtsApi->textIdDelete: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textIdDelete-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+
+# Create an instance of the API class
+api_instance = openapi_client.TtsApi()
+id = id_example # String |  (default to null)
+
+try:
+    # Delete a text-to-speech job
+    api_instance.text_id_delete(id)
+except ApiException as e:
+    print("Exception when calling TtsApi->textIdDelete: %s\n" % e)</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textIdDelete-0-rust">
+                              <pre class="prettyprint"><code class="language-rust">extern crate TtsApi;
+
+pub fn main() {
+    let id = id_example; // String
+
+    let mut context = TtsApi::Context::default();
+    let result = client.textIdDelete(id, &context).wait();
+
+    println!("{:?}", result);
+}
+</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Scopes</h2>
+                          <table>
+                            
+                          </table>
+
+                          <h2>Parameters</h2>
+
+                            <div class="methodsubtabletitle">Path parameters</div>
+                            <table id="methodsubtable">
+                                <tr>
+                                  <th width="150px">Name</th>
+                                  <th>Description</th>
+                                </tr>
+                                  <tr><td style="width:150px;">id*</td>
+<td>
+
+
+    <div id="d2e199_textIdDelete_id">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+            </div>
+                <div class="inner required">
+                    Required
+                </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                            </table>
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3 id="examples-Tts-textIdDelete-title-200"></h3>
+                            <p id="examples-Tts-textIdDelete-description-200" class="marked"></p>
+                            <script>
+                              var responseTts200_description = `Resource successfully deleted`;
+                              var responseTts200_description_break = responseTts200_description.indexOf('\n');
+                              if (responseTts200_description_break == -1) {
+                                $("#examples-Tts-textIdDelete-title-200").text("Status: 200 - " + responseTts200_description);
+                              } else {
+                                $("#examples-Tts-textIdDelete-title-200").text("Status: 200 - " + responseTts200_description.substring(0, responseTts200_description_break));
+                                $("#examples-Tts-textIdDelete-description-200").html(responseTts200_description.substring(responseTts200_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Tts-textIdDelete-200" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Tts-textIdDelete-200-wrapper" style='margin-bottom: 10px;'>
+                            </div>
+                            <h3 id="examples-Tts-textIdDelete-title-404"></h3>
+                            <p id="examples-Tts-textIdDelete-description-404" class="marked"></p>
+                            <script>
+                              var responseTts404_description = `Unknown text-to-speech ID`;
+                              var responseTts404_description_break = responseTts404_description.indexOf('\n');
+                              if (responseTts404_description_break == -1) {
+                                $("#examples-Tts-textIdDelete-title-404").text("Status: 404 - " + responseTts404_description);
+                              } else {
+                                $("#examples-Tts-textIdDelete-title-404").text("Status: 404 - " + responseTts404_description.substring(0, responseTts404_description_break));
+                                $("#examples-Tts-textIdDelete-description-404").html(responseTts404_description.substring(responseTts404_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Tts-textIdDelete-404" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Tts-textIdDelete-404-wrapper" style='margin-bottom: 10px;'>
+                            </div>
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Tts-textIdGet">
+                      <article id="api-Tts-textIdGet-0" data-group="User" data-name="textIdGet" data-version="0">
+                        <div class="pull-left">
+                          <h1>textIdGet</h1>
+                          <p>Retrieve details about a text-to-speech request</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/text/{id}</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Tts-textIdGet-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Tts-textIdGet-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Tts-textIdGet-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Tts-textIdGet-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Tts-textIdGet-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Tts-textIdGet-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Tts-textIdGet-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Tts-textIdGet-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Tts-textIdGet-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Tts-textIdGet-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Tts-textIdGet-0-python">Python</a></li>
+                          <li class=""><a href="#examples-Tts-textIdGet-0-rust">Rust</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Tts-textIdGet-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X GET \
+ -H "Accept: application/json" \
+ "http://chatterbox.services.its.uq.edu.au/v1/text/{id}"
+</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Tts-textIdGet-0-java">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.*;
+import org.openapitools.client.auth.*;
+import org.openapitools.client.model.*;
+import org.openapitools.client.api.TtsApi;
+
+import java.io.File;
+import java.util.*;
+
+public class TtsApiExample {
+    public static void main(String[] args) {
+
+        // Create an instance of the API class
+        TtsApi apiInstance = new TtsApi();
+        String id = id_example; // String | 
+
+        try {
+            TextResponse result = apiInstance.textIdGet(id);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling TtsApi#textIdGet");
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Tts-textIdGet-0-android">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.api.TtsApi;
+
+public class TtsApiExample {
+    public static void main(String[] args) {
+        TtsApi apiInstance = new TtsApi();
+        String id = id_example; // String | 
+
+        try {
+            TextResponse result = apiInstance.textIdGet(id);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling TtsApi#textIdGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Tts-textIdGet-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Tts-textIdGet-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">
+
+// Create an instance of the API class
+TtsApi *apiInstance = [[TtsApi alloc] init];
+String *id = id_example; //  (default to null)
+
+// Retrieve details about a text-to-speech request
+[apiInstance textIdGetWith:id
+              completionHandler: ^(TextResponse output, NSError* error) {
+    if (output) {
+        NSLog(@"%@", output);
+    }
+    if (error) {
+        NSLog(@"Error: %@", error);
+    }
+}];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textIdGet-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var ChatterboxWip = require('chatterbox_wip');
+
+// Create an instance of the API class
+var api = new ChatterboxWip.TtsApi()
+var id = id_example; // {String} 
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.textIdGet(id, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Tts-textIdGet-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Tts-textIdGet-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using Org.OpenAPITools.Api;
+using Org.OpenAPITools.Client;
+using Org.OpenAPITools.Model;
+
+namespace Example
+{
+    public class textIdGetExample
+    {
+        public void main()
+        {
+
+            // Create an instance of the API class
+            var apiInstance = new TtsApi();
+            var id = id_example;  // String |  (default to null)
+
+            try {
+                // Retrieve details about a text-to-speech request
+                TextResponse result = apiInstance.textIdGet(id);
+                Debug.WriteLine(result);
+            } catch (Exception e) {
+                Debug.Print("Exception when calling TtsApi.textIdGet: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textIdGet-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+// Create an instance of the API class
+$api_instance = new OpenAPITools\Client\Api\TtsApi();
+$id = id_example; // String | 
+
+try {
+    $result = $api_instance->textIdGet($id);
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling TtsApi->textIdGet: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textIdGet-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::OPenAPIClient::Configuration;
+use WWW::OPenAPIClient::TtsApi;
+
+# Create an instance of the API class
+my $api_instance = WWW::OPenAPIClient::TtsApi->new();
+my $id = id_example; # String | 
+
+eval {
+    my $result = $api_instance->textIdGet(id => $id);
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling TtsApi->textIdGet: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textIdGet-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+
+# Create an instance of the API class
+api_instance = openapi_client.TtsApi()
+id = id_example # String |  (default to null)
+
+try:
+    # Retrieve details about a text-to-speech request
+    api_response = api_instance.text_id_get(id)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling TtsApi->textIdGet: %s\n" % e)</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textIdGet-0-rust">
+                              <pre class="prettyprint"><code class="language-rust">extern crate TtsApi;
+
+pub fn main() {
+    let id = id_example; // String
+
+    let mut context = TtsApi::Context::default();
+    let result = client.textIdGet(id, &context).wait();
+
+    println!("{:?}", result);
+}
+</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Scopes</h2>
+                          <table>
+                            
+                          </table>
+
+                          <h2>Parameters</h2>
+
+                            <div class="methodsubtabletitle">Path parameters</div>
+                            <table id="methodsubtable">
+                                <tr>
+                                  <th width="150px">Name</th>
+                                  <th>Description</th>
+                                </tr>
+                                  <tr><td style="width:150px;">id*</td>
+<td>
+
+
+    <div id="d2e199_textIdGet_id">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+            </div>
+                <div class="inner required">
+                    Required
+                </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                            </table>
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3 id="examples-Tts-textIdGet-title-200"></h3>
+                            <p id="examples-Tts-textIdGet-description-200" class="marked"></p>
+                            <script>
+                              var responseTts200_description = ``;
+                              var responseTts200_description_break = responseTts200_description.indexOf('\n');
+                              if (responseTts200_description_break == -1) {
+                                $("#examples-Tts-textIdGet-title-200").text("Status: 200 - " + responseTts200_description);
+                              } else {
+                                $("#examples-Tts-textIdGet-title-200").text("Status: 200 - " + responseTts200_description.substring(0, responseTts200_description_break));
+                                $("#examples-Tts-textIdGet-description-200").html(responseTts200_description.substring(responseTts200_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Tts-textIdGet-200" class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-Tts-textIdGet-200-schema">Schema</a>
+                                </li>
+
+
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Tts-textIdGet-200-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Tts-textIdGet-200-schema">
+                                  <div id="responses-Tts-textIdGet-schema-200" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/TextResponse"
+      }
+    }
+  }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Tts-textIdGet-200-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Tts-textIdGet-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Tts-textIdGet-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+                            <h3 id="examples-Tts-textIdGet-title-404"></h3>
+                            <p id="examples-Tts-textIdGet-description-404" class="marked"></p>
+                            <script>
+                              var responseTts404_description = `Unknown text-to-speech ID`;
+                              var responseTts404_description_break = responseTts404_description.indexOf('\n');
+                              if (responseTts404_description_break == -1) {
+                                $("#examples-Tts-textIdGet-title-404").text("Status: 404 - " + responseTts404_description);
+                              } else {
+                                $("#examples-Tts-textIdGet-title-404").text("Status: 404 - " + responseTts404_description.substring(0, responseTts404_description_break));
+                                $("#examples-Tts-textIdGet-description-404").html(responseTts404_description.substring(responseTts404_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Tts-textIdGet-404" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Tts-textIdGet-404-wrapper" style='margin-bottom: 10px;'>
+                            </div>
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Tts-textPost">
+                      <article id="api-Tts-textPost-0" data-group="User" data-name="textPost" data-version="0">
+                        <div class="pull-left">
+                          <h1>textPost</h1>
+                          <p>Request generation of a new text audio</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/text</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Tts-textPost-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Tts-textPost-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Tts-textPost-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Tts-textPost-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Tts-textPost-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Tts-textPost-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Tts-textPost-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Tts-textPost-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Tts-textPost-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Tts-textPost-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Tts-textPost-0-python">Python</a></li>
+                          <li class=""><a href="#examples-Tts-textPost-0-rust">Rust</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Tts-textPost-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X POST \
+ -H "Accept: application/json" \
+ -H "Content-Type: application/json" \
+ "http://chatterbox.services.its.uq.edu.au/v1/text" \
+ -d '{
+  &quot;message&quot; : &quot;Hello, CSSE6400!&quot;,
+  &quot;operation&quot; : &quot;SYNC&quot;
+}'
+</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Tts-textPost-0-java">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.*;
+import org.openapitools.client.auth.*;
+import org.openapitools.client.model.*;
+import org.openapitools.client.api.TtsApi;
+
+import java.io.File;
+import java.util.*;
+
+public class TtsApiExample {
+    public static void main(String[] args) {
+
+        // Create an instance of the API class
+        TtsApi apiInstance = new TtsApi();
+        TextRequest body = ; // TextRequest | 
+
+        try {
+            TextResponse result = apiInstance.textPost(body);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling TtsApi#textPost");
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Tts-textPost-0-android">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.api.TtsApi;
+
+public class TtsApiExample {
+    public static void main(String[] args) {
+        TtsApi apiInstance = new TtsApi();
+        TextRequest body = ; // TextRequest | 
+
+        try {
+            TextResponse result = apiInstance.textPost(body);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling TtsApi#textPost");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Tts-textPost-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Tts-textPost-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">
+
+// Create an instance of the API class
+TtsApi *apiInstance = [[TtsApi alloc] init];
+TextRequest *body = ; // 
+
+// Request generation of a new text audio
+[apiInstance textPostWith:body
+              completionHandler: ^(TextResponse output, NSError* error) {
+    if (output) {
+        NSLog(@"%@", output);
+    }
+    if (error) {
+        NSLog(@"Error: %@", error);
+    }
+}];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textPost-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var ChatterboxWip = require('chatterbox_wip');
+
+// Create an instance of the API class
+var api = new ChatterboxWip.TtsApi()
+var body = ; // {TextRequest} 
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.textPost(body, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Tts-textPost-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Tts-textPost-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using Org.OpenAPITools.Api;
+using Org.OpenAPITools.Client;
+using Org.OpenAPITools.Model;
+
+namespace Example
+{
+    public class textPostExample
+    {
+        public void main()
+        {
+
+            // Create an instance of the API class
+            var apiInstance = new TtsApi();
+            var body = new TextRequest(); // TextRequest | 
+
+            try {
+                // Request generation of a new text audio
+                TextResponse result = apiInstance.textPost(body);
+                Debug.WriteLine(result);
+            } catch (Exception e) {
+                Debug.Print("Exception when calling TtsApi.textPost: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textPost-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+// Create an instance of the API class
+$api_instance = new OpenAPITools\Client\Api\TtsApi();
+$body = ; // TextRequest | 
+
+try {
+    $result = $api_instance->textPost($body);
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling TtsApi->textPost: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textPost-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::OPenAPIClient::Configuration;
+use WWW::OPenAPIClient::TtsApi;
+
+# Create an instance of the API class
+my $api_instance = WWW::OPenAPIClient::TtsApi->new();
+my $body = WWW::OPenAPIClient::Object::TextRequest->new(); # TextRequest | 
+
+eval {
+    my $result = $api_instance->textPost(body => $body);
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling TtsApi->textPost: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textPost-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+
+# Create an instance of the API class
+api_instance = openapi_client.TtsApi()
+body =  # TextRequest | 
+
+try:
+    # Request generation of a new text audio
+    api_response = api_instance.text_post(body)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling TtsApi->textPost: %s\n" % e)</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Tts-textPost-0-rust">
+                              <pre class="prettyprint"><code class="language-rust">extern crate TtsApi;
+
+pub fn main() {
+    let body = ; // TextRequest
+
+    let mut context = TtsApi::Context::default();
+    let result = client.textPost(body, &context).wait();
 
     println!("{:?}", result);
 }
@@ -1146,15 +3086,14 @@ pub fn main() {
                               </tr>
                                 <tr><td style="width:150px;">body <span style="color:red;">*</span></td>
 <td>
-<p class="marked">Text request to generate</p>
+<p class="marked"></p>
 <script>
 $(document).ready(function() {
   var schemaWrapper = {
-  "description" : "Text request to generate",
   "content" : {
     "application/json" : {
       "schema" : {
-        "$ref" : "#/components/schemas/SpeechRequest"
+        "$ref" : "#/components/schemas/TextRequest"
       }
     }
   },
@@ -1175,12 +3114,12 @@ $(document).ready(function() {
   }
 
   var view = new JSONSchemaView(schema,2,{isBodyParam: true});
-  var result = $('#d2e199_requestPost_body');
+  var result = $('#d2e199_textPost_body');
   result.empty();
   result.append(view.render());
 });
 </script>
-<div id="d2e199_requestPost_body"></div>
+<div id="d2e199_textPost_body"></div>
 </td>
 </tr>
 
@@ -1189,27 +3128,71 @@ $(document).ready(function() {
 
 
                           <h2>Responses</h2>
-                            <h3 id="examples-Tts-requestPost-title-405"></h3>
-                            <p id="examples-Tts-requestPost-description-405" class="marked"></p>
+                            <h3 id="examples-Tts-textPost-title-200"></h3>
+                            <p id="examples-Tts-textPost-description-200" class="marked"></p>
                             <script>
-                              var responseTts405_description = `Invalid input`;
-                              var responseTts405_description_break = responseTts405_description.indexOf('\n');
-                              if (responseTts405_description_break == -1) {
-                                $("#examples-Tts-requestPost-title-405").text("Status: 405 - " + responseTts405_description);
+                              var responseTts200_description = ``;
+                              var responseTts200_description_break = responseTts200_description.indexOf('\n');
+                              if (responseTts200_description_break == -1) {
+                                $("#examples-Tts-textPost-title-200").text("Status: 200 - " + responseTts200_description);
                               } else {
-                                $("#examples-Tts-requestPost-title-405").text("Status: 405 - " + responseTts405_description.substring(0, responseTts405_description_break));
-                                $("#examples-Tts-requestPost-description-405").html(responseTts405_description.substring(responseTts405_description_break));
+                                $("#examples-Tts-textPost-title-200").text("Status: 200 - " + responseTts200_description.substring(0, responseTts200_description_break));
+                                $("#examples-Tts-textPost-description-200").html(responseTts200_description.substring(responseTts200_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-Tts-requestPost-405" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-Tts-textPost-200" class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-Tts-textPost-200-schema">Schema</a>
+                                </li>
+
+
 
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-Tts-requestPost-405-wrapper" style='margin-bottom: 10px;'>
+                            <div class="tab-content" id="responses-Tts-textPost-200-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Tts-textPost-200-schema">
+                                  <div id="responses-Tts-textPost-schema-200" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/TextResponse"
+      }
+    }
+  }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Tts-textPost-200-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Tts-textPost-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Tts-textPost-200-schema-data' type='hidden' value=''></input>
+                                </div>
                             </div>
                         </article>
                       </div>
@@ -1219,8 +3202,8 @@ $(document).ready(function() {
           <div id="footer">
             <div id="api-_footer">
               <p>Suggestions, contact, support and error reporting;
-                  <div class="app-desc">Information URL: <a href="https://openapi-generator.tech">https://openapi-generator.tech</a></div>
-                  <div class="app-desc">Contact Info: <a href="team@openapitools.org">team@openapitools.org</a></div>
+                  <div class="app-desc">Information URL: <a href="https://csse6400.uqcloud.net">https://csse6400.uqcloud.net</a></div>
+                  <div class="app-desc">Contact Info: <a href="noreply@uq.edu.au">noreply@uq.edu.au</a></div>
               </p>
                 <div class="license-info">All rights reserved</div>
                 <div class="license-url">http://apache.org/licenses/LICENSE-2.0.html</div>
