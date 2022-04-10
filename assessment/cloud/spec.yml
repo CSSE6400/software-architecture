@@ -18,9 +18,14 @@ paths:
   /health:
     get:
       tags: ["tts"]
-      summary: "Query the health of the chatterbox service"
-      # produces:
-      #   - "application/json"
+      summary: "Query the health of the chatterbox service."
+      description: |
+        The health endpoint is a useful for determining whether an instance is still healthy.
+        This can help if you are configuring auto-scaling groups.
+        
+        We do not specify the response payload for this endpoint,
+        however you may find it useful to return a more detailed status of your system.
+        For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
       responses:
         "200":
           description: "Service is healthy"
@@ -30,11 +35,22 @@ paths:
     get:
       tags: ["tts"]
       summary: "List all generated audios"
+      description: |
+        List all of the generated audios in descending order of creation date-time.
+        The response is paginated with 10 elements on each page.
       produces:
         - "application/json"
+      parameters:
+        - in: path
+          name: page
+          type: integer
+          default: 1
+          description: |
+            The page number to return.
+            If page is 3, returns elements between 30 and 40.
       responses:
         "200":
-          description: "List of generated audios"
+          description: "List of generated audios."
           schema:
             type: array
             items:
@@ -43,6 +59,16 @@ paths:
     post:
       tags: ["tts"]
       summary: "Request generation of a new text audio"
+      description: |
+        Request a new message is translated into synthesized speech.
+
+        If the requested operation is SYNC, the request should not return until a speech file has been generated (or error).
+
+        If the requested operation is ASYNC, the request should return immediantly regardless of whether the request has finished, if the request is still working the status should just be PENDING.
+
+        Messages greater than 280 characters must be ASYNC or a bad request should be returned.
+
+        The error field in the response is left unspecified, you should populate this field as you see appropriate.
       consumes:
         - "application/json"
       produces:
@@ -55,7 +81,13 @@ paths:
             $ref: "#/definitions/TextRequest"
       responses:
         "200":
-          description: ""
+          description: "The request returned successfully."
+          schema:
+            $ref: "#/definitions/TextResponse"
+        "400":
+          description: "Body parameter was malformed or invalid."
+        "500":
+          description: "An unknown error occurred trying to process the request. The response should contain as much of the payload as possible, the error field should be populated in this case."
           schema:
             $ref: "#/definitions/TextResponse"
   /text/{id}:
@@ -64,36 +96,42 @@ paths:
         in: "path"
         required: true
         type: string
+        description: "The identifier of the text resource."
     get:
       tags: ["tts"]
-      summary: "Retrieve details about a text-to-speech request"
+      summary: "Retrieve details about a text-to-speech request."
       produces:
         - "application/json"
       
       responses:
         "200":
-          description: ""
+          description: "Successfully found a text resource."
           schema:
             $ref: "#/definitions/TextResponse"
         "404":
-          description: "Unknown text-to-speech ID"
+          description: "Unknown resource identifier."
     delete:
       tags: ["tts"]
-      summary: "Delete a text-to-speech job"
+      summary: "Delete a text-to-speech job."
+      description: |
+        "This endpoint will remove all known information about a text-to-speech job, including any generated audio files."
       responses:
         "200":
-          description: "Resource successfully deleted"
+          description: "Resource successfully deleted."
         "404":
-          description: "Unknown text-to-speech ID"
+          description: "Unknown resource identifier."
   /model:
     get:
       tags: ["tts"]
-      summary: "List all available text-to-speech models"
+      summary: "List all available text-to-speech models."
+      description: |
+        The full list of available text-to-speech model identifiers.
+        This content should not be paginated.
       produces:
         - "application/json"
       responses:
         "200":
-          description: "List of available text-to-speech models"
+          description: "List of available text-to-speech model identifiers."
           schema:
             type: array
             items:
@@ -104,16 +142,19 @@ paths:
         in: "path"
         required: true
         type: string
+        description: The string identifier of the model as listed by the /model endpoint.
     get:
       tags: ["tts"]
-      summary: "Retrieve details about a specified text-to-speech model"
+      summary: "Retrieve details about a specified text-to-speech model."
       produces:
         - "application/json"
       responses:
         "200":
-          description: ""
+          description: "All known details about the text-to-speech model."
           schema:
-            $ref: "#/definitions/Models"
+            $ref: "#/definitions/Model"
+        "404":
+          description: "Unknown resource identifier."
 definitions:
   Models:
     type: "string"
@@ -138,15 +179,19 @@ definitions:
         example: "EK1 en-rp tacotron2 by NMStoker"
       author:
         type: "string"
-        description: "Author of the model"
+        nullable: true
+        description: "Author of the model. This field may be null."
         example: "Eren Gölge @erogol"
       license:
         type: "string"
-        description: ""
+        nullable: true
+        description: "License of the model. This field may be null."
         example: "CC BY-NC-ND 4.0"
       url:
         type: "string"
+        nullable: true
         format: "uri"
+        description: "URL to download the model. This field may be null."
         example: "https://coqui.gateway.scarf.sh/v0.1.0/tts_models--en--ek1--tacotron2.zip"
   TextRequest:
     type: "object"
