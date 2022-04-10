@@ -130,7 +130,29 @@ to build and publish your container to the GitHub container registry.
 An example of this can be seen in the \link{todo-app}{https://github.com/CSSE6400/todo-app/blob/main/.github/workflows/backend.yml}.
 Containers can then be deployed from a ghcr URL, e.g. \url{ghcr.io/csse6400/todo-app}.
 
-\todo{This needs to be private \& needs to show how to login}
+Containers deployed to the container registry will need to be private.
+You will need to authenticate when pulling your container.
+The current best approach is:
+
+\begin{enumerate}
+  \item Create a \link{Personal Access Token (PAT)}{https://github.com/settings/tokens/new} with \texttt{read:packages} permissions.
+  \item Create a Terraform variable \texttt{github\_pat}.
+\begin{code}[language=terraform]{}
+variable "github_pat" {
+    description = "A personal access token with read:packages permissions"
+    type        = string
+}
+\end{code}
+  \item Configure your EC2 provisioning script to login to docker with these credentials, e.g.
+  \bash{echo \$CR_PAT | docker login ghcr.io -u <username> --password-stdin}
+  \item When running \texttt{terraform apply} ensure that the PAT is set as the environment variable,\\
+  \texttt{TF\_VAR\_github\_pat}
+  \bash{export TF_VAR_github_pat=<token>}
+\end{enumerate}
+
+When we run your \texttt{deploy.sh} script,
+our environment will contain a \texttt{TF\_VAR\_github\_pat} with access to pull from your container registry.
+
 
 \paragraph{Unique S3 buckets}
 You may find it helpful to use S3 buckets for this assignment.
@@ -151,7 +173,20 @@ resource "aws_s3_bucket" "bucket" {
 }
 \end{code}
 
-\todo{S3 signed URLs}
+\paragraph{S3 pre-signed URLs}
+If you are using AWS S3 to store audio recordings,
+ensure that you consider the security aspects of storing these recordings.
+You do not want to make your S3 bucket publicly accessible.
+A good middle-ground is to use pre-signed URLs which allow you to generate temporary URLs that have read access to an object in an S3 bucket, e.g.
+
+\begin{code}[language=python]{}
+import boto3
+url = boto3.client('s3').generate_presigned_url(
+  ClientMethod='get_object', 
+  Params={'Bucket': BUCKET_NAME, 'Key': OBJECT_KEY},
+  ExpiresIn=3600
+)
+\end{code}
 
 
 \subsection{Fine Print}
