@@ -9,7 +9,7 @@ RUN wget https://releases.hashicorp.com/terraform/1.1.0/terraform_1.1.0_linux_am
     && rm -rf terraform_1.1.0_linux_amd64.zip \
     && chmod +x /usr/local/bin/terraform
 
-# Install docker
+# Install docker client
 RUN apt-get update \
     && apt-get install -y docker.io \
     && rm -rf /var/lib/apt/lists/*

@@ -17,9 +17,9 @@ i.e. a scalable application.
 You will be asked to deploy a tool that accepts text input and generates synthesized speech output.
 Specially you need to support:
 \begin{itemize}
-    \item Uploading and generating a large text input.
-    \item Generating speech output while remaining responsive to the user.
+    \item Uploading and generating speech for text input of varying sizes.
     \item Access via a specified REST API for use by front-end interfaces.
+    \item Remaining responsive to the user while generating speech.
 \end{itemize}
 
 Your service will be deployed to AWS and will undergo automated correctness and load-testing to ensure it meets the required scalability.
@@ -36,8 +36,8 @@ many open-source implementations are still inefficient.
 For this assignment,
 the University of Queensland is looking to convert all course content into speech.
 This will support visually impaired students in their studies.
-All course content from slack messages and blackboard announcements to text-books must be converted to speech.
-You will be responsible for designing and implementing this service for use across the entire university.
+All course content from slack messages and blackboard announcements to textbooks must be converted to speech.
+You will be responsible for designing and implementing a service to generate synthesized speech for use across the entire university.
 
 \paragraph{Requirements}
 As you might imagine,
@@ -45,9 +45,9 @@ blackboard announcements occur frequently and should be translated in almost rea
 While textbooks are set ahead of semester and may take several days to process.
 The university will experience peaks of usage.
 At the start of semester,
-instructors many set textbooks which need to be processed.
-The university will also experience usage lows over the summer holiday period when no translations will be required.
-The university is not willing to pay for the resources required during start of semester all year round.
+instructors set many textbooks which need to be processed.
+The university will also experience usage lows over the summer holiday period when few translations will be required.
+The university is not willing to pay for the resources required during usage peaks all year round.
 Your implementation must be able to scale dynamically based on the current amount of jobs to be processed.
 
 % \section{Features}
@@ -55,16 +55,16 @@ Your implementation must be able to scale dynamically based on the current amoun
 
 \section{Interface}
 Your service will be utilised by almost every system in the university.
-It has been decided that every university services must support text-to-speech on the first Monday of semester two.
+Every university service must support text-to-speech on the first Monday of semester two.
 An interface specification has already been developed and distributed to existing service owners,
-who are working hard to deliver support in their services.
+who are working hard to deliver support for their services.
 
-You must implement this interface exactly as described,
-the interface specification is available to all service owners online:
+You must implement this interface exactly as described.
+The interface specification is available to all service owners online:
 \url{https://csse6400.uqcloud.net/assessment/chatterbox}
 
 \section{Submission}
-Your final solution will be committed to a GitHub repository.
+Your solution must committed to a GitHub repository, specified in Section \ref{sect:github}.
 Committing to this repository will be disabled after \textbf{16:00 (AEST) on 6 May 2022} and the contents of the repository at this time will be taken as your submission.
 The repository \textbf{must} contain everything required to successfully deploy your application.
 You must include all of the following in the repository:
@@ -75,21 +75,24 @@ You must include all of the following in the repository:
 \end{itemize}
 
 When deploying your application to mark,
-we will follow rigid and reproducible steps.
-We outline the steps here so that you may re-create the process yourself.
+we will follow reproducible steps, outlined below.
+You may re-create the process yourself.
 
 \begin{enumerate}
   \item Your Git repository will be checked out locally.
-  \item AWS credentials will be copied into your repository in the top-level directory.
+  \item AWS credentials will be copied into your repository in the top-level directory,
+  in a file called \texttt{credentials}.
   \item The script \texttt{deploy.sh} in the top-level of the repository will be run.
   \item The \texttt{deploy.sh} script \textbf{must} create a file named \texttt{api.txt} which contains the URL where your API is deployed to.
-  \item We will run automated load-testing on the URL provided in the \texttt{api.txt} file.
+  \item We will run automated functionality and load-testing on the URL provided in the \texttt{api.txt} file.
 \end{enumerate}
+
+\subsection{GitHub Repository}\label{sec:github}
 
 \subsection{Tips}
 
 \paragraph{Outputting an API URL}
-Your Terraform code should produce a URL where you API can be accessed from.
+Your Terraform code should produce a URL where your API can be accessed from.
 A requirement is that this URL is stored to \texttt{api.txt}.
 We recommend that you use the \texttt{local\_file} resource to accomplish this.
 
@@ -102,11 +105,11 @@ resource "local_file" "url" {
 
 \paragraph{Terraform apply in deploy script}
 Your \texttt{deploy.sh} script must deploy without user interaction.
-You run Terraform apply without prompting for configuration using the command:
+You can run Terraform apply without prompting for configuration using the command:
 \bash{terraform apply -auto-approve}
 
 \paragraph{If something goes wrong}
-Ideally, your infrastructure will be provisioned successfully but this may go wrong for a number of unforeseen reasons.
+Ideally, your infrastructure will be deployed successfully but this could go wrong for any number of unforeseen reasons.
 If something does go wrong during deployment,
 teaching staff will refer to your \texttt{README.md} file to attempt to resolve the issue where possible.
 Please ensure that your \texttt{README.md} documentation is of high quality to allow yourself the best chance for recovery.
@@ -144,7 +147,7 @@ variable "github_pat" {
 }
 \end{code}
   \item Configure your EC2 provisioning script to login to docker with these credentials, e.g.
-  \bash{echo \$CR_PAT | docker login ghcr.io -u <username> --password-stdin}
+  \bash{echo \$\{GH\_PAT\} | docker login ghcr.io -u <username> --password-stdin}
   \item When running \texttt{terraform apply} ensure that the PAT is set as the environment variable,\\
   \texttt{TF\_VAR\_github\_pat}
   \bash{export TF_VAR_github_pat=<token>}
@@ -156,7 +159,7 @@ our environment will contain a \texttt{TF\_VAR\_github\_pat} with access to pull
 
 \paragraph{Unique S3 buckets}
 You may find it helpful to use S3 buckets for this assignment.
-It is important to be aware the the name of an S3 bucket has to be \textsl{globally} unique.
+It is important to be aware that the name of an S3 bucket has to be \textsl{globally} unique.
 To avoid any deployment conflicts,
 we recommend that you use the \texttt{random\_string} Terraform resource.
 This allows you to generate a random string which can be appended to the S3 bucket name.
@@ -177,7 +180,7 @@ resource "aws_s3_bucket" "bucket" {
 If you are using AWS S3 to store audio recordings,
 ensure that you consider the security aspects of storing these recordings.
 You do not want to make your S3 bucket publicly accessible.
-A good middle-ground is to use pre-signed URLs which allow you to generate temporary URLs that have read access to an object in an S3 bucket, e.g.
+A good middle-ground is to use \link{pre-signed URLs}{https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html} which allow you to generate temporary URLs that have read access to an object in an S3 bucket, e.g.
 
 \begin{code}[language=python]{}
 import boto3
@@ -194,14 +197,15 @@ You can reproduce our process for deploying your application using our \link{Doc
 \codefile[language=docker]{Dockerfile}{deployment/Dockerfile}
 
 \noindent
-Our steps for deploying your infrastructure using this container are as follows,
+Our steps for deploying your infrastructure using this container are as follows.
 \texttt{\$REPO} is the name of your repository,
-\texttt{\$CREDENTIALS} is the path where we will store our AWS credentials:
+\texttt{\$CREDENTIALS} is the path where we will store our AWS credentials,
+and \texttt{\$GH\_PAT} is a personal access token with package read permissions:
 \begin{code}[language=shell]{}
 $ git clone git@github.com:CSSE6400/$REPO
 $ cp $CREDENTIALS $REPO
-$ docker run -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd)/$REPO:/workspace csse6400-cloud-testing
-$ cat api.txt # this will be used for load-testing
+$ docker run -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd)/$REPO:/workspace --env TF_VAR_github_path=$GH_PAT csse6400-cloud-testing
+$ cat $REPO/api.txt # this will be used for load-testing
 \end{code}
 
 \noindent
@@ -217,22 +221,22 @@ Quality testing is based upon several likely use case scenarios,
 the scenarios create different scaling requirements.
 
 Partial marks are available for both types of tests,
-i.e. if one some functionality is implemented you can receive marks for that functionality,
+i.e. if some functionality is implemented you can receive marks for that functionality,
 or if your service can handle 80\% of the load during quality testing you will receive marks for that.
 
 \subsection{Functionality}
 You will be awarded some credit for correct implementation of the API specification without being able to cope with excessive load.
 A suite of automated API tests will be provided.
-These tests will access the correctness of the implementation,
-via a series of API calls.
+These tests will assess the correctness of the implementation,
+via a sequence of API calls.
 
-\subsection{Quality}
+\subsection{Quality Scenarios}
 
 \paragraph{Semester break}
 Your application will see decreased usage during the semester break.
-Minimal students and staff may periodically query generated speech when revising content.
+Minimal students and staff may periodically query pre-generated speech when revising content.
 During this period we might see traffic of not more than 20 parallel users,
-querying the read-only endpoints.
+querying read-only endpoints.
 
 % \begin{code}[language=javascript]{}
 % stages: [
@@ -266,23 +270,24 @@ about 3,500 characters each.
 \paragraph{Teaching cancelled}
 Queensland has seen `unprecedented' rainfall causing the university to flood.
 The university admin have made the call to cancel teaching for the week.
-Coordinators are responsible for disseminating this information to their students all \todo{5,000} courses have to send announcements averaging 100 characters (many exact copies of the suggested announcement),
+Coordinators are responsible for disseminating this information to their students.
+All 1,957 courses must send announcements averaging 100 characters (many exact copies of the suggested announcement),
 to relay this information.
 
 \paragraph{Reading list due date}
 The library has a deadline for course coordinators to submit their course reading lists.
-In this definitely fictional example,
+In this completely fictional example,
 we can imagine that coordinators have left uploading their reading list until the last minute.
 Suddenly your system receives a large amount of requests to generate the spoken version of textbooks (we will vastly under-estimate that textbooks are round 7,000 characters).
 About 100 coordinators submit their reading list at the last minute.
 
 \paragraph{In-semester Monday morning}
-Each semester there are a small number of new courses run.
+Each semester there are a small number of new courses running for the first time.
 These courses, in an attempt to keep up with the passage of time,
 upload the course material for the week on a Monday morning.
 About 20 courses uploading 2,500 characters of material.
 At the same time, many coordinators like to send our announcements on Monday mornings summarizing the weeks content.
-These announcements are typically around 80 characters long and sent out by 75 coordinators.
+These announcements are typically around 80 characters long and sent out by 75 or so coordinators.
 
 
 \section{Academic Integrity}
