@@ -1,0 +1,54 @@
+name: Build Cloud Assignment Requirements
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - assessment/cloud/spec.yml
+      - assessment/cloud/deployment/Dockerfile
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Generate OpenAPI docs
+        uses: openapi-generators/openapitools-generator-action@v1
+        with:
+          generator: html2
+          openapi-file: ./assessment/cloud/spec.yml
+          command-args: --output ./assessment/cloud/docs --template-dir ./assessment/cloud/docs-template
+
+      - name: Upload Specification
+        uses: actions/upload-artifact@v2
+        with:
+          name: cloud-spec
+          path: |
+            ./assessment/cloud/docs
+  
+  build-container:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: assessment/cloud/deployment
+          push: true
+          tags: csse6400/csse6400-cloud-testing:latest
