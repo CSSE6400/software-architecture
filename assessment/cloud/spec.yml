@@ -41,20 +41,68 @@ paths:
       produces:
         - "application/json"
       parameters:
-        - in: path
-          name: page
+        - in: query
+          name: start
           type: integer
-          default: 1
+          default: 0
+          required: false
           description: |
-            The page number to return.
-            If page is 3, returns elements between 30 and 40.
+            Starting index of the results.
+        - in: query
+          name: limit
+          type: integer
+          default: 10
+          required: false
+          description: |
+            The maximum amount of results to return.
       responses:
         "200":
           description: "List of generated audios."
           schema:
-            type: array
-            items:
-              $ref: "#/definitions/TextResponse"
+            type: object
+            
+            properties:
+              size:
+                type: integer
+                example: 1
+                description: |
+                  The length of the response. Must be under the requested limit.
+              start:
+                type: integer
+                example: 0
+                description: |
+                  The starting index of the results, should equal the request parameter.
+              _links:
+                type: object
+                properties: 
+                  next:
+                    type: string
+                    nullable: true
+                    description: |
+                      The endpoint of the next page of results.
+
+                      Limit parameter should equal request.
+
+                      If there are no more results, field should be null.
+                    example: http://chatterbox.services.its.uq.edu.au/api/v1/text?limit=5&start=10
+                  prev:
+                    type: string
+                    description: |
+                      The endpoint of the previous page of results.
+
+                      Limit parameter should equal request.
+
+                      If there are no prior results, field should be null.
+                    example: http://chatterbox.services.its.uq.edu.au/api/v1/text?limit=5&start=0
+
+              data:
+                type: array
+                items:
+                  $ref: "#/definitions/TextResponse"
+
+              error:
+                type: object
+                description: Unspecified field to describe any errors.
             
     post:
       tags: ["tts"]
@@ -85,7 +133,10 @@ paths:
           schema:
             $ref: "#/definitions/TextResponse"
         "400":
-          description: "Body parameter was malformed or invalid."
+          description: |
+            Body parameter was malformed or invalid.
+
+            Return value is not specified but should describe the error.
         "500":
           description: "An unknown error occurred trying to process the request. The response should contain as much of the payload as possible, the error field should be populated in this case."
           schema:
