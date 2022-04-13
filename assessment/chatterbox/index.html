@@ -846,6 +846,50 @@ ul.nav-tabs {
   <script>
     // Script section to load models into a JS Var
     var defs = {}
+    defs["inline_response_200"] = {
+  "type" : "object",
+  "properties" : {
+    "size" : {
+      "type" : "integer",
+      "description" : "The length of the response. Must be under the requested limit.\n",
+      "example" : 1
+    },
+    "start" : {
+      "type" : "integer",
+      "description" : "The starting index of the results, should equal the request parameter.\n",
+      "example" : 0
+    },
+    "_links" : {
+      "$ref" : "#/components/schemas/inline_response_200__links"
+    },
+    "data" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/components/schemas/TextResponse"
+      }
+    },
+    "error" : {
+      "type" : "object",
+      "properties" : { },
+      "description" : "Unspecified field to describe any errors."
+    }
+  }
+};
+    defs["inline_response_200__links"] = {
+  "type" : "object",
+  "properties" : {
+    "next" : {
+      "type" : "string",
+      "description" : "The endpoint of the next page of results.\n\nLimit parameter should equal request.\n\nIf there are no more results, field should be null.\n",
+      "example" : "http://chatterbox.services.its.uq.edu.au/api/v1/text?limit=5&start=10"
+    },
+    "prev" : {
+      "type" : "string",
+      "description" : "The endpoint of the previous page of results.\n\nLimit parameter should equal request.\n\nIf there are no prior results, field should be null.\n",
+      "example" : "http://chatterbox.services.its.uq.edu.au/api/v1/text?limit=5&start=0"
+    }
+  }
+};
     defs["Model"] = {
   "type" : "object",
   "properties" : {
@@ -859,16 +903,17 @@ ul.nav-tabs {
     },
     "author" : {
       "type" : "string",
-      "description" : "Author of the model",
+      "description" : "Author of the model. This field may be null.",
       "example" : "Eren Gölge @erogol"
     },
     "license" : {
       "type" : "string",
-      "description" : "",
+      "description" : "License of the model. This field may be null.",
       "example" : "CC BY-NC-ND 4.0"
     },
     "url" : {
       "type" : "string",
+      "description" : "URL to download the model. This field may be null.",
       "format" : "uri",
       "example" : "https://coqui.gateway.scarf.sh/v0.1.0/tts_models--en--ek1--tacotron2.zip"
     }
@@ -937,7 +982,7 @@ ul.nav-tabs {
     "processed_at" : {
       "type" : "string",
       "format" : "date-time",
-      "example" : "2022-04-09T07:43:29.111Z"
+      "example" : "2022-04-09T07:43:31.111Z"
     },
     "error" : {
       "type" : "object",
@@ -1013,12 +1058,18 @@ ul.nav-tabs {
                         <div class="pull-left">
                           <!-- <h1>healthGet</h1> -->
                           <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/health</span></code></pre></h1>
-                          <p>Query the health of the chatterbox service</p>
+                          <p>Query the health of the chatterbox service.</p>
                         </div>
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked"></p>
+                        <p class="marked">The health endpoint is a useful for determining whether an instance is still healthy.
+This can help if you are configuring auto-scaling groups.
+
+We do not specify the response payload for this endpoint,
+however you may find it useful to return a more detailed status of your system.
+For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
+</p>
                         <p></p>
                         <br />
 
@@ -1087,12 +1138,14 @@ ul.nav-tabs {
                         <div class="pull-left">
                           <!-- <h1>modelGet</h1> -->
                           <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/model</span></code></pre></h1>
-                          <p>List all available text-to-speech models</p>
+                          <p>List all available text-to-speech models.</p>
                         </div>
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked"></p>
+                        <p class="marked">The full list of available text-to-speech model identifiers.
+This content should not be paginated.
+</p>
                         <p></p>
                         <br />
 
@@ -1111,7 +1164,7 @@ ul.nav-tabs {
                             <h3 id="examples-Tts-modelGet-title-200"></h3>
                             <p id="examples-Tts-modelGet-description-200" class="marked"></p>
                             <script>
-                              var responseTts200_description = `List of available text-to-speech models`;
+                              var responseTts200_description = `List of available text-to-speech model identifiers.`;
                               var responseTts200_description_break = responseTts200_description.indexOf('\n');
                               if (responseTts200_description_break == -1) {
                                 $("#examples-Tts-modelGet-title-200").text("Status: 200 - " + responseTts200_description);
@@ -1139,7 +1192,7 @@ ul.nav-tabs {
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "List of available text-to-speech models",
+  "description" : "List of available text-to-speech model identifiers.",
   "content" : {
     "application/json" : {
       "schema" : {
@@ -1186,7 +1239,7 @@ ul.nav-tabs {
                         <div class="pull-left">
                           <!-- <h1>modelIdGet</h1> -->
                           <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/model/{id}</span></code></pre></h1>
-                          <p>Retrieve details about a specified text-to-speech model</p>
+                          <p>Retrieve details about a specified text-to-speech model.</p>
                         </div>
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
@@ -1218,6 +1271,9 @@ ul.nav-tabs {
                     String
                 </span>
 
+                    <div class="inner description marked">
+The string identifier of the model as listed by the /model endpoint.
+                    </div>
             </div>
                 <div class="inner required">
                     Required
@@ -1237,7 +1293,7 @@ ul.nav-tabs {
                             <h3 id="examples-Tts-modelIdGet-title-200"></h3>
                             <p id="examples-Tts-modelIdGet-description-200" class="marked"></p>
                             <script>
-                              var responseTts200_description = ``;
+                              var responseTts200_description = `All known details about the text-to-speech model.`;
                               var responseTts200_description_break = responseTts200_description.indexOf('\n');
                               if (responseTts200_description_break == -1) {
                                 $("#examples-Tts-modelIdGet-title-200").text("Status: 200 - " + responseTts200_description);
@@ -1265,11 +1321,11 @@ ul.nav-tabs {
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "",
+  "description" : "All known details about the text-to-speech model.",
   "content" : {
     "application/json" : {
       "schema" : {
-        "$ref" : "#/components/schemas/Models"
+        "$ref" : "#/components/schemas/Model"
       }
     }
   }
@@ -1301,6 +1357,29 @@ ul.nav-tabs {
                                 </div>
                             </div>
                             
+                            <h3 id="examples-Tts-modelIdGet-title-404"></h3>
+                            <p id="examples-Tts-modelIdGet-description-404" class="marked"></p>
+                            <script>
+                              var responseTts404_description = `Unknown resource identifier.`;
+                              var responseTts404_description_break = responseTts404_description.indexOf('\n');
+                              if (responseTts404_description_break == -1) {
+                                $("#examples-Tts-modelIdGet-title-404").text("Status: 404 - " + responseTts404_description);
+                              } else {
+                                $("#examples-Tts-modelIdGet-title-404").text("Status: 404 - " + responseTts404_description.substring(0, responseTts404_description_break));
+                                $("#examples-Tts-modelIdGet-description-404").html(responseTts404_description.substring(responseTts404_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Tts-modelIdGet-404" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Tts-modelIdGet-404-wrapper" style='margin-bottom: 10px;'>
+                            </div>
+                            
                         </article>
                       </div>
                       <hr>
@@ -1314,26 +1393,77 @@ ul.nav-tabs {
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked"></p>
+                        <p class="marked">List all of the generated audios in descending order of creation date-time.
+The response is paginated with 10 elements on each page.
+</p>
                         <p></p>
                         <br />
 
                         <h3>Curl Request Example</h3>
                         <pre class="prettyprint"><code class="language-bsh">curl -X GET \
  -H "Accept: application/json" \
- "http://chatterbox.services.its.uq.edu.au/v1/text"
+ "http://chatterbox.services.its.uq.edu.au/v1/text?start=56&limit=56"
 </code></pre>
 
 
 
 
 
+                            <h2 class="methodsubtabletitle">Query parameters</h2>
+                            <table id="methodsubtable">
+                              <tr>
+                                <th width="150px">Name</th>
+                                <th>Description</th>
+                              </tr>
+                                <tr><td style="width:150px;">start</td>
+<td>
+
+
+    <div id="d2e199_textGet_start">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    Integer
+                </span>
+
+                    <div class="inner description marked">
+Starting index of the results.
+
+                    </div>
+            </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                                <tr><td style="width:150px;">limit</td>
+<td>
+
+
+    <div id="d2e199_textGet_limit">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    Integer
+                </span>
+
+                    <div class="inner description marked">
+The maximum amount of results to return.
+
+                    </div>
+            </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                            </table>
 
                           <h2>Responses</h2>
                             <h3 id="examples-Tts-textGet-title-200"></h3>
                             <p id="examples-Tts-textGet-description-200" class="marked"></p>
                             <script>
-                              var responseTts200_description = `List of generated audios`;
+                              var responseTts200_description = `List of generated audios.`;
                               var responseTts200_description_break = responseTts200_description.indexOf('\n');
                               if (responseTts200_description_break == -1) {
                                 $("#examples-Tts-textGet-title-200").text("Status: 200 - " + responseTts200_description);
@@ -1361,14 +1491,11 @@ ul.nav-tabs {
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "List of generated audios",
+  "description" : "List of generated audios.",
   "content" : {
     "application/json" : {
       "schema" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/TextResponse"
-        }
+        "$ref" : "#/components/schemas/inline_response_200"
       }
     }
   }
@@ -1408,12 +1535,13 @@ ul.nav-tabs {
                         <div class="pull-left">
                           <!-- <h1>textIdDelete</h1> -->
                           <h1><pre class="prettyprint language-html prettyprinted" data-type="delete"><code><span class="pln">/text/{id}</span></code></pre></h1>
-                          <p>Delete a text-to-speech job</p>
+                          <p>Delete a text-to-speech job.</p>
                         </div>
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked"></p>
+                        <p class="marked">&quot;This endpoint will remove all known information about a text-to-speech job, including any generated audio files.&quot;
+</p>
                         <p></p>
                         <br />
 
@@ -1439,6 +1567,9 @@ ul.nav-tabs {
                     String
                 </span>
 
+                    <div class="inner description marked">
+The identifier of the text resource.
+                    </div>
             </div>
                 <div class="inner required">
                     Required
@@ -1458,7 +1589,7 @@ ul.nav-tabs {
                             <h3 id="examples-Tts-textIdDelete-title-200"></h3>
                             <p id="examples-Tts-textIdDelete-description-200" class="marked"></p>
                             <script>
-                              var responseTts200_description = `Resource successfully deleted`;
+                              var responseTts200_description = `Resource successfully deleted.`;
                               var responseTts200_description_break = responseTts200_description.indexOf('\n');
                               if (responseTts200_description_break == -1) {
                                 $("#examples-Tts-textIdDelete-title-200").text("Status: 200 - " + responseTts200_description);
@@ -1481,7 +1612,7 @@ ul.nav-tabs {
                             <h3 id="examples-Tts-textIdDelete-title-404"></h3>
                             <p id="examples-Tts-textIdDelete-description-404" class="marked"></p>
                             <script>
-                              var responseTts404_description = `Unknown text-to-speech ID`;
+                              var responseTts404_description = `Unknown resource identifier.`;
                               var responseTts404_description_break = responseTts404_description.indexOf('\n');
                               if (responseTts404_description_break == -1) {
                                 $("#examples-Tts-textIdDelete-title-404").text("Status: 404 - " + responseTts404_description);
@@ -1509,7 +1640,7 @@ ul.nav-tabs {
                         <div class="pull-left">
                           <!-- <h1>textIdGet</h1> -->
                           <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/text/{id}</span></code></pre></h1>
-                          <p>Retrieve details about a text-to-speech request</p>
+                          <p>Retrieve details about a text-to-speech request.</p>
                         </div>
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
@@ -1541,6 +1672,9 @@ ul.nav-tabs {
                     String
                 </span>
 
+                    <div class="inner description marked">
+The identifier of the text resource.
+                    </div>
             </div>
                 <div class="inner required">
                     Required
@@ -1560,7 +1694,7 @@ ul.nav-tabs {
                             <h3 id="examples-Tts-textIdGet-title-200"></h3>
                             <p id="examples-Tts-textIdGet-description-200" class="marked"></p>
                             <script>
-                              var responseTts200_description = ``;
+                              var responseTts200_description = `Successfully found a text resource.`;
                               var responseTts200_description_break = responseTts200_description.indexOf('\n');
                               if (responseTts200_description_break == -1) {
                                 $("#examples-Tts-textIdGet-title-200").text("Status: 200 - " + responseTts200_description);
@@ -1588,7 +1722,7 @@ ul.nav-tabs {
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "",
+  "description" : "Successfully found a text resource.",
   "content" : {
     "application/json" : {
       "schema" : {
@@ -1627,7 +1761,7 @@ ul.nav-tabs {
                             <h3 id="examples-Tts-textIdGet-title-404"></h3>
                             <p id="examples-Tts-textIdGet-description-404" class="marked"></p>
                             <script>
-                              var responseTts404_description = `Unknown text-to-speech ID`;
+                              var responseTts404_description = `Unknown resource identifier.`;
                               var responseTts404_description_break = responseTts404_description.indexOf('\n');
                               if (responseTts404_description_break == -1) {
                                 $("#examples-Tts-textIdGet-title-404").text("Status: 404 - " + responseTts404_description);
@@ -1660,7 +1794,16 @@ ul.nav-tabs {
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked"></p>
+                        <p class="marked">Request a new message is translated into synthesized speech.
+
+If the requested operation is SYNC, the request should not return until a speech file has been generated (or error).
+
+If the requested operation is ASYNC, the request should return immediantly regardless of whether the request has finished, if the request is still working the status should just be PENDING.
+
+Messages greater than 280 characters must be ASYNC or a bad request should be returned.
+
+The error field in the response is left unspecified, you should populate this field as you see appropriate.
+</p>
                         <p></p>
                         <br />
 
@@ -1731,7 +1874,7 @@ $(document).ready(function() {
                             <h3 id="examples-Tts-textPost-title-200"></h3>
                             <p id="examples-Tts-textPost-description-200" class="marked"></p>
                             <script>
-                              var responseTts200_description = ``;
+                              var responseTts200_description = `The request returned successfully.`;
                               var responseTts200_description_break = responseTts200_description.indexOf('\n');
                               if (responseTts200_description_break == -1) {
                                 $("#examples-Tts-textPost-title-200").text("Status: 200 - " + responseTts200_description);
@@ -1759,7 +1902,7 @@ $(document).ready(function() {
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "",
+  "description" : "The request returned successfully.",
   "content" : {
     "application/json" : {
       "schema" : {
@@ -1792,6 +1935,99 @@ $(document).ready(function() {
                                     </script>
                                   </div>
                                   <input id='responses-Tts-textPost-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+                            
+                            <h3 id="examples-Tts-textPost-title-400"></h3>
+                            <p id="examples-Tts-textPost-description-400" class="marked"></p>
+                            <script>
+                              var responseTts400_description = `Body parameter was malformed or invalid.
+
+Return value is not specified but should describe the error.
+`;
+                              var responseTts400_description_break = responseTts400_description.indexOf('\n');
+                              if (responseTts400_description_break == -1) {
+                                $("#examples-Tts-textPost-title-400").text("Status: 400 - " + responseTts400_description);
+                              } else {
+                                $("#examples-Tts-textPost-title-400").text("Status: 400 - " + responseTts400_description.substring(0, responseTts400_description_break));
+                                $("#examples-Tts-textPost-description-400").html(responseTts400_description.substring(responseTts400_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Tts-textPost-400" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Tts-textPost-400-wrapper" style='margin-bottom: 10px;'>
+                            </div>
+                            
+                            <h3 id="examples-Tts-textPost-title-500"></h3>
+                            <p id="examples-Tts-textPost-description-500" class="marked"></p>
+                            <script>
+                              var responseTts500_description = `An unknown error occurred trying to process the request. The response should contain as much of the payload as possible, the error field should be populated in this case.`;
+                              var responseTts500_description_break = responseTts500_description.indexOf('\n');
+                              if (responseTts500_description_break == -1) {
+                                $("#examples-Tts-textPost-title-500").text("Status: 500 - " + responseTts500_description);
+                              } else {
+                                $("#examples-Tts-textPost-title-500").text("Status: 500 - " + responseTts500_description.substring(0, responseTts500_description_break));
+                                $("#examples-Tts-textPost-description-500").html(responseTts500_description.substring(responseTts500_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Tts-textPost-500" class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-Tts-textPost-500-schema">Schema</a>
+                                </li>
+
+
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Tts-textPost-500-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Tts-textPost-500-schema">
+                                  <div id="responses-Tts-textPost-schema-500" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "An unknown error occurred trying to process the request. The response should contain as much of the payload as possible, the error field should be populated in this case.",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/TextResponse"
+      }
+    }
+  }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Tts-textPost-500-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Tts-textPost-schema-500');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Tts-textPost-500-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
                             
