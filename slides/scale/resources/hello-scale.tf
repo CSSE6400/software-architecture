@@ -5,10 +5,8 @@ resource "aws_instance" "hello-server" {
   instance_type = "t2.micro"
   user_data = file("${path.module}/setup.sh")
 
-  associate_public_ip_address = true
-  subnet_id = module.network.subnets[count.index].public.id
-  vpc_security_group_ids = [
-    module.network.http-port.id
+  security_groups = [
+    aws_security_group.hello-server.name
   ]
 
   tags = {
@@ -20,7 +18,7 @@ resource "aws_lb_target_group" "hello-target" {
   name     = "hello-target-group"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = module.network.vpc.id
+  vpc_id   = aws_security_group.hello-server.vpc_id
 
   health_check {
     port     = 80
@@ -37,18 +35,17 @@ resource "aws_lb_target_group_attachment" "hello-target-link" {
   port             = 80
 }
 
+data "aws_subnet_ids" "nets" {
+    vpc_id = aws_security_group.hello-server.vpc_id
+}
+
 resource "aws_lb" "hello-balancer" {
   name               = "hello-balancer"
   internal           = false
   load_balancer_type = "application"
-  subnets            = [
-    module.network.subnets[0].public.id,
-    module.network.subnets[1].public.id,
-    module.network.subnets[2].public.id,
-    module.network.subnets[3].public.id
-  ]
+  subnets            = aws_subnet_ids.nets.ids
   security_groups    = [
-    module.network.http-port.id
+    aws_security_group.hello-server.name
   ]
 }
 
