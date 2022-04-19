@@ -1,8 +1,11 @@
 swagger: "2.0"
 info:
-  description: "A text-to-speech service to provide improved accessibility to the University of Queensland's teaching content."
-  version: "0.1.0"
-  title: "Chatterbox WIP"
+  description: |
+    A text-to-speech service to provide improved accessibility to the University of Queensland's teaching content.
+
+    Note that the URL used in the cURL examples below are just illustrative, you should replace [http://chatterbox.services.its.uq.edu.au/](http://chatterbox.services.its.uq.edu.au/) with the host of your service.
+  version: "0.1.1"
+  title: "Chatterbox"
   contact:
     name: CSSE6400
     url: https://csse6400.uqcloud.net
@@ -106,15 +109,13 @@ paths:
             
     post:
       tags: ["tts"]
-      summary: "Request generation of a new text audio"
+      summary: Request a new message is translated into synthesized speech.
       description: |
-        Request a new message is translated into synthesized speech.
+        - If the requested operation is SYNC, the request should not return until a speech file has been generated (or error).
 
-        If the requested operation is SYNC, the request should not return until a speech file has been generated (or error).
+        - If the requested operation is ASYNC, the request should return immediantly regardless of whether the request has finished, if the request is still working the status should just be PENDING.
 
-        If the requested operation is ASYNC, the request should return immediantly regardless of whether the request has finished, if the request is still working the status should just be PENDING.
-
-        Messages greater than 280 characters must be ASYNC or a bad request should be returned.
+        - Messages greater than 280 characters must be ASYNC or a bad request should be returned.
 
         The error field in the response is left unspecified, you should populate this field as you see appropriate.
       consumes:
@@ -165,7 +166,7 @@ paths:
       tags: ["tts"]
       summary: "Delete a text-to-speech job."
       description: |
-        "This endpoint will remove all known information about a text-to-speech job, including any generated audio files."
+        This endpoint will remove all known information about a text-to-speech job, including any generated audio files.
       responses:
         "200":
           description: "Resource successfully deleted."
@@ -174,10 +175,20 @@ paths:
   /model:
     get:
       tags: ["tts"]
-      summary: "List all available text-to-speech models."
+      summary: "List all available text-to-speech models for the service."
       description: |
-        The full list of available text-to-speech model identifiers.
+        Provides a list of available text-to-speech model identifiers.
         This content should not be paginated.
+        
+        You must support at least:
+          - tts_models/en/ek1/tacotron2
+          - tts_models/en/ljspeech/tacotron2-DDC
+          - tts_models/en/ljspeech/glow-tts
+          - tts_models/en/ljspeech/fast_pitch
+
+        Other models you may support are:
+          - tts_models/en/ljspeech/tacotron2-DDC_ph
+          - tts_models/en/sam/tacotron-DDC
       produces:
         - "application/json"
       responses:
@@ -186,7 +197,13 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/Models"
+              type: "string"
+              description: "Text-to-speech model"
+            example: |
+              ["tts_models/en/ek1/tacotron2",
+               "tts_models/en/ljspeech/tacotron2-DDC",
+               "tts_models/en/ljspeech/glow-tts",
+               "tts_models/en/ljspeech/fast_pitch"]
   /model/{id}:
     parameters:
       - name: "id"
@@ -197,6 +214,7 @@ paths:
     get:
       tags: ["tts"]
       summary: "Retrieve details about a specified text-to-speech model."
+      description: "Details can be found here: [https://github.com/CSSE6400/tts-cli/blob/main/chatterbox/.models.json](https://github.com/CSSE6400/tts-cli/blob/main/chatterbox/.models.json)"
       produces:
         - "application/json"
       responses:
@@ -204,46 +222,41 @@ paths:
           description: "All known details about the text-to-speech model."
           schema:
             $ref: "#/definitions/Model"
+            example: |
+              {
+                "name": "tts_models/en/ljspeech/glow-tts",
+                "description": "",
+                "author": "Eren Gölge @erogol",
+                "license": "MPL",
+                "url": "https://coqui.gateway.scarf.sh/v0.0.9/tts_models--en--ljspeech--glow-tts.zip"
+              }
         "404":
           description: "Unknown resource identifier."
 definitions:
-  Models:
-    type: "string"
-    description: "Text-to-speech model"
-    enum:
-      - tacotron
-      - tacotron2
-      - glow-tts
-      - speedy-speech
-      - align-tts
-      - fastpitch
-      - fastspeech
-      - vits
   Model:
     type: "object"
     properties: 
       name:
-        $ref: "#/definitions/Models"
+        type: "string"
+        description: "Text-to-speech model"
+        example: "tts_models/en/ljspeech/glow-tts"
       description: 
         type: "string"
         description: "A description of the model"
-        example: "EK1 en-rp tacotron2 by NMStoker"
+        example: ""
       author:
         type: "string"
-        nullable: true
         description: "Author of the model. This field may be null."
         example: "Eren Gölge @erogol"
       license:
         type: "string"
-        nullable: true
         description: "License of the model. This field may be null."
-        example: "CC BY-NC-ND 4.0"
+        example: "MPL"
       url:
         type: "string"
-        nullable: true
         format: "uri"
         description: "URL to download the model. This field may be null."
-        example: "https://coqui.gateway.scarf.sh/v0.1.0/tts_models--en--ek1--tacotron2.zip"
+        example: "https://coqui.gateway.scarf.sh/v0.0.9/tts_models--en--ljspeech--glow-tts.zip"
   TextRequest:
     type: "object"
     properties:
@@ -258,7 +271,9 @@ definitions:
           - SYNC
           - ASYNC
       model:
-        $ref: "#/definitions/Models"
+        type: "string"
+        description: "Text-to-speech model"
+        example: "tts_models/en/ljspeech/glow-tts"
   TextResponse:
     allOf:
       - type: "object"
