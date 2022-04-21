@@ -1,0 +1,290 @@
+\documentclass{slide}
+% \usepackage{pgfpages}
+
+% \setbeameroption{show notes on second screen}
+
+\usepackage{tikz}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{shapes}
+\usetikzlibrary{tikzmark}
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows}
+\usetikzlibrary{fit}
+
+\title{Web APIs}
+\subtitle{CSSE6400}
+\author{Brae Webb}
+\date{\week{8}}
+
+\usepackage{languages}
+
+\newcommand{\component}[3]{%
+\tikzmarknode{#1}{\colorbox{#2}{\color{white}#3}}%
+}
+
+\definecolor{navyblue}{rgb}{0.0, 0.4, 0.65}
+\definecolor{neonfuchsia}{rgb}{1.0, 0.25, 0.39}
+\definecolor{mediumseagreen}{rgb}{0.24, 0.7, 0.44}
+\definecolor{mediumorchid}{rgb}{0.73, 0.33, 0.83}
+\definecolor{meatbrown}{rgb}{0.9, 0.72, 0.23}
+
+\begin{document}
+
+\maketitle
+
+\point[Goals]{
+    \begin{itemize}[<+->]
+        \item Review existing networking knowledge.
+        \item Understand \highlight{URLs}.
+        \item Understand \highlight{HTTP} protocol and methods.
+        \item Understand \highlight{RESTful} APIs.
+        \item \highlight{Build} a basic RESTful API.
+    \end{itemize}
+}
+
+\begin{frame}{OSI Model}
+\centering
+\begin{tikzpicture}[scale=0.5]
+
+    \draw[very thick,draw=secondary,top color=white] (-3,0) rectangle (3,-1.5);
+    \draw[very thick,draw=secondary,top color=white] (-3.5,-2) rectangle (3.5,-3.5);
+    \draw[very thick,draw=secondary,top color=white] (-4,-4) rectangle (4,-5.5);
+    \draw[very thick,draw=secondary,top color=white] (-4.5,-6) rectangle (4.5,-7.5);
+    \draw[very thick,draw=secondary,top color=white] (-5,-8) rectangle (5,-9.5);
+    \draw[very thick,draw=secondary,top color=white] (-5.5,-10) rectangle (5.5,-11.5);
+    \draw[very thick,draw=secondary,top color=white] (-6,-12) rectangle (6,-13.5);
+
+    \node at (0, -0.75) (app) {Application Layer};
+    \node [below of=app] (pres) {Presentation Layer};
+    \node [below of=pres] (sess) {Session Layer};
+    \node [below of=sess] (trans) {Transport Layer};
+    \node [below of=trans] (net) {Network Layer};
+    \node [below of=net] (data) {Data Link Layer};
+    \node [below of=data] {Physical Layer};
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}{OSI Model}
+\centering
+\begin{tikzpicture}[scale=0.5]
+
+    \draw[very thick,draw=black!10,top color=white] (-3,0) rectangle (3,-1.5);
+    \draw[very thick,draw=black!10,top color=white] (-3.5,-2) rectangle (3.5,-3.5);
+    \draw[very thick,draw=black!10,top color=white] (-4,-4) rectangle (4,-5.5);
+    \draw[very thick,draw=secondary,top color=white] (-4.5,-6) rectangle (4.5,-7.5);
+    \draw[very thick,draw=black!10,top color=white] (-5,-8) rectangle (5,-9.5);
+    \draw[very thick,draw=black!10,top color=white] (-5.5,-10) rectangle (5.5,-11.5);
+    \draw[very thick,draw=black!10,top color=white] (-6,-12) rectangle (6,-13.5);
+
+    \node [color=black!30] at (0, -0.75) (app) {Application Layer};
+    \node [color=black!30,below of=app] (pres) {Presentation Layer};
+    \node [color=black!30,below of=pres] (sess) {Session Layer};
+    \node [below of=sess] (trans) {Transport Layer};
+    \node [color=black!30,below of=trans] (net) {Network Layer};
+    \node [color=black!30,below of=net] (data) {Data Link Layer};
+    \node [color=black!30,below of=data] {Physical Layer};
+
+    \only<2>{\node [right=1cm of trans] {TCP/UDP (CSSE2310)};}
+\end{tikzpicture}
+\end{frame}
+
+\point[TCP/UDP]{
+    Low-level with \highlight{minimal abstraction}.
+}
+
+\point[TCP/UDP]{
+    \highlight{Impractical} for building web APIs.
+}
+
+\begin{frame}{OSI Model}
+\centering
+\begin{tikzpicture}[scale=0.5]
+
+    \draw[very thick,draw=secondary,top color=white] (-3,0) rectangle (3,-1.5);
+    \draw[very thick,draw=black!10,top color=white] (-3.5,-2) rectangle (3.5,-3.5);
+    \draw[very thick,draw=black!10,top color=white] (-4,-4) rectangle (4,-5.5);
+    \draw[very thick,draw=black!10,top color=white] (-4.5,-6) rectangle (4.5,-7.5);
+    \draw[very thick,draw=black!10,top color=white] (-5,-8) rectangle (5,-9.5);
+    \draw[very thick,draw=black!10,top color=white] (-5.5,-10) rectangle (5.5,-11.5);
+    \draw[very thick,draw=black!10,top color=white] (-6,-12) rectangle (6,-13.5);
+
+    \node at (0, -0.75) (app) {Application Layer};
+    \node [color=black!30,below of=app] (pres) {Presentation Layer};
+    \node [color=black!30,below of=pres] (sess) {Session Layer};
+    \node [color=black!30,below of=sess] (trans) {Transport Layer};
+    \node [color=black!30,below of=trans] (net) {Network Layer};
+    \node [color=black!30,below of=net] (data) {Data Link Layer};
+    \node [color=black!30,below of=data] {Physical Layer};
+
+    \only<2>{\node [right=1cm of app] {HTTP/HTTPS (CSSE6400)};}
+\end{tikzpicture}
+\end{frame}
+
+\point[The anatomy of]{URLs}
+
+\begin{frame}[fragile]
+\huge
+\ttfamily
+\begin{center}
+\component{proto}{mediumseagreen}{http}%
+://%
+\component{host}{navyblue}{example.com}%
+/%
+\component{path}{neonfuchsia}{hello-world}%
+\end{center}
+\begin{tikzpicture}[overlay,remember picture,>=stealth,nodes={align=left,inner ysep=1pt},<-]
+    % For 'proto'
+    \path (proto.south) ++ (0,-1.5em) node[anchor=north west,color=mediumseagreen!87] (proto-lab){$Protocol$};
+    \draw [color=mediumseagreen!87](proto.south) |- ([xshift=-0.3ex,color=blue]proto-lab.south east);
+
+    % For 'host'
+    \path (host.north) ++ (0,2em) node[anchor=south east,color=navyblue!87] (scalep){$Host name$};
+    \draw [color=navyblue!87](host.north) |- ([xshift=-0.3ex,color=red]scalep.south west);
+
+    % For 'path'
+    \path (path.south) ++ (0,-1.5em) node[anchor=north west,color=neonfuchsia!87] (mean){$Path$};
+    \draw [color=neonfuchsia!87](path.south) |- ([xshift=-0.3ex,color=blue]mean.south east);
+\end{tikzpicture}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\huge
+\ttfamily
+\begin{center}
+\component{proto}{mediumseagreen}{http}%
+://%
+\component{host}{navyblue}{example.com}%
+:\component{port}{mediumorchid}{80}%
+/%
+\component{path}{neonfuchsia}{hello-world}%
+\end{center}
+\begin{tikzpicture}[overlay,remember picture,>=stealth,nodes={align=left,inner ysep=1pt},<-]
+    % For 'proto'
+    \path (proto.south) ++ (0,-1.5em) node[anchor=north west,color=mediumseagreen!87] (proto-lab){$Protocol$};
+    \draw [color=mediumseagreen!87](proto.south) |- ([xshift=-0.3ex,color=blue]proto-lab.south east);
+
+    % For 'host'
+    \path (host.north) ++ (0,2em) node[anchor=south east,color=navyblue!87] (scalep){$Host name$};
+    \draw [color=navyblue!87](host.north) |- ([xshift=-0.3ex,color=red]scalep.south west);
+
+    % For 'path'
+    \path (path.south) ++ (0,-1.5em) node[anchor=north west,color=neonfuchsia!87] (mean){$Path$};
+    \draw [color=neonfuchsia!87](path.south) |- ([xshift=-0.3ex,color=blue]mean.south east);
+
+    % For 'port'
+    \path (port.north) ++ (0,1em) node[anchor=south west,color=mediumorchid!87] (mean){$Port$};
+    \draw [color=mediumorchid!87](port.north) |- ([xshift=-0.3ex,color=blue]mean.south east);
+\end{tikzpicture}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\Large
+\ttfamily
+\begin{center}
+\component{proto}{mediumseagreen}{http}%
+://%
+\component{host}{navyblue}{example.com}%
+/%
+\component{path}{neonfuchsia}{hello-world}%
+?%
+\component{query}{meatbrown}{key=value}%
+\end{center}
+\begin{tikzpicture}[overlay,remember picture,>=stealth,nodes={align=left,inner ysep=1pt},<-]
+    % For 'proto'
+    \path (proto.south) ++ (0,-1.5em) node[anchor=north west,color=mediumseagreen!87] (proto-lab){$Protocol$};
+    \draw [color=mediumseagreen!87](proto.south) |- ([xshift=-0.3ex,color=blue]proto-lab.south east);
+
+    % For 'host'
+    \path (host.north) ++ (0,2em) node[anchor=south east,color=navyblue!87] (scalep){$Host name$};
+    \draw [color=navyblue!87](host.north) |- ([xshift=-0.3ex,color=red]scalep.south west);
+
+    % For 'path'
+    \path (path.south) ++ (0,-1.5em) node[anchor=north west,color=neonfuchsia!87] (mean){$Path$};
+    \draw [color=neonfuchsia!87](path.south) |- ([xshift=-0.3ex,color=blue]mean.south east);
+
+    % For 'query'
+    \path (query.north) ++ (0,2em) node[anchor=south east,color=meatbrown!87] (scalep){$Query\,Variable$};
+    \draw [color=meatbrown!87](query.north) |- ([xshift=-0.3ex,color=red]scalep.south west);
+\end{tikzpicture}
+\end{frame}
+
+\point[HTTP]{
+    A \highlight{request-response} abstraction for networking.
+}
+
+\point[HTTP Request]{
+    \begin{description}[width=URL]
+        \item[URL] An endpoint to send request to.
+        \item[Method] Described later.
+        \item[Headers] Specify type of data, e.g. JSON, HTML, etc.
+        \item[Body] Optional extra data to include.
+    \end{description}
+}
+
+\point[HTTP Response]{
+    \begin{description}[width=Body]
+        \item[Status Code] A number between 100 and 599 giving details about the response.
+        \item[Headers] Specify type of response data, e.g. JSON, HTML, etc.
+        \item[Body] Content of the response.
+    \end{description}
+}
+
+\point[Status Codes]{
+    \begin{description}
+        \item[200s] Indicate the request was \highlight{successful}, 200 is most common.
+        \item[300s] \highlight{Redirects} the client to another location.
+        \item[400s] Indicates that the \highlight{request was wrong}\\
+        {\small e.g. 404 meaning that the request was for something that doesn't exist.}
+        \item[500s] Indicates that the \highlight{server had a problem} fulfilling the request.
+    \end{description}
+}
+
+\point[Types of HTTP communication]{HTTP Methods}
+
+\begin{frame}{HTTP Methods}
+\Huge
+\begin{description}[<+->][width=GET]
+    \item[GET] \highlight{Query} for information.
+    \item[POST] \highlight{Create} resource.
+    \item[PUT] \highlight{Update} resource.
+    \item[DELETE] \highlight{Delete} resource.  
+\end{description}
+\end{frame}
+
+\point{Examples}
+
+\begin{frame}[fragile]
+\begin{code}[language=python]{app.py}
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello_world():
+    return "Hello, World!"
+\end{code}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\begin{code}[language=javascript]{app.js}
+const express = require('express')
+const app = express()
+const port = 3000
+
+app.get('/', (req, res) => {
+    res.send('Hello, World!')
+})
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})
+\end{code}
+\end{frame}
+
+% \references{articles,books}
+
+\end{document}
