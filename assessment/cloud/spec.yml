@@ -3,7 +3,7 @@ info:
   description: |
     A text-to-speech service to provide improved accessibility to the University of Queensland's teaching content.
 
-    Note that the URL used in the cURL examples below are just illustrative, you should replace [http://chatterbox.services.its.uq.edu.au/](http://chatterbox.services.its.uq.edu.au/) with the host of your service.
+    Note that the URL used in the cURL examples below are just illustrative, you should replace [http://chatterbox.services.its.uq.edu.au/api/v1/](http://chatterbox.services.its.uq.edu.au/api/v1) with the host of your service.
   version: "0.1.1"
   title: "Chatterbox"
   contact:
@@ -11,7 +11,7 @@ info:
     url: https://csse6400.uqcloud.net
     email: noreply@uq.edu.au
 host: "chatterbox.services.its.uq.edu.au"
-basePath: "/v1"
+basePath: "/api/v1"
 tags:
 - name: "tts"
   description: "Text-to-speech service"
@@ -37,7 +37,7 @@ paths:
   /text:
     get:
       tags: ["tts"]
-      summary: "List all generated audios"
+      summary: "List all generated audios."
       description: |
         List all of the generated audios in descending order of creation date-time.
         The response is paginated with 10 elements on each page.
@@ -179,16 +179,20 @@ paths:
       description: |
         Provides a list of available text-to-speech model identifiers.
         This content should not be paginated.
+
+        Note that when using the chatterbox CLI, dots (.) are replaced by forward slashes (/).
         
         You must support at least:
-          - tts_models/en/ek1/tacotron2
-          - tts_models/en/ljspeech/tacotron2-DDC
-          - tts_models/en/ljspeech/glow-tts
-          - tts_models/en/ljspeech/fast_pitch
+          - tts_models.en.ek1.tacotron2
+          - tts_models.en.ljspeech.tacotron2-DDC
+          - tts_models.en.ljspeech.glow-tts
+          - tts_models.en.ljspeech.fast_pitch
 
         Other models you may support are:
-          - tts_models/en/ljspeech/tacotron2-DDC_ph
-          - tts_models/en/sam/tacotron-DDC
+          - tts_models.en.ljspeech.tacotron2-DDC_ph
+          - tts_models.en.sam.tacotron-DDC
+
+        You may find the performance characteristics interesting/helpful, documented here: https://github.com/csse6400/tts-cli
       produces:
         - "application/json"
       responses:
@@ -200,10 +204,10 @@ paths:
               type: "string"
               description: "Text-to-speech model"
             example: |
-              ["tts_models/en/ek1/tacotron2",
-               "tts_models/en/ljspeech/tacotron2-DDC",
-               "tts_models/en/ljspeech/glow-tts",
-               "tts_models/en/ljspeech/fast_pitch"]
+              ["tts_models.en.ek1.tacotron2",
+               "tts_models.en.ljspeech.tacotron2-DDC",
+               "tts_models.en.ljspeech.glow-tts",
+               "tts_models.en.ljspeech.fast_pitch"]
   /model/{id}:
     parameters:
       - name: "id"
@@ -224,7 +228,7 @@ paths:
             $ref: "#/definitions/Model"
             example: |
               {
-                "name": "tts_models/en/ljspeech/glow-tts",
+                "name": "tts_models.en.ljspeech.glow-tts",
                 "description": "",
                 "author": "Eren Gölge @erogol",
                 "license": "MPL",
@@ -239,7 +243,7 @@ definitions:
       name:
         type: "string"
         description: "Text-to-speech model"
-        example: "tts_models/en/ljspeech/glow-tts"
+        example: "tts_models.en.ljspeech.glow-tts"
       description: 
         type: "string"
         description: "A description of the model"
@@ -273,7 +277,7 @@ definitions:
       model:
         type: "string"
         description: "Text-to-speech model"
-        example: "tts_models/en/ljspeech/glow-tts"
+        example: "tts_models.en.ljspeech.glow-tts"
   TextResponse:
     allOf:
       - type: "object"
