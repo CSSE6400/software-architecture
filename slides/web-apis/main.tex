@@ -265,18 +265,114 @@ app = Flask(__name__)
 @app.route("/")
 def hello_world():
     return "Hello, World!"
+
+if __name__ == "__main__":
+    app.run(port=6400)
 \end{code}
 \end{frame}
 
+\point[Result]{
+\vspace{10pt}
+\browser{http://localhost:6400/}{http://localhost:6400/}{
+    \hspace{10pt}\tiny Hello, World!
+}
+}
 
 \begin{frame}[fragile]
 \begin{code}[language=javascript]{app.js}
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 6400
 
 app.get('/', (req, res) => {
     res.send('Hello, World!')
+})
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})
+\end{code}
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\begin{code}[language=python]{app.py}
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/health")
+def hello_world():
+    return {"status": "okay!"}
+
+if __name__ == "__main__":
+    app.run(port=6400)
+\end{code}
+\end{frame}
+
+\point[Result]{
+\vspace{10pt}
+\browser{http://localhost:6400/}{http://localhost:6400/}{
+    \hspace{10pt}\tiny \texttt{\{"status": "okay!"\}}
+}
+}
+
+\begin{frame}[fragile]
+\begin{code}[language=javascript]{app.js}
+const express = require('express')
+const app = express()
+const port = 6400
+
+app.get('/', (req, res) => {
+    res.send({"status": "okay!"})
+})
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})
+\end{code}
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\begin{code}[language=python]{app.py}
+from flask import Flask
+from flask import request
+
+app = Flask(__name__)
+
+@app.route("/echo", methods=["POST"])
+def hello_world():
+    return request.json.say
+
+if __name__ == "__main__":
+    app.run(port=6400)
+\end{code}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{code}[language=bash]{}
+>>> curl -X POST \
+-H "Accept: application/json" \
+-H "Content-Type: application/json" \
+"http://localhost:6400" \
+-d '{
+    "say" : "Hello, World",
+}'
+Hello, World
+\end{code}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{code}[language=javascript]{app.js}
+const express = require('express')
+const app = express()
+const port = 6400
+
+app.post('/', express.json(), (req, res) => {
+    res.send(req.body.say)
 })
 
 app.listen(port, () => {
