@@ -94,6 +94,8 @@ You may re-create the process yourself.
   \item We will run automated functionality and load-testing on the URL provided in the \texttt{api.txt} file.
 \end{enumerate}
 
+\textbf{Important Note: AWS will deactivate your account if more than 15 EC2 instances are running. Ensure you do not exceed a total of 15 EC2 instances running at once.}
+
 \subsection{GitHub Repository}\label{sec:github}
 You will be provisioned with a private repo on GitHub for this assignment, via GitHub Classroom.
 You must click on the link below and associate your GitHub username with your UQ student id in the Classroom.
@@ -213,6 +215,30 @@ url = boto3.client('s3').generate_presigned_url(
 )
 \end{code}
 
+\paragraph{Authenticating AWS resources from EC2}
+You may find it helpful to access other AWS resources,
+such as S3 from an EC2 instance.
+AWS offers \link{libraries to handle this communication}%
+{https://aws.amazon.com/tools/},
+however you will need to authenticate to access the resources.
+
+You can give the EC2 instance the built-in IAM instance profile,
+\texttt{LabInstanceProfile} \link{using Terraform}%
+{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance\#iam_instance_profile}.
+This profile will provide your EC2 instance with access to all AWS resources on the account.
+
+\paragraph{EC2 Instance Size}
+The chatterbox command line tool and dependencies are quite large.
+You may find that the default 8GB size of an EC2 instance is insufficient.
+You can use \link{the \texttt{block\_device\_mappings} field}%
+{https://github.com/CSSE6400/terraform/blob/740edeb8eacb8b80f5d85a729fd3914b4d2a5b0f/template/main.tf\#L31} of \texttt{aws\_instance}
+to create a volume with larger storage space.
+
+\paragraph{URL Validity}
+The URL returned from the API to access the audio file
+only needs to be valid for four hours after initial generation.
+You may assume the URL will not be used after that period.
+This may be helpful if you are using signed URLs.
 
 \subsection{Fine Print}
 You can reproduce our process for deploying your application using our \link{Docker image}{https://ghcr.io/CSSE6400/csse6400-cloud-testing}:
