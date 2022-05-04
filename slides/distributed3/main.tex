@@ -8,7 +8,7 @@
 CSSE6400}
 
 \author{Richard Thomas}
-\date{\week{7}}
+\date{\week{10}}
 
 \begin{document}
 
@@ -105,6 +105,199 @@ CSSE6400}
     \item Link analogy to Byzantine faults
     \item Mention idea of Byzantine fault-tolerant systems
     \item e.g. safety critical systems, blockchain, \dots
+}
+
+\definition{Poison Message}{
+    A message that causes the receiver to fail.
+}
+\note[itemize]{
+    \item Could literally cause the receiver to crash
+    \item Often the receiver just cannot process the message and aborts processing
+}
+
+\begin{frame}{Poison Message}
+    \begin{columns}[onlytextwidth,T]
+      \column{\dimexpr\linewidth-30mm-5mm}
+        {\LARGE
+        \begin{itemize}
+            \item Receiver can't process message
+            \begin{itemize}
+                \vspace{1mm}
+                \Large\item Always fails
+                \begin{itemize}
+                    \large\item Not due to transient failure
+                \end{itemize}
+            \end{itemize}
+            \vspace{2mm}
+            \item Failed messages are retried
+            \begin{itemize}
+                \vspace{1mm}
+                \Large\item Returned to front of queue
+                \begin{itemize}
+                    \large\item Preserve message order
+                \end{itemize}
+            \end{itemize}
+            \vspace{2mm}
+            \item Next receiver fails to process message
+            \begin{itemize}
+                \vspace{1mm}
+                \Large\item Infinite loop
+            \end{itemize}
+            \vspace{2mm}
+            \item Blocks sending of following messages
+        \end{itemize}
+        }
+
+      \column{30mm}
+        \includegraphics[width=33mm]{images/poison-bottle.png}  % From https://pixabay.com/vectors/poison-bottle-toxic-chemistry-4662212/
+    \end{columns}
+\end{frame}
+\note[itemize]{
+    \item Elaborate on the error process and why it leads to the loop.
+}
+
+\questionanswer{What causes a message to be poisonous?}{
+    \begin{itemize}
+        \item<2-> Content is invalid
+            \begin{itemize}
+                \Large\item e.g. Invalid product id sent to purchasing service
+                \vspace{1mm}
+                \Large\item Error handling doesn't cater for error case
+            \end{itemize}
+            \vspace{2mm}
+        \item<3-> System state is invalid
+            \begin{itemize}
+                \Large\item e.g. Add item to shopping cart that has been deleted
+                \vspace{1mm}
+                \Large\item Logic doesn't handle out of order messages
+                \begin{itemize}
+                    \large\item Insidious asynchronous faults
+                \end{itemize}
+            \end{itemize}
+    \end{itemize}
+}
+\note[itemize]{
+Invalid content may be
+    \item corrupted data,
+    \item old version of data structure,
+    \item incorrect data, or
+    \item malicious data.
+}
+
+\begin{frame}{Detecting Poison Messages}
+    \vspace{1mm}
+    {\LARGE
+        Retry counter -- with limit
+        \begin{itemize}
+            \Large\item Where is counter stored?
+            \begin{itemize}
+                \large\item Memory -- What if server restarts?
+                \vspace{1mm}
+                \large\item DB -- Slow
+                \vspace{2mm}
+                \large\item Must ensure counter is reset, regardless of how message is handled
+                \begin{itemize}
+                    \item e.g. Message is manually deleted
+                \end{itemize}
+            \end{itemize}
+        \end{itemize}
+        \pause
+        \vspace{3mm}
+        Message service may have a timeout property
+        \begin{itemize}
+            \Large\item Message removed from queue
+            \begin{itemize}
+                \large\item Pending messages get older while waiting for poison message
+                \vspace{1mm}
+                \large\item Transient network faults may exceed timeout
+            \end{itemize}
+        \end{itemize}
+    }
+\end{frame}
+
+\begin{frame}{Detecting Poison Messages}
+    \vspace{1mm}
+    {\LARGE
+        Monitoring service
+        \begin{itemize}
+            \Large\item Trigger action if message stays at top of queue for too long
+            \vspace{2mm}
+            \Large\item Can check for queue errors
+            \begin{itemize}
+                \large\item No messages are being processed
+                \vspace{1mm}
+                \large\item Restart message service
+            \end{itemize}
+        \end{itemize}
+    }
+\end{frame}
+
+\begin{frame}{Handling Poison Messages}
+    \vspace{1mm}
+    {\LARGE
+        Discard message
+        \begin{itemize}
+            \Large\item System must not require guarantee of message delivery
+            \Large\item Suitable when message processing speed is most important
+        \end{itemize}
+        \pause
+        \vspace{3mm}
+        Always retry
+        \begin{itemize}
+            \Large\item Requires mechanism to fix message
+            \begin{itemize}
+                \large\item Often requires manual intervention
+            \end{itemize}
+            \Large\item Suitable when message delivery is most important
+            \Large\item Very long delays in processing
+        \end{itemize}
+    }
+\end{frame}
+
+\begin{frame}{Handling Poison Messages}
+    \vspace{1mm}
+    {\LARGE
+        Dead-letter queue
+        \begin{itemize}
+            \Large\item Long transient failures result in adding many messages
+            \begin{itemize}
+                \large\item e.g. Network failure
+            \end{itemize}
+            \Large\item Requires manual monitoring and intervention
+            \Large\item System must not require strict ordering of messages
+            \Large\item Suitable when message processing speed is important
+        \end{itemize}
+    }
+\end{frame}
+
+\begin{frame}{Handling Poison Messages}
+    \vspace{1mm}
+    {\LARGE
+        Retry queue
+        \begin{itemize}
+            \Large\item Transient failures also added
+            \Large\item Use a previous strategy to deal with poison messages
+            \Large\item System must not require strict ordering of messages
+            \Large\item Suitable when message processing speed is very important
+            \begin{itemize}
+                \large\item Main queue is never blocked
+                \large\item Receivers need to process from two message queues
+            \end{itemize}
+        \end{itemize}
+    }
+\end{frame}
+
+\definition{Poison Pill Message}{
+    Special message used to notify receiver it should no longer wait for messages.
+}
+\note{Emphasise that this is different to a poison message}
+
+\questionanswer{Why use a poison pill message?}{
+    Graceful shutdown of system.
+}
+\note[itemize]{
+    \item Implementation is challenging with multiple producers and/or consumers
+    \item It must be the last message received by all consumers
 }
 
 \questionanswer{How to order asynchronous messages?}{
