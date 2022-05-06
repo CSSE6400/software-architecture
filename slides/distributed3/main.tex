@@ -101,10 +101,63 @@ CSSE6400}
         }
     \end{columns}
 \end{frame}
+\note{Link analogy to Byzantine faults}
+
+\definition{Byzantine Faults}{
+    Nodes in a distributed system may `lie' -- send faulty or corrupted messages or responses.
+}
 \note[itemize]{
-    \item Link analogy to Byzantine faults
-    \item Mention idea of Byzantine fault-tolerant systems
-    \item e.g. safety critical systems, blockchain, \dots
+    \item A message that causes the receiver to fail.
+    \item Incorrect responses (e.g. they have finished processing a message but haven't).
+    \item Can be due to faults or malicious hosts.
+    \item Difficult to deal with all possible variations of these faults.
+}
+
+\questionanswer{Can we design a system to be Byzantine fault tolerant?}{
+    Yes, but, it is \emph{challenging}.
+}
+\note[itemize]{
+    \item Most systems don't attempt to
+    \item Some need to (e.g. safety critical systems, blockchain, \dots)
+    \item Refer to CSSE3012 Safety Critical guest lecture.
+}
+
+\begin{frame}{Limited Fault Tolerance}
+    \vspace{1mm}
+    {\LARGE
+        \begin{itemize}
+            \item<1-> Validate format of received messages
+            \begin{itemize}
+                \Large\item Need strategy to handle \& report errors
+            \end{itemize}
+            \vspace{2mm}
+            \item<2-> Santise inputs
+            \begin{itemize}
+                \Large\item Assume any input from external sources may be malicious
+            \end{itemize}
+            \vspace{2mm}
+            \item<3-> Retrieve data from multiple sources
+            \begin{itemize}
+                \Large\item If possible
+                \Large\item e.g. Multiple NTP servers
+            \end{itemize}
+        \end{itemize}
+    }
+\end{frame}
+
+\point[Assumption]{
+    If all nodes are part of our system, we may assume there are no Byzantine faults.
+    \begin{itemize}
+        \item Santise user input
+        \vspace{1mm}
+        \item Byzantine faults may still arise
+        \begin{itemize}
+            \LARGE\item Logic defects
+            \begin{itemize}
+                \Large\item Same code is usually deployed to all replicated nodes, defeating easy fault tolerance solutions
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
 }
 
 \definition{Poison Message}{
@@ -381,12 +434,25 @@ CSSE6400}
     \item Finite precision -- two events may end up with the same timestamp, if they occur in quick succession
 }
 
+\point{Data Issues}
+
 \point[Consistency]{
     \begin{description}
         \item[Eventual Consistency] weak guarantee
         \item[Linearisability] strong guarantee
         \item[Causal Ordering] strong guarantee
     \end{description}
+}
+
+\point[Eventual Consistency]{
+\begin{itemize}
+    \item Allows stale reads
+    \vspace{3mm}
+    \item May be appropriate for some systems
+    \begin{itemize}
+        \LARGE\item e.g. Social media updates\footnote{See \href{https://csse6400.uqcloud.net/slides/distributed2.pdf}{Distributed II slides 40 - 44}.}
+    \end{itemize}
+\end{itemize}
 }
 
 \point[Linearisability]{
@@ -481,6 +547,83 @@ CSSE6400}
     \item Commit intent is recorded in log before sending to participants
     \item Even if a particiant fails, commit can proceed when it recovers
     \item Comment on performance costs
+}
+
+\begin{frame}{Distributed Systems Timing Assumptions}
+    \vspace{1mm}
+    {\LARGE
+    \begin{itemize}
+        \item<1-> Synchonous System
+        \begin{itemize}
+            \Large\item Not realistic due to faults above
+            \Large\item Minimal performance benefit
+        \end{itemize}
+        \vspace{2mm}
+        \item<2-> Partially Synchonous System
+        \begin{itemize}
+            \Large\item Assumes important message order is preserved
+            \Large\item Assumes most faults are rare \& transient
+            \Large\item Error handling to catch faults
+        \end{itemize}
+        \vspace{2mm}
+        \item<3-> Asynchonous System
+        \begin{itemize}
+            \Large\item No timing assumptions
+            \Large\item Important message order managed by application
+            \Large\item Difficult \& limited design
+        \end{itemize}
+    \end{itemize}
+    }
+\end{frame}
+
+\begin{frame}{Distributed Systems Node Failure Assumptions}
+    \vspace{1mm}
+    {\LARGE
+    \begin{itemize}
+        \item<1-> Crash Stop
+        \begin{itemize}
+            \Large\item Node fails and never restarts
+        \end{itemize}
+        \vspace{2mm}
+        \item<2-> Crash Recovery
+        \begin{itemize}
+            \Large\item Node fails and restarts
+            \begin{itemize}
+                \large\item Requires persistent memory to recover to close to prior state
+            \end{itemize}
+        \end{itemize}
+        \vspace{2mm}
+        \item<3-> Arbitrary Failure
+        \begin{itemize}
+            \Large\item Nodes may perform spurious or malicious actions
+            \begin{itemize}
+                \large\item Byzantine faults
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+    }
+\end{frame}
+\note[itemize]{
+    \item Crash Stop -- Cloud-based system that kills crashed nodes.
+    \item Crash Recovery -- Any system that allows nodes to be restarted.
+    \item Crash Recovery -- May lose some steps in memory for non-critical tasks.
+    \item Arbitrary Failure -- Nodes may send faulty or malicious messages.
+}
+
+\point{
+\begin{itemize}
+    \item Distributed systems are hard to build
+    \vspace{3mm}
+    \item Large systems have to be distributed
+    \begin{itemize}
+        \LARGE\item Monoliths can't scale to millions of users
+    \end{itemize}
+    \vspace{3mm}
+    \item Use environments, tools \& libraries
+    \begin{itemize}
+        \LARGE\item Leaverage others' experience
+    \end{itemize}
+\end{itemize}
 }
 
 \end{document}
