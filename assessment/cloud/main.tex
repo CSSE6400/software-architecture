@@ -248,11 +248,12 @@ You can reproduce our process for deploying your application using our \link{Doc
 Our steps for deploying your infrastructure using this container are as follows.
 \texttt{\$REPO} is the name of your repository,
 \texttt{\$CREDENTIALS} is the path where we will store our AWS credentials,
-and \texttt{\$GH\_PAT} is a personal access token with package read permissions:
+\texttt{\$GH\_PAT} is a personal access token we will generate with package read permissions,
+and \texttt{\$GH\_USER} is the username to go along with the PAT:
 \begin{code}[language=shell]{}
 $ git clone git@github.com:CSSE6400/$REPO
 $ cp $CREDENTIALS $REPO
-$ docker run -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd)/$REPO:/workspace --env TF_VAR_github_path=$GH_PAT csse6400-cloud-testing
+$ docker run -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd)/$REPO:/workspace --env TF_VAR_github_pat=$GH_PAT --env TF_VAR_github_user=$GH_USER csse6400-cloud-testing
 $ cat $REPO/api.txt # this will be used for load-testing
 \end{code}
 
