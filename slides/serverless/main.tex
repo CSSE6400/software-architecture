@@ -1,0 +1,76 @@
+\documentclass{slide}
+
+\usepackage[shortlabels]{enumitem}
+\usepackage{tabto}
+% \usepackage{pgfpages}
+% \setbeameroption{show notes on second screen}
+
+\title{Serverless Architecture}
+\subtitle{CSSE6400}
+\author{Richard Thomas}
+\date{\week{12}}
+
+\begin{document}
+
+\maketitle
+
+\oxymoron{Serverless}{Logic running on someone else's server.}
+\note{Developers can focus on logic, not infrastructure to deliver it.}
+
+\definition{Backend as a Service (BaaS)}{Cloud-hosted applications or services that deliver functionality used by an application front-end.}
+\note[itemize]{
+    \item Front-end may be a SPA or mobile app.
+    \item Back-end provides sophisticated functionality (e.g. database, machine learning, location services, authentication, \dots).
+    \item Front-end ties back-end services together to deliver the application's functionality.
+}
+
+\definition{Functions as a Service (FaaS)}{Application logic that is triggered by an event and runs in a transient, stateless compute node.}
+\note[itemize]{
+    \item Node may only exist for duration of function call.
+    \item Server infrastructure (e.g. type of node, lifespan, scaling, \dots) are managed by hosting provider.
+    \item e.g. AWS Lambda, Google App Engine, Azure Automation, \dots.
+}
+
+\definition{Serverless Architecture}{
+    \begin{enumerate}[a)]
+        \item Rich client layer that uses BaaS to deliver functionality.
+        \item Functionality running in a FaaS environment and used by other services.
+    \end{enumerate}
+}
+\note{Serverless now commonly implies definition (b).}
+
+%\image[height=.96\textheight]{diagrams/microservices-arch.png}
+
+\image[trim=39 50 22 39,clip,height=\textheight]{../../notes/microservices/diagrams/microservices-arch.png}
+\note[itemize]{
+    \item Basic structure of a microservices architecture.
+    \item UIs are fairly monolithic to provide a rich interface.
+    \item Fairly common to have multiple UIs, some of which use a different combination of services.
+}
+
+\definition{Service Cohesion Principle}{Services are cohesive business processes. They are a bounded context.}
+
+\definition{Service Independence Principle}{Services should not depend on the implementation of other services.}
+
+\corollary{Low Coupling}{Services should have minimal coupling with other services.}
+
+\corollary{No Reuse}{Services do not reuse components from other services, to avoid dependencies.}
+
+\begin{frame}{Pros \& Cons}
+    \vspace{1mm}
+    {\LARGE
+    \begin{description}
+        \item[Modularity] \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Extensibility] \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Reliability] \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Interoperability] \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Scalability] \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Security] \tabto{15em}\includegraphics[trim=57 145 70 85,clip,width=8mm]{../../shared/images/neutral.png}
+        \item[Deployability] \tabto{15em}\includegraphics[trim=22 19 22 12,clip,width=8mm]{../../shared/images/neutral.png}
+        \item[Testability] \tabto{15em}\includegraphics[trim=22 19 22 12,clip,width=8mm]{../../shared/images/neutral.png}
+        \item[Simplicity] \tabto{15em}\includegraphics[trim=22 19 22 12,clip,width=8mm]{../../shared/images/thumbs-down.png}
+    \end{description}
+    }
+\end{frame}
+
+\end{document}
