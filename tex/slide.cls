@@ -124,6 +124,17 @@
     }
     {\end{tcolorbox}}
 
+\newcounter{oxymoron}[part]
+\newenvironment{oxy}[1][]
+    {\refstepcounter{oxymoron}
+    \vspace{1em}
+    \begin{tcolorbox}%
+    \noindent {\color{primary}{Oxymoron~\theoxymoron. #1}}
+    
+    \vspace{4pt}
+    }
+    {\end{tcolorbox}}
+
 % The standard `point' to highlight something
 \newcommand{\point}[2][]{
     \frame[c,plain]{
@@ -154,7 +165,7 @@
 % Point with a definition
 \renewcommand{\definition}[3][]{
     \point[#1]{
-        {\large
+        {\LARGE
         \begin{defn}[#2]
             #3
         \end{defn}}
@@ -164,10 +175,20 @@
 % Point with a corollary
 \renewcommand{\corollary}[3][]{
     \point[#1]{
-        {\large
+        {\LARGE
         \begin{col}[#2]
             #3
         \end{col}}
+    }
+}
+
+% Point with an oxymoron
+\renewcommand{\oxymoron}[3][]{
+    \point[#1]{
+        {\LARGE
+        \begin{oxy}[#2]
+            #3
+        \end{oxy}}
     }
 }
 
