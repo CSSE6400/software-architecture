@@ -183,7 +183,7 @@
 }
 
 % Point with an oxymoron
-\renewcommand{\oxymoron}[3][]{
+\newcommand{\oxymoron}[3][]{
     \point[#1]{
         {\LARGE
         \begin{oxy}[#2]
