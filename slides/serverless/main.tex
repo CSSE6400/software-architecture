@@ -1,6 +1,6 @@
 \documentclass{slide}
 
-\usepackage[shortlabels]{enumitem}
+\usepackage{changepage}
 \usepackage{tabto}
 % \usepackage{pgfpages}
 % \setbeameroption{show notes on second screen}
@@ -24,6 +24,20 @@
     \item Front-end ties back-end services together to deliver the application's functionality.
 }
 
+\begin{frame}{BaaS Example}
+    \begin{adjustwidth}{-12mm}{-12mm}
+        \centering
+        \includegraphics[trim=195 195 195 195,clip,width=0.98\paperwidth]{diagrams/baas-example.png}
+    \end{adjustwidth}
+\end{frame}
+\note[itemize]{
+    \item Example of simple system with back-end functionality delivered entirely via BaaS.
+    \item Feature-rich front-ends coordinate behaviour delivered by BaaS.
+    \item Consequence: Front-ends are tightly coupled to BaaS.
+    \item Consequence: Front-ends are have both UI and functional behaviour logic.
+    \item Front-end could have a layered design, though many SPAs don't.
+}
+
 \definition{Functions as a Service (FaaS)}{Application logic that is triggered by an event and runs in a transient, stateless compute node.}
 \note[itemize]{
     \item Node may only exist for duration of function call.
@@ -31,24 +45,43 @@
     \item e.g. AWS Lambda, Google App Engine, Azure Automation, \dots.
 }
 
-\definition{Serverless Architecture}{
-    \begin{enumerate}[a)]
-        \item Rich client layer that uses BaaS to deliver functionality.
-        \item Functionality running in a FaaS environment and used by other services.
-    \end{enumerate}
-}
-\note{Serverless now commonly implies definition (b).}
-
-%\image[height=.96\textheight]{diagrams/microservices-arch.png}
-
-\image[trim=39 50 22 39,clip,height=\textheight]{../../notes/microservices/diagrams/microservices-arch.png}
+\begin{frame}{FaaS Example}
+    \begin{adjustwidth}{-12mm}{-12mm}
+        \centering
+        \includegraphics[trim=195 195 195 195,clip,width=0.98\paperwidth]{diagrams/faas-example.png}
+    \end{adjustwidth}
+\end{frame}
 \note[itemize]{
-    \item Basic structure of a microservices architecture.
-    \item UIs are fairly monolithic to provide a rich interface.
-    \item Fairly common to have multiple UIs, some of which use a different combination of services.
+    \item Example of simple system with back-end functionality delivered entirely by FaaS.
+    \item Feature-rich front-ends coordinate behaviour delivered by FaaS.
+    \item Front-ends invoke functions via an API.
+    \item API Gateway provides some separation between front-end and functions.
+    \item May allow a bit more separation between UI and logic.
 }
 
-\corollary{No Reuse}{Services do not reuse components from other services, to avoid dependencies.}
+\definition{Serverless Architecture}{Software system delivering functionality through BaaS or FaaS.}
+}
+\note[itemize]{
+    \item Many people focus on FaaS when considering Serverless.
+    \item Some simple Single Page Web Apps (SPA) coordinate.
+    \item Front-end ties back-end services together to deliver the application's functionality.
+}
+
+\begin{frame}{Serverless Sahara eCommerce}
+    \begin{adjustwidth}{-12mm}{-12mm}
+        \centering
+        \includegraphics[trim=195 195 195 195,clip,width=\paperwidth]{diagrams/sahara-deployment-1.png}
+    \end{adjustwidth}
+\end{frame}
+\note[itemize]{
+    \item Sahara eCommerce example as a serverless app.
+    \item Only browse, search and purchase are shown.
+    \item Should mention that shopping cart is within the web or mobile app.
+    \item Payment Confirmation event added to Queue would be picked up by a fulfillment function to pack \& send order.
+    \item Once sent, another event would trigger an `order sent' function.
+}
+
+\todo{Continue Sahara Example with Steps After Diagram Above}
 
 \begin{frame}{Pros \& Cons}
     \vspace{1mm}
