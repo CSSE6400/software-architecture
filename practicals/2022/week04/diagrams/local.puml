@@ -1,0 +1,24 @@
+@startuml local
+
+left to right direction
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!include DEVICONS/laravel.puml
+!include DEVICONS/javascript.puml
+!include DEVICONS/mysql.puml
+
+Deployment_Node(machine, "Your machine") {
+  Deployment_Node(browser, "Your browser") {
+    Container(todopage, "Todo Page", "HTML and JavaScript", "Provides the functionality of the Todo App to the user.", $sprite="javascript")
+  }
+  Deployment_Node(compose, "Docker") {
+    Container(todoinst, "Todo App", "Docker Container", "Serves HTTP and makes database requests.", $sprite="laravel")
+    ContainerDb(tododb, "Todo Database", "MySQL Database", "Stores todo application data.", $sprite="mysql")
+  }
+}
+Rel(todoinst, todopage, "Serves HTML and Javascript")
+Rel(todopage, todoinst, "REST requests")
+BiRel(todoinst, tododb, "Reads from and writes to")
+@enduml
