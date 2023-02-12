@@ -13,9 +13,10 @@
     - 3.2: Docker Compose
 - Week 4
     - 4.1: Introduction to AWS
+    - 4.2: Introduction to Terraform
 - Week 5
-    - 5.1: More AWS
-    - 5.2: IaC / Terraform
+    - 5.1: Using Terraform to deploy a RDS instance on AWS
+    - 5.2: Using Terraform to deploy a REST API on AWS
 - Week 6
     - 6.1: Load Balancers explained
     - 6.2: Load Balancers in practice
@@ -23,9 +24,10 @@
     - 7.1: Load Balancers with Autoscaling
     - 7.2: Queues
 - Week 8
-    - 8.1: Help & Tips
+    - 8.1: Stress Testing
+    - 8.2: Help & Tips
 - Week 9:
-    - 9.1: Stress Testing
+    - 9.1: Help & Tips
 - Week 10:
     - 10.1: Practical Examples Presentation
     - 10.2: Help & Tips
