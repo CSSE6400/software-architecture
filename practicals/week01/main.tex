@@ -1,0 +1,218 @@
+\documentclass{csse4400}
+
+% \teachermodetrue
+
+\usepackage{float}
+
+\usepackage{languages}
+
+\title{Application Programming Interfaces (APIs)}
+\author{Brae Webb}
+
+\date{\week{1}}
+\begin{document}
+
+\maketitle
+
+\begin{figure}[h]
+  \href{https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/ch04.html}{
+    \includegraphics[width=\textwidth]{images/communication}
+  }
+\caption{A map of communication techniques from Designing Data-Intensive Applications \cite{data-intensive}.}
+\end{figure}
+
+\section{This Week}
+This week our goal is to:
+\begin{itemize}
+  \item explore the various techniques developers use to communicate between components in distributed systems;
+  \item build a skeleton of a todo app using the Flask framework;
+\end{itemize}
+
+\teacher{
+    Spend approximately the first 30 minutes exploring concepts.
+}
+
+\section{Communication}
+The world relies (heavily) on distributed systems,
+there is no machine in the world powerful enough to process the requests Google receives every second%
+\footnote{Current estimates are that Google requires over a million servers}.
+Even systems of a much smaller scale can still need many hundreds or thousands of machines working seamlessly together.
+This inter-machine teamwork requires machines to know how to talk to each other.
+For the practical this week we will look at APIs as a mechanism for communication.
+
+\section{Data Formats}
+Communication requires an exchange of information.
+On computer systems information is stored at runtime in memory as primitive data which your programming language can interpret;
+bytes, integers, strings, etc.
+In object-oriented languages,
+primitive data is wrapped up into useful packages: objects.
+If we want this information to escape the confines of our programming language runtime,
+we need to package it up in a language-independent format.
+For a format to be language-independent we just need many languages to implement an encoding and decoding mechanism for the format.
+We have several language-independent formats available but a few defacto standards.
+
+\subsection{XML}
+Extensible Markup Language (XML) is one of the most widely used language-independent formats.
+The use cases of XML are extensive,
+it is the \link{foundation for many popular utilities}{https://en.wikipedia.org/wiki/List_of_XML_markup_languages},
+such as SVG file formats, SAML authentication, RSS feeds, and ePub books.
+
+\begin{code}[language=xml]{csse6400.xml}
+<root>
+  <item>
+    <key>Course Code</key>
+    <value>CSSE6400</value>
+  </item>
+  <item>
+    <key>Course Title</key>
+    <value>Software Architecture</value>
+  </item>
+</root>
+\end{code}
+
+XML is designed as a markup language, similar to HTML,
+it is not designed as a data exchange format.
+Developers have come to point out that the verbosity and complexity of XML,
+compared to alternatives such as JSON, are deal breakers.
+While XML can be used as a data exchange format it is not designed for it,
+and as a result APIs built around XML as a data format are becoming less common.
+
+\subsection{JSON}
+JavaScript Object Notation (JSON) is quickly replacing XML as the data format used in APIs.
+As you will note, it is more succinct and communicates the important points to a human reader better.
+The popularity of JSON is largely due to its compatibility with JavaScript which has taken over web development.
+JSON is the map-esque data type in JavaScript.
+Detractors of JSON claim that its main disadvantage compared to XML is that it lacks a schema.
+However, \link{schemas are possible in JSON}{https://json-schema.org/},
+they are optional, just as in XML, but are used much less than in XML.
+
+\begin{code}[language=json]{csse6400.json}
+{
+    "Course Code": "CSSE6400",
+    "Course Title": "Software Architecture"
+}
+\end{code}
+
+\subsection{MessagePack}
+It should not be a surprise that the JSON and XML formats are not resource efficient.
+Nowadays, we are less concerned with squeezing data into a tiny amount of data on the hard drive as our hard drives are massive.
+However, we are often concerned with how much data is being transmitted via network communication.
+
+In the example JSON snippet above, we use 78 bytes to encode the message.
+\link{MessagePack}{https://msgpack.org/} is a standard for encoding and decoding JSON.
+When encoding our original JSON snippet with MessagePack we shrink to just 57 bytes.
+At our scale, a negligible difference,
+but at the scale of terrabytes or petabytes,
+a significant consideration.
+
+\begin{code}[]{csse6400.msgpack}
+82 ab 43 6f 75 72 73 65 20 43 6f 64 65 a8 43 53 53 45 36 34 30 30 ac 43 6f 75 72 73 65 20 54 69 74 6c 65 b5 53 6f 66 74 77 61 72 65 20 41 72 63 68 69 74 65 63 74 75 72 65
+\end{code}
+
+\info{
+    For those interested,
+    0x82 specifies a map type (0x80) with two fields (0x02).
+    Followed by a string type (0xa0) of size eleven (0x0b).
+    The rest is left as an exercise: \url{https://github.com/msgpack/msgpack/blob/master/spec.md}.
+}
+
+\subsection{Protobuf}
+Protocol Buffers (protobuf) is another type of binary encoding.
+However, unlike MessagePack, the format was designed from scratch,
+allowing a more compact and better designed format.
+Protobufs require all data to be defined by a schema.
+For example:
+
+\begin{code}[language=protobuf]{csse6400.proto}
+message Course {
+    required string code = 1;
+    required string name = 2;
+}
+\end{code}
+
+Protobufs differ from XML, JSON, and MessagePack via their method of integration.
+In the previous examples,
+your language would have a library to encode and decode the data format into and out of your language's type system.
+With protobuf, an external tool, \textsl{protoc},
+takes the schema and generates a model of the schema in your target language.
+This gives every language a native method to interact with the data format,
+it often means that developers do not need to be aware of the underlying encoding.
+
+\begin{code}[language=java]{csse6400.java}
+Course softarch = Course.newBuilder()
+    .setCode("CSSE6400")
+    .setName("Software Architecture")
+    .build();
+output = new FileOutputStream(args[0]);
+softarch.writeTo(output);
+\end{code}
+
+\section{Application Programming Interfaces}
+It is worth being aware of a few of the common API paradigms available.
+We outline a few but note that in this course we will primarily focus on REST APIs.
+This is only an indication that they are better understood by course staff,
+not their superiority.
+
+\subsection{XML-RPC}
+XML-RPC was one of the first API standards.
+It is a Remote Procedure Call (RPC) based API which communicates via XML.
+It is not a commonly used standard anymore.
+
+\subsection{SOAP}
+After XML-RPC came SOAP.
+SOAP was impactful for service-oriented (now microservices) architectures but has largely fallen out of favour in-place of REST APIs.
+We do not cover SOAP in any meaningful depth due to its increasing irrelevance and complexity.
+
+\subsection{REST}
+REST is not a standard like SOAP once was,
+instead REST is an architectural style guided by a set of architectural constraints that allows us to build flexible APIs.
+
+In this course we do not dive too deep into the architectural style and instead opt for a more surface level understanding.
+It is a common mistake for people to refer to REST as a HTTP based web service API,
+they are different.
+In this course we chose to embrace this mistake and often refer to a HTTP based web service API when saying REST.
+
+\noindent An example of this type of API might be:
+\begin{description}
+  \item[GET /api/v1/todo] List all tasks todo
+  \item[POST /api/v1/todo] Create a task todo
+  \item[GET /api/v1/todo/{id}] List all details about a certain task
+  \item[PUT /api/v1/todo/{id}] Update the fields of an existing task
+  \item[DELETE /api/v1/todo/{id}] Delete a specific task
+\end{description}
+
+\subsection{JSON-RPC}
+A JSON RPC is another RPC based API based around communication via JSON.
+When deciding whether to use an RPC-based API or a REST/SOAP based API,
+the common distinction to make is that RPC APIs should be action based, i.e. I want to do X.
+Whereas REST/SOAP APIs are Create Read Update Delete (CRUD) based for providing a interface to mutable data.
+
+\subsection{GraphQL}
+GraphQL is a query language which allows more dynamic querying of data than REST based APIs.
+You can create nested queries and specify the fields you want to receive in response.
+GraphQL APIs are well-suited for building APIs designed for developers to consume but when dealing with rigid inter-service based requests,
+REST APIs are generally preferable.
+
+\subsection{gRPC}
+Another RPC framework, gRPC has started gaining a lot of attention since its first release in 2016.
+gRPC is based on the protobuf communication standard.
+In addition to a more type-safe system,
+gRPC based APIs provide authentication and streaming mechanisms.
+
+\section{Creating our own Todo app}
+
+\subsection{The API design}
+
+\todo{Add description of all the API endpoints}
+
+\subsection{Implementation with Flask}
+
+\todo{Intro to getting python up and running}
+\todo{Intro to flask}
+\todo{returning json with flask}
+\todo{Calling your api locally}
+
+\bibliographystyle{ieeetr}
+\bibliography{books,ours}
+
+\end{document}
