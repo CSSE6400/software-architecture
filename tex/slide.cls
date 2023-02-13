@@ -5,8 +5,7 @@
 
 \LoadClass[aspectratio=169]{beamer}
 
-\RequirePackage[sfdefault]{cabin}
-\RequirePackage[T1]{fontenc}
+\usefonttheme{serif}
 
 % Colours
 \RequirePackage{xcolor}
@@ -14,21 +13,25 @@
 \definecolor{primary}{RGB}{50, 98, 115}
 \definecolor{secondary}{RGB}{92, 158, 173}
 \definecolor{focus}{RGB}{227, 151, 116}
+\definecolor{focus}{rgb}{1.0,0.27,0.0}
+\definecolor{focus}{rgb}{0.79, 0.17, 0.57}
+\definecolor{secondary}{rgb}{0.19, 0.84, 0.78}
+\definecolor{primary}{rgb}{0.06, 0.3, 0.57}
+\definecolor{secondary}{rgb}{0.36, 0.57, 0.9}
+
+\definecolor{tomato}{rgb}{1.0, 0.39, 0.28}
 
 \setbeamercolor{frametitle}{fg=primary}
+\setbeamerfont{subtitle}{shape=\itshape}
 \setbeamercolor{description item}{fg=secondary}
 
 \setbeamercolor{caption name}{fg=primary}
 \setbeamercolor{local structure}{fg=secondary}
 
 \let\oldcite\cite
-\renewcommand{\cite}[1]{{\color{primary}\oldcite{#1}}}
+\renewcommand{\cite}[1]{{\textsuperscript{\color{tomato}\footnotesize\itshape\kern-1ex\oldcite{#1}}}}
 
 \setbeamertemplate{itemize items}[circle]
-
-% Fonts
-\RequirePackage[sfdefault]{cabin}
-\RequirePackage[T1]{fontenc}
 
 \RequirePackage{wrapfig}
 
@@ -43,14 +46,14 @@
 \vspace*{-\baselineskip}
 
 %   \centering
-  \usebeamerfont{title}\Huge{\color{primary}\inserttitle}\par
+  \usebeamerfont{title}\huge{\color{primary}\inserttitle}\par
   \bigskip
   \usebeamerfont{subtitle}{\Large\color{primary}\insertsubtitle}\par
   \bigskip\vspace{3em}
-  \usebeamerfont{author}{\huge\color{secondary}\insertauthor}\par
+  \usebeamerfont{author}{\large\color{secondary}\textnormal\insertauthor}\par
   \bigskip
   
-  \usebeamerfont{date}{\large\color{secondary}\insertdate}\par
+  \usebeamerfont{date}{\color{secondary}\textnormal\insertdate}\par
   {\large\color{secondary}\usebeamerfont{institute}\insertinstitute}\par
 }
 
@@ -107,7 +110,7 @@
     {\refstepcounter{definition}
     \vspace{1em}
     \begin{tcolorbox}%
-    \noindent {\color{primary}{Definition~\thedefinition. #1}}
+        \noindent {\color{primary}{\textit{Definition~\thedefinition.} #1}}
     
     \vspace{4pt}
     }
@@ -118,7 +121,7 @@
     {\refstepcounter{corollary}
     \vspace{1em}
     \begin{tcolorbox}%
-    \noindent {\color{primary}{Corollary~\thecorollary. #1}}
+        \noindent {\color{primary}{\textit{Corollary~\thecorollary.} #1}}
     
     \vspace{4pt}
     }
@@ -129,7 +132,7 @@
     {\refstepcounter{oxymoron}
     \vspace{1em}
     \begin{tcolorbox}%
-    \noindent {\color{primary}{Oxymoron~\theoxymoron. #1}}
+        \noindent {\color{primary}{\textit{Oxymoron~\theoxymoron.} #1}}
     
     \vspace{4pt}
     }
@@ -139,7 +142,7 @@
 \newcommand{\point}[2][]{
     \frame[c,plain]{
         \par\bigskip
-        {\color{primary}#1}
+        {\color{primary}\textit{#1}}
 
         \huge #2
     }
@@ -156,7 +159,7 @@
 \newcommand{\questionanswer}[2]{
     \point[Question]{#1
     \only<2->{\par\bigskip
-    {\normalsize\color{focus}Answer}
+        {\normalsize\color{focus}\textit{Answer}}
 
     \huge #2
     }}
@@ -197,7 +200,7 @@
         \par\bigskip
         {\huge\color{black}#2}
         \par
-        {\hfill\large\color{primary}- #1}
+        {\hfill\large\color{primary}\textit{- #1}}
     }
 }
 
@@ -211,7 +214,7 @@
 
 % Bibliography styling
 \setbeamertemplate{bibliography item}[text]
-\setbeamercolor{bibliography item}{fg=primary}
+\setbeamercolor{bibliography item}{fg=tomato}
 \setbeamercolor{bibliography entry author}{fg=black}
 \setbeamercolor{bibliography entry location}{fg=black}
 \setbeamercolor{bibliography entry title}{fg=focus}
@@ -221,13 +224,13 @@
         \par\bigskip
         {\color{primary}References}
 
-        \bibliographystyle{unsrt}
+        \bibliographystyle{apalike}
         \normalsize \bibliography{#1}
     }
 }
 
 % Use the focus font for highlighting
-\newcommand{\highlight}[1]{{\color{focus} \textsl{#1}}}
+\newcommand{\highlight}[1]{{\color{focus} \textit{#1}}}
 
 \newcommand{\extra}[2][2-]{\only<#1>{\blfootnote{#2}}}
 
@@ -240,3 +243,13 @@
 
 % Remove cluttered notes formatting
 \setbeamertemplate{note page}{\vfill\Large\insertnote\vfill}
+
+% Sectioning
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \fontsize{40}{20}\selectfont\color{primary}\textit{\S\hspace{0.5em}\insertsectionhead}\par%
+  \vfill
+  \end{frame}
+}
+
