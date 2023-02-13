@@ -20,6 +20,7 @@
 \definecolor{secondary}{rgb}{0.36, 0.57, 0.9}
 
 \definecolor{tomato}{rgb}{1.0, 0.39, 0.28}
+\definecolor{pine}{RGB}{0,139,114}
 
 \setbeamercolor{frametitle}{fg=primary}
 \setbeamerfont{subtitle}{shape=\itshape}
