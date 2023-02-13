@@ -20,9 +20,10 @@
 - Week 6
     - 6.1: Load Balancers explained
     - 6.2: Load Balancers in practice
+    - 6.3: Load Balancers with Autoscaling
 - Week 7
-    - 7.1: Load Balancers with Autoscaling
-    - 7.2: Queues
+    - 7.1: Queues
+    - 7.2: Todo App with Worker Queues
 - Week 8
     - 8.1: Stress Testing
     - 8.2: Help & Tips
