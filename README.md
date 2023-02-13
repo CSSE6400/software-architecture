@@ -1,4 +1,4 @@
-# Software Architecture [![Site Published](https://img.shields.io/badge/website-published-brightgreen)](https://csse6400.brae.dev/)
+# Software Architecture [![Site Published](https://img.shields.io/badge/website-published-brightgreen)](https://csse6400.uqcloud.net/ "Software Architecture course website")
 
 
 [![Build Assessment](https://github.com/CSSE6400/software-architecture/actions/workflows/build-assessment.yml/badge.svg?branch=main)](https://github.com/CSSE6400/software-architecture/actions/workflows/build-assessment.yml)
@@ -8,7 +8,7 @@
 [![Build Slides](https://github.com/CSSE6400/software-architecture/actions/workflows/build-slides.yml/badge.svg)](https://github.com/CSSE6400/software-architecture/actions/workflows/build-slides.yml)
 
 
-This repository hosts the course on Software Architecture at the University of Queensland.
+This repository hosts the course material for the [Software Architecture course (CSSE6400)](https://csse6400.uqcloud.net/ "Software Architecture course website") at the [University of Queensland](https://uq.edu.au/ "UQ home page").
 
 
 ## Folder Structure
@@ -35,6 +35,8 @@ Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
 
 This work is licensed under a
 [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa].
+
+Feel free to fork the course material for your own use. Please submit a pull request if you have any suggestions for corrections or improvements.
 
 [![CC BY-NC-SA 4.0][cc-by-nc-sa-image]][cc-by-nc-sa]
 

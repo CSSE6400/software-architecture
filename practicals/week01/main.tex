@@ -1,8 +1,12 @@
 \documentclass{csse4400}
 
+% \teachermodetrue
+
+\usepackage{float}
+
 \usepackage{languages}
 
-\title{AWS Academy Introduction}
+\title{Application Programming Interfaces (APIs)}
 \author{Brae Webb}
 
 \date{\week{1}}
@@ -10,270 +14,207 @@
 
 \maketitle
 
-\section{Before Class}
-Prior to attending class, \textbf{select an open-source website} that you would be interested in deploying.
-In this guide, we will be deploying hextris \cite{hextris}, an online game similar to tetris.
-You may also deploy hextris, although,
-you can take the opportunity choose something which interests you.
-Note that deploying other websites is likely to be more involved than the example in the guide.
-
-Potential ideas are:
-\begin{itemize}
-    \item \textbf{Habitica:} \url{https://github.com/HabitRPG/habitica}
-    \item \textbf{DailyNotes:} \url{https://github.com/m0ngr31/DailyNotes/}
-    \item \textbf{kcal:} \url{https://github.com/kcal-app/kcal} 
-\end{itemize}
-
-\teacher{Discourage \texttt{kcal} unless they already have some understanding of docker.}
-
-\noindent Alternatively, browse through the impressive collection here:\\ \url{https://github.com/awesome-selfhosted/awesome-selfhosted}
+\begin{figure}[h]
+  \href{https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/ch04.html}{
+    \includegraphics[width=\textwidth]{images/communication}
+  }
+\caption{A map of communication techniques from Designing Data-Intensive Applications \cite{data-intensive}.}
+\end{figure}
 
 \section{This Week}
-This week our goal is to get acquainted with AWS Academy.
-Throughout the course we will use AWS Academy to learn how to deploy and manage infrastructure with AWS.
-Specifically, this week you need to:
+This week our goal is to:
 \begin{itemize}
-    \item Enrol in
-    \begin{enumerate}
-        \item AWS Academy Cloud Foundations [10906] course;
-        \item AWS Academy Learner Lab - Foundation Services [10909] course; and
-    \end{enumerate}
-    \item Navigate the AWS Academy interface.
-    \item Enter the AWS Console from an AWS Academy lab.
-    \item Use the AWS Console to provision an EC2 instance with a simple web interface.
+  \item explore the various techniques developers use to communicate between components in distributed systems;
+  \item Getting started with our github practical respository;
+  \item build a skeleton of a todo app using the Flask framework;
 \end{itemize}
 
-\section{AWS Academy}
-AWS Academy is an educational platform to support teaching AWS services.
-In this course, we will be using it in two ways:
-\begin{enumerate}
-    \item The Cloud Foundations course will be used as supplementary material to help cement your ability to use AWS.
-          The use of Cloud Foundations is completely optional.
-    \item The Learner Lab provides access to an environment which will be used in these practicals to learn AWS. 
-\end{enumerate}
-
-\section{Enrol in AWS Academy}
-
-\begin{enumerate}
-    \item
-        Set up your AWS Academy account by responding to your email invitation and clicking \textbf{Get Started}.
-        The email invitation will come from AWS Academy.
-        Check your junk/spam folders.
-
-        \includegraphics{images/email-invite}
-
-    \item Go to \url{https://www.awsacademy.com/LMS_Login} to login.
-    \begin{enumerate}
-        \item Press \textbf{Student Login}.
-        \item Use the email address that received the email invitation.
-    \end{enumerate}
-
-    \includegraphics[width=0.75\textwidth]{images/labs-login}
-\end{enumerate}
-
-
-\section{Exploring the Interface}
-\aside{We will just be looking at the learner lab today, please ask on the slack if you need help using the cloud foundations course.}
-
-The following steps will enter the learner lab:
-
-\begin{enumerate}
-
-\item Once you have enrolled in the course, you should see this course page (minus everything in pink):
-
-\includegraphics[width=0.9\textwidth]{images/academy-homepage}
-
-\item Navigate to the \texttt{Modules} tab and select the link for ``Learner Lab - Foundational Services''.
-      You may also open and browse the ``Learner Lab - Student Guide.pdf'' link which covers some of the content of this guide.
-
-\includegraphics[width=0.9\textwidth]{images/modules-page}
-
-\item Now we have entered the main part of the interface, the learner lab.
-\begin{itemize}
-      \item The AWS text with the currently red circle is the link to open the AWS console.
-      \item You also see your budget, note that the budget is not updated in real-time.
-      \item The \texttt{00:00} indicates how long your lab has been activated.
-      A lab can only remain active for 6 hours, after which it will be closed, unless you press start lab again before the 6 hours expires.
-      \item AWS details will become important later but are not needed now.
-      \item The README button will re-open the text panel currently on the right of the terminal interface.
-      \item The terminal interface is not yet important.
-      \item The right-hand has a lot of important information including what AWS services are available in the learner labs environment, please read it.
-\end{itemize}
-
-\includegraphics[width=0.9\textwidth]{images/lab-interface}
-
-\item Go ahead and start the lab. It will take a few moments to get ready and the red circle will turn green once it is.
-      Click on the green circle when it is available.
-      This will open the AWS Console in a new tab.\footnote{Your view will be different as you will not yet have any recently visited services.}
-      If you end up working in a company which uses AWS, welcome to your new home.
-
-\teacher{It can take much more than a few moments for some students.}
-
-\includegraphics[width=0.9\textwidth]{images/aws-console}
-
-\end{enumerate}
-
-\aside{A short introduction to AWS:
-Amazon Web Services (AWS) is an
-Infrastructure as a Service (IaaS)
-and Software as a Service (SaaS) provider.
-They offer a collection of services which are helpful for development.
-For example, they offer virtual compute resources, database storage options, and networking to tie it all together.
-Services are offered with a pay as you go model, meaning you only pay for the seconds you use a service.
-We will get acquainted with some simple services offered by AWS now.}
-
-\section{AWS EC2}
-
-Today we are going to focus on using AWS's EC2 service.
-Elastic Compute Cloud (EC2) is the primary compute service offered by AWS.
-It allows you to create a linux virtual machine on Amazon's infrastructure.
-You have full control over this machine and can configure it for whatever purpose you need.
-
-Navigate to the search bar in the top left and find the EC2 service.
-You might find this interface overwhelming.
-It is important to note that since EC2 is one of the primary services offered by AWS,
-many smaller services we do not need are bundled into the service.
-
-\teacher{The foundation course has a module (6) that covers EC2 in more depth, feel free to direct students to it for after the hextris example.}
-
-\vspace{3mm}
-\includegraphics[width=0.9\textwidth]{images/ec2-interface}
-\vspace{3mm}
-
-Today, we will just need the \texttt{Instances} dashboard.
-Navigate to there and select ``Launch instances''.
-
-\subsection{EC2 AMI}
-First we will need to select an Amazon Machine Image (AMI).
-An AMI is the template (cookie cutter) which provides instructions on how an instance should be provisioned.
-Amazon offers a range of built-in AMIs. There are also community AMIs or you can create your own.
-As we just want a simple server today, we will use one of the built-in AMIs.
-
-Every AMI has a unique AMI code, something that looks like \texttt{ami-0a8b4cd432b1c3063}.
-We will use this AMI today%
-\footnote{Check the requirements for your chosen website, if your website requires a specific operating system, look for it as a community AMI.
-Ask for help if you aren't sure.}
-, it is considered one of the fundamental images.
-Search for it via the code and select it.
-
-\teacher{This AMI is an instance of Amazon Linux 2 which is a RedHat style distro with yum as its package manager.}
-
-\subsection{Instance Settings}
-The next few settings for configuring your instance are:
-\begin{enumerate}
-\item We do not need a large server, choose \texttt{t2.micro}.
-\item Keep the `Configure Instance' settings as default.
-\item Keep the `Add Storage' settings as default.
-\item Add a `Name' tag, call it the name of your website, e.g. \texttt{hextris}.
-\item Choose `Create a \textbf{new} security group'.
-\begin{enumerate}
-\item Give it a meaningful name, e.g. \texttt{hextris-http-ssh-access}.
-\item Change the description to something meaningful, e.g. \texttt{Hextris HTTP and SSH access}.
-\item Add a rule, select the \texttt{Type} as \texttt{HTTP}.
-\end{enumerate}
-\teacher{To make the box pingable dont forget to add the All-ICMP4 with source anywhere.}
-\item When prompted to choose a key pair (after the clicking \texttt{Launch} button), select the existing \texttt{vockey | RSA} option.
-\end{enumerate}
-
-\section{Accessing the Instance}
-
-Return to the \texttt{Instances} dashboard.
-You should now see a new instance created, its instance state might not yet be \texttt{Running}, if not, wait.
-
-\vspace{1mm}
-\includegraphics[width=0.9\textwidth]{images/instance-interface}
-
-Note the public IPv4 address, we will need to use this to connect to the server.
-
-\notice{
-    For terminal examples in this section, lines that begin with a \$ indicate a line which you should 
-    type while the other lines are example output that you should expect. Not all of the output is captured 
-    in the examples to save on space. 
+\teacher{
+    Spend approximately the first 30 minutes exploring concepts.
 }
 
-\begin{enumerate}
-    \item Return to the learner lab interface.
-    \item Run the following, \textcolor{red}{replacing \texttt{127.0.0.1}} with the public IP of your instance.
-          This command uses the \texttt{vockey | RSA} key pair to gain SSH access to the machine.
-\end{enumerate}
-\bash{ssh -i ~/.ssh/labsuser.pem ec2-user@127.0.0.1}
+\section{Communication}
+The world relies (heavily) on distributed systems,
+there is no machine in the world powerful enough to process the requests Google receives every second%
+\footnote{Current estimates are that Google requires over a million servers}.
+Even systems of a much smaller scale can still need many hundreds or thousands of machines working seamlessly together.
+This inter-machine teamwork requires machines to know how to talk to each other.
+For the practical this week we will look at APIs as a mechanism for communication.
 
-example:
-\bash{
-    ssh -i ~/.ssh/labsuser.pem ec2-user@35.173.230.42^^J
-The authenticity of host '35.173.230.42 (35.173.230.42)' can not be established.^^J
-ECDSA key fingerprint is SHA256:W7OzzZm6nhwM9tB9Kb7enONPryo1a4259hJmSAZX7HQ.^^J
-Are you sure you want to continue connecting (yes/no)?^^J
-^^J
-# At this point you will want to type yes and press enter ^^J
-Warning: Permanently added '35.173.230.42' (ECDSA) to the list of known hosts.^^J
-Connection to 35.173.230.42 closed by remote host.^^J
-Connection to 35.173.230.42 closed.
+\section{Data Formats}
+Communication requires an exchange of information.
+On computer systems information is stored at runtime in memory as primitive data which your programming language can interpret;
+bytes, integers, strings, etc.
+In object-oriented languages,
+primitive data is wrapped up into useful packages: objects.
+If we want this information to escape the confines of our programming language runtime,
+we need to package it up in a language-independent format.
+For a format to be language-independent we just need many languages to implement an encoding and decoding mechanism for the format.
+We have several language-independent formats available but a few defacto standards.
+
+\subsection{XML}
+Extensible Markup Language (XML) is one of the most widely used language-independent formats.
+The use cases of XML are extensive,
+it is the \link{foundation for many popular utilities}{https://en.wikipedia.org/wiki/List_of_XML_markup_languages},
+such as SVG file formats, SAML authentication, RSS feeds, and ePub books.
+
+\begin{code}[language=xml]{csse6400.xml}
+<root>
+  <item>
+    <key>Course Code</key>
+    <value>CSSE6400</value>
+  </item>
+  <item>
+    <key>Course Title</key>
+    <value>Software Architecture</value>
+  </item>
+</root>
+\end{code}
+
+XML is designed as a markup language, similar to HTML,
+it is not designed as a data exchange format.
+Developers have come to point out that the verbosity and complexity of XML,
+compared to alternatives such as JSON, are deal breakers.
+While XML can be used as a data exchange format it is not designed for it,
+and as a result APIs built around XML as a data format are becoming less common.
+
+\subsection{JSON}
+JavaScript Object Notation (JSON) is quickly replacing XML as the data format used in APIs.
+As you will note, it is more succinct and communicates the important points to a human reader better.
+The popularity of JSON is largely due to its compatibility with JavaScript which has taken over web development.
+JSON is the map-esque data type in JavaScript.
+Detractors of JSON claim that its main disadvantage compared to XML is that it lacks a schema.
+However, \link{schemas are possible in JSON}{https://json-schema.org/},
+they are optional, just as in XML, but are used much less than in XML.
+
+\begin{code}[language=json]{csse6400.json}
+{
+    "Course Code": "CSSE6400",
+    "Course Title": "Software Architecture"
+}
+\end{code}
+
+\subsection{MessagePack}
+It should not be a surprise that the JSON and XML formats are not resource efficient.
+Nowadays, we are less concerned with squeezing data into a tiny amount of data on the hard drive as our hard drives are massive.
+However, we are often concerned with how much data is being transmitted via network communication.
+
+In the example JSON snippet above, we use 78 bytes to encode the message.
+\link{MessagePack}{https://msgpack.org/} is a standard for encoding and decoding JSON.
+When encoding our original JSON snippet with MessagePack we shrink to just 57 bytes.
+At our scale, a negligible difference,
+but at the scale of terrabytes or petabytes,
+a significant consideration.
+
+\begin{code}[]{csse6400.msgpack}
+82 ab 43 6f 75 72 73 65 20 43 6f 64 65 a8 43 53 53 45 36 34 30 30 ac 43 6f 75 72 73 65 20 54 69 74 6c 65 b5 53 6f 66 74 77 61 72 65 20 41 72 63 68 69 74 65 63 74 75 72 65
+\end{code}
+
+\info{
+    For those interested,
+    0x82 specifies a map type (0x80) with two fields (0x02).
+    Followed by a string type (0xa0) of size eleven (0x0b).
+    The rest is left as an exercise: \url{https://github.com/msgpack/msgpack/blob/master/spec.md}.
 }
 
-\section{Installing Hextris}
-Hextris is very simple to install, using an EC2 interface is perhaps overkill for it.
-It is an entirely client-side application which means we just have to serve the static files.
+\subsection{Protobuf}
+Protocol Buffers (protobuf) is another type of binary encoding.
+However, unlike MessagePack, the format was designed from scratch,
+allowing a more compact and better designed format.
+Protobufs require all data to be defined by a schema.
+For example:
 
-First, we will need to enable the basic serving of static files.
-We can install and start the \texttt{httpd} service for this.
-The AMI we have picked uses the yum package manager, so to install httpd we run:
-
-\bash{sudo yum install httpd^^J
-Loaded plugins: extras_suggestions, langpacks, priorities, update-motd^^J
-Resolving Dependencies^^J
-..... ^^J
-..... ^^J
-Total download size: 1.9 M^^J
-Installed size: 5.2 M^^J
-Is this ok [y/d/N]:^^J
-^^J
-# enter y to install ^^J
-..... ^^J
-..... ^^J
-Complete! ^^J
-\$ sudo systemctl enable httpd ^^J
-Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service to /usr/lib/systemd/system/httpd.service. ^^J
-\$ sudo systemctl start httpd ^^J
+\begin{code}[language=protobuf]{csse6400.proto}
+message Course {
+    required string code = 1;
+    required string name = 2;
 }
+\end{code}
 
-All files in the \texttt{/var/www/html} directory will now be served when accessed via HTTP.
-Change to this directory and notice that it is currently empty.
+Protobufs differ from XML, JSON, and MessagePack via their method of integration.
+In the previous examples,
+your language would have a library to encode and decode the data format into and out of your language's type system.
+With protobuf, an external tool, \textsl{protoc},
+takes the schema and generates a model of the schema in your target language.
+This gives every language a native method to interact with the data format,
+it often means that developers do not need to be aware of the underlying encoding.
 
-Next, we need to download the static files to the server.
-We can use git for this, but first git needs to be installed on the machine.
+\begin{code}[language=java]{csse6400.java}
+Course softarch = Course.newBuilder()
+    .setCode("CSSE6400")
+    .setName("Software Architecture")
+    .build();
+output = new FileOutputStream(args[0]);
+softarch.writeTo(output);
+\end{code}
 
-\bash{sudo yum install git}
+\section{Application Programming Interfaces}
+It is worth being aware of a few of the common API paradigms available.
+We outline a few but note that in this course we will primarily focus on REST APIs.
+This is only an indication that they are better understood by course staff,
+not their superiority.
 
-Finally, let's double check we are in the \texttt{/var/www/html} directory.
+\subsection{XML-RPC}
+XML-RPC was one of the first API standards.
+It is a Remote Procedure Call (RPC) based API which communicates via XML.
+It is not a commonly used standard anymore.
 
-\bash{cd /var/www/html}
+\subsection{SOAP}
+After XML-RPC came SOAP.
+SOAP was impactful for service-oriented (now microservices) architectures but has largely fallen out of favour in-place of REST APIs.
+We do not cover SOAP in any meaningful depth due to its increasing irrelevance and complexity.
 
-\teacher{This path will currently be owned by root, proper permissions can be done (but are not nesscary) by following \url{https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Tutorials.WebServerDB.CreateWebServer.html}}
+\subsection{REST}
+REST is not a standard like SOAP once was,
+instead REST is an architectural style guided by a set of architectural constraints that allows us to build flexible APIs.
 
-And clone the repository into that directory.
+In this course we do not dive too deep into the architectural style and instead opt for a more surface level understanding.
+It is a common mistake for people to refer to REST as a HTTP based web service API,
+they are different.
+In this course we chose to embrace this mistake and often refer to a HTTP based web service API when saying REST.
 
-\bash{sudo git clone https://github.com/Hextris/hextris .}
+\noindent An example of this type of API might be:
+\begin{description}
+  \item[GET /api/v1/todo] List all tasks todo
+  \item[POST /api/v1/todo] Create a task todo
+  \item[GET /api/v1/todo/{id}] List all details about a certain task
+  \item[PUT /api/v1/todo/{id}] Update the fields of an existing task
+  \item[DELETE /api/v1/todo/{id}] Delete a specific task
+\end{description}
 
-\teacher{Mention to not forget about the "." as it is easily missed.}
-\teacher{If git is prompting for a username and password then there may be a typo in the repository url.}
+\subsection{JSON-RPC}
+A JSON RPC is another RPC based API based around communication via JSON.
+When deciding whether to use an RPC-based API or a REST/SOAP based API,
+the common distinction to make is that RPC APIs should be action based, i.e. I want to do X.
+Whereas REST/SOAP APIs are Create Read Update Delete (CRUD) based for providing a interface to mutable data.
 
-Now if you navigate to the \textbf{http} address of the public IP address (e.g. \url{http://18.208.165.253}), you should be able to see your newly deployed website.
+\subsection{GraphQL}
+GraphQL is a query language which allows more dynamic querying of data than REST based APIs.
+You can create nested queries and specify the fields you want to receive in response.
+GraphQL APIs are well-suited for building APIs designed for developers to consume but when dealing with rigid inter-service based requests,
+REST APIs are generally preferable.
 
-\teacher{If they're having timeout issues, one problem could be using \texttt{https} to connect rather than \texttt{http}.}
+\subsection{gRPC}
+Another RPC framework, gRPC has started gaining a lot of attention since its first release in 2016.
+gRPC is based on the protobuf communication standard.
+In addition to a more type-safe system,
+gRPC based APIs provide authentication and streaming mechanisms.
 
-\teacher{Make sure they delete their instances.}
+\section{Creating our own Todo app}
 
-\section{Further Work}
-If you picked your own website to deploy, the steps for installation will likely be more involved.
-Track down those instructions and try your best to deploy the site.
-If you get stuck, ask your neighbour or your tutor.
+\subsection{The API design}
 
-Once you have worked out how to deploy your chosen website,
-please commit an installation script or installation instructions for others to re-use:
-\url{https://github.com/CSSE6400/selfhost-cookbook}
+\todo{Add description of all the API endpoints}
+
+\subsection{Implementation with Flask}
+
+\todo{getting our github repo going}
+\todo{Intro to getting python up and running}
+\todo{Intro to flask}
+\todo{returning json with flask}
+\todo{Calling your api locally}
 
 \bibliographystyle{ieeetr}
-\bibliography{hextris}
+\bibliography{books,ours}
 
 \end{document}

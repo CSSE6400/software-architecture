@@ -1,0 +1,40 @@
+2023 Game Plan
+--------------
+
+- Week 1
+    - 1.1: Fundementals of REST
+    - 1.2: Introduction to Flask / Building a REST API
+- Week 2
+    - 2.1: Introduction to ORMs
+    - 2.2: Introduction to Migrations/SQLAlchemy
+    - 2.3: Testing a REST API
+- Week 3
+    - 3.1: Docker
+    - 3.2: Docker Compose
+- Week 4
+    - 4.1: Introduction to AWS
+    - 4.2: Introduction to Terraform
+- Week 5
+    - 5.1: Using Terraform to deploy a RDS instance on AWS
+    - 5.2: Using Terraform to deploy a REST API on AWS
+- Week 6
+    - 6.1: Load Balancers explained
+    - 6.2: Load Balancers in practice
+- Week 7
+    - 7.1: Load Balancers with Autoscaling
+    - 7.2: Queues
+- Week 8
+    - 8.1: Stress Testing
+    - 8.2: Help & Tips
+- Week 9:
+    - 9.1: Help & Tips
+- Week 10:
+    - 10.1: Practical Examples Presentation
+    - 10.2: Help & Tips
+- Week 11:
+    - 11.1: Practical Examples Presentation
+    - 11.2: Help & Tips
+- Week 12:
+    - Speeches
+- Week 13:
+    - Speeches
