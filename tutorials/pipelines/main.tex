@@ -10,7 +10,7 @@
 
 \usepackage{languages}
 
-\title{Pipeline Architectures}
+\title{Codegram}
 \author{Brae Webb}
 
 \date{\week{2}}
@@ -19,17 +19,91 @@
 \maketitle
 
 \section{Brief}
-This week we are looking into architectures which
-follow the pipeline architectural style.
-Specifically, this week we will:
+
+You are working on Codegram,
+a social media website where programmers can post screenshots of their favourite code to share with others.
+Naturally, developers want their code screenshots to look as good as possible,
+many users are requesting image filter features to make their screenshots look more appealing.
+
+You have been tasked to design the backend for this feature.
+The frontend team has developed a user interface for the feature.
+Images are already uploaded and accessible via a URL.
+
+\section{Requirements}
+
 \begin{enumerate}
-    \item Briefly recap the concepts of pipeline architectures.
-    \item Explore the advantages of using bash as a well-implemented pipeline architecture using the Knuth/McIlroy example.
-    \item Explore whether compilers are a suitable pipeline architecture.
-    \item Briefly look at one of the primary modern applications of the pipeline style,
-        MapReduce.
+    \item The frontend should be able to make a HTTP request to the backend to apply a filter to an image.
+    \item The HTTP request should include the URL of the image to be filtered.
+    \item You can design the HTTP request however you like.
+    \item The response should be the filtered image, you do not need to re-upload the image.
+    \item The current filter options are:
+    \begin{itemize}
+        \item \textbf{Grayscale}: Converts the image to grayscale.
+        \item \textbf{Sepia}: Converts the image to sepia.
+        \item \textbf{Invert}: Inverts the image.
+        \item \textbf{Blur}: Blurs the image.
+        \item \textbf{Sharpen}: Sharpens the image.
+    \end{itemize}
+        But you should expect more filters to be added in the future.
 \end{enumerate}
 
+\section{Outline}
+
+\subsection*{Introduction (5 minutes)}
+Introduction to the brief, what is a filter, what are the requirements, where to start.
+
+\subsection*{Design (10 minutes)}
+Individually or in pairs, sketch out a potential design for the backend.
+You can use any tools you like, but you should be able to explain your design to the class.
+Your design does not need to be complete or perfect,
+try to be creative so that we can discuss the pros and cons of various design options.
+
+\subsection*{Discussion (10 minutes)}
+With the class, present a few of the designs and discuss the pros and cons of each.
+Consider the following questions:
+\begin{itemize}
+    \item Does the design meet the requirements?
+    \item Which quality attributes are prioritised in this design?
+    \item How would you extend this design to support more filters?
+    \item Are there trade-offs in this design?
+\end{itemize}
+
+
+\subsection*{Implementation (20 minutes)}
+In a programming language of your choice,
+attempt to sketch out a basic implementation of your preferred design.
+This will require you to narrow down the format of the HTTP request.
+If you are not familiar with Web APIs,
+you can simulate the HTTP request by calling a function in your code.%
+\footnote{But we will use Web APIs in the future, so it is worth learning.}
+
+\subsection*{Optimization (10 minutes)}
+Discuss how you would optimize your design to improve extensibility, performance, scalability, etc. in a real system.
+Consider the following questions:
+\begin{itemize}
+    \item What are the time/computation consuming parts of your design?
+    \item Are there any bottlenecks?
+    \item Are there use cases of the system that you can optimize? e.g. what if users repost and filter the same image?
+    \item How would you scale your design to support more users?
+    \item Are there any security concerns?
+\end{itemize}
+
+\section{Design Challenges}
+
+\subsection*{Challenge 1: Malicious Images}
+Codegram routinely scans hashes of uploaded images to detect malicious images, such as uploads of PHP code.
+Users have used the filter feature to bypass this detection.
+How would you modify your design to prevent this?
+
+\subsection*{Challenge 2: Global}
+Codegram is a global service, and users are located all over the world.
+Some users have reported that the filter feature is slow.
+You have determined that the primary cause is the latency between the user and the server.
+How would you modify your design to reduce the latency?
+
+\end{document}
+
+% TODO(bw): Move case studies into handout
 \section{Case Study: Compilers}
 
 An interesting case study of the pipeline architecture is a compiler.%
@@ -193,4 +267,3 @@ How would you improve the efficiency of the code snippet above?
 \bibliographystyle{ieeetr}
 \bibliography{articles}
 
-\end{document}

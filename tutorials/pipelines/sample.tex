@@ -1,0 +1,171 @@
+\documentclass{csse4400}
+
+\usepackage{languages}
+
+\title{Codegram Write-up}
+\author{Brae Webb}
+
+\date{\week{2}}
+\begin{document}
+
+\maketitle
+
+\section{Design Overview}
+
+Using a pipeline architecture can be an effective solution to implement the image filter feature for Codegram.
+A pipeline architecture breaks down the image filtering process into a sequence of smaller,
+more manageable steps that can be executed in parallel or in series.
+
+To simplify the implementation,
+each step in the pipeline is implemented as a separate function.
+The functions are then chained together to form a pipeline.
+
+The incoming HTTP request will specify the image and the steps of filters to apply.
+This allows the image to be processed in a single pass through the pipeline.
+
+\section{Discussion}
+
+\paragraph{Which quality attributes are prioritized in this design}
+Our design prioritizes simplicity and to an extent extensibility.
+A pipeline is a conceptually simple way to think about filtering.
+We have also prioritized simplicity by implementing each step of the pipeline as a separate function rather than a different modules, or programs.
+Extensibility is also a priority because the pipeline can be easily extended by adding new functions to the pipeline.
+
+\paragraph{How would you extend this design to support more filters?}
+To support more filters, we would add a new function to the pipeline.
+The function would take an image as input and return a new image with the filter applied.
+
+\paragraph{Are there trade-offs in this design?}
+We are trading off extensibility for simplicity to some extent.
+If we were to implement each step of the pipeline as a separate module, we could easily add new steps to the pipeline without modifying the existing code.
+However, this could make the code more complex and harder to understand.
+
+We are also trading off scalability for simplicity.
+Each filter could be implemented as a separate endpoint.
+This would allow the filters to be scaled independently.
+However, this would make the code more complex and harder to understand.
+
+\section{Implementation}
+
+\begin{code}[language=python]{pipeline.py}
+import cv2
+import numpy as np
+from flask import Flask, request, send_file
+
+
+def read_image(file_path):
+    image = cv2.imread(file_path)
+    return image
+
+def write_image(file_path, image):
+    cv2.imwrite(file_path, image)
+
+def grayscale(image):
+    return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+def sepia(image):
+    return cv2.transform(image, np.matrix([[0.272, 0.534, 0.131],
+                                           [0.349, 0.686, 0.168],
+                                           [0.393, 0.769, 0.189]]))
+
+def invert(image):
+    return cv2.bitwise_not(image)
+
+def blur(image):
+    return cv2.GaussianBlur(image, (21, 21), 0)
+
+def sharpen(image):
+    kernel = np.array([[-1, -1, -1],
+                       [-1,  9, -1],
+                       [-1, -1, -1]])
+    return cv2.filter2D(image, -1, kernel)
+
+def pipeline(image, filters):
+    for filter in filters:
+        image = filter(image)
+    return image
+
+app = Flask(__name__)
+
+@app.route('/filter', methods=['POST'])
+def filter():
+    image = read_image(request.files['image'])
+    filters = [globals()[filter] for filter in request.form['filters'].split(',')]
+    image = pipeline(image, filters)
+    write_image('output.png', image)
+    return send_file('output.png', mimetype='image/png')
+
+if __name__ == '__main__':
+    app.run()
+\end{code}
+
+Example HTTP request:
+
+\begin{code}[language=json]{request}
+{
+  "image": "https://repository-images.githubusercontent.com/367934588/4a27ae00-b73b-11eb-801b-36dd1756dc93",
+  "pipes": [
+    {
+      "name": "grayscale",
+      "parameters": {}
+    },
+    {
+      "name": "blur",
+      "parameters": {
+        "kernel_size": 3
+      }
+    },
+  ]
+}
+\end{code}
+
+\section{Optimization}
+
+\paragraph{What are the time/computation consuming parts of your design?}
+The time consuming parts of our design are the image processing steps.
+This computation is inherent to the image filtering feature.
+We have minimized the amount of web requests by implementing the image processing steps as a single pipeline.
+
+\paragraph{Are there any bottlenecks?}
+The bottleneck in our design is the image processing steps.
+Again, this is inherent to the image filtering feature.
+
+\paragraph{Are there any use cases that you can optimize?}
+We currently optimize the use case where the user wants to apply multiple filters to the same image.
+
+We could also optimize the use case where the user wants to apply the same filter to multiple images by including an array of images in the request.
+
+We could optimize applying repeated filters by caching the results of the filters.
+
+\paragraph{How would you scale your design to support more users?}
+We would horizontally scale the image processing steps.
+This would allow us to scale the image processing steps independently of the web server.
+Adding filtering requests to a queue would also allow us to scale the web server independently of the image processing steps.
+
+\paragraph{Are there any security concerns?}
+Images are given to the filtering service as a public URL.
+This means that all user images are publicly accessible,
+which may be a security concern of the system but is not a concern of the image filtering feature.
+
+\section{Design Challenges}
+
+\subsection{Mallicious Images}
+As we process filtering steps in bulk,
+the original image may be mallicious.
+We could, at the point of processing,
+check the hash of the image to ensure that it is not mallicious.
+However, this does not account for applying the filter service multiple times.
+
+Additionally, this is inflexible as our database of mallicious images is likely to be updated frequently which is why Codegram does a periodic scan.
+Instead we should store the hash pairs of the original and filtered images in a database.
+This allows us to extend our mallicious image detection to include hashes of filtered images.
+However, this approach could be expensive as we could require a much larger mallicious hash list.
+We could instead store the hash of the original image with each filtered image and check this hash during the scan.
+
+\subsection{Global}
+To optimize for global access,
+we can consider using a distributed system or a CDN to store and serve the filtered images.
+This would allow users to access their images from a location close to them and reduce latency.
+
+\end{document}
+
