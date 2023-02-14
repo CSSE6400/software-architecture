@@ -9,9 +9,9 @@ In the beginning developers created the \textit{big ball of mud}.
 It was without form and void, and darkness was over the face of the developers\footnote{Liberties taken from
 \href{https://www.biblegateway.com/passage/?search=gen+1\&version=ESV}{Genesis 1:1-2}.}.
 The big ball of mud is an architectural style identified by it's lack of architectural style \cite{ballofmud}.
-In a big ball of mud architecture, all components of the system are allowed to communicate.
-If your GUI code wants to ask the database a question, it will write an SQL query and ask it.
-Likewise, if the code which primarily talks to the database decides your GUI needs to be updated a particular way, it will do so.
+In a big ball of mud architecture, all components of the system are allowed to communicate directly with each other.
+If the GUI code wants data from the database, it will write an SQL query and send it to directly to the database.
+Likewise, if the code which primarily talks to the database decides the GUI needs to be updated in a particular way, it will do so.
 
 The ball of mud style is a challenging system to work under.
 Modifications can come from any direction at any time.
@@ -22,8 +22,8 @@ to understand everything that is happening or could happen.
 \aside{
 Code examples in these notes are works of fiction.
 Any resemblance to a working code is pure coincidence.
-Having said that, python-esque syntax is often used for it's brevity.
-We expect that you can take away the important points from the code examples without getting distracted in the details.
+Having said that, python-esque syntax is often used for its brevity.
+We expect that you can take away the important points from the code examples without getting distracted by the details.
 }
 
 \begin{figure}[ht]
@@ -39,7 +39,7 @@ button.onclick(e =>
 A small example of a \textsl{big ball of mud} architecture.
 This type of software is fine for experimentation
 but not for any code that has to be maintained.
-However, it does not work well at scale.
+It also does not work well at scale.
 }
 \end{figure}
 
@@ -83,9 +83,10 @@ Being a single executable component, deployment is as simple as copying the exec
 
 System and integration testing tends to be easier with a monolith, as end-to-end tests are executing on a single application.
 This often leads to easier debugging once errors are found in the software.
-All dependencies and logic are within the application.
+All dependencies and logic are within the application.	
 
-There are also fewer issues to do with logging, exception handling, monitoring, and even scalability if it is running on a server.
+There are also fewer issues to do with logging, exception handling, monitoring,
+and, to some extent, scalability if it is running on a server.
 
 \subsection{Disadvantages}
 
@@ -93,7 +94,7 @@ The drawbacks of a monolith are complexity, coupling and scalability.
 Being a single application, as it gets larger and more complex, there is more to understand.
 It becomes harder to know how to change existing functionality or add new functionality without creating unexpected side effects.
 A catch phrase in software design and architecture is to build complex systems, but not complicated systems.
-Monoliths usually become complicated as they grow to deliver complex behaviour.
+Monoliths can easily become complicated as they grow to deliver complex behaviour.
 
 Related to complexity is coupling, with all behaviour implemented in one system
 there tends to be greater dependency between different parts of the system.
@@ -106,6 +107,12 @@ The drawback is that you have to replicate the entire system on another server.
 You cannot scale components of the system independently of each other.
 If the persistence logic is creating a bottleneck, you have to copy the entire application on to another server to scale the application.
 You cannot user servers that are optimised to perform specialised tasks.
+
+Persistent state is a particular challenge when scaling a monolith.
+If the system is replicated on multiple servers,
+the system has to be designed so that changes to the persistent data on one server
+does not invalidate behaviour executing on another server.
+
 
 \section{Layered Architecture}
 
@@ -153,7 +160,7 @@ For traditional GUI applications, the presentation layer would use a GUI library
 
 The business layer is the logic central to the application.
 The interface to the business layer is events or queries triggered by the presentation layer.
-It's the responsibility of the business layer to determine the data updates or queries required to fulfil the event or query.
+It is the responsibility of the business layer to determine the data updates or queries required to fulfil the event or query.
 
 The persistence layer is essentially a wrapper over the database,
 allowing more abstract data updates or queries to be made by the business layer.
@@ -205,7 +212,7 @@ click_counts = ClickCounter()
 \end{figure}
 
 One of the key benefits afforded by a well designed layered architecture is each layer should be interchangeable.
-A typical example is an application which starts as a command line application
+An example is an application which starts as a command line application,
 but can later be adapted to a GUI application by just replacing the presentation layer.
 
 \subsection{Deployment Variations}
@@ -236,7 +243,6 @@ the database layer is a natural first choice for physical separation.
     \label{fig:layered-db-separated}
 \end{figure}
 
-\pagebreak
 In a well designed system, any layer of the system could be physically separated with minimal difficulty.
 The presentation layer is another common target, as shown in figure \ref{fig:layered-db-pres-separated}.
 Physically separating the presentation layer gives users the ability to only install the presentation layer and allow communication to
@@ -287,6 +293,7 @@ as shown in figure \ref{fig:layered-pres-separated}.
     \label{fig:layered-pres-separated}
 \end{figure}
 
+\pagebreak
 An uncommon deployment variation (figure \ref{fig:uncommon-diagram}) separates
 the presentation and business layers from the persistence and database layers.
 An updated version of our running example is given in figure~\ref{fig:uncommon-code},
@@ -401,7 +408,7 @@ If the message is meant to return a value, in most languages it cannot also retu
 There may also be different types of errors that need to be communicated to the higher layer.
 (e.g. The call from the higher layer broke the contract specified in the interface.
 Or, the lower layer is encountering a transient fault and the higher layer should try again later.)
-Exception handling would work, if all layers are within one executable environment,
+Exception handling works, if all layers are within one executable environment,
 but a key purpose of a layered architecture is to allow separation of the layers,
 so throwing an exception is not appropriate.
 
@@ -452,6 +459,8 @@ Figure \ref{fig:sidecar2} is an example of using sidecars for both of these purp
 In the example shown in figure \ref{fig:sidecar2}, the servlets and action classes layer is equivalent to the presentation layer.
 The controller and service classes layers are a further partitioning of the business layer.
 The DAO (Data Access Objects) classes layer is equivalent to the persistence layer.
+The database layer is not shown in this example,
+which is common practice to hide it in diagrams focussing on the system's architecture.
 
 The Presentation DTOs (Data Transfer Objects) sidecar contains simple \link{JavaBeans}{https://www.educative.io/edpresso/why-use-javabean}
 that contain data that is to be displayed.
@@ -464,7 +473,7 @@ These provide common data and behaviour that spans multiple layers in many syste
 \subsubsection{Closed/Open Layers}
 
 Some textbooks discuss the concept of closed and open layers.
-This is a way to descrive how communication flows between layers.
+This is a way to describe how communication flows between layers.
 Layers are categorised as either \textsl{open} or \textsl{closed}.
 By default layers are \textsl{closed}.
 Closed layers prevent direct communication between their adjacent layers, i.e. they enforce the neighbour communication principle.
@@ -543,4 +552,4 @@ Poorly designed layers will encourage developers to break the layered architectu
 This can lead to a system that in detail more closely resembles a big ball of mud, than a layered design.
 
 Layering often introduces performance penalties.
-Requiring a chain of message passing to obtain a service from a much lower layer in the architecture adds to the cost of delivering the behaviour.
+Requiring a chain of message passing to obtain a service from a lower layer in the architecture adds to the cost of delivering the behaviour.
