@@ -20,11 +20,11 @@ for folder in ${REPO_ROOT}/notes/*; do
         # Build HTML
         latexmk -pdf- -dvi -outdir= -halt-on-error
         if [ $? -ne 0 ]; then
-        #    echo "error: $(basename $folder) notes failed to build"
+            echo "error: $(basename $folder) notes failed to build"
         #    exit 1
         else
-        mkdir -p "${REPO_ROOT}/dist/handouts/$(basename $folder)"
-        cp ./main.html "${REPO_ROOT}/dist/handouts/$(basename $folder)/index.html"
+            mkdir -p "${REPO_ROOT}/dist/handouts/$(basename $folder)"
+            cp ./main.html "${REPO_ROOT}/dist/handouts/$(basename $folder)/index.html"
         fi
         popd
     fi
