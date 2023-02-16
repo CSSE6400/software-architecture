@@ -23,6 +23,13 @@
     \hfill --- #2\IfValueT{#1}{~---~#1}\endoldquote 
     \addvspace{\bigskipamount}}
 
+% htlatex macro for conditional rendering if web or pdf
+\newif\ifhtlatex
+\ifx\HCode\UnDeFiNeD
+  \htlatexfalse
+\else
+  \htlatextrue
+\fi
 
 % Links
 \RequirePackage{hyperref}
@@ -94,6 +101,8 @@
 
 % Full page title
 \newcommand{\makecover}{%
+\ifhtlatex
+\else
 \begin{titlepage}
     \begin{center}
         \hfill Lecture Notes in Software Engineering
@@ -125,6 +134,7 @@
             
     \end{center}
 \end{titlepage}
+\fi
 }
 
 % Misc environments
