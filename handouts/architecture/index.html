@@ -1,0 +1,466 @@
+Last Updated on 2023/02/16     
+
+<?xml version="1.0" encoding="iso-8859-1" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+<!--http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd-->  
+<html xmlns="http://www.w3.org/1999/xhtml"  
+> 
+<head> <title>Software Architecture</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
+<!-- fn-in,html,htex4ht,xhtml --> 
+<meta name="src" content="main.tex" /> 
+<link rel="stylesheet" type="text/css" href="main.css" /> 
+<link rel="stylesheet" href="https://latex.now.sh/style.css"> 
+<style>body {max-width: 100ch;} 
+dl dd {text-align: left}</style> 
+</head><body 
+>
+   <div class="maketitle"><a 
+ id="Q1-1-1"></a>
+_________________________________________________________________________________________________
+<h2 class="titleHead">Software Architecture</h2>                                                Software Architecture
+   <div class="date" >February 20, 2023</div>                                                                             <div class="author" >Brae Webb &amp; Richard
+Thomas</div>
+____________________________________________________________________________________________
+   </div>
+   <h3 class="sectionHead"><span class="titlemark">1   </span> <a 
+ id="x1-10001"></a>Introduction</h3>
+<!--l. 8--><p class="noindent" >An introduction to Software Architecture would be incomplete without the requisite exploration
+into the term &#8216;software architecture&#8217;. The term is often overloaded to describe a number of
+completely separate concepts. The overloaded nature of the term makes an introduction quite
+challenging. Martin Fowler wrestles with this difficultly in his talk on <a 
+href="https://www.youtube.com/watch?v=DngAZyWMGR0" >&#8220;Making Architecture
+Matter&#8221;</a><span class="footnote-mark"><a 
+href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
+ id="x1-1001f1"></a>. In
+the talk Fowler settles on the slightly vague definition from Ralph Johnson <span class="cite">[<a 
+href="#Xfowler-what-is-architecture">1</a>]</span>:
+<a 
+ id="x1-1003r1"></a>
+</p>
+   <div class="tcolorbox tcolorbox" id="tcolobox-1">    
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 15--><p class="noindent" ><span 
+class="ecbx-1200">Definition</span><span 
+class="ecbx-1200">&#x00A0;1. Software Architecture</span>
+</p><!--l. 16--><p class="noindent" >The important stuff; whatever that is. </p> 
+</div> 
+</div>
+<!--l. 19--><p class="indent" >   In this course, we will try to narrow the scope slightly. We need a definition which encompasses the
+numerous practical strategies which you need to survive and thrive in industry life. This definition should not
+be attributed to the term &#8216;Software Architecture&#8217;; that term is much too broad to define succinctly. This is
+purely the definition used to provide an appropriate scope for the course.
+<a 
+ id="x1-1004r2"></a>
+</p>
+   <div class="tcolorbox tcolorbox" id="tcolobox-2">    
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 24--><p class="noindent" ><span 
+class="ecbx-1200">Definition</span><span 
+class="ecbx-1200">&#x00A0;2. Software Architecture: The Course</span>
+</p><!--l. 25--><p class="noindent" >The set of tools, processes, and design patterns which enable me to deliver high quality software.
+</p> 
+</div> 
+</div>
+<!--l. 32--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">2   </span> <a 
+ id="x1-20002"></a>High Quality Software</h3>
+<!--l. 33--><p class="noindent" >We assume that as software engineers you wish to deliver high quality software systems. What makes life
+interesting<span class="footnote-mark"><a 
+href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
+ id="x1-2001f2"></a>
+is that <span 
+class="ecti-1200">quality</span>, like <span 
+class="ecti-1200">beauty</span>, is in the eye of the beholder. As a diligent and enthusiastic software engineer, you
+may think that <span 
+class="ecti-1200">high quality </span>means well designed software with few defects. On the other hand, your users may
+think that <span 
+class="ecti-1200">high quality </span>means an engaging user experience, with no defects. While your project sponsor, who is
+funding the project, may think that <span 
+class="ecti-1200">high quality </span>means the software includes all the features they
+requested and was delivered on-time and on-budget. Rarely is there enough time and money available
+to deliver everything to the highest standard. The development team has to balance competing
+expectations and priorities to develop a software system that is a good compromise and meets its key
+goals.
+                                                                                                    
+                                                                                                    
+</p><!--l. 43--><p class="indent" >   From the perspective of designing a software architecture, competing expectations provides what are
+sometimes called <span 
+class="ecti-1200">architectural drivers</span>.
+</p><!--l. 45--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">2.1   </span> <a 
+ id="x1-30002.1"></a>Functional Requirements</h4>
+<!--l. 46--><p class="noindent" >A seemingly obvious driver is the functional requirements for the software system, i.e. what the software
+should do. If you do not know what the software is meant to do, how can you design it? You do not need an
+extensive and in-depth description of every small feature of the software, but you do need to know what
+problem the software is meant to solve, who are the key users, and what are the key features of the software.
+Without this information, you do not know what style of architecture is going to be appropriate for the
+software system.
+</p><!--l. 53--><p class="indent" >   For example, consider an application that allows users to write and save notes with embedded images and
+videos. Say the decision was made to implement it as a simple mobile app that saves notes locally. If it is then
+decided that web and desktop applications are needed, allowing users to sync their notes across applications
+and share notes with others, the application will need to be redesigned from scratch. Knowing up-front that
+the software needed to support multiple platforms, and that syncing and sharing notes was important, would
+have allowed the developers to design a software architecture that would support this from the
+start.<span class="footnote-mark"><a 
+href="#fn3x0" id="fn3x0-bk"><sup class="textsuperscript">3</sup></a></span><a 
+ id="x1-3001f3"></a>
+</p><!--l. 61--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">2.2   </span> <a 
+ id="x1-40002.2"></a>Constraints</h4>
+<!--l. 62--><p class="noindent" >Constraints are external factors that are imposed on the development project. Commonly, these are imposed
+by the organisation for whom you are building the software system. The most obvious constraint is time and
+budget. A sophisticated software architecture will take more time, and consume more of the total budget, than
+a simple but less flexible architecture.
+</p><!--l. 67--><p class="indent" >   Other common constraints are technology, people, and the organisation&#8217;s environment. Technology constraints
+are one of the most common set of constraints that affect the design of the architecture. Even if it is a &#8220;greenfields&#8221;
+project<span class="footnote-mark"><a 
+href="#fn4x0" id="fn4x0-bk"><sup class="textsuperscript">4</sup></a></span><a 
+ id="x1-4001f4"></a>
+there will usually be restrictions on choices of technology that may or may not be used. For example, if all of
+the organisation&#8217;s existing applications are running on the Google cloud platform, there will probably be a
+restriction requiring all new applications to be built on the same platform to avoid the overheads of working
+with different cloud providers.
+</p><!--l. 76--><p class="indent" >   People constraints takes into consideration the skills that are available within the organisation and the
+availability of developers for the project. Designing an architecture that requires skills that are not
+available, adds risk to project success and overhead to the project&#8217;s development cost. If contractors
+can be hired, or training is available, these may reduce some of the risks, but there will still be
+budget overhead. The decision needs to be made based on the risks, budget available, and potential
+benefits.
+</p><!--l. 81--><p class="indent" >   The organisation&#8217;s environment may influence other constraints, or add new constraints. An organisation
+that encourages innovation may be flexible in allowing some technology constraints to be broken. If the project
+is of strategic value to the business, there may be options to negotiate for a larger budget or to adopt a new
+technology<span class="footnote-mark"><a 
+href="#fn5x0" id="fn5x0-bk"><sup class="textsuperscript">5</sup></a></span><a 
+ id="x1-4003f5"></a>,
+if they could lead to a more robust solution with a longer lifespan. Politics can introduce constraints on
+architectural choices. If there is an influential group who promote a particular architectural style, it may be
+difficult or impossible to make different choices.
+                                                                                                    
+                                                                                                    
+</p><!--l. 89--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">2.3   </span> <a 
+ id="x1-50002.3"></a>Principles</h4>
+<!--l. 90--><p class="noindent" >Principles are self-imposed approaches to designing the software. Typically these are standards that
+all developers are expected to follow to try to ensure the overall software design is consistent.
+From a programming perspective, coding standards and test coverage goals are examples of
+principles that all developers are expected to follow. Architectural principles typically relate to
+how the software should be structured and how design decisions should be made to work
+well with the software architecture. Consequently, principles usually do not influence the
+architecture<span class="footnote-mark"><a 
+href="#fn6x0" id="fn6x0-bk"><sup class="textsuperscript">6</sup></a></span><a 
+ id="x1-5001f6"></a>,
+rather the architecture will influence which principles should be prioritised during software design.
+</p><!--l. 97--><p class="indent" >   As an example, if the software architecture is designed to be scalable to accommodate peaks in load, then
+an architectural principle might be that software components should be stateless to allow them to be easily
+replicated to share the load. Another principle might be that an architecture that relies on an underlying
+object model, will adopt the SOLID design principles <span class="cite">[<a 
+href="#Xmartin-principles-patterns">2</a>]</span>.
+</p><!--l. 101--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">2.4   </span> <a 
+ id="x1-60002.4"></a>Quality Attributes</h4>
+<!--l. 102--><p class="noindent" >While the functional requirements specify what the software should do, non-functional requirements specify
+properties required for the project to be successful. These non-functional requirements are also termed <span 
+class="ecti-1200">quality</span>
+<span 
+class="ecti-1200">attributes</span>.
+</p><!--l. 106--><p class="indent" >   Often quality attributes are specified by phrases ending in
+-ility<span class="footnote-mark"><a 
+href="#fn7x0" id="fn7x0-bk"><sup class="textsuperscript">7</sup></a></span><a 
+ id="x1-6001f7"></a>.
+Medical software needs <span 
+class="ecti-1200">reliability</span>. Social media needs <span 
+class="ecti-1200">availability</span>. Census software needs <span 
+class="ecti-1200">scalability</span>.
+</p><!--l. 111--><p class="indent" >   Below is a collection of non-exhaustive quality attributes to help give you an idea of what we will be
+looking at in this course.
+</p><!--l. 113--><p class="indent" >
+      </p><dl class="description"><dt class="description">
+      <!--l. 114--><p class="noindent" >
+<span 
+class="ecbx-1200">Modularity</span> </p></dt><dd 
+class="description">
+      <!--l. 114--><p class="noindent" >Components of the software are separated into discrete modules.
+      </p></dd><dt class="description">
+      <!--l. 115--><p class="noindent" >
+<span 
+class="ecbx-1200">Availability</span> </p></dt><dd 
+class="description">
+      <!--l. 115--><p class="noindent" >The software is available to access by end users, either at any time or on any platform, or both.
+      </p></dd><dt class="description">
+      <!--l. 116--><p class="noindent" >
+<span 
+class="ecbx-1200">Scalability</span> </p></dt><dd 
+class="description">
+      <!--l. 116--><p class="noindent" >The  software  can  handle  peaks  of  high  demand  by  taking  advantage  of  available  computing
+      resources.
+      </p></dd><dt class="description">
+      <!--l. 117--><p class="noindent" >
+<span 
+class="ecbx-1200">Extensibility</span> </p></dt><dd 
+class="description">
+      <!--l. 117--><p class="noindent" >Features or extensions can be easily added to the base software.
+                                                                                                    
+                                                                                                    
+      </p></dd><dt class="description">
+      <!--l. 118--><p class="noindent" >
+<span 
+class="ecbx-1200">Testibility</span> </p></dt><dd 
+class="description">
+      <!--l. 118--><p class="noindent" >The software is designed so that automated tests can be easily deployed.</p></dd></dl>
+<!--l. 121--><p class="indent" >   Quality attributes are one of the main focuses of a software architect. Quality attributes are
+achieved through architecture designed to support them. Likewise, software architecture quality and
+consistency is achieved by principles put in place by a software architect and the development
+team.
+</p><!--l. 125--><p class="indent" >   Software architects are responsible for identifying the important attributes for their project and
+implementing architecture and principles which satisfies the desired attributes.
+</p><!--l. 128--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">2.5   </span> <a 
+ id="x1-70002.5"></a>Documentation</h4>
+<!--l. 129--><p class="noindent" >The importance of these architectural drivers means they need to be
+documented<span class="footnote-mark"><a 
+href="#fn8x0" id="fn8x0-bk"><sup class="textsuperscript">8</sup></a></span><a 
+ id="x1-7001f8"></a>.
+The extent and format of the documentation will depend on the size of the project, team organisation, and the
+software engineering process being followed. The larger the team, or if the team is distributed between
+different locations, the more important it is that the documentation is well-defined and easily accessible. The
+documentation may be stored as notes in a wiki or as a collection of user stories and other notes. Or, it could
+be an extensive set of requirements and design specifications following a standard like <a 
+href="https://www.iso.org/obp/ui/#iso:std:iso-iec-ieee:15289" >ISO/IEC/IEEE
+15289</a><span class="footnote-mark"><a 
+href="#fn9x0" id="fn9x0-bk"><sup class="textsuperscript">9</sup></a></span><a 
+ id="x1-7003f9"></a>.
+</p><!--l. 139--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">3   </span> <a 
+ id="x1-80003"></a>Attributes in Tension</h3>
+<!--l. 140--><p class="noindent" >One of the defining characteristics of quality attributes is that they are often in conflict with each
+other. It is a valiant yet wholly impractical pursuit to construct software which meets all quality
+attributes.
+</p><!--l. 143--><p class="indent" >   The role of a software architect is to identify which quality attributes are crucial to the success of their
+project, and to design an architecture and implement principles which ensure the quality attributes are
+achieved.
+                                                                                                    
+                                                                                                    
+</p><!--l. 147--><p class="indent" >   The first law of software architecture, as defined by Richards <span class="cite">[<a 
+href="#Xrichards2020fundamentals">4</a>]</span>, reflects the difficultly in supporting
+multiple quality attributes.
+<a 
+ id="x1-8001r3"></a>
+</p>
+   <div class="tcolorbox tcolorbox" id="tcolobox-3">    
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 149--><p class="noindent" ><span 
+class="ecbx-1200">Definition</span><span 
+class="ecbx-1200">&#x00A0;3. The First Law of Software Architecture</span>
+</p><!--l. 150--><p class="noindent" >Everything in software architecture is a trade-off. </p> 
+</div> 
+</div>
+<!--l. 153--><p class="indent" >   Galster and Angelov <span class="cite">[<a 
+href="#Xwicked-architecture">5</a>]</span> define this as &#8216;wicked architecture&#8217;. They identify the &#8216;wicked&#8217; nature of
+architecture as the main difficultly in teaching the subject.
+<a 
+ id="x1-8002r4"></a>
+</p>
+   <div class="tcolorbox tcolorbox" id="tcolobox-4">    
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 156--><p class="noindent" ><span 
+class="ecbx-1200">Definition</span><span 
+class="ecbx-1200">&#x00A0;4. Wicked Architecture</span>
+</p><!--l. 157--><p class="noindent" >There are often no clear problem descriptions, no clear solutions, good or bad solutions, no clear
+rules when to &#8220;stop&#8221; architecting and mostly team rather than individual work. </p> 
+</div> 
+</div>
+<!--l. 161--><p class="indent" >   They stress that &#8220;In contrast, other software engineering topics such as programming lead to solutions that
+can be checked and measured for correctness. Architecture may be the worst-case scenario when it comes to
+fuzziness in software engineering&#8221;.
+</p><!--l. 164--><p class="indent" >   Despite this difficultly, in this course we intend to expose you to a number of case studies,
+architectures, and tools which aim to give you experience in tackling the trade-offs involved in software
+architecture.
+</p><!--l. 167--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">4   </span> <a 
+ id="x1-90004"></a>The World Today</h3>
+<!--l. 168--><p class="noindent" >Software architecture today is more important than ever. The importance of architecture can be considered a
+result of <span 
+class="ecsl-1200">expectations </span>and <span 
+class="ecsl-1200">infrastructure</span>. Today we expect our software to be available 24/7. To
+exemplify this point, in October 2021 Facebook went offline for 6-7 hours out of the 8760 hours
+of the year. Those 6-7 hours of downtime resulted in mass media coverage, $60 million loss of
+revenue, and a 5% drop in company shares which caused Zuckerberg&#8217;s wealth alone to drop $6
+billion. Interestingly, the outage also caused other sites such as Gmail, TikTok, and Snapchat to
+slowdown.
+</p><!--l. 176--><p class="indent" >   This is a massive change in public expectations for software availability. As recently as 2017, human
+resources at UQ would monopolise the university&#8217;s computing resources for an evening each fortnight to
+calculate the payroll. Nowadays that lack of availability from even the university&#8217;s software systems would be
+completely unacceptable. The change in expectations has forced developers to adapt by designing architectures
+capable of supporting this heightened up-time.
+</p><!--l. 181--><p class="indent" >   In addition to shifting expectations, developers now have access to a range of Infrastructure as a Service
+(IaaS) platforms. IaaS empowers developers to quickly and programmatically create and manage computing,
+networking, and storage resources. In part, this enables individual developers to support up-times comparable
+to tech giants. Of course, to be able to support these up-times software has increased in overall complexity. A
+website is now commonly spread over multiple servers, marking a change from centralised systems to
+distributed systems.
+</p><!--l. 187--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">5   </span> <a 
+ id="x1-100005"></a>Conclusion</h3>
+                                                                                                    
+                                                                                                    
+<!--l. 189--><p class="noindent" >You should now have some understanding of what software architecture is and that it is, at least in our view,
+important. Let us return to our definition for the course.
+<a 
+ id="x1-10001r5"></a>
+</p>
+   <div class="tcolorbox tcolorbox" id="tcolobox-5">    
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 192--><p class="noindent" ><span 
+class="ecbx-1200">Definition</span><span 
+class="ecbx-1200">&#x00A0;5. Software Architecture: The Course</span>
+</p><!--l. 193--><p class="noindent" >The set of tools, processes, and design patterns which enable me to deliver high quality software.
+</p> 
+</div> 
+</div>
+<!--l. 196--><p class="indent" >   In practical terms, what does this mean you should expect from the course? First, you will learn how to
+communicate your visions of software architecture through <span 
+class="ecsl-1200">architectural views</span>. From there, you will use
+quality attributes such as extensibility, scalability, etc. to motivate the introduction of common architectural
+patterns, processes, and tooling which support those attributes.
+</p><!--l. 201--><p class="indent" >   For example, you can expect extensibility to motivate an introduction to plugin-based architectures. You
+can expect scalability to motivate our introduction to load balancers. And testability to motivate a look into
+A/B testing practices.
+</p><!--l. 205--><p class="indent" >   You can view the planned outline for the course on the <a 
+href="https://csse6400.uqcloud.net/" >course
+website</a><span class="footnote-mark"><a 
+href="#fn10x0" id="fn10x0-bk"><sup class="textsuperscript">10</sup></a></span><a 
+ id="x1-10002f10"></a>. All the course material
+can be found on <a 
+href="https://github.com/CSSE6400/software-architecture" >GitHub</a><span class="footnote-mark"><a 
+href="#fn11x0" id="fn11x0-bk"><sup class="textsuperscript">11</sup></a></span><a 
+ id="x1-10004f11"></a>.
+If you think you can explain a concept more succinctly, or find a typo, you are encouraged to submit a pull
+request to help improve the course. We really hope that you enjoy the course and, perhaps more importantly,
+benefit from it in your careers as software development professionals!
+</p><!--l. 1--><p class="noindent" >
+</p>
+   <h3 class="likesectionHead"><a 
+ id="x1-11000"></a>References</h3>
+<!--l. 1--><p class="noindent" >
+   </p><div class="thebibliography">
+   <p class="bibitem" ><span class="biblabel">
+ [1]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xfowler-what-is-architecture"></a>M.&#x00A0;Fowler,  &#8220;Software  architecture  guide.&#8221;        <a 
+href="https://martinfowler.com/architecture/" class="url" ><span 
+class="ectt-1200">https://martinfowler.com/architecture/</span></a>,
+   August 2019.
+   </p>
+   <p class="bibitem" ><span class="biblabel">
+ [2]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xmartin-principles-patterns"></a>R.&#x00A0;C. Martin, &#8220;Design principles and design patterns.&#8221;    <a 
+href="https://web.archive.org/web/20150906155800/http://www.objectmentor.com/resources/articles/Principles\_and\_Patterns.pdf" class="url" ><span 
+class="ectt-1200">https://web.archive.org/web/20150906155800/http://www.objectmentor.com/resources/articles/Principles\_and\_Patterns.pdf</span></a>,
+   2000. Accessed: 2022-01-10.
+   </p>
+   <p class="bibitem" ><span class="biblabel">
+ [3]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xpsychprog"></a>G.&#x00A0;M. Weinberg, <span 
+class="ecti-1200">The Psychology of Computer Programming</span>.  USA: John Wiley &amp; Sons, Inc.,
+   1985.
+   </p>
+   <p class="bibitem" ><span class="biblabel">
+ [4]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xrichards2020fundamentals"></a>M.&#x00A0;Richards and N.&#x00A0;Ford, <span 
+class="ecti-1200">Fundamentals of Software Architecture: An Engineering Approach</span>.
+   O&#8217;Reilly Media, Inc., January 2020.
+   </p>
+                                                                                                    
+                                                                                                    
+   <p class="bibitem" ><span class="biblabel">
+ [5]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xwicked-architecture"></a>M.&#x00A0;Galster  and  S.&#x00A0;Angelov,  &#8220;What  makes  teaching  software  architecture  difficult?,&#8221;  in
+   <span 
+class="ecti-1200">Proceedings of the 38th International Conference on Software Engineering Companion</span>, ICSE &#8217;16,
+   pp.&#x00A0;356&#8211;359, Association for Computing Machinery, 2016.
+</p>
+   </div>
+   <div class="footnotes"><a 
+ id="x1-1002x1"></a>
+<!--l. 12--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span>    <a 
+href="https://www.youtube.com/watch?v=DngAZyWMGR0" class="url" ><span 
+class="ectt-1000">https://www.youtube.com/watch?v=DngAZyWMGR0</span></a></p><a 
+ id="x1-2002x2"></a>
+<!--l. 34--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span><span 
+class="ecrm-1000">As in the apocryphal Chinese curse &#8220;May you live in interesting times.&#8221;</span></p><a 
+ id="x1-3002x2.1"></a>
+<!--l. 59--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn3x0-bk" id="fn3x0"><sup class="textsuperscript">3</sup></a></span><span 
+class="ecrm-1000">This is different to building a quick-and-dirty prototype to explore options. That is a valid design process, and in that</span>
+<span 
+class="ecrm-1000">case minimal effort will be put into creating a well-designed app.</span></p><a 
+ id="x1-4002x2.2"></a>
+<!--l. 70--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn4x0-bk" id="fn4x0"><sup class="textsuperscript">4</sup></a></span><span 
+class="ecrm-1000">This refers to the idea that it is a new project and is not limited by needing to conform to existing system&#8217;s or</span>
+<span 
+class="ecrm-1000">expectations.</span></p><a 
+ id="x1-4004x2.2"></a>
+<!--l. 85--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn5x0-bk" id="fn5x0"><sup class="textsuperscript">5</sup></a></span><span 
+class="ecrm-1000">I have consulted with organsiations who have adopted new, and risky at the time, technologies to potentially gain</span>
+<span 
+class="ecrm-1000">business benefits like easier extensibility.</span></p><a 
+ id="x1-5002x2.3"></a>
+<!--l. 94--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn6x0-bk" id="fn6x0"><sup class="textsuperscript">6</sup></a></span><span 
+class="ecrm-1000">The exception to this is if some principles are constraints enforced by the organisation.</span></p><a 
+ id="x1-6002x2.4"></a>
+<!--l. 106--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn7x0-bk" id="fn7x0"><sup class="textsuperscript">7</sup></a></span><span 
+class="ecrm-1000">Consequently, they are sometimes called the software &#8216;ilities&#8217;.</span></p><a 
+ id="x1-7002x2.5"></a>
+<!--l. 130--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn8x0-bk" id="fn8x0"><sup class="textsuperscript">8</sup></a></span><span 
+class="ecrm-1000">Documentation is the castor oil of programming, managers know it must be good because programmers hate it so much</span>
+<span class="cite"><span 
+class="ecrm-1000">[</span><a 
+href="#Xpsychprog"><span 
+class="ecrm-1000">3</span></a><span 
+class="ecrm-1000">]</span></span><span 
+class="ecrm-1000">.</span></p><a 
+ id="x1-7004x2.5"></a>
+<!--l. 137--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn9x0-bk" id="fn9x0"><sup class="textsuperscript">9</sup></a></span>    <a 
+href="https://www.iso.org/obp/ui/\#iso:std:iso-iec-ieee:15289" class="url" ><span 
+class="ectt-1000">https://www.iso.org/obp/ui/\#iso:std:iso-iec-ieee:15289</span></a></p><a 
+ id="x1-10003x5"></a>
+<!--l. 205--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn10x0-bk" id="fn10x0"><sup class="textsuperscript">10</sup></a></span>    <a 
+href="https://csse6400.uqcloud.net/" class="url" ><span 
+class="ectt-1000">https://csse6400.uqcloud.net/</span></a></p><a 
+ id="x1-10005x5"></a>
+<!--l. 206--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn11x0-bk" id="fn11x0"><sup class="textsuperscript">11</sup></a></span>    <a 
+href="https://github.com/CSSE6400/software-architecture" class="url" ><span 
+class="ectt-1000">https://github.com/CSSE6400/software-architecture</span></a></p>                                          </div>
+ 
+</body></html> 
+
+                                                                                                    
+
+

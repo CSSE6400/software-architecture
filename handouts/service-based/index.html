@@ -1,0 +1,481 @@
+Last Updated on 2022/03/18     
+
+<?xml version="1.0" encoding="iso-8859-1" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+<!--http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd-->  
+<html xmlns="http://www.w3.org/1999/xhtml"  
+> 
+<head> <title>Service-Based Architecture</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
+<!-- fn-in,html,htex4ht,xhtml --> 
+<meta name="src" content="main.tex" /> 
+<link rel="stylesheet" type="text/css" href="main.css" /> 
+<link rel="stylesheet" href="https://latex.now.sh/style.css"> 
+<style>body {max-width: 100ch;} 
+dl dd {text-align: left}</style> 
+</head><body 
+>
+   <div class="maketitle"><a 
+ id="Q1-1-1"></a>
+_________________________________________________________________________________________________
+<h2 class="titleHead">Service-Based Architecture</h2>                                         Software Architecture
+   <div class="date" >March 20, 2023</div>                                                                                                   <div class="author" >Richard
+Thomas</div>
+____________________________________________________________________________________________
+   </div>
+   <h3 class="sectionHead"><span class="titlemark">1   </span> <a 
+ id="x1-10001"></a>Introduction</h3>
+<!--l. 9--><p class="noindent" >Service-based architecture is one of the simpler, but still flexible, distributed architectural styles. It
+provides good support for delivering quality attributes of modularlity, availability, deployability,
+and simplicity (in the context of a distributed system). The key characteristic of a service-based
+architecture is that it uses domain partitioning, and each domain becomes its own distributed service.
+This partitioning provides high-level modularisation that helps ensure the domain partitions are
+independent of each other. The distribution of domains means that multiple instances of a service
+can be made available through a load balancer, providing better availability and some level of
+scalability.
+</p><!--l. 16--><p class="indent" >   Many medium-sized bespoke systems<span class="footnote-mark"><a 
+href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
+ id="x1-1001f1"></a>
+are built using a service-based architecture. For example, an on-line store might be partitioned into services
+such as ProductBrowsing, ProductPurchasing, ProductFulfilment, InventoryManagement, and
+CustomerAccountManagement. Each of these could be independent distributed services that use a shared
+database.
+<a 
+ id="x1-1003r1"></a>
+</p>
+   <div class="tcolorbox tcolorbox" id="tcolobox-1">    
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 23--><p class="noindent" ><span 
+class="ecbx-1200">Definition</span><span 
+class="ecbx-1200">&#x00A0;1. Service-based Architecture</span>
+</p><!--l. 24--><p class="noindent" >The system is partitioned into business domains that are deployed as distributed services.<br 
+class="newline" />Functionality is delivered through a user interface that interacts with the domain services. </p> 
+</div> 
+</div>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-1004r1"></a>
+                                                                                                    
+                                                                                                    
+<dl class="list1"><dt class="list">
+</dt><dd 
+class="list">
+<!--l. 29--><p class="noindent" ><img 
+src="diagrams/general-service-based-arch.png" alt="PIC"  
+width="567" height="-610"  /></p></dd></dl>
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;1: </span><span  
+class="content">Service-based architecture &#8211; general structure.</span></div><!--tex4ht:label?: x1-1004r1 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+   <h3 class="sectionHead"><span class="titlemark">2   </span> <a 
+ id="x1-20002"></a>Terminology</h3>
+<!--l. 40--><p class="noindent" >The service-based architecture consists of four elements. The <span 
+class="ecti-1200">user interface</span>, <span 
+class="ecti-1200">services</span>, <span 
+class="ecti-1200">service APIs</span>, and
+<span 
+class="ecti-1200">database</span>, as shown in figure <a 
+href="#x1-1004r1">1<!--tex4ht:ref: fig:service-based-arch --></a>.
+</p><!--l. 44--><p class="indent" >
+      </p><dl class="description"><dt class="description">
+      <!--l. 44--><p class="noindent" >
+<span 
+class="ecbx-1200">User Interface</span> </p></dt><dd 
+class="description">
+      <!--l. 44--><p class="noindent" >provides users access to the system functionality.
+      </p></dd><dt class="description">
+      <!--l. 45--><p class="noindent" >
+<span 
+class="ecbx-1200">Services</span> </p></dt><dd 
+class="description">
+      <!--l. 45--><p class="noindent" >implement functionality for a single, independent business process.
+      </p></dd><dt class="description">
+      <!--l. 46--><p class="noindent" >
+<span 
+class="ecbx-1200">Service APIs</span> </p></dt><dd 
+class="description">
+      <!--l. 46--><p class="noindent" >provide a communication mechanism between the user interface and each service.
+      </p></dd><dt class="description">
+      <!--l. 47--><p class="noindent" >
+<span 
+class="ecbx-1200">Database</span> </p></dt><dd 
+class="description">
+      <!--l. 47--><p class="noindent" >stores the persistent data for the system.</p></dd></dl>
+<!--l. 50--><p class="indent" >   The user interface runs as a standalone process to manage user interactions. It communicates with the
+services through their service APIs to invoke system behaviour. This requires a remote access
+communication protocol, such as REST, a message transport service, remote method invocation,
+<a 
+href="https://www.w3schools.com/xml/xml_soap.asp" >SOAP</a><span class="footnote-mark"><a 
+href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
+ id="x1-2001f2"></a>
+or some other protocol.
+</p><!--l. 55--><p class="indent" >   To reduce coupling between the user interface and the service APIs, and to
+provide easier extensibility, the user interface often uses a <a 
+href="https://www.baeldung.com/java-service-locator-pattern" >service locator design
+pattern</a><span class="footnote-mark"><a 
+href="#fn3x0" id="fn3x0-bk"><sup class="textsuperscript">3</sup></a></span><a 
+ id="x1-2003f3"></a> to manage
+access to the services<span class="footnote-mark"><a 
+href="#fn4x0" id="fn4x0-bk"><sup class="textsuperscript">4</sup></a></span><a 
+ id="x1-2005f4"></a>.
+This provides a registry of the services and the details of the API of each service. The user interface uses the
+registry to retrieve an object that communicates with a service through its API. This also makes it easier to
+add new services to the application, as the details of the new service are encapsulated in the
+registry.
+</p><!--l. 63--><p class="indent" >   Services implement the application logic for independent business processes. These are often called
+&#8220;coarse-grained&#8221; services, as each one implements a significant part of the system&#8217;s functionality. Each service
+is deployed on its own computing infrastructure. Commonly, there is a single instance of each service but it is
+possible to run multiple instances of services. Multiple instances of services improves availability because if one
+instance goes down, other instances can handle future requests from the user interface. To provide higher
+reliability, in the context of running multiple instances of a service, it should implement the <a 
+href="https://www.oreilly.com/library/view/design-patterns-and/9781786463593/f47b37fc-6fc9-4f0b-8cd9-2f41cb364509.xhtml" >stateless service
+pattern</a><span class="footnote-mark"><a 
+href="#fn5x0" id="fn5x0-bk"><sup class="textsuperscript">5</sup></a></span><a 
+ id="x1-2007f5"></a>. A
+system running multiple instances of a service, that does not implement the stateless service pattern, would
+                                                                                                    
+                                                                                                    
+still have higher availability if a service instance went down, as other instances could handle future requests.
+But, any user in the middle of performing a business process would need to restart their activity, thus lowering
+system reliability.
+</p><!--l. 74--><p class="indent" >   Services implement their own service API using the <a 
+href="https://refactoring.guru/design-patterns/facade" >façade design
+pattern</a><span class="footnote-mark"><a 
+href="#fn6x0" id="fn6x0-bk"><sup class="textsuperscript">6</sup></a></span><a 
+ id="x1-2009f6"></a>.
+This defines the communication protocol used between the user interface and the service. For simplicity,
+usually all services use the same communication protocol. The façade design pattern reduces coupling between
+the user interface and the services, as the user interface does not depend on the implementation details of the
+services.
+</p><!--l. 80--><p class="indent" >   The service API provides the benefit that different user interfaces can all use the same services. For
+example, an application with web and mobile interfaces could use the same set of distributed domain
+services.
+</p><!--l. 83--><p class="indent" >   The database stores persistent data for the system. Often, a single database is shared by all the services as
+it is common that some data will be shared between services. A shared database makes it easier to maintain
+data integrity and consistency. This is because each service implements a single business process and can
+usually perform all transaction management related to the data involved in the process. For example, the
+ProductPurchasing service for an on-line store can manage the entire database transaction for making an
+order. If the product is no longer available or payment fails, the service can rollback the transaction to ensure
+data integrity.
+</p><!--l. 92--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">3   </span> <a 
+ id="x1-30003"></a>Design Considerations</h3>
+<!--l. 94--><p class="noindent" >A service-based architecture is typically used for medium-sized systems. This is because the user interface
+interacts with all services through their APIs. The user interface becomes more complicated when it
+has to deal with many services. If the services follow the common approach of using a shared
+database, it means the the greater the number of services, the more complicated the database
+design becomes. There is also a potential performance bottleneck if many services are using a
+shared database. Strategies to improve database performance, like replicated databases, defeat
+some of the benefits of a shared database (e.g. consistency). Typically a service-based architecture
+will have six to twelve domain services. There is no specific upper or lower limit on the number
+of services allowed, it is a tradeoff that architects make based on all the requirements for the
+system.
+</p><!--l. 105--><p class="indent" >   Coarsed-grained services will usually have some internal complexity that requires some architectural
+structure. This internal structure may follow either technical or domain partitioning. Technical partitioning
+will typically consist of three layers, the API façade, business logic and persistence. Domain partitioning will
+break the service domain into smaller components related to each part of the domain&#8217;s behaviour. For
+example, the ProductPurchasing service domain may have components for the internal behaviours of checking
+out, payment and inventory adjustment. Payment would use an API to process payment through a financial
+service gateway. Figure <a 
+href="#x1-3001r2">2<!--tex4ht:ref: fig:service-partitions --></a> provides an example of the structure for both technical and domain partitioning of a
+service.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-3001r2"></a>
+                                                                                                    
+                                                                                                    
+<!--l. 115--><p class="noindent" ><img 
+src="diagrams/service-partitions.png" alt="PIC"  
+width="525" height="-386"  /><br /></p><div class="caption" 
+><span class="id">Figure&#x00A0;2: </span><span  
+class="content">Partitioning options for a service domain.</span></div><!--tex4ht:label?: x1-3001r2 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 121--><p class="indent" >   Consequences of a shared database are increased data coupling between the services and lower testability.
+Increased data coupling means that if one service changes its persistent data, then all services that share that
+data need to be updated, as well as the tables storing the data in the database. Lower testability is the
+consequence of shared data and services implementing complete business processes. A small change to one part
+of the service requires the entire service to be tested, and all other services that share data with the service
+also need to be tested.
+</p><!--l. 128--><p class="indent" >   To mitigate data coupling, design a minimal set of shared (or <span 
+class="ecti-1200">common</span>) persistent objects and their
+corresponding tables in the database. Implement a library containing the shared persistent classes that is used
+by all services. Restrict changes to the shared persistent classes and their database tables. Changes
+may only occur after consideration of the consequences to all services. A variation is to not only
+have shared persistent objects, but other persistent objects that are only shared with a subset of
+services.
+</p><!--l. 135--><p class="indent" >   Each service may have its own set of persistent objects and corresponding database tables. These are
+independent of other services, so there are no external consequences to changing these within a
+service. Figure <a 
+href="#x1-3002r3">3<!--tex4ht:ref: fig:db-logical-partitioning --></a> is an example of shared persistent objects and a service with its own persistent
+objects.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-3002r3"></a>
+                                                                                                    
+                                                                                                    
+<!--l. 141--><p class="noindent" ><img 
+src="diagrams/db-logical-partitioning.png" alt="PIC"  
+width="320" height="-192"  />
+<br /> </p><div class="caption" 
+><span class="id">Figure&#x00A0;3: </span><span  
+class="content">Database logical partitioning example.</span></div><!--tex4ht:label?: x1-3002r3 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+   <h3 class="sectionHead"><span class="titlemark">4   </span> <a 
+ id="x1-40004"></a>Service-Based Principles</h3>
+<!--l. 147--><p class="noindent" >There are a couple of principles which should be maintained when designing a service-based architecture to
+produce a simple, maintainable, deployable and modular designs.
+<a 
+ id="x1-4001r2"></a>
+</p>
+   <div class="tcolorbox tcolorbox" id="tcolobox-2">    
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 151--><p class="noindent" ><span 
+class="ecbx-1200">Definition</span><span 
+class="ecbx-1200">&#x00A0;2. Independent Service Principle</span>
+</p><!--l. 152--><p class="noindent" >Services should be independent, with no dependencies on other services. </p> 
+</div> 
+</div>
+<!--l. 155--><p class="indent" >   Services should be independent of each other. If a service depends on other services they either cannot be
+deployed separately, or they require communication protocols between services, which increases the coupling
+and complexity of the system design.
+<a 
+ id="x1-4002r3"></a>
+</p>
+   <div class="tcolorbox tcolorbox" id="tcolobox-3">    
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 160--><p class="noindent" ><span 
+class="ecbx-1200">Definition</span><span 
+class="ecbx-1200">&#x00A0;3. API Abstraction Principle</span>
+</p><!--l. 161--><p class="noindent" >Services should provide an API that hides implementation details. </p> 
+</div> 
+</div>
+<!--l. 164--><p class="indent" >   The user interface should not depend on implementation details of any services. Each service should
+publish an API that is a layer of abstraction between the service&#8217;s implementation and the rest of the system.
+This provides an interface through which the service can be used and reduces coupling between
+the service and its users. In a service-based architecture, the user interface is the primary client
+of service APIs but it is not necessarily the only client. Auditing services may also need to use
+domain services. In more sophisticated environments, services may be shared across different
+systems.
+</p><!--l. 172--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">5   </span> <a 
+ id="x1-50005"></a>Extensions</h3>
+<!--l. 174--><p class="noindent" >There are a few common variations of the service-based architecture to consider.
+</p><!--l. 176--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">5.1   </span> <a 
+ id="x1-60005.1"></a>Separate Databases</h4>
+<!--l. 178--><p class="noindent" >The first variation we will consider is to have separate databases for each service. This extends the idea of
+logical partitioning your database, as described in section <a 
+href="#x1-30003">3<!--tex4ht:ref: sec:design-considerations --></a>. Figure <a 
+href="#x1-6001r4">4<!--tex4ht:ref: fig:separate-dbs --></a> shows a few options of how this can be
+implemented.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-6001r4"></a>
+                                                                                                    
+                                                                                                    
+<dl class="list1"><dt class="list">
+</dt><dd 
+class="list">
+<!--l. 183--><p class="noindent" ><img 
+src="diagrams/separate-dbs.png" alt="PIC"  
+width="549" height="-662"  /></p></dd></dl>
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;4: </span><span  
+class="content">Separate databases example.</span></div><!--tex4ht:label?: x1-6001r4 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 191--><p class="indent" >   In figure <a 
+href="#x1-6001r4">4<!--tex4ht:ref: fig:separate-dbs --></a>, there is a shared database that contains the entity data that is shared across services. Service 1
+and 2 are deployed on separate servers but share a single database server that hosts different tables for each
+service. Service 3 has communicates with its own database server that hosts its tables. Service 4 uses a
+database that is running on the same server as the service.
+</p><!--l. 196--><p class="indent" >   Each of these approaches have their own advantages and disadvantages. A key consideration is whether a
+service has enough unique data to make it worth creating a separate database for just the service. If most data
+is shared between services, it may be easier to implement the system with just a single shared database. If
+there is some data that is unique to some services, a single database server with either logical partitioning of
+the data or even indepedent database services, may provide enough performance for the system. A
+separate database server for some or all services provides greater flexibility for scaling, if database
+performance is likely to become a bottleneck for the service. Running an independent database on the
+same server as the service provides easier communication with the database and may suit cases
+where an independent database is useful but it is not large enough to warrant to run on its own
+server.
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">5.2   </span> <a 
+ id="x1-70005.2"></a>Separate User Interfaces</h4>
+<!--l. 209--><p class="noindent" >A similar variation can be applied to the user interface, so that there are separate user interfaces for some
+services. This allows separate interfaces to be implemented for different user interface domains (e.g.
+standard users, power users, administrators, ...). Figure <a 
+href="#x1-7001r5">5<!--tex4ht:ref: fig:separate-uis --></a> shows some options of how this can be
+implemented.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-7001r5"></a>
+                                                                                                    
+                                                                                                    
+<!--l. 216--><p class="noindent" ><img 
+src="diagrams/separate-uis.png" alt="PIC"  
+width="472" height="-546"  />
+<br /> </p><div class="caption" 
+><span class="id">Figure&#x00A0;5: </span><span  
+class="content">Separate user interfaces example.</span></div><!--tex4ht:label?: x1-7001r5 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 221--><p class="indent" >   In figure <a 
+href="#x1-7001r5">5<!--tex4ht:ref: fig:separate-uis --></a>, there is one user interface that interacts with two services, like the single interface in the
+general structure shown in figure <a 
+href="#x1-1004r1">1<!--tex4ht:ref: fig:service-based-arch --></a>. There are then two interfaces that interact with service 3. A benefit of the
+service API is that it allows multiple interfaces to be implemented to work with the backend
+services.
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">5.3   </span> <a 
+ id="x1-80005.3"></a>API Layer</h4>
+<!--l. 228--><p class="noindent" >It is possible to place an API layer between the user interface and the services, as shown in figure <a 
+href="#x1-8001r6">6<!--tex4ht:ref: fig:api-layer --></a>. The API
+layer is a reverse proxy or gateway that provides access to the services, while hiding details of the
+services.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-8001r6"></a>
+                                                                                                    
+                                                                                                    
+<!--l. 235--><p class="noindent" ><img 
+src="diagrams/api-layer.png" alt="PIC"  
+width="446" height="-260"  />
+<br /> </p><div class="caption" 
+><span class="id">Figure&#x00A0;6: </span><span  
+class="content">API layer separating the user interface from services.</span></div><!--tex4ht:label?: x1-8001r6 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 240--><p class="indent" >   If any domain services are used by external systems, a reverse proxy hides the internal network structure of
+your system&#8217;s architecture. This extra layer of abstraction means that you can expose a different interface to
+external systems than to internal systems. This can help deliver the security principle of least
+privilege.
+</p><!--l. 244--><p class="indent" >   The API layer allows the implementation of <span 
+class="ecti-1200">cross-cutting </span>concerns to be separated from the user interface.
+For example security policies, user access logging, or service discovery could be implemented in the API
+layer.
+</p><!--l. 247--><p class="indent" >   Service discovery allows new services to be registered and provides a mechanism for clients to &#8220;discover&#8221; the
+new services. The API layer would provide an interface that allows services to be registered, including
+information about their interface. The API layer would also provide an interface to clients that allows them to
+query what services are available and to retrieve an interface that the client can use to access the service
+through the API layer.
+</p><!--l. 252--><p class="indent" >   The API layer can also perform load balancing by delegating service requests to different servers running
+the same domain service.
+</p>
+   <h3 class="sectionHead"><span class="titlemark">6   </span> <a 
+ id="x1-90006"></a>Service Oriented Architecture</h3>
+<!--l. 257--><p class="noindent" >Service Oriented Architecture (SOA) is an extension of service-based architecture. In SOA, each service
+implements a single business process and provides one or more interfaces that allow access to its
+functionality. The primary purpose of the API layer is to provide a robust service discovery platform
+and to implement security policies. Systems are implemented by integrating a set of services to
+deliver the required functionality. Consequently, the user interface is part of the system being
+implemented and not part of the service architecture. SOA requires each service to be independent of
+the others, including very low data coupling. Typically in SOA, each service would have its own
+database.
+</p><!--l. 265--><p class="indent" >   SOA sounds like a good idea, but in practice many organisations made compromises that neutered much of
+the expected benefits. Business processes are often not perfectly independent and there is often data
+dependencies between processes. If these dependencies are not managed well, the services are not
+independent. This results in services having to be used together, which reduces their reusability and
+composability.
+</p><!--l. 270--><p class="indent" >   Another common issue was a poor service discovery implementation. One problem was that the mechanism
+to discover new services required too much knowledge about the services. This results in the clients needing to
+know the services, before they can discover them. Another problem was poor interface design, that caused
+dependencies on some implementation details of the services.
+</p><!--l. 275--><p class="indent" >   Microservices were designed to deliver the promised benefits of SOA without some of the implementation
+issues. In particular, microservices deliver much smaller elements of functionality, reducing the possibility of
+tight coupling between services. There are challenges in designing and delivering microservices to achieve the
+benefits. These will be explored later in the course.
+</p><!--l. 281--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">7   </span> <a 
+ id="x1-100007"></a>Conclusion</h3>
+<!--l. 283--><p class="noindent" >Service-based architecture is an approach to designing a distributed system that is not too complex. Domain
+services provide natural modularity and deployability characteristics in the architecture design.
+Well designed service APIs improve the encapsulation and hide implementation details of the
+services.
+                                                                                                    
+                                                                                                    
+</p>
+   <div class="footnotes"><a 
+ id="x1-1002x1"></a>
+<!--l. 16--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span><span 
+class="ecti-1000">Bespoke systems </span><span 
+class="ecrm-1000">are custom designed and built for a single organisation.</span></p><a 
+ id="x1-2002x2"></a>
+<!--l. 53--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span>    <a 
+href="https://www.w3schools.com/xml/xml_soap.asp" class="url" ><span 
+class="ectt-1000">https://www.w3schools.com/xml/xml_soap.asp</span></a></p><a 
+ id="x1-2004x2"></a>
+<!--l. 56--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn3x0-bk" id="fn3x0"><sup class="textsuperscript">3</sup></a></span>    <a 
+href="https://www.baeldung.com/java-service-locator-pattern" class="url" ><span 
+class="ectt-1000">https://www.baeldung.com/java-service-locator-pattern</span></a></p><a 
+ id="x1-2006x2"></a>
+<!--l. 58--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn4x0-bk" id="fn4x0"><sup class="textsuperscript">4</sup></a></span><span 
+class="ecrm-1000">Martin Fowler provides good commentary about using the service locator pattern at</span>
+<a 
+href="https://martinfowler.com/articles/injection.html\#UsingAServiceLocator" class="url" ><span 
+class="ectt-1000">https://martinfowler.com/articles/injection.html\#UsingAServiceLocator</span></a><span 
+class="ecrm-1000">. He expands further on some tradeoffs of the</span>
+<span 
+class="ecrm-1000">pattern than other more superficial descriptions of the pattern.</span></p><a 
+ id="x1-2008x2"></a>
+<!--l. 69--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn5x0-bk" id="fn5x0"><sup class="textsuperscript">5</sup></a></span>   <a 
+href="https://www.oreilly.com/library/view/design-patterns-and/9781786463593/f47b37fc-6fc9-4f0b-8cd9-2f41cb364509.xhtml" class="url" ><span 
+class="ectt-1000">https://www.oreilly.com/library/view/design-patterns-and/9781786463593/f47b37fc-6fc9-4f0b-8cd9-2f41cb364509.xhtml</span></a></p><a 
+ id="x1-2010x2"></a>
+<!--l. 74--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn6x0-bk" id="fn6x0"><sup class="textsuperscript">6</sup></a></span>    <a 
+href="https://refactoring.guru/design-patterns/facade" class="url" ><span 
+class="ectt-1000">https://refactoring.guru/design-patterns/facade</span></a></p>                                            </div>
+ 
+</body></html> 
+
+                                                                                                    
+
+

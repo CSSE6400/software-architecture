@@ -1,0 +1,1856 @@
+Last Updated on 2022/02/24     
+
+<?xml version="1.0" encoding="iso-8859-1" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+<!--http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd-->  
+<html xmlns="http://www.w3.org/1999/xhtml"  
+> 
+<head> <title>Architectural Views</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
+<!-- fn-in,html,htex4ht,xhtml --> 
+<meta name="src" content="main.tex" /> 
+<link rel="stylesheet" type="text/css" href="main.css" /> 
+<link rel="stylesheet" href="https://latex.now.sh/style.css"> 
+<style>body {max-width: 100ch;} 
+dl dd {text-align: left}</style> 
+</head><body 
+>
+   <div class="maketitle"><a 
+ id="Q1-1-1"></a>
+_________________________________________________________________________________________________
+<h2 class="titleHead">Architectural Views</h2>                                                  Software Architecture
+   <div class="date" >March 6, 2023</div>                                                                               <div class="author" >Richard Thomas &amp; Brae
+Webb</div>
+______________________________________________________________________________________________
+   </div>
+   <h3 class="sectionHead"><span class="titlemark">1   </span> <a 
+ id="x1-10001"></a>Introduction</h3>
+<!--l. 9--><p class="noindent" >Understanding software is hard. It is often claimed that reading code is harder than writing
+code<span class="footnote-mark"><a 
+href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
+ id="x1-1001f1"></a>.
+This principle is used to explain a programmers&#8217; innate desire to constantly rewrite their code from scratch. If
+software is hard to understand, then software architecture is near impossible. Fortunately, architects have
+developed a number of techniques to manage this complexity.
+</p><!--l. 16--><p class="indent" >   A software architecture consists of many dimensions. Programming languages, communication protocols,
+the operating systems and hardware used, virtualisation used, and the code itself are a subset of the many
+dimensions which comprise a software architecture. Asking a programmer&#8217;s monkey brain to understand,
+communicate, or document every dimension at once is needlessly cruel. This is where architectural views come
+in.
+</p><!--l. 22--><p class="indent" >   Architectural views, or architectural projections, are a representation of one or more related aspects of a
+software architecture. Views allow us to focus on a particular slice of our multi-dimensional software
+architecture, ignoring other irrelevant slices. For example, if we are interested in applying a security patch to
+our software then we are only interested in the view which tells us which software packages are used on each
+host machine.
+</p><!--l. 27--><p class="indent" >   The successful implementation of any architecture relies on the ability for the architectural views to be
+disseminated, understood, and implemented. For some organisations, the software is simple enough, or the
+team small enough, that the design can be communicated through word of mouth. As software becomes
+increasingly complex and developers number in the thousands, it is critical for design to be communicated as
+effectively as possible. In addition to facilitating communication, architectural views also enable architectural
+policies to be designed and implemented.
+</p><!--l. 36--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">2   </span> <a 
+ id="x1-20002"></a>4+1 Views</h3>
+<!--l. 37--><p class="noindent" >Philippe Kruchten was one of the earliest to advocate the idea of using views to design and document
+software architectures. In &#8220;4+1 View Model of Software Architecture&#8221; <span class="cite">[<a 
+href="#X4+1-model">3</a>]</span> he describes five different
+views. These are logical, process, development, physical, and scenario views, which are summarised
+below.
+      </p><dl class="description"><dt class="description">
+      <!--l. 41--><p class="noindent" >
+<span 
+class="ecbx-1200">Logical</span> </p></dt><dd 
+class="description">
+      <!--l. 41--><p class="noindent" >How functionality is implemented, using class and state diagrams.
+                                                                                                    
+                                                                                                    
+      </p></dd><dt class="description">
+      <!--l. 42--><p class="noindent" >
+<span 
+class="ecbx-1200">Process</span> </p></dt><dd 
+class="description">
+      <!--l. 42--><p class="noindent" >Runtime behaviour, including concurrency, distribution, performance and scalability. Sequence,
+      communication and activity diagrams are used to describe this view.
+      </p></dd><dt class="description">
+      <!--l. 44--><p class="noindent" >
+<span 
+class="ecbx-1200">Development</span> </p></dt><dd 
+class="description">
+      <!--l. 44--><p class="noindent" >The software structure from a developer&#8217;s perspective, using package and component diagrams.
+      This is also known as the implementation view.
+      </p></dd><dt class="description">
+      <!--l. 46--><p class="noindent" >
+<span 
+class="ecbx-1200">Physical</span> </p></dt><dd 
+class="description">
+      <!--l. 46--><p class="noindent" >The hardware environment and deployment of software components. This is also known as the
+      deployment view.
+      </p></dd><dt class="description">
+      <!--l. 48--><p class="noindent" >
+<span 
+class="ecbx-1200">Scenario</span> </p></dt><dd 
+class="description">
+      <!--l. 48--><p class="noindent" >The  key  usage  scenarios  that  demonstrate  how  the  architecture  delivers  the  functional
+      requirements. This is the &#8216;+1&#8217; view as it is used to validate the software architecture. This is also
+      known as the use case view, as high-level use case diagrams are used to outline the key use cases
+      and actors.</p></dd></dl>
+<!--l. 52--><p class="noindent" >The experience which led to the development the 4+1 View Model was developing the air traffic control
+management system for Canada. The system provides an integrated air traffic control system for the entire
+Canadian airspace. This airspace is about double the size of the Australian airspace and borders the two
+busiest airspaces in the world. The project&#8217;s architecture was designed by a team of three people led by
+Philippe. Development was done by a team of 2500 developers from two large consulting companies. The
+project was delivered on-time and on-budget, with three incremental releases in less than three
+years<span class="footnote-mark"><a 
+href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
+ id="x1-2001f2"></a>.
+This project also developed many of the ideas that led to the Rational Unified Process <span class="cite">[<a 
+href="#Xkruchten2004rational">5</a>]</span>.
+</p><!--l. 64--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">3   </span> <a 
+ id="x1-30003"></a><span 
+class="ecti-1200">Software Architecture in Practice </span>Views</h3>
+<!--l. 65--><p class="noindent" >The seminal architecture book, <span 
+class="ecti-1200">Software Architecture in Practice </span><span class="cite">[<a 
+href="#Xbass2021software">6</a>]</span>, categorises architectural views
+into three groups. These three groups each answer different questions about the architecture,
+specifically:
+      </p><dl class="description"><dt class="description">
+      <!--l. 69--><p class="noindent" >
+<span 
+class="ecbx-1200">Module Views</span> </p></dt><dd 
+class="description">
+      <!--l. 69--><p class="noindent" >How implementation components of a system are structured and depended upon.
+                                                                                                    
+                                                                                                    
+      </p></dd><dt class="description">
+      <!--l. 70--><p class="noindent" >
+<span 
+class="ecbx-1200">Component-and-connector Views</span> </p></dt><dd 
+class="description">
+      <!--l. 70--><p class="noindent" >How individual components communicate with each other.
+      </p></dd><dt class="description">
+      <!--l. 71--><p class="noindent" >
+<span 
+class="ecbx-1200">Allocation Views</span> </p></dt><dd 
+class="description">
+      <!--l. 71--><p class="noindent" >How the components are allocated to personnel, file stores, hardware, etc.</p></dd></dl>
+<!--l. 74--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">3.1   </span> <a 
+ id="x1-40003.1"></a>Module Views</h4>
+<!--l. 75--><p class="noindent" >Module views are composed of modules, which are static units of functionality such as classes, functions,
+packages, or whole programs. The defining characteristic of a module is that it represents software responsible
+for some well-defined functionality. For example, a class which converts JSON to XML would be considered a
+module, as would a function which performs the same task.
+</p><!--l. 79--><p class="indent" >   The primary function of module views is to communicate the dependencies of a module. Rarely does
+software work completely in isolation, often it is constructed with implicit or explicit dependencies. A module
+which converts JSON to XML might depend upon a module which parses JSON and a module which can
+format XML. Module views make these dependencies explicit.
+</p><!--l. 84--><p class="indent" >   Module views focus on the developer&#8217;s perspective of how the software is implemented, rather than how it
+manifests itself when deployed in a computing environment.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<div class="subfigure">
+<!--l. 88--><p class="noindent" ></p>
+<div class="framedenv" id="shaded-1">
+<!--l. 90-->
+<pre class="lstlisting" id="listing-1"><span class="label"><a 
+ id="x1-4001r1"></a><span 
+class="ecrm-0600">1</span></span><span style="color:#006699"><span 
+class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">json</span></span> 
+<span class="label"><a 
+ id="x1-4002r2"></a><span 
+class="ecrm-0600">2</span></span><span style="color:#006699"><span 
+class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">xml</span></span> 
+<span class="label"><a 
+ id="x1-4003r3"></a></span> 
+<span class="label"><a 
+ id="x1-4004r4"></a><span 
+class="ecrm-0600">4</span></span><span style="color:#006699"><span 
+class="ectt-1200">class</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">JSONtoXML</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-4005r5"></a><span 
+class="ecrm-0600">5</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">load</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">self</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">json_file</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-4006r6"></a><span 
+class="ecrm-0600">6</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">with</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">open</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">json_file</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">as</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">f</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-4007r7"></a><span 
+class="ecrm-0600">7</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">data</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">json</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">load</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">f</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-4008r8"></a><span 
+class="ecrm-0600">8</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">self</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">data</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">self</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">convert</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">data</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-4009r9"></a></span> 
+<span class="label"><a 
+ id="x1-4010r10"></a><span 
+class="ecrm-0600">10</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">export</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">self</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">xml_file</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-4011r11"></a><span 
+class="ecrm-0600">11</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">xml</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">write</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">xml_file</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">data</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-4012r12"></a></span> 
+<span class="label"><a 
+ id="x1-4013r13"></a><span 
+class="ecrm-0600">13</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">convert</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">self</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">data</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">JSON</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">XML</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-4014r14"></a><span 
+class="ecrm-0600">14</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">...</span></span></pre>
+</div> <a 
+ id="x1-4015r1"></a>
+<div class="caption" ><span class="id"><span 
+class="ecrm-1095">(a) </span></span><span  
+class="content"><span 
+class="ecrm-1095">Pseudo-code to convert JSON to XML</span>
+</span></div>                                                                                                    </div>
+<div class="subfigure">
+<!--l. 111--><p class="noindent" ></p>
+<div class="center" 
+>
+<!--l. 112--><p class="noindent" >
+<!--l. 120--><p class="noindent" ><object data="main-1.svg" width="347.88205 " height="101.97755 " type="image/svg+xml"><p>SVG-Viewer needed.</p></object></p></div>
+<a 
+ id="x1-4016r2"></a>
+<div class="caption" ><span class="id"><tspan font-family="\ecrm" font-size="\1095">(b) </tspan></span><span  
+class="content"><tspan font-family="\ecrm" font-size="\1095">An example of a module view which illustrates the dependencies of the </tspan><tspan font-family="\ectt" font-size="\1095">JSONtoXML </tspan><tspan font-family="\ecrm" font-size="\1095">class</tspan>
+</span></div>                                                                                                    </div>
+<a 
+ id="x1-4017r1"></a>
+<div class="caption" ><span class="id">Figure&#x00A0;1: </span><span  
+class="content">A simple module view of a JSON to XML program.
+</span></div>
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+   <h4 class="subsectionHead"><span class="titlemark">3.2   </span> <a 
+ id="x1-50003.2"></a>Component-and-Connector Views</h4>
+<!--l. 128--><p class="noindent" >Component-and-connector views focus on the structures that deliver the runtime, or dynamic
+behaviour of a system. Components are units which perform some computation or operation at
+runtime. These components could overlap with the modules of a module view but are often at a
+higher level of abstraction. The focus of component-and-connector views is how these components
+communicate at runtime. Runtime communication is the connector of components. For example,
+a service which registers users to a website might have new registrations communicated via a
+<a 
+href="https://www.ibm.com/cloud/learn/rest-apis" >REST</a><span class="footnote-mark"><a 
+href="#fn3x0" id="fn3x0-bk"><sup class="textsuperscript">3</sup></a></span><a 
+ id="x1-5001f3"></a>
+request. The service may then communicate the new user information to a database via SQL
+queries.
+</p><!--l. 136--><p class="indent" >   When we look at software architecture, component-and-connector views are the most commonly used
+views. They are common because they contain runtime information which is not easily automatically
+extracted. Module views can be generated after the fact, i.e. it is easy enough for a project to generate a UML
+class diagram. (Simple tools will create an unreadably complex class diagram. Tagging important
+information in the source code, or manually removing small details is required to end up with readable
+diagrams.) Component-and-connector views are often maintained manually by architects and
+developers.
+</p><!--l. 143--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">3.3   </span> <a 
+ id="x1-60003.3"></a>Allocation Views</h4>
+<!--l. 144--><p class="noindent" >According to Bass et al, allocation views map the software&#8217;s structures to the system&#8217;s non-software structures
+<span class="cite">[<a 
+href="#Xbass2021software">6</a>]</span>. They include concepts such as who is developing which software elements, where are source files
+stored for different activities such as development and testing, and where are software elements
+executed. The first two points are important for project management and build management.
+The last point of how the software is executed on different processing nodes is important for
+architectural design. This is sometimes called the <tspan font-family="\ecti" font-size="\1200">deployment structure </tspan>or the software system&#8217;s <tspan font-family="\ecti" font-size="\1200">physical</tspan>
+<tspan font-family="\ecti" font-size="\1200">architecture</tspan>.
+</p><!--l. 152--><p class="indent" >   Understanding the physical architecture (simplistically the
+hardware<span class="footnote-mark"><a 
+href="#fn4x0" id="fn4x0-bk"><sup class="textsuperscript">4</sup></a></span><a 
+ id="x1-6001f4"></a>
+on which the software is executed) is important when designing the software&#8217;s <tspan font-family="\ecti" font-size="\1200">logical architecture</tspan>.
+Component-and-connector views describe the software&#8217;s logical architecture. This design of the logical
+architecture must contain components that can be allocated appropriately to processing nodes, and these
+nodes must have communication links that enable the components to interact.
+</p><!--l. 158--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">4   </span> <a 
+ id="x1-70004"></a>Sahara eCommerce Example</h3>
+<!--l. 159--><p class="noindent" >Sahara<span class="footnote-mark"><a 
+href="#fn5x0" id="fn5x0-bk"><sup class="textsuperscript">5</sup></a></span><a 
+ id="x1-7001f5"></a>
+eCommerce is an ambitious company who&#8217;s prime business unit is an on-line store selling a wide range of
+products. They provide both web and mobile applications to deliver the shopping experience to
+customers.
+                                                                                                    
+                                                                                                    
+</p><!--l. 162--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">4.1   </span> <a 
+ id="x1-80004.1"></a>Architecturally Significant Requirements</h4>
+<!--l. 163--><p class="noindent" ><tspan font-family="\ecti" font-size="\1200">Architecturally significant requirements </tspan>(ASR) are functional or non-functional requirements, or constraints or
+principles, which influence the design of the system architecture. The structure of a software architecture has
+to be designed to ensure that the ASRs can be delivered.
+</p><!--l. 167--><p class="indent" >   Not all requirements for a system will be architecturally significant, but those that are need to be
+identified. Once ASRs are identified, an architecture needs to be designed to deliver them. This may require
+some research, and experimentation with prototypes, to determine which options are appropriate. Tests should
+be designed to verify that the architecture is delivering the ASRs. Ideally, these should be part of an
+automated test suite. This may not be possible for all tests. Regardless, the ASR tests should be
+executed frequently during development to provide assurance that the system will deliver the
+ASRs.
+</p><!--l. 175--><p class="indent" >   Inevitably, some ASRs will be discovered later in the project. The existing architecture will
+need to be evaluated to determine if it can deliver the new ASRs. If it can, new tests need to be
+added to the ASR test suite to verify delivery of the new ASRs. If the architecture is no longer
+suitable due to the new ASRs, a major redesign needs to be done to create a new, more suitable,
+architecture.
+</p><!--l. 181--><p class="indent" >   The architecturally significant requirements for the Sahara eCommerce system are: </p>
+      <ul class="itemize1">
+      <li class="itemize">
+      <!--l. 183--><p class="noindent" >Customers can start shopping on one device and continue on another device. (e.g. Add a product
+      to their shopping cart while browsing on their computer when they are bored at school. Checkout
+      their shopping cart from their mobile phone on their way home on the bus.)
+      </p></li>
+      <li class="itemize">
+      <!--l. 186--><p class="noindent" >The system must be scalable. It must cater for peaks in demand (e.g. Cyber Monday and Singles
+      Day). It must cater for an unknown distribution of customers accessing the on-line store through
+      web or mobile applications.
+      </p></li>
+      <li class="itemize">
+      <!--l. 188--><p class="noindent" >The system must be robust. The system must continue to operate if a server fails. It must be able
+      to recover quickly from sub-system failures.
+      </p></li>
+      <li class="itemize">
+      <!--l. 190--><p class="noindent" >The system must have high availability. Target availability is &#8220;four nines&#8221;<span class="footnote-mark"><a 
+href="#fn6x0" id="fn6x0-bk"><sup class="textsuperscript">6</sup></a></span><a 
+ id="x1-8001f6"></a>
+      up time.</p></li></ul>
+<!--l. 196--><p class="noindent" >The following sections will describe the physical and software architecture for this system, and demonstrate how it
+delivers these ASRs.
+</p><!--l. 199--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">4.2   </span> <a 
+ id="x1-90004.2"></a>Allocation View</h4>
+<!--l. 200--><p class="noindent" >Figure <a 
+href="#x1-9001r2">2<!--tex4ht:ref: fig:deploymentDiagram --></a> uses a UML deployment diagram as a visual representation of the physical architecture of the system
+as part of the allocation view. The diagram also shows some of the important software components that are
+                                                                                                    
+                                                                                                    
+deployed onto parts of the physical architecture. For simplicity, details such as load balancing and failover are
+not shown in this example.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 206--><p class="noindent" ><img 
+src="images/uml/deployment_diagram.png" alt="PIC"  
+width="498" height="-454"  /> <a 
+ id="x1-9001r2"></a>
+<br />                                                                                                    </p><div class="caption" 
+><span class="id">
+Figure&#x00A0;2: </span><span  
+class="content">Example physical architecture for the Sahara eCommerce system.                          </span></div><!--tex4ht:label?: x1-9001r2 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 211--><p class="indent" >   There are both web and mobile applications that customers use to shop at the store. A J2EE server (e.g.
+<a 
+href="https://tomee.apache.org/" >TomEE</a><span class="footnote-mark"><a 
+href="#fn7x0" id="fn7x0-bk"><sup class="textsuperscript">7</sup></a></span><a 
+ id="x1-9002f7"></a>),
+running on a web server hardware platform, handles browser requests from customers, using the HTTPS
+protocol over the Internet. A JavaScript module called <tspan font-family="\ectt" font-size="\1200">ProductAnimator </tspan>is downloaded to the customer&#8217;s
+browser to allow them to see interactive 3d views of products. The <tspan font-family="\ectt" font-size="\1200">ProductBrowsing </tspan>and <tspan font-family="\ectt" font-size="\1200">ShoppingCartView</tspan>
+components run on the J2EE server, providing those aspects of the user interaction. The J2EE server uses
+RMI<span class="footnote-mark"><a 
+href="#fn8x0" id="fn8x0-bk"><sup class="textsuperscript">8</sup></a></span><a 
+ id="x1-9004f8"></a>
+over a network connection to an application server.
+</p><!--l. 218--><p class="indent" >   The application server provides the shared logic of the on-line store. This supports implementing the
+functional requirement that a customer can start shopping on one device and continue on another. Running
+the applicaiton server on its own device allows easier scalability of the system. The application server could be
+replicated on multiple devices to handle requests from different sources, without duplicating unneeded web or
+database logic. Examples of components that would run on the application server are <tspan font-family="\ectt" font-size="\1200">Customer</tspan>,
+<tspan font-family="\ectt" font-size="\1200">ShoppingCart</tspan>, <tspan font-family="\ectt" font-size="\1200">Order </tspan>and <tspan font-family="\ectt" font-size="\1200">Product</tspan>.
+</p><!--l. 224--><p class="indent" >   The application server uses JPA<span class="footnote-mark"><a 
+href="#fn9x0" id="fn9x0-bk"><sup class="textsuperscript">9</sup></a></span><a 
+ id="x1-9006f9"></a>
+over a network connection to communicate with the application database running on a separate server. The
+<tspan font-family="\ectt" font-size="\1200">orders </tspan>schema is an example of one of the tables that would be created in the application database. The
+application server also uses RMI over a network connection to communicate with a data mining
+server.
+</p><!--l. 228--><p class="indent" >   The data mining server uses JDBC<span class="footnote-mark"><a 
+href="#fn10x0" id="fn10x0-bk"><sup class="textsuperscript">10</sup></a></span><a 
+ id="x1-9008f10"></a>
+over a network connection to a server running the data warehouse. The mobile applications run on their
+respective phone environments and use REST API calls over the Internet to interact with application
+server.
+</p><!--l. 231--><p class="indent" >   <tspan font-family="\ecbx" font-size="\1200">Note</tspan>, for web applications the customer&#8217;s computer and browser would only be shown in the deployment
+diagram if the software system downloads application logic that executes in the browser (e.g. JavaScript). In
+this example the <tspan font-family="\ectt" font-size="\1200">ProductAnimator.js </tspan>module is an important part of the application&#8217;s functional
+requirements.
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">4.2.1   </span> <a 
+ id="x1-100004.2.1"></a>Deployment Diagram Notation</h5>
+<!--l. 236--><p class="noindent" >In the diagram, cube icons represent <tspan font-family="\ecti" font-size="\1200">nodes</tspan>. Nodes are computational resources that can execute software
+artifacts. Nodes may be «device»&#8217;s, representing hardware. They may also be «executionEnvironment»&#8217;s,
+representing software that provides an environment in which other software artifacts can be executed. (The
+keyword has been shortened to «exec env»&#x00A0;in this example.) Execution environments need to be allocated to
+devices. In figure <a 
+href="#x1-9001r2">2<!--tex4ht:ref: fig:deploymentDiagram --></a>, <tspan font-family="\ectt" font-size="\1200">Browser </tspan>and <tspan font-family="\ectt" font-size="\1200">J2EE Server </tspan>are software environments running, respectively, on the
+hardware devices <tspan font-family="\ectt" font-size="\1200">Personal Computer </tspan>and <tspan font-family="\ectt" font-size="\1200">Web Server</tspan>.
+</p><!--l. 244--><p class="indent" >   The solid lines between nodes are <tspan font-family="\ecti" font-size="\1200">associations</tspan>, which represent communication paths. A communication
+path can represent a <tspan font-family="\ecti" font-size="\1200">physical connection </tspan>or <tspan font-family="\ecti" font-size="\1200">protocol</tspan>. Formally, a stereotype (e.g. «protocol») is used to
+distinguish the type of communication path. In figure <a 
+href="#x1-9001r2">2<!--tex4ht:ref: fig:deploymentDiagram --></a>, all communication paths are protocols so the
+stereotype is not included. The protocol name is used to indicate which one is being used on the
+communication path. The end of an association can indicate <tspan font-family="\ecti" font-size="\1200">multiplicity</tspan>. In a deployment diagram this is used
+to indicate that some nodes may be replicated (e.g. for performance or robustness). The &#8216;*&#8217; symbol is used to
+indicate many instances may be involved.
+</p><!--l. 253--><p class="indent" >   The rectangles with a &#8216;plug&#8217; icon in their top-right corner are <tspan font-family="\ecti" font-size="\1200">components</tspan>. Components are executable
+software which need to be deployed to a node on which they will run. The dashed dependency arrow,
+with the stereotype «deploy», indicates the node on which the component will be deployed for
+execution.
+</p><!--l. 257--><p class="indent" >   <tspan font-family="\ecbx" font-size="\1200">Note</tspan>, this approach of showing components being deployed to nodes is an older style of UML. The current
+                                                                                                    
+                                                                                                    
+version of UML has the concept of <tspan font-family="\ecti" font-size="\1200">artifacts </tspan>being deployed to nodes. Artifacts can implement
+(manifest in UML terminology) components, which provides an additional layer of abstraction.
+Formally, components would be manifested by an artifact that is then deployed to a node. In figure <a 
+href="#x1-9001r2">2<!--tex4ht:ref: fig:deploymentDiagram --></a>,
+components are deployed directly to nodes to keep the diagram simple. UML provides multiple
+ways to indicate which artifacts are deployed on a node, e.g. a textual list of artifacts inside the
+node icon. The approach taken for a diagram should be chosen to aid readability and reduce
+clutter.
+</p><!--l. 265--><p class="indent" >   Artifacts are used in this diagram to represent software that has to be packaged (i.e. deployed
+through a manifest), which corresponds to the idea of an artifact in the note above. An artifact is
+represented by a rectangle with the «artifact»&#x00A0;keyword and the name of the artifact that is created for
+deployment.
+</p><!--l. 269--><p class="indent" >   The «schema»&#x00A0;stereotype indicates that the artifact is a database schema describing tables to be created in
+the database.
+</p><!--l. 271--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">4.3   </span> <a 
+ id="x1-110004.3"></a>Component-and-Connector View</h4>
+<!--l. 272--><p class="noindent" >Figure <a 
+href="#x1-11001r3">3<!--tex4ht:ref: fig:componentDiagram --></a> uses a UML component diagram as a visual representation of the logical components that deliver
+system behaviour as part of the component-and-connector view. It models the logical architecture of the
+components that allow customers to browse for products, add them to their shopping cart, and purchase
+them. To keep the example manageable, this is the only part of the system that is shown in this
+view.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 279--><p class="noindent" ><img 
+src="images/uml/component_diagram.png" alt="PIC"  
+width="383" height="-767"  /> <a 
+ id="x1-11001r3"></a>
+<br />                                                                                                    </p><div class="caption" 
+><span class="id">
+Figure&#x00A0;3: </span><span  
+class="content">Example logical architecture &#8211; browsing for products and purchasing them.                </span></div><!--tex4ht:label?: x1-11001r3 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 284--><p class="indent" >   As was shown in figure <a 
+href="#x1-9001r2">2<!--tex4ht:ref: fig:deploymentDiagram --></a>, the <tspan font-family="\ectt" font-size="\1200">ProductBrowsing </tspan>and <tspan font-family="\ectt" font-size="\1200">ShoppingCartView </tspan>components are deployed on the
+J2EE server. These two component provide the user interaction behaviour in the web application of browsing
+for products, adding them to the shopping cart, and purchasing the products.
+</p><!--l. 289--><p class="indent" >   The <tspan font-family="\ectt" font-size="\1200">Product</tspan>, <tspan font-family="\ectt" font-size="\1200">ShoppingCart</tspan>, <tspan font-family="\ectt" font-size="\1200">Order </tspan>and <tspan font-family="\ectt" font-size="\1200">Customer </tspan>components are deployed on the application server.
+These components deliver the logical behaviour of providing information about products, tracking what is in
+the shopping cart, and placing orders.
+</p><!--l. 292--><p class="indent" >   The <tspan font-family="\ectt" font-size="\1200">ProductBrowsing </tspan>component uses the <tspan font-family="\ecst" font-size="\1200">ProductInformation </tspan>and <tspan font-family="\ecst" font-size="\1200">ManageCart </tspan>interfaces. These two
+interfaces are realised (or implemented) by the <tspan font-family="\ectt" font-size="\1200">Product </tspan>and <tspan font-family="\ectt" font-size="\1200">ShoppingCart </tspan>components respectively. The
+<tspan font-family="\ectt" font-size="\1200">ShoppingCartView </tspan>component uses the <tspan font-family="\ecst" font-size="\1200">CartCheckout </tspan>interface, which is realised by the <tspan font-family="\ectt" font-size="\1200">ShoppingCart</tspan>
+component. These interfaces describe the communication pathways between the components on the different
+nodes of the physical architecture.
+</p><!--l. 297--><p class="indent" >   The <tspan font-family="\ectt" font-size="\1200">ShoppingCart </tspan>component uses the <tspan font-family="\ectt" font-size="\1200">Product</tspan>, <tspan font-family="\ectt" font-size="\1200">Customer </tspan>and <tspan font-family="\ectt" font-size="\1200">Order </tspan>components. At the
+programming level, there could be interfaces between these components which are not shown in this
+diagram.
+</p><!--l. 300--><p class="noindent" >The application database is not shown in this component diagram as all of its behaviour is defined
+within the application server&#8217;s logic. JPA automates the process of saving and retrieving objects
+from a relational database. Consequently, the database is just a storage mechanism and does not
+implement any application logic. If the database implemented logic (e.g. through stored procedures
+and constraints), then components representing that logical behaviour would be included in this
+diagram.
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">4.3.1   </span> <a 
+ id="x1-120004.3.1"></a>Component Diagram Notation</h5>
+<!--l. 308--><p class="noindent" >As indicated in <a 
+href="#x1-100004.2.1">4.2.1<!--tex4ht:ref: sec:deploymentNotation --></a>, rectangles with the &#8216;plug&#8217; icon represent <tspan font-family="\ecti" font-size="\1200">components </tspan>in UML.
+</p><!--l. 310--><p class="indent" >   Circles represent <tspan font-family="\ecti" font-size="\1200">interfaces</tspan>, and are labelled with the interface&#8217;s name. A line from a component to an
+interface circle indicates that the component provides (or realises) the interface.
+</p><!--l. 313--><p class="indent" >   Cups represent a <tspan font-family="\ecti" font-size="\1200">required interface</tspan>, and a line from a component to a cup indicates that the
+component depends on (or uses) the interface. This notation visualises the connection between
+components.
+</p><!--l. 316--><p class="indent" >   Dependency arrows point from a component whose runtime behaviour depends on behaviour provided by
+the target component.
+</p><!--l. 318--><p class="indent" >   Boxes around groups of components are <tspan font-family="\ecti" font-size="\1200">subjects</tspan>. They represent a logical grouping of elements in
+a UML diagram and can be given a name to describe the grouping. Colours and shading can
+be used to help distinguish between different logical groups. In this example, the J2EE Server
+and Application Server subjects represent system boundaries for the two respective deployment
+environments.
+</p><!--l. 323--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">4.3.2   </span> <a 
+ id="x1-130004.3.2"></a>Behaviour Structure</h5>
+<!--l. 324--><p class="noindent" >For complex systems, describing how important behaviour is implemented can aid in understanding the intent
+of the architecture&#8217;s design. UML sequence and communication diagrams can describe this behavioural
+structure. Figure <a 
+href="#x1-13001r4">4<!--tex4ht:ref: fig:sequenceDiagram --></a> is a high-level sequence diagram describing how the <tspan font-family="\ectt" font-size="\1200">ProductBrowsing </tspan>component in the
+J2EE server collaborates with the <tspan font-family="\ectt" font-size="\1200">ShoppingCart </tspan>component on the application server to enable a customer to
+add a product to their shopping cart. It also shows the <tspan font-family="\ectt" font-size="\1200">ShoppingCart </tspan>component communicating with the
+application database.
+</p>
+                                                                                                    
+                                                                                                    
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 333--><p class="noindent" ><img 
+src="images/uml/component-level_sequence_diagram.png" alt="PIC"  
+width="525" height="-1176"  /> <a 
+ id="x1-13001r4"></a>
+<br />                                                                                                    </p><div class="caption" 
+><span class="id">
+Figure&#x00A0;4: </span><span  
+class="content">Example behavioural description &#8211; customer adding a product to their shopping cart.      </span></div><!--tex4ht:label?: x1-13001r4 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 338--><p class="indent" >   Figure <a 
+href="#x1-13001r4">4<!--tex4ht:ref: fig:sequenceDiagram --></a> does not provide much additional information that is not already shown or implied by figures <a 
+href="#x1-9001r2">2<!--tex4ht:ref: fig:deploymentDiagram --></a>
+and <a 
+href="#x1-11001r3">3<!--tex4ht:ref: fig:componentDiagram --></a>. Normally sequence or communication diagrams are used to describe behaviour that is not clear from
+other diagrams and descriptions. This can include complex interactions between modules, complex
+concurrency, real-time constraints, or latency constraints.
+</p><!--l. 343--><p class="noindent" >For example, when Boeing was upgrading the combat control system of the
+<a 
+href="https://www.youtube.com/watch?v=xUcpZJE050s" >F-111</a><span class="footnote-mark"><a 
+href="#fn11x0" id="fn11x0-bk"><sup class="textsuperscript">11</sup></a></span><a 
+ id="x1-13002f11"></a>
+for the Australian Airforce, they designed a software architecture that used
+<a 
+href="https://www.ibm.com/docs/en/integration-bus/9.0.0?topic=corba-common-object-request-broker-architecture" >CORBA</a><span class="footnote-mark"><a 
+href="#fn12x0" id="fn12x0-bk"><sup class="textsuperscript">12</sup></a></span><a 
+ id="x1-13004f12"></a>
+as middleware. The implementation of the middleware caused a fixed delay in sending messages between
+components. From an architectural design perspective, it was important to document this delay and enforce a
+maximum delay on the time taken to complete any process. A sequence diagram can use constraints to
+indicate these types of real-time restrictions in your design.
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">4.3.3   </span> <a 
+ id="x1-140004.3.3"></a>Sequence Diagram Notation</h5>
+<!--l. 352--><p class="noindent" >Sequence diagrams are read from the top down. The top of the diagram represents the start of the scenario,
+and execution time progresses down the diagram. The bottom of the diagram is the end of the scenario.
+Duration constraints can be placed between messages indicating information like the maximum allowed time
+between the start and end of a message.
+</p><!--l. 357--><p class="indent" >   Rectangles with lines descending from them are <tspan font-family="\ecti" font-size="\1200">lifelines</tspan>. They represent an instance of a participant in the
+scenario being described. The name at the top of a lifeline describes the participant. In figure <a 
+href="#x1-13001r4">4<!--tex4ht:ref: fig:sequenceDiagram --></a>, these are
+components or the database system.
+</p><!--l. 362--><p class="indent" >   The horizontal lines are <tspan font-family="\ecti" font-size="\1200">messages </tspan>sent between participants. Messages use hierarchical numbers to indicate
+both nesting and sequence of messages. Message 1.1 is sent by message 1. Message 1.1.1 comes before message
+1.1.2. Message 1 in figure <a 
+href="#x1-13001r4">4<!--tex4ht:ref: fig:sequenceDiagram --></a> is a <tspan font-family="\ecti" font-size="\1200">found message</tspan>, meaning that the sender of the message is not shown in the
+diagram.
+</p><!--l. 367--><p class="indent" >   A closed arrowhead on a message (e.g. message 1) indicates that it is a synchronous message. An
+open arrowhead on a message (e.g. message 1.1) indicates that it is an asynchronous message. In
+figure <a 
+href="#x1-13001r4">4<!--tex4ht:ref: fig:sequenceDiagram --></a>, stereotypes have been placed on most messages to indicate the protocol used to send the
+message.
+</p><!--l. 371--><p class="indent" >   The vertical rectangles sitting on top of lifelines are <tspan font-family="\ecti" font-size="\1200">execution specifications</tspan>. They indicate when an
+instance is executing logic. For example, after the asynchronous message 1.1 is sent to the <tspan font-family="\ectt" font-size="\1200">ShoppingCart</tspan>
+component, message 1 finishes executing. When the synchronous message 1.1.1 is sent to the database,
+message 1.1 is still active as it is waiting for message 1.1.1 to finish before message 1.1 can continue to the next
+part of the logic.
+</p><!--l. 378--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">4.4   </span> <a 
+ id="x1-150004.4"></a>Module View</h4>
+<!--l. 379--><p class="noindent" >Figure <a 
+href="#x1-15001r5">5<!--tex4ht:ref: fig:classDiagram --></a> uses a UML class diagram as a visual representation of the static structure of the classes that
+implement the <tspan font-family="\ectt" font-size="\1200">ShoppingCart </tspan>component as part of the module view. Usually only architecturally
+significant operations and attributes are shown. (e.g. Operations and attributes needed to understand
+relationships and behaviour in the component-and-connector view.) And for simplicity in this diagram,
+only the classes and interfaces related to adding items to a shopping cart and checking out are
+shown.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<dl class="list1"><dt class="list">
+</dt><dd 
+class="list">
+<!--l. 387--><p class="noindent" ><img 
+src="images/uml/shopping_cart_class_diagram.png" alt="PIC"  
+width="585" height="-356"  /></p></dd></dl>
+<a 
+ id="x1-15001r5"></a>
+<br />                                                                                                    <div class="caption" 
+><span class="id">
+Figure&#x00A0;5: </span><span  
+class="content">Example static structure for part of the shopping cart package in the class model.
+</span></div><!--tex4ht:label?: x1-15001r5 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 394--><p class="noindent" >The <tspan font-family="\ectt" font-size="\1200">CartManager </tspan>and <tspan font-family="\ectt" font-size="\1200">Checkout </tspan>control classes implement, respectively, the <tspan font-family="\ecst" font-size="\1200">ManageCart </tspan>and
+<tspan font-family="\ecst" font-size="\1200">CartCheckout </tspan>interfaces. These two classes implement the Façade design pattern and manage
+how adding products to a shopping cart and checking out are delivered by the classes in this
+package. Going back to the component and connector view (figure <a 
+href="#x1-11001r3">3<!--tex4ht:ref: fig:componentDiagram --></a>), when a customer, via their
+web browser, selects to add a product to their shopping cart, the <tspan font-family="\ectt" font-size="\1200">ProductBrowsing </tspan>component&#8217;s
+logic uses the <tspan font-family="\ecst" font-size="\1200">ManageCart </tspan>interface&#8217;s <tspan font-family="\ectt" font-size="\1200">additem </tspan>operation to send a message to the <tspan font-family="\ectt" font-size="\1200">ShoppingCart</tspan>
+component.
+</p><!--l. 404--><p class="indent" >   In the implementation of the <tspan font-family="\ectt" font-size="\1200">ShoppingCart </tspan>component, the <tspan font-family="\ectt" font-size="\1200">CartManager </tspan>class uses the cart and product
+JPA data access objects (DAOs) to load the product details and the customer&#8217;s shopping cart from the
+application database. The DAOs create <tspan font-family="\ectt" font-size="\1200">Product </tspan>and <tspan font-family="\ectt" font-size="\1200">Cart </tspan>entity objects, and <tspan font-family="\ectt" font-size="\1200">CartManager </tspan>adds the
+product to the cart. Once this is done the <tspan font-family="\ectt" font-size="\1200">CartDAO </tspan>is used to save the updated cart data into the
+database.
+</p><!--l. 410--><p class="indent" >   When a customer wants to checkout the products in their shopping cart, the <tspan font-family="\ectt" font-size="\1200">ShoppingCartView</tspan>
+component uses the <tspan font-family="\ecst" font-size="\1200">Checkout </tspan>interface&#8217;s <tspan font-family="\ectt" font-size="\1200">products </tspan>operation to get a list of the product details to be
+displayed in the shopping cart. The <tspan font-family="\ectt" font-size="\1200">ProductDetails </tspan>class is a Java bean that is used to pass the data about
+each product to the <tspan font-family="\ectt" font-size="\1200">ShoppingCartView</tspan>. Once a customer decides to buy the products in their shopping cart,
+the <tspan font-family="\ectt" font-size="\1200">ShoppingCartView </tspan>sends the <tspan font-family="\ectt" font-size="\1200">checkOut </tspan>message to the <tspan font-family="\ectt" font-size="\1200">ShoppingCart</tspan>. <tspan font-family="\ectt" font-size="\1200">Checkout </tspan>uses the
+<tspan font-family="\ecst" font-size="\1200">PaymentGateway </tspan>interface to process the payment.
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">4.4.1   </span> <a 
+ id="x1-160004.4.1"></a>Class Diagram Notation</h5>
+<!--l. 418--><p class="noindent" >Formally in UML, rectangles represent <tspan font-family="\ecti" font-size="\1200">classifiers</tspan>. A <tspan font-family="\ecti" font-size="\1200">class </tspan>is one type of classifier. In a class diagram, a
+rectangle represents a class, unless a keyword is used to indicate that it is a different type of classifier.
+Classifier rectangles have three compartments. The top compartment contains its name and optionally includes
+a keyword, stereotypes and properties for the classifier. The middle compartment contains <tspan font-family="\ecti" font-size="\1200">attributes</tspan>. The
+bottom compartment contains <tspan font-family="\ecti" font-size="\1200">operations</tspan>.
+</p><!--l. 425--><p class="indent" >   Solid lines represent <tspan font-family="\ecti" font-size="\1200">associations</tspan>, which may optionally have an arrow indicating the direction of the
+relationship. An association indicates a structural relationship between classes. Typically this
+means that the target of an association will be an implicit attribute of the class. The end of an
+association can use <tspan font-family="\ecti" font-size="\1200">multiplicity </tspan>to indicate the number of objects of the class that may take part in the
+relationship.
+</p><!--l. 430--><p class="noindent" >A diamond on the end of an association indicates <tspan font-family="\ecti" font-size="\1200">aggregate </tspan>relationship. The diamond is on the end
+that is the aggregate, and the other end is the part. The diamond may be filled or not. A filled
+diamond represents <tspan font-family="\ecti" font-size="\1200">composition </tspan>in UML. This indicates &#8216;ownership&#8217;, where the aggregate controls
+the lifespan of the part. A hollow diamond, as in the relationship between <tspan font-family="\ectt" font-size="\1200">Order </tspan>and <tspan font-family="\ectt" font-size="\1200">Product</tspan>,
+indicates <tspan font-family="\ecti" font-size="\1200">aggregation </tspan>in UML. This is a weaker relationship than composition, as the aggregate
+does not control the lifespan of the part, but it still indicates a strong relationship between the
+classes.
+</p><!--l. 440--><p class="indent" >   A dashed line with an open arrowhead (e.g. from <tspan font-family="\ectt" font-size="\1200">CartManager </tspan>to <tspan font-family="\ectt" font-size="\1200">Product</tspan>) indicates that one classifier
+<tspan font-family="\ecti" font-size="\1200">depends </tspan>on (or uses) another. This is meant to indicate a transient relationship.
+</p><!--l. 443--><p class="indent" >   A dashed lines with a closed and hollow arrowhead (e.g. from <tspan font-family="\ectt" font-size="\1200">Checkout </tspan>to <tspan font-family="\ecst" font-size="\1200">CartCheckout</tspan>) indicates that
+the class is <tspan font-family="\ecti" font-size="\1200">realising </tspan>(or implementing) that interface.
+</p><!--l. 446--><p class="indent" >   <tspan font-family="\ecti" font-size="\1200">Italicised </tspan>names indicate an abstract classifier. Keywords are used to indicate the type of a
+classifier. In this example, the keyword «interface»&#x00A0;indicates that the classifier is an interface.
+Stereotypes use the same notation as keywords. Three standard stereotypes for classes in UML
+are:
+   </p><dl class="description"><dt class="description">
+   <!--l. 450--><p class="noindent" >
+                                                                                                    
+                                                                                                    
+   <tspan font-family="\ecbx" font-size="\1200">«entity»</tspan> </p></dt><dd 
+class="description">
+   <!--l. 450--><p class="noindent" >Represents a concept (<tspan font-family="\ecti" font-size="\1200">entity</tspan>) from the problem domain.
+   </p></dd><dt class="description">
+   <!--l. 451--><p class="noindent" >
+   <tspan font-family="\ecbx" font-size="\1200">«control»</tspan> </p></dt><dd 
+class="description">
+   <!--l. 451--><p class="noindent" >Provides logical behaviour from the solution domain.
+   </p></dd><dt class="description">
+   <!--l. 452--><p class="noindent" >
+   <tspan font-family="\ecbx" font-size="\1200">«boundary»</tspan> </p></dt><dd 
+class="description">
+   <!--l. 452--><p class="noindent" >Communicates with something outside of the system. (Not shown in diagram.)</p></dd></dl>
+<!--l. 454--><p class="noindent" >An additional stereotype «bean»&#x00A0;is used to indicate that the class is a Java bean.
+</p><!--l. 456--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">4.4.2   </span> <a 
+ id="x1-170004.4.2"></a>Detailed Behaviour Structure</h5>
+<!--l. 457--><p class="noindent" >Figure <a 
+href="#x1-17001r6">6<!--tex4ht:ref: fig:detailedSequenceDiagram --></a> is a detailed sequence showing how the class model in figure <a 
+href="#x1-15001r5">5<!--tex4ht:ref: fig:classDiagram --></a> implements the behaviour of a
+customer adding a product to their shopping cart. Like with the high-level sequence diagram, you
+would only provide detailed sequence diagrams to describe architecturally important details of the
+design.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<dl class="list1"><dt class="list">
+</dt><dd 
+class="list">
+<!--l. 463--><p class="noindent" ><img 
+src="images/uml/detailed_sequence_diagram.png" alt="PIC"  
+width="585" height="-4604"  /></p></dd></dl>
+<a 
+ id="x1-17001r6"></a>
+<br />                                                                                                    <div class="caption" 
+><span class="id">
+Figure&#x00A0;6: </span><span  
+class="content">Example detailed sequence diagram showing the implementation of customer adding a product
+to their shopping cart.
+</span></div><!--tex4ht:label?: x1-17001r6 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 470--><p class="noindent" >The scenario starts with the JSF session-scoped bean <tspan font-family="\ectt" font-size="\1200">WebCart </tspan>receiving the <tspan font-family="\ectt" font-size="\1200">updateCart </tspan>message from the
+browser. <tspan font-family="\ectt" font-size="\1200">WebCart </tspan>retrieves the product id and uses the <tspan font-family="\ectt" font-size="\1200">ManageCart </tspan>interface to send it, along with the cart id,
+to the <tspan font-family="\ectt" font-size="\1200">ShoppingCart </tspan>component on the application server. The <tspan font-family="\ectt" font-size="\1200">ManageCart </tspan>interface is implemented by the
+<tspan font-family="\ectt" font-size="\1200">CartManager </tspan>class in the <tspan font-family="\ectt" font-size="\1200">ShoppingCart </tspan>component.
+</p><!--l. 476--><p class="indent" >   The <tspan font-family="\ectt" font-size="\1200">CartManager </tspan>uses two JPA data access objects (DAOs) to retrieve the cart and product entities from
+the application database. Once the product is added to the cart, the <tspan font-family="\ectt" font-size="\1200">CartDAO </tspan>saves the updated cart details to
+the database. Upon successfully saving the updated cart, the <tspan font-family="\ectt" font-size="\1200">CartManager </tspan>notifies the <tspan font-family="\ectt" font-size="\1200">WebCart </tspan>object in the
+<tspan font-family="\ectt" font-size="\1200">ProductBrowsing </tspan>component in the J2EE server.
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">4.4.3   </span> <a 
+ id="x1-180004.4.3"></a>Sequence Diagram Notation</h5>
+<!--l. 482--><p class="noindent" >The «create»&#x00A0;and «destroy»&#x00A0;stereotypes indicate when instances are created or destroyed. When an instance
+is created, its lifeline starts at the level of the sequence diagram that indicates the time when
+it is created. When an instance is destroyed, its lifeline finishes, with a large <tspan font-family="\ectt" font-size="\1200">X</tspan>. Lifelines that
+are at the top of the diagram indicate instances that existed before the start of the scenario.
+Lifelines that reach the bottom of the diagram indicate instances that still exist after the end of the
+scenario.
+</p><!--l. 488--><p class="indent" >   In figure <a 
+href="#x1-17001r6">6<!--tex4ht:ref: fig:detailedSequenceDiagram --></a>, system boundary boxes are used to indicate which objects execute on which nodes from the
+deployment diagram.
+</p><!--l. 490--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">4.5   </span> <a 
+ id="x1-190004.5"></a>Delivering Architecturally Significant Requirements</h4>
+<!--l. 491--><p class="noindent" >In section <a 
+href="#x1-80004.1">4.1<!--tex4ht:ref: sec:storeReq --></a>, four ASRs were identified for the Sahara eCommerce system. These were the abililty to continue
+shopping on different devices, scalability, robustness and availability.
+</p><!--l. 494--><p class="indent" >   Implementing shared logic on an application server, as shown in figure <a 
+href="#x1-9001r2">2<!--tex4ht:ref: fig:deploymentDiagram --></a>, enables the web and mobile
+applications to share common logic and state. This delivers the functionality of allowing a customer to start
+shopping on one device and to continue on another device. It also minimises duplication of logic, as it is shared
+by the frontend applications.
+</p><!--l. 499--><p class="indent" >   Using separate servers for the web server, application server, application database, and data mining server,
+as shown in figure <a 
+href="#x1-9001r2">2<!--tex4ht:ref: fig:deploymentDiagram --></a>, provides more options to deliver scalability, robustness and availability. For scalability
+and performance, each computing environment can be optimised for the services it delivers. It also means that
+new servers can be deployed to target specific bottlenecks.
+</p><!--l. 504--><p class="indent" >   The  system  follows  the  <a 
+href="https://www.redhat.com/en/topics/cloud-native-apps/stateful-vs-stateless" ><tspan font-family="\ecti" font-size="\1200">stateless architecture</tspan>
+pattern</a><span class="footnote-mark"><a 
+href="#fn13x0" id="fn13x0-bk"><sup class="textsuperscript">13</sup></a></span><a 
+ id="x1-19001f13"></a>.
+The web and mobile applications do not store any application state (e.g. products currently stored in the
+shopping cart). Every time the customer performs a transaction (e.g. viewing product details or
+adding a product to their shopping cart), the web or mobile application sends a message to the
+application server to perform the action. The application server then saves or loads data to or from the
+application database. This means that web and mobile applications can send messages to a different
+application server for each request. This facilitates scalability, robustness and availability. A new
+application server can be started to cater for increasing system load, or to replace a failed server. The
+stateless nature of the application server logic means that no data will be lost if a server fails, or if a
+frontend application accesses a different application server in the middle of a customer&#8217;s shopping
+experience.
+</p><!--l. 515--><p class="indent" >   Having multiple application servers, and multiple application databases and data mining servers, means
+that if one server fails its load can be picked up by other servers. Automating the process of starting or
+                                                                                                    
+                                                                                                    
+restarting servers improves robustness and availability.
+</p><!--l. 519--><p class="indent" >   One challenge of a stateless architecture is providing a replicated database that contains up-to-date copies
+of the system&#8217;s state. We will look at this issue later in the course.
+</p><!--l. 522--><p class="indent" >   By designing the architecture as a set of components running on different servers, it is also
+easier to migrate the application to cloud-based infrastructure. Figure <a 
+href="#x1-9001r2">2<!--tex4ht:ref: fig:deploymentDiagram --></a> does not constrain the
+system to run on physical hardware hosted by Sahara eCommerce. Any of the nodes could be
+provisioned by a service offered by a cloud provider. Figure <a 
+href="#x1-27003r18">18<!--tex4ht:ref: fig:c4_deployment --></a> in section <a 
+href="#x1-270005.6">5.6<!--tex4ht:ref: sec:c4_deployment --></a> provides an example of
+a hybrid cloud solution. In that example, the on-line store components of the architecture run
+on hardware hosted by Sahara eCommerce. The data mining components run on Oracle&#8217;s cloud
+infrastructure.
+</p><!--l. 529--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">5   </span> <a 
+ id="x1-200005"></a>C4 Model</h3>
+<!--l. 530--><p class="noindent" >Simon Brown&#8217;s C4 model provides a set of abstractions that describe the static structure of the software
+architecture <span class="cite">[<a 
+href="#Xbrown2022c4">7</a>]</span>. The C4 model uses these abstractions in a hierarchical set of diagrams, each
+leading to finer levels of detail. The hierarchical structure is based on the idea that a software
+system is composed of containers, which are implemented by components, that are built using
+code.
+      </p><dl class="description"><dt class="description">
+      <!--l. 534--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">Software System</tspan> </p></dt><dd 
+class="description">
+      <!--l. 534--><p class="noindent" >Something that delivers functional value to its users (human or other systems).
+      </p></dd><dt class="description">
+      <!--l. 535--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">Containers</tspan> </p></dt><dd 
+class="description">
+      <!--l. 535--><p class="noindent" >Deployable &#8216;block&#8217; of code or data that provides behaviour as part of the software system.
+      </p></dd><dt class="description">
+      <!--l. 536--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">Components</tspan> </p></dt><dd 
+class="description">
+      <!--l. 536--><p class="noindent" >Encapsulate a group of related functionality, usually hidden behind a published interface.
+      </p></dd><dt class="description">
+      <!--l. 537--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">Code</tspan> </p></dt><dd 
+class="description">
+      <!--l. 537--><p class="noindent" >Elements built from programming language constructs, e.g. classes, interfaces, functions, ....</p></dd></dl>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 542--><p class="noindent" ><img 
+src="images/c4_terminology.jpg" alt="PIC"  
+width="420" height="344"  /> <a 
+ id="x1-20001r7"></a>
+<br />                                                                                                    </p><div class="caption" 
+><span class="id">
+Figure&#x00A0;7: </span><span  
+class="content">Levels within the C4 model (figure 2.1 from <span class="cite">[<a 
+href="#Xbrown2022c4">7</a>]</span>).                                           </span></div><!--tex4ht:label?: x1-20001r7 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 547--><p class="noindent" >This leads to describing the static structure of software architecture through four levels of abstraction. Each
+level providing detail about parts of the previous level.
+      </p><dl class="description"><dt class="description">
+      <!--l. 551--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">Context</tspan> </p></dt><dd 
+class="description">
+      <!--l. 551--><p class="noindent" >How the software system fits into the broader context around it.
+      </p></dd><dt class="description">
+      <!--l. 552--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">Containers</tspan> </p></dt><dd 
+class="description">
+      <!--l. 552--><p class="noindent" >How the containers are connected to deliver system functionality.
+      </p></dd><dt class="description">
+      <!--l. 553--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">Components</tspan> </p></dt><dd 
+class="description">
+      <!--l. 553--><p class="noindent" >How the components are structured to implement a container&#8217;s behaviour.
+      </p></dd><dt class="description">
+      <!--l. 554--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">Code</tspan> </p></dt><dd 
+class="description">
+      <!--l. 554--><p class="noindent" >How the code is structured to implement a component.</p></dd></dl>
+   <h4 class="subsectionHead"><span class="titlemark">5.1   </span> <a 
+ id="x1-210005.1"></a>System Context</h4>
+<!--l. 558--><p class="noindent" >The system context provides the &#8216;big picture&#8217; perspective of the software system. It describes the key purpose
+of the system, who uses it, and with which other systems it interacts. The context diagram is usually
+a simple block diagram. The software system being designed typically sits in the centre of the
+diagram surrounded by uers and other systems. The intent is to set the context for thinking about
+the software system&#8217;s architecture. It can also be used to communicate basic structural ideas to
+non-technical stakeholders. Figure <a 
+href="#x1-21001r8">8<!--tex4ht:ref: fig:c4_context --></a> is a context diagram for the Sahara eCommerce example from section
+<a 
+href="#x1-70004">4<!--tex4ht:ref: sec:storeExample --></a>.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 568--><p class="noindent" ><img 
+src="images/c4/context_diagram.png" alt="PIC"  
+width="525" height="520"  /> <a 
+ id="x1-21001r8"></a>
+<br />                                                                                                    </p><div class="caption" 
+><span class="id">
+Figure&#x00A0;8: </span><span  
+class="content">Context diagram for the Saraha eCommerce on-line store.                                 </span></div><!--tex4ht:label?: x1-21001r8 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 573--><p class="noindent" >Figure <a 
+href="#x1-21002r9">9<!--tex4ht:ref: fig:c4_context_key --></a> is the key to help interpret the context diagram. A key is important for C4 diagrams, as they do not
+have a formal syntax and specification like UML diagrams.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<dl class="list1"><dt class="list">
+</dt><dd 
+class="list">
+<!--l. 579--><p class="noindent" ><img 
+src="images/c4/context_diagram-key.png" alt="PIC"  
+width="567" height="693"  /></p></dd></dl>
+<a 
+ id="x1-21002r9"></a>
+<br />                                                                                                    <div class="caption" 
+><span class="id">
+Figure&#x00A0;9: </span><span  
+class="content">Context diagram key.
+</span></div><!--tex4ht:label?: x1-21002r9 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 586--><p class="noindent" >The context diagram situates the on-line store software system in the environment in which it will be used.
+There are customers who shop at the on-line store, which is part of Sahara eCommerce&#8217;s software ecosystem.
+The on-line store uses a data mining service that is also implemented by the company. The two key
+relationships between the on-line store and the data mining service are that the on-line store sends customer
+browsing data to the service, and that the on-line store requests the data mining service to recommend
+products for a customer.
+</p><!--l. 594--><p class="indent" >   In C4, arrows are used to indicate the main direction of the relationship, not the flow of data. So, in this
+example, the arrow points from the on-line store to the data mining service as it is the store that manages the
+communication.
+</p><!--l. 597--><p class="indent" >   In UML, a high-level use case diagram can be used to convey similar information to the C4 context
+diagram. Kruchten&#8217;s &#8220;4+1 View Model of Software Architecture&#8221; <span class="cite">[<a 
+href="#X4+1-model">3</a>]</span> uses this approach.
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">5.2   </span> <a 
+ id="x1-220005.2"></a>Containers</h4>
+<!--l. 601--><p class="noindent" >Container diagrams provide an overview of the software architecture. They describe the main structure of the
+software system and the technologies selected to implement these aspects of the system. Containers are &#8216;blocks&#8217;
+of code that can be independently deployed and executed. Examples of containers are web or
+mobile applications, databases, message buses, .... It is important to note that this is not a type of
+deployment diagram. Containers may be deployed on the same computing infrastructure or on different
+devices.
+</p><!--l. 608--><p class="indent" >   While the container diagram does not explicitly show computing infrastructure, some of the infrastructure
+may be implied by the types of containers. Decisions about how containers are connected and communicate
+have major implications for how the components and code will be designed and deployed. Figure&#x00A0;<a 
+href="#x1-22001r10">10<!--tex4ht:ref: fig:c4_container_store --></a> is a
+container diagram for the on-line store.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<dl class="list1"><dt class="list">
+</dt><dd 
+class="list">
+<!--l. 614--><p class="noindent" ><img 
+src="images/c4/store_container_diagram.png" alt="PIC"  
+width="573" height="509"  /></p></dd></dl>
+<a 
+ id="x1-22001r10"></a>
+<br />                                                                                                    <div class="caption" 
+><span class="id">
+Figure&#x00A0;10: </span><span  
+class="content">Container diagram for the on-line store software system.
+</span></div><!--tex4ht:label?: x1-22001r10 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 621--><p class="noindent" >Customers can access the on-line store through either web or mobile applications. The <tspan font-family="\ectt" font-size="\1200">Interactive Web</tspan>
+<tspan font-family="\ectt" font-size="\1200">Pages </tspan>container indicates that some of the web application&#8217;s behaviour is delivered in a separate container.
+This indicates similar information as in figure <a 
+href="#x1-9001r2">2<!--tex4ht:ref: fig:deploymentDiagram --></a>, where the customer&#8217;s computer and browser were included in
+the deployment diagram to show that a JavaScript component was to be deployed to run in the
+browser.
+</p><!--l. 627--><p class="indent" >   The web and mobile applications both communicate with the application backend, via different protocols,
+to provide the logical behaviour of the on-line store. The backend uses JPA to perform database operations on
+the application&#8217;s database.
+</p><!--l. 630--><p class="indent" >   To provide a link to the context diagram, a container diagram usually shows which containers communicate
+with which external elements. The text inside the square brackets in a container, and on a relationship,
+indicates the technology used to implement that container or relationship.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 635--><p class="noindent" ><img 
+src="images/c4/container_diagram-key.png" alt="PIC"  
+width="525" height="-262"  /> <a 
+ id="x1-22002r11"></a>
+<br />                                                                                                    </p><div class="caption" 
+><span class="id">
+Figure&#x00A0;11: </span><span  
+class="content">Container diagram key.                                                                  </span></div><!--tex4ht:label?: x1-22002r11 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 640--><p class="indent" >   While a container diagram does not explicitly show computing infrastructure, some of it can be implied by
+the types of containers in the diagram. Clearly, the mobile app and the code running in the interactive
+web pages have to be separate computing platforms to the rest of the on-line store&#8217;s software
+system.
+</p><!--l. 645--><p class="indent" >   Colours and icons can be used to provide further information in the diagrams. The diagram key in
+figure&#x00A0;<a 
+href="#x1-22002r11">11<!--tex4ht:ref: fig:c4_container_key --></a> explains the purpose of each icon and colour. UML also allows you to use icons and
+colours to add further information to a model, it is just difficult to do in many UML modelling
+tools.
+</p><!--l. 650--><p class="noindent" >The data mining service software system (figure <a 
+href="#x1-22003r12">12<!--tex4ht:ref: fig:c4_container_datamining --></a>) has three main containers.
+</p><!--l. 653--><p class="indent" >   <tspan font-family="\ectt" font-size="\1200">Data Mining Interface </tspan>provides the interface used to interact with the data mining service. It accepts
+data to store for future data mining. It returns suggestions based on requests from external systems, such as
+the on-line store.
+</p><!--l. 657--><p class="indent" >   <tspan font-family="\ectt" font-size="\1200">Data Mining Process </tspan>performs the data mining logic.
+</p><!--l. 659--><p class="indent" >   <tspan font-family="\ectt" font-size="\1200">Data Warehouse </tspan>stores the data and provides an SQL-based query system to manipulate the
+data.
+</p>
+<div class="center" 
+>
+<!--l. 661--><p class="noindent" >
+</p><dl class="list1"><dt class="list">
+</dt><dd 
+class="list">
+<!--l. 662--><p class="noindent" ><img 
+src="images/c4/datamining_container_diagram.png" alt="PIC"  
+width="549" height="549"  /></p></dd></dl>
+<a 
+ id="x1-22003r12"></a>
+<br />                                                                                                    <div class="caption" 
+><span class="id">
+Figure&#x00A0;12: </span><span  
+class="content">Container diagram for the data mining service software system.
+</span></div><!--tex4ht:label?: x1-22003r12 -->
+</div>
+   <h4 class="subsectionHead"><span class="titlemark">5.3   </span> <a 
+ id="x1-230005.3"></a>Components</h4>
+<!--l. 670--><p class="noindent" >Component diagrams describe the major parts of containers and how they are connected. Components should
+describe their important responsibilities and the technology used to implement them (e.g. using React to
+implement a web frontend component). Like a container diagram, a component diagram can include elements
+from higher level diagrams to provide context of how the components interact with elements outside of the
+container.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<dl class="list1"><dt class="list">
+</dt><dd 
+class="list">
+<!--l. 678--><p class="noindent" ><img 
+src="images/c4/appbackend_component_diagram.png" alt="PIC"  
+width="573" height="566"  /></p></dd></dl>
+<a 
+ id="x1-23001r13"></a>
+<br />                                                                                                    <div class="caption" 
+><span class="id">
+Figure&#x00A0;13: </span><span  
+class="content">Component diagram for the application backend container.
+</span></div><!--tex4ht:label?: x1-23001r13 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 685--><p class="noindent" >In figure <a 
+href="#x1-23001r13">13<!--tex4ht:ref: fig:c4_component_appbackend --></a>, the application backend is divided into five main components. The <tspan font-family="\ectt" font-size="\1200">Shopping Cart </tspan>component
+provides the backend logic of implementing a shopping cart. The web application interacts with the
+<tspan font-family="\ectt" font-size="\1200">Shopping Cart </tspan>component via RMI. The <tspan font-family="\ectt" font-size="\1200">Shopping Cart </tspan>component would provide interfaces
+for this interaction. The mobile applications use a REST API provided by the <tspan font-family="\ectt" font-size="\1200">Shopping Cart</tspan>
+<tspan font-family="\ectt" font-size="\1200">Controller </tspan>component to interact with the <tspan font-family="\ectt" font-size="\1200">Shopping Cart</tspan>. <tspan font-family="\ectt" font-size="\1200">Shopping Cart </tspan>uses the <tspan font-family="\ectt" font-size="\1200">Product</tspan>,
+<tspan font-family="\ectt" font-size="\1200">Order </tspan>and <tspan font-family="\ectt" font-size="\1200">Customer </tspan>components to deliver its behaviour. These are all implemented as Java
+beans.
+</p><!--l. 694--><p class="indent" >   The <tspan font-family="\ectt" font-size="\1200">Product</tspan>, <tspan font-family="\ectt" font-size="\1200">Order </tspan>and <tspan font-family="\ectt" font-size="\1200">Customer </tspan>components use JPA to retrieve and store data in the application
+database. (As indicated in section <a 
+href="#x1-110004.3">4.3<!--tex4ht:ref: sec:CnC_view --></a>, only the components related to managing the shopping cart are shown
+in this example.)
+</p><!--l. 697--><p class="indent" >   Figure <a 
+href="#x1-23002r14">14<!--tex4ht:ref: fig:c4_component_key --></a>, shows the icons and colours used to represent different elements in the component
+diagrams.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<dl class="list1"><dt class="list">
+</dt><dd 
+class="list">
+<!--l. 701--><p class="noindent" ><img 
+src="images/c4/component_diagram-key.png" alt="PIC"  
+width="567" height="2722"  /></p></dd></dl>
+<a 
+ id="x1-23002r14"></a>
+<br />                                                                                                    <div class="caption" 
+><span class="id">
+Figure&#x00A0;14: </span><span  
+class="content">Component diagram key.
+</span></div><!--tex4ht:label?: x1-23002r14 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 708--><p class="indent" >
+                                                                                                    
+                                                                                                    
+</p><!--l. 709--><p class="noindent" >Figure <a 
+href="#x1-23003r15">15<!--tex4ht:ref: fig:c4_component_webapp --></a> shows the components that provide the frontend behaviour of browsing for products, adding them to
+the shopping cart, and purchasing them.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 715--><p class="noindent" ><img 
+src="images/c4/webapp_component_diagram.png" alt="PIC"  
+width="341" height="350"  /> <a 
+ id="x1-23003r15"></a>
+<br />                                                                                                    </p><div class="caption" 
+><span class="id">
+Figure&#x00A0;15: </span><span  
+class="content">Component diagram for the web application container.                                   </span></div><!--tex4ht:label?: x1-23003r15 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 720--><p class="noindent" >Figure <a 
+href="#x1-23004r16">16<!--tex4ht:ref: fig:c4_component_browser --></a>, shows that the <tspan font-family="\ectt" font-size="\1200">Product Animator </tspan>component is downloaded from the web application to the
+customer&#8217;s browser and that it is implemented in JavaScript. This provides similar information about the
+<tspan font-family="\ectt" font-size="\1200">Product Animator </tspan>component, as described in section <a 
+href="#x1-90004.2">4.2<!--tex4ht:ref: sec:storeAllocView --></a>.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 727--><p class="noindent" ><img 
+src="images/c4/browser_component_diagram.png" alt="PIC"  
+width="341" height="378"  /> <a 
+ id="x1-23004r16"></a>
+<br />                                                                                                    </p><div class="caption" 
+><span class="id">
+Figure&#x00A0;16: </span><span  
+class="content">Component diagram for the interactive web pages container.                              </span></div><!--tex4ht:label?: x1-23004r16 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+   <h5 class="subsubsectionHead"><span class="titlemark">5.3.1   </span> <a 
+ id="x1-240005.3.1"></a>Component Diagram Detail</h5>
+<!--l. 733--><p class="noindent" >There may be some components that are important parts of the software design, but which may not
+necessarily be included in component diagrams. For example, a logging component is an important part of
+many software systems. But, due to the nature of a logging component, most other components will use it.
+Adding it to component diagrams will often clutter the diagrams without adding much useful
+information. Usually it is better to add a note indicating which logging component is used in
+the system. If it is helpful to indicate which components use the logging component, it may be
+better to colour code these components or use an icon to represent that they use the logging
+component.
+</p><!--l. 742--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">5.4   </span> <a 
+ id="x1-250005.4"></a>Code</h4>
+<!--l. 743--><p class="noindent" >The code-level diagrams describe the structure of the code that implements a component. The intent is to
+provide a visual representation of the important aspects of the code&#8217;s structure. Rarely do you need to provide
+all the detail that replicates the source code. (The source code could be considered a fifth level to the C4
+model.)
+</p><!--l. 748--><p class="indent" >   The C4 model suggests using diagrams appropriate to your programming paradigm. Assuming the
+implementation is in an object-oriented language, a UML class diagram would be an appropriate way to model
+the design of the code. Figure <a 
+href="#x1-15001r5">5<!--tex4ht:ref: fig:classDiagram --></a>, from section <a 
+href="#x1-150004.4">4.4<!--tex4ht:ref: sec_moduleView --></a>, would be an example class diagram of how the <tspan font-family="\ectt" font-size="\1200">Shopping</tspan>
+<tspan font-family="\ectt" font-size="\1200">Cart </tspan>component is implemented.
+</p><!--l. 753--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">5.5   </span> <a 
+ id="x1-260005.5"></a>Dynamic</h4>
+<!--l. 754--><p class="noindent" >Dynamic diagrams in C4 are similar to UML communication diagrams. (Communication and sequence
+diagrams are types of interaction diagrams. They show the same information but with different
+visual emphasis. Sequence diagrams focus on the time or ordered sequence of events that occur in
+a scenario. Communication diagrams focus on the links and extent of communication between
+objects.)
+</p><!--l. 760--><p class="indent" >   As was mentioned about behavioural structures in sections <a 
+href="#x1-130004.3.2">4.3.2<!--tex4ht:ref: sec:behaviourStruct --></a> and <a 
+href="#x1-170004.4.2">4.4.2<!--tex4ht:ref: sec:detailedBehaviourStruct --></a>, dynamic diagrams are usually
+only provided to explain how the architecture delivers complex behaviour.
+</p><!--l. 763--><p class="indent" >   Figure <a 
+href="#x1-26001r17">17<!--tex4ht:ref: fig:c4_dynamic --></a> provides an overview of how the <tspan font-family="\ectt" font-size="\1200">Product Browsing </tspan>component in the <tspan font-family="\ectt" font-size="\1200">Web Application</tspan>
+container collaborates with the <tspan font-family="\ectt" font-size="\1200">Shopping Cart </tspan>component in the <tspan font-family="\ectt" font-size="\1200">Application Backend </tspan>container to deliver
+the behaviour of a customer adding a product to their shopping cart. It also shows the communication between
+the <tspan font-family="\ectt" font-size="\1200">Shopping Cart </tspan>component and the application database.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 771--><p class="noindent" ><img 
+src="images/c4/add_to_cart_dynamic_diagram.png" alt="PIC"  
+width="525" height="591"  /> <a 
+ id="x1-26001r17"></a>
+<br />                                                                                                    </p><div class="caption" 
+><span class="id">
+Figure&#x00A0;17: </span><span  
+class="content">Dynamic diagram for adding a product to the customer&#8217;s shopping cart.                  </span></div><!--tex4ht:label?: x1-26001r17 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 776--><p class="noindent" >If the information is useful, a more detailed dynamic diagram, like the detailed sequence diagram in figure&#x00A0;<a 
+href="#x1-17001r6">6<!--tex4ht:ref: fig:detailedSequenceDiagram --></a>,
+can be provided. Sequence diagrams can be used instead of C4 dynamic diagrams, if the order of events is
+important.
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">5.6   </span> <a 
+ id="x1-270005.6"></a>Deployment</h4>
+<!--l. 781--><p class="noindent" >While not one of the &#8220;four C&#8217;s&#8221;, deployment diagrams are important for most systems. They describe
+the physical architecture or infrastructure on which the system will be deployed. It shows which
+containers will run on which computing platforms (<tspan font-family="\ecti" font-size="\1200">deployment nodes</tspan>). Deployment nodes can be
+nested, as shown in figure <a 
+href="#x1-27003r18">18<!--tex4ht:ref: fig:c4_deployment --></a>. They may also contain infrastructure nodes or software system
+instances<span class="footnote-mark"><a 
+href="#fn14x0" id="fn14x0-bk"><sup class="textsuperscript">14</sup></a></span><a 
+ id="x1-27001f14"></a>.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<dl class="list1"><dt class="list">
+</dt><dd 
+class="list">
+<!--l. 789--><p class="noindent" ><img 
+src="images/c4/deployment_diagram.png" alt="PIC"  
+width="567" height="644"  /></p></dd></dl>
+<a 
+ id="x1-27003r18"></a>
+<br />                                                                                                    <div class="caption" 
+><span class="id">
+Figure&#x00A0;18: </span><span  
+class="content">Deployment diagram for the Sahara eCommerce System.
+</span></div><!--tex4ht:label?: x1-27003r18 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 796--><p class="indent" >   Figure <a 
+href="#x1-27003r18">18<!--tex4ht:ref: fig:c4_deployment --></a> is an example C4 deployment diagram for the Sahara eCommerce system. It takes a slightly
+different approach to the physical architecture than was shown in figure <a 
+href="#x1-9001r2">2<!--tex4ht:ref: fig:deploymentDiagram --></a>. It shows that the on-line store
+software system runs in Sahara&#8217;s data centre. The data mining service runs on Oracle&#8217;s cloud infrastructure.
+This approach of a system that uses cloud services for some of its implementation is called a <tspan font-family="\ecti" font-size="\1200">hybrid cloud</tspan>
+application. There are still the apps running on mobile devices and the code running in the customer&#8217;s
+browser.
+</p><!--l. 803--><p class="indent" >   Like UML, a software environment is embedded in the hardware environment on which it runs. The web
+application runs in an Apache TomEE J2EE server, which is running on a Ubuntu server. The &#8220;<tspan font-family="\ectt" font-size="\1200">x4</tspan>&#8221; inside the
+web server deployment node indicates that there will be four of these servers to share the load. The application
+backend runs on eight Ubuntu servers, providing the core business logic shared by the web and mobile
+applications.
+</p><!--l. 808--><p class="indent" >   The application database runs in MySQL on its own Ubuntu server. Replication of the application
+database is explicitly shown in this example, whereas it was not shown in figure <a 
+href="#x1-9001r2">2<!--tex4ht:ref: fig:deploymentDiagram --></a>. Replicating the database
+running on another server allows for failover. The application backend can continue to operate if the primary
+application database fails.
+</p><!--l. 813--><p class="indent" >   In this version of the example, the application backend communicates with the data mining
+service through an API published by the data mining interface running in a virtual machine on
+Oracle&#8217;s cloud infrastructure. The data mining service uses Oracle&#8217;s machine learning services to
+perform the data mining. Oracle&#8217;s cloud-based data warehouse infrastructure is used to hold all the
+data.
+</p><!--l. 818--><p class="noindent" >Figure <a 
+href="#x1-27004r19">19<!--tex4ht:ref: fig:c4_deployment_key --></a> is the key describing the icons and colours used in the deployment diagram.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<dl class="list1"><dt class="list">
+</dt><dd 
+class="list">
+<!--l. 823--><p class="noindent" ><img 
+src="images/c4/deployment_diagram-key.png" alt="PIC"  
+width="567" height="-3289"  /></p></dd></dl>
+<a 
+ id="x1-27004r19"></a>
+<br />                                                                                                    <div class="caption" 
+><span class="id">
+Figure&#x00A0;19: </span><span  
+class="content">Deployment diagram key.
+</span></div><!--tex4ht:label?: x1-27004r19 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+   <h3 class="sectionHead"><span class="titlemark">6   </span> <a 
+ id="x1-280006"></a>Tools</h3>
+<!--l. 831--><p class="noindent" >We do not advocate a specific notation or support tools. Both UML and C4 have been used so that you are
+aware of some options. UML is a standardised notation, with formal syntax and semantics. There will
+be situations where the formality will be useful. C4 is popular because it has a basic structure,
+but the rules are intentionally loose to make it easy to adopt. Regardless of whether you use
+UML, C4, or another notation, you should use tools to aid the creation of your diagrams and
+documentation.
+</p><!--l. 1--><p class="indent" >   The important thing is that you should use a modelling tool, not a drawing tool. Many drawing tools
+provide UML templates, and some also support C4. The issue with drawing tools is that they do not know
+what the elements of the diagram mean. If the name of an operation in a class is changed in a
+drawing tool, you will need to manually change it wherever it is referenced in other diagrams (e.g. in
+sequence diagrams). A modelling tool will track the information that describes the model, so that a
+change to a model element in one place, will be replicated wherever that element appears in other
+diagrams.
+</p><!--l. 9--><p class="indent" >   There are many tools that support UML. In a commercial project using UML on a
+large system, the cost of professional UML tools is negligible and is quickly recovered by
+the automation they provide. There are a number of free UML tools. Some to consider are
+<a 
+href="https://astah.net/products/free-student-license/" >Astah</a><span class="footnote-mark"><a 
+href="#fn15x0" id="fn15x0-bk"><sup class="textsuperscript">15</sup></a></span><a 
+ id="x1-28001f15"></a>,
+<a 
+href="https://www.modelio.org/" >ModelIO</a><span class="footnote-mark"><a 
+href="#fn16x0" id="fn16x0-bk"><sup class="textsuperscript">16</sup></a></span><a 
+ id="x1-28003f16"></a>, or
+<a 
+href="https://plantuml.com/" >PlantUML</a><span class="footnote-mark"><a 
+href="#fn17x0" id="fn17x0-bk"><sup class="textsuperscript">17</sup></a></span><a 
+ id="x1-28005f17"></a>.
+<a 
+href="https://www.visual-paradigm.com/" >Visual Paradigm</a><span class="footnote-mark"><a 
+href="#fn18x0" id="fn18x0-bk"><sup class="textsuperscript">18</sup></a></span><a 
+ id="x1-28007f18"></a>
+is not as recommended, as their free cloud-based tool is only a drawing tool, and not a modelling
+tool.
+</p><!--l. 16--><p class="indent" >
+      </p><dl class="description"><dt class="description">
+      <!--l. 16--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">Astah</tspan> </p></dt><dd 
+class="description">
+      <!--l. 16--><p class="noindent" >is a commercial product that supports visual modelling in many notations. They provide a free
+      UML tool for students.
+      </p></dd><dt class="description">
+      <!--l. 18--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">ModelIO</tspan> </p></dt><dd 
+class="description">
+      <!--l. 18--><p class="noindent" >is an open source visual UML modelling tool.
+      </p></dd><dt class="description">
+      <!--l. 19--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">PlantUML</tspan> </p></dt><dd 
+class="description">
+      <!--l. 19--><p class="noindent" >Is an open source text-based descriptive language that generates UML diagrams. <a 
+href="https://www.planttext.com/" >PlantText</a><span class="footnote-mark"><a 
+href="#fn19x0" id="fn19x0-bk"><sup class="textsuperscript">19</sup></a></span><a 
+ id="x1-28009f19"></a>
+      is an online tool supporting it.
+      </p></dd><dt class="description">
+      <!--l. 21--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">Visual Paradigm</tspan> </p></dt><dd 
+class="description">
+                                                                                                    
+                                                                                                    
+      <!--l. 21--><p class="noindent" >is a commercial product that supports visual modelling in many notations. They provide a simple
+      free cloud-based drawing tool that supports UML and some limited aspects of C4, but it lacks
+      full modelling support.</p></dd></dl>
+<!--l. 25--><p class="noindent" >There are fewer tools that support C4. Some to consider are
+<a 
+href="https://www.structurizr.com/" >Structurizr</a><span class="footnote-mark"><a 
+href="#fn20x0" id="fn20x0-bk"><sup class="textsuperscript">20</sup></a></span><a 
+ id="x1-28011f20"></a>,
+<a 
+href="https://github.com/plantuml-stdlib/C4-PlantUML" >C4-PlantUML</a><span class="footnote-mark"><a 
+href="#fn21x0" id="fn21x0-bk"><sup class="textsuperscript">21</sup></a></span><a 
+ id="x1-28013f21"></a>,
+<a 
+href="https://www.archimatetool.com/" >Archi</a><span class="footnote-mark"><a 
+href="#fn22x0" id="fn22x0-bk"><sup class="textsuperscript">22</sup></a></span><a 
+ id="x1-28015f22"></a>,
+<a 
+href="https://icepanel.io/" >IcePanel</a><span class="footnote-mark"><a 
+href="#fn23x0" id="fn23x0-bk"><sup class="textsuperscript">23</sup></a></span><a 
+ id="x1-28017f23"></a>, or
+<a 
+href="https://gaphor.org/" >Gaphor</a><span class="footnote-mark"><a 
+href="#fn24x0" id="fn24x0-bk"><sup class="textsuperscript">24</sup></a></span><a 
+ id="x1-28019f24"></a>.
+</p><!--l. 31--><p class="indent" >
+      </p><dl class="description"><dt class="description">
+      <!--l. 31--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">Structurizr</tspan> </p></dt><dd 
+class="description">
+      <!--l. 31--><p class="noindent" >was  developed  by  Simon  Brown  as  a  tool  to  support  generating  C4  diagrams  from  textual
+      descriptions. UQ students may register for free access to the paid version of the <a 
+href="https://structurizr.com/help/academic" >Structurizr Cloud
+      Service</a><span class="footnote-mark"><a 
+href="#fn25x0" id="fn25x0-bk"><sup class="textsuperscript">25</sup></a></span><a 
+ id="x1-28021f25"></a>.
+      You must use your <tspan font-family="\ectt" font-size="\1200">student.uq.edu.au </tspan>or <tspan font-family="\ectt" font-size="\1200">uq.net.au </tspan>email address when you register to get free
+      access. Structurizr is an <a 
+href="https://github.com/structurizr/" >open source tool</a><span class="footnote-mark"><a 
+href="#fn26x0" id="fn26x0-bk"><sup class="textsuperscript">26</sup></a></span><a 
+ id="x1-28023f26"></a>.
+      You can use a domain specific language to describe a C4 model, or you can embed the details in
+      Java or .Net code.
+      </p></dd><dt class="description">
+      <!--l. 37--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">C4-PlantUML</tspan> </p></dt><dd 
+class="description">
+      <!--l. 37--><p class="noindent" >which extends PlantUML to support C4.
+      </p></dd><dt class="description">
+      <!--l. 38--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">Archi</tspan> </p></dt><dd 
+class="description">
+      <!--l. 38--><p class="noindent" >is an open source visual modelling tool that <a 
+href="https://www.archimatetool.com/blog/2020/04/18/c4-model-architecture-viewpoint-and-archi-4-7/" >supports C4</a><span class="footnote-mark"><a 
+href="#fn27x0" id="fn27x0-bk"><sup class="textsuperscript">27</sup></a></span><a 
+ id="x1-28025f27"></a>
+      and ArchiMate models.
+      </p></dd><dt class="description">
+      <!--l. 40--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">IcePanel</tspan> </p></dt><dd 
+class="description">
+      <!--l. 40--><p class="noindent" >is a cloud-based visual modelling tool that supports C4. There is a limited free license for the
+      tool.
+      </p></dd><dt class="description">
+      <!--l. 41--><p class="noindent" >
+<tspan font-family="\ecbx" font-size="\1200">Gaphor</tspan> </p></dt><dd 
+class="description">
+      <!--l. 41--><p class="noindent" >is an open source visual modelling tool that supports UML and C4.</p></dd></dl>
+                                                                                                    
+                                                                                                    
+<!--l. 44--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">6.1   </span> <a 
+ id="x1-290006.1"></a>Textual vs Visual Modelling</h4>
+<!--l. 45--><p class="noindent" >The tools described above include both graphical and textual modelling tools. Graphical tools, such as Astah, ModelIO,
+Archi and Gaphor, allow you to create models by drawing them. This approach is often preferred by <a 
+href="https://vark-learn.com/strategies/visual-strategies/" >visually oriented
+learners</a><span class="footnote-mark"><a 
+href="#fn28x0" id="fn28x0-bk"><sup class="textsuperscript">28</sup></a></span><a 
+ id="x1-29001f28"></a>.
+Text-based tools, such as PlantUML and Structurizr, allow you to create models by providing a
+textual description of the model. This approach is often preferred by <a 
+href="https://vark-learn.com/strategies/readwrite-strategies/" >read/write oriented
+learners</a><span class="footnote-mark"><a 
+href="#fn29x0" id="fn29x0-bk"><sup class="textsuperscript">29</sup></a></span><a 
+ id="x1-29003f29"></a>.
+</p><!--l. 51--><p class="indent" >   Despite preferences, there are situations where there are advantages of using a text-based modelling tool.
+Being text, the model can be stored and versioned in a version control system (e.g. git). For team projects, it is
+much easier for everyone to edit the model and ensure that you do not destory other team members&#8217; work. It is
+also possible to build a tool pipeline that will generate diagrams and embed them into the project
+documentation.
+</p><!--l. 56--><p class="indent" >   Text-based modelling tools, such as Structurizr or PlantUML, use a <a 
+href="https://opensource.com/article/20/2/domain-specific-languages" >domain specific
+language</a><span class="footnote-mark"><a 
+href="#fn30x0" id="fn30x0-bk"><sup class="textsuperscript">30</sup></a></span><a 
+ id="x1-29005f30"></a>
+(DSL) to describe the model. These tools require that you learn the syntax and semantics of the DSL. The
+following sources of information will help you learn the C4 DSL: </p>
+      <ul class="itemize1">
+      <li class="itemize">
+      <!--l. 61--><p class="noindent" ><a 
+href="https://github.com/structurizr/dsl/blob/master/docs/language-reference.md" >language reference manual</a><span class="footnote-mark"><a 
+href="#fn31x0" id="fn31x0-bk"><sup class="textsuperscript">31</sup></a></span><a 
+ id="x1-29007f31"></a>,
+      </p></li>
+      <li class="itemize">
+      <!--l. 62--><p class="noindent" ><a 
+href="https://github.com/structurizr/dsl/tree/master/docs/cookbook" >language examples</a><span class="footnote-mark"><a 
+href="#fn32x0" id="fn32x0-bk"><sup class="textsuperscript">32</sup></a></span><a 
+ id="x1-29009f32"></a>,
+      </p></li>
+      <li class="itemize">
+      <!--l. 63--><p class="noindent" ><a 
+href="https://structurizr.com/dsl" >on-line editable examples</a><span class="footnote-mark"><a 
+href="#fn33x0" id="fn33x0-bk"><sup class="textsuperscript">33</sup></a></span><a 
+ id="x1-29011f33"></a>,
+      and
+      </p></li>
+      <li class="itemize">
+      <!--l. 64--><p class="noindent" ><a 
+href="https://github.com/structurizr/cli/blob/master/docs/getting-started.md" >off-line tool</a><span class="footnote-mark"><a 
+href="#fn34x0" id="fn34x0-bk"><sup class="textsuperscript">34</sup></a></span><a 
+ id="x1-29013f34"></a>.</p></li></ul>
+<!--l. 66--><p class="noindent" >You may find that the Sahara eCommerce C4 model is useful as an example of a number of features of the
+DSL.
+</p><!--l. 68--><p class="indent" >   The following sources of information will help you learn how to use the PlantUML DSL: </p>
+      <ul class="itemize1">
+      <li class="itemize">
+      <!--l. 70--><p class="noindent" ><a 
+href="https://plantuml.com/guide" >language reference manual</a><span class="footnote-mark"><a 
+href="#fn35x0" id="fn35x0-bk"><sup class="textsuperscript">35</sup></a></span><a 
+ id="x1-29015f35"></a>,
+      </p></li>
+      <li class="itemize">
+      <!--l. 71--><p class="noindent" ><a 
+href="https://plantuml.com/" >language overview with examples</a><span class="footnote-mark"><a 
+href="#fn36x0" id="fn36x0-bk"><sup class="textsuperscript">36</sup></a></span><a 
+ id="x1-29017f36"></a>,
+      and
+      </p></li>
+      <li class="itemize">
+      <!--l. 72--><p class="noindent" ><a 
+href="https://www.planttext.com/" >on-line editable examples</a><span class="footnote-mark"><a 
+href="#fn37x0" id="fn37x0-bk"><sup class="textsuperscript">37</sup></a></span><a 
+ id="x1-29019f37"></a>.</p></li></ul>
+<!--l. 75--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">6.2   </span> <a 
+ id="x1-300006.2"></a>Example Diagrams</h4>
+<!--l. 76--><p class="noindent" >You are able to download the UML and C4 models of the Sahara eCommerce example, from the course website. The <a 
+href="https://csse6400.uqcloud.net/resources/Sahara_eCommerce.asta" >UML
+                                                                                                    
+                                                                                                    
+model</a><span class="footnote-mark"><a 
+href="#fn38x0" id="fn38x0-bk"><sup class="textsuperscript">38</sup></a></span><a 
+ id="x1-30001f38"></a> was created
+using <a 
+href="https://astah.net/products/free-student-license/" >Astah</a><span class="footnote-mark"><a 
+href="#fn39x0" id="fn39x0-bk"><sup class="textsuperscript">39</sup></a></span><a 
+ id="x1-30003f39"></a>.
+You may use this as an example of creating a model using a visual modelling tool. There is a little more detail
+in the Astah model than what is shown in these notes.
+</p><!--l. 82--><p class="indent" >   The <a 
+href="https://csse6400.uqcloud.net/resources/c4_model.zip" >C4 model</a><span class="footnote-mark"><a 
+href="#fn40x0" id="fn40x0-bk"><sup class="textsuperscript">40</sup></a></span><a 
+ id="x1-30005f40"></a> was created
+using the <a 
+href="https://www.structurizr.com/" >Structurizr</a><span class="footnote-mark"><a 
+href="#fn41x0" id="fn41x0-bk"><sup class="textsuperscript">41</sup></a></span><a 
+ id="x1-30007f41"></a> DSL
+(<a 
+href="https://opensource.com/article/20/2/domain-specific-languages" >Domain Specific Language</a><span class="footnote-mark"><a 
+href="#fn42x0" id="fn42x0-bk"><sup class="textsuperscript">42</sup></a></span><a 
+ id="x1-30009f42"></a>).
+You may use the C4 model as an example of creating a model using a textual description of the model (the
+DSL).
+</p><!--l. 841--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">7   </span> <a 
+ id="x1-310007"></a>Conclusion</h3>
+<!--l. 842--><p class="noindent" >Architectural views help developers understand different dimensions and details of a complex software
+architecture. They are useful both during design and as documentation. During design, views help you to focus
+on a particular aspect of the software architecture and ensure that it will allow the system to deliver all of its
+requirements. As documentation, views help developers to understand how different aspects of the architecture
+are intended to behave.
+</p><!--l. 847--><p class="indent" >   We have intentionally looked at a few different approaches to helping you describe a software architecture.
+You should be conversant with multiple different approaches. The hallmark of a professional is to know when
+to select a particular approach.
+</p><!--l. 851--><p class="indent" >   If you compare the &#8220;4+1 View Model&#8221; <span class="cite">[<a 
+href="#X4+1-model">3</a>]</span> with the views described in <tspan font-family="\ecti" font-size="\1200">Software Architecture in</tspan>
+<tspan font-family="\ecti" font-size="\1200">Practice </tspan>(SAP) <span class="cite">[<a 
+href="#Xbass2021software">6</a>]</span>, you will see that there are obvious similarities but also some differences. The
+logical, development and process views from the 4+1 view model map closely to the module and
+component-and-connector (C&amp;C) views from SAP. The physical view corresponds to the allocation view. The
+4+1 view model also includes the scenario view, which does not correspond directly to the SAP
+views.
+</p><!--l. 857--><p class="indent" >   The C4 model does not explicitly include the concept of views. Like SAP, it emphasises the structure of the
+software architecture.
+</p><!--l. 860--><p class="noindent" >The scenario view is used to demonstrate how the architecture described in the other views delivers the core
+functional requirements. It is used while designing a software architecture to validate that it is suitable for the
+system.
+</p><!--l. 864--><p class="indent" >   Kruchten intentionally separated the process view from the logical and development views, rather than
+bundling them together like the C&amp;C view in SAP. This is because for some systems the dynamic details,
+which are described by the process view, can be complex and important. Dealing with issues such as complex
+concurrency, real-time interactions or latency, can often be more easily considered by having a separate view
+for them.
+</p><!--l. 869--><p class="indent" >   Kruchten&#8217;s experience with Canada&#8217;s integrated, nation-wide, air traffic control system was such a case.
+Data from radar systems and aircraft transponders have to be processed and reported to air traffic controllers
+in near real-time. With thousands of input sources and hundreds of controller stations, understanding
+concurrency issues is critical. Tracking aircraft from one control space to another means that communication
+latency is important. Each control space has its own hardware and is separated from neighbouring spaces by
+hundreds or thousands of kilometres.
+</p><!--l. 875--><p class="indent" >   As a software architect you need to choose which views provide meaningful information about your
+software system. The graphical notation used to describe a view is only one part of the view (though an
+important part). Ensure you provide enough supporting information so others will know how to work with
+your architecture and why you made the choices that you did.
+                                                                                                    
+                                                                                                    
+</p><!--l. 1--><p class="noindent" >
+</p>
+   <h3 class="likesectionHead"><a 
+ id="x1-32000"></a>References</h3>
+<!--l. 1--><p class="noindent" >
+   </p><div class="thebibliography">
+   <p class="bibitem" ><span class="biblabel">
+ [1]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xlister-tracing-explaining-writing"></a>R.&#x00A0;Lister, C.&#x00A0;Fidge, and D.&#x00A0;Teague, &#8220;Further evidence of a relationship between explaining,
+   tracing and writing skills in introductory programming,&#8221; in <tspan font-family="\ecti" font-size="\1200">Proceedings of the 14th Annual ACM</tspan>
+   <tspan font-family="\ecti" font-size="\1200">SIGCSE Conference on Innovation and Technology in Computer Science Education</tspan>, ITiCSE &#8217;09,
+   (New York, NY, USA), p.&#x00A0;161&#8211;165, Association for Computing Machinery, 2009.
+   </p>
+   <p class="bibitem" ><span class="biblabel">
+ [2]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xlister-neo-piagetian"></a>R.&#x00A0;Lister, &#8220;Concrete and other neo-piagetian forms of reasoning in the novice programmer,&#8221; in
+   <tspan font-family="\ecti" font-size="\1200">Proceedings of the Thirteenth Australasian Computing Education Conference - Volume 114</tspan>, ACE
+   &#8217;11, (AUS), p.&#x00A0;9&#8211;18, Australian Computer Society, Inc., 2011.
+   </p>
+   <p class="bibitem" ><span class="biblabel">
+ [3]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="X4+1-model"></a>P.&#x00A0;Kruchten,                                      &#8220;Architectural                                      blueprints
+   &#8212; the &#8216;4+1&#8217; view model of software architecture,&#8221; <tspan font-family="\ecti" font-size="\1200">IEEE Software</tspan>, vol.&#x00A0;12, no.&#x00A0;6, pp.&#x00A0;42&#8211;50, 1995.
+   <a 
+href="https://www.cs.ubc.ca/~gregor/teaching/papers/4+1view-architecture.pdf" class="url" ><tspan font-family="\ectt" font-size="\1200">https://www.cs.ubc.ca/~gregor/teaching/papers/4+1view-architecture.pdf</tspan></a>.
+   </p>
+   <p class="bibitem" ><span class="biblabel">
+ [4]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xfaa-aas"></a>T.&#x00A0;Hilburn,          A.&#x00A0;Squires,          H.&#x00A0;Davidz,          and          R.&#x00A0;Turner,          &#8220;Federal
+   aviation        administration        (faa)        advanced        automation        system        (aas).&#8221;
+   <a 
+href="https://www.sebokwiki.org/wiki/Federal_Aviation_Administration_(FAA)_Advanced_Automation_System_(AAS)" class="url" ><tspan font-family="\ectt" font-size="\1200">https://www.sebokwiki.org/wiki/Federal_Aviation_Administration_(FAA)_Advanced_Automation_System_(AAS)</tspan></a>,
+   October  2021.     Example  from  the  <tspan font-family="\ecti" font-size="\1200">Guide  to  the  Systems  Engineering  Body  of  Knowledge</tspan>
+   <a 
+href="https://www.sebokwiki.org/w/index.php?title=Guide_to_the_Systems_Engineering_Body_of_Knowledge_(SEBoK)&oldid=63222" class="url" ><tspan font-family="\ectt" font-size="\1200">https://www.sebokwiki.org/w/index.php?title=Guide_to_the_Systems_Engineering_Body_of_Knowledge_(SEBoK)&amp;oldid=63222</tspan></a>.
+   </p>
+   <p class="bibitem" ><span class="biblabel">
+ [5]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xkruchten2004rational"></a>P.&#x00A0;Kruchten, <tspan font-family="\ecti" font-size="\1200">The Rational Unified Process: An Introduction</tspan>. Addison-Wesley Professional, 2004.
+   </p>
+   <p class="bibitem" ><span class="biblabel">
+ [6]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xbass2021software"></a>L.&#x00A0;Bass, P.&#x00A0;Clements, and R.&#x00A0;Kazman, <tspan font-family="\ecti" font-size="\1200">Software Architecture in Practice</tspan>.   Addison-Wesley,
+   4th&#x00A0;ed., August 2021.
+   </p>
+   <p class="bibitem" ><span class="biblabel">
+ [7]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xbrown2022c4"></a>S.&#x00A0;Brown,  <tspan font-family="\ecti" font-size="\1200">Software  Architecture  for  Developers  -  Volume  2</tspan>.     Leanpub,  January  2022.
+   <a 
+href="https://leanpub.com/visualising-software-architecture" class="url" ><tspan font-family="\ectt" font-size="\1200">https://leanpub.com/visualising-software-architecture</tspan></a>.
+</p>
+   </div>
+                                                                                                    
+                                                                                                    
+   <div class="footnotes"><a 
+ id="x1-1002x1"></a>
+<!--l. 11--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span><tspan font-family="\ecrm" font-size="\1000">Though evidence suggests that an ability to read and reason about code is necessary to learn how to program well </tspan><span class="cite"><tspan font-family="\ecrm" font-size="\1000">[</tspan><a 
+href="#Xlister-tracing-explaining-writing"><tspan font-family="\ecrm" font-size="\1000">1</tspan></a><tspan font-family="\ecrm" font-size="\1000">]</tspan></span>
+<span class="cite"><tspan font-family="\ecrm" font-size="\1000">[</tspan><a 
+href="#Xlister-neo-piagetian"><tspan font-family="\ecrm" font-size="\1000">2</tspan></a><tspan font-family="\ecrm" font-size="\1000">]</tspan></span><tspan font-family="\ecrm" font-size="\1000">.</tspan></p><a 
+ id="x1-2002x2"></a>
+<!--l. 61--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span><tspan font-family="\ecrm" font-size="\1000">Contrast this to the United States Federal Aviation Administration&#8217;s Advanced Automation System project from a similar</tspan>
+<tspan font-family="\ecrm" font-size="\1000">era. The original estimate was $2.5 billion and fourteen years to implement. The project was effectively cancelled</tspan>
+<tspan font-family="\ecrm" font-size="\1000">after twelve years. By then the estimate had almost tripled and the project was at least a decade behind schedule</tspan>
+<span class="cite"><tspan font-family="\ecrm" font-size="\1000">[</tspan><a 
+href="#Xfaa-aas"><tspan font-family="\ecrm" font-size="\1000">4</tspan></a><tspan font-family="\ecrm" font-size="\1000">]</tspan></span><tspan font-family="\ecrm" font-size="\1000">.</tspan></p><a 
+ id="x1-5002x3.2"></a>
+<!--l. 133--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn3x0-bk" id="fn3x0"><sup class="textsuperscript">3</sup></a></span>    <a 
+href="https://www.ibm.com/cloud/learn/rest-apis" class="url" ><tspan font-family="\ectt" font-size="\1000">https://www.ibm.com/cloud/learn/rest-apis</tspan></a></p><a 
+ id="x1-6002x3.3"></a>
+<!--l. 152--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn4x0-bk" id="fn4x0"><sup class="textsuperscript">4</sup></a></span><tspan font-family="\ecrm" font-size="\1000">Whether it is virtualised or physical hardware</tspan></p><a 
+ id="x1-7002x4"></a>
+<!--l. 159--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn5x0-bk" id="fn5x0"><sup class="textsuperscript">5</sup></a></span><tspan font-family="\ecrm" font-size="\1000">Yes, that is intentionally a </tspan><tspan font-family="\ecti" font-size="\1000">dry </tspan><tspan font-family="\ecrm" font-size="\1000">joke.</tspan></p><a 
+ id="x1-8002x4.1"></a>
+<!--l. 193--><p class="noindent" ><span class="footnote-mark"><a 
+href="#fn6x0-bk" id="fn6x0"><sup class="textsuperscript">6</sup></a></span><tspan font-family="\ecrm" font-size="\1000">A number of nines (e.g. four nines) is a common way to measure availability. It represents the percentage of time the</tspan>
+<tspan font-family="\ecrm" font-size="\1000">system is &#8220;up&#8221;. Four nines means the system is available 99.99% of the time, or it is not available for less than one hour</tspan>
+<tspan font-family="\ecrm" font-size="\1000">per year.</tspan></p><a 
+ id="x1-9003x4.2"></a>
+<!--l. 212--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn7x0-bk" id="fn7x0"><sup class="textsuperscript">7</sup></a></span>    <a 
+href="https://tomee.apache.org/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://tomee.apache.org/</tspan></a></p><a 
+ id="x1-9005x4.2"></a>
+<!--l. 216--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn8x0-bk" id="fn8x0"><sup class="textsuperscript">8</sup></a></span><tspan font-family="\ecrm" font-size="\1000">Remote Method Invocation</tspan></p><a 
+ id="x1-9007x4.2"></a>
+<!--l. 224--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn9x0-bk" id="fn9x0"><sup class="textsuperscript">9</sup></a></span><tspan font-family="\ecrm" font-size="\1000">Java Persistence API</tspan></p><a 
+ id="x1-9009x4.2"></a>
+<!--l. 228--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn10x0-bk" id="fn10x0"><sup class="textsuperscript">10</sup></a></span><tspan font-family="\ecrm" font-size="\1000">Java DataBase Connectivity</tspan></p><a 
+ id="x1-13003x4.3.2"></a>
+<!--l. 344--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn11x0-bk" id="fn11x0"><sup class="textsuperscript">11</sup></a></span>    <a 
+href="https://www.youtube.com/watch?v=xUcpZJE050s" class="url" ><tspan font-family="\ectt" font-size="\1000">https://www.youtube.com/watch?v=xUcpZJE050s</tspan></a></p><a 
+ id="x1-13005x4.3.2"></a>
+<!--l. 346--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn12x0-bk" id="fn12x0"><sup class="textsuperscript">12</sup></a></span>   <a 
+href="https://www.ibm.com/docs/en/integration-bus/9.0.0?topic=corba-common-object-request-broker-architecture" class="url" ><tspan font-family="\ectt" font-size="\1000">https://www.ibm.com/docs/en/integration-bus/9.0.0?topic=corba-common-object-request-broker-architecture</tspan></a></p><a 
+ id="x1-19002x4.5"></a>
+<!--l. 504--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn13x0-bk" id="fn13x0"><sup class="textsuperscript">13</sup></a></span>    <a 
+href="https://www.redhat.com/en/topics/cloud-native-apps/stateful-vs-stateless" class="url" ><tspan font-family="\ectt" font-size="\1000">https://www.redhat.com/en/topics/cloud-native-apps/stateful-vs-stateless</tspan></a></p><a 
+ id="x1-27002x5.6"></a>
+<!--l. 785--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn14x0-bk" id="fn14x0"><sup class="textsuperscript">14</sup></a></span>    <a 
+href="https://github.com/structurizr/dsl/blob/master/docs/language-reference.md\#deploymentNode" class="url" ><tspan font-family="\ectt" font-size="\1000">https://github.com/structurizr/dsl/blob/master/docs/language-reference.md\#deploymentNode</tspan></a></p><a 
+ id="x1-28002x6"></a>
+<!--l. 11--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn15x0-bk" id="fn15x0"><sup class="textsuperscript">15</sup></a></span>    <a 
+href="https://astah.net/products/free-student-license/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://astah.net/products/free-student-license/</tspan></a></p><a 
+ id="x1-28004x6"></a>
+<!--l. 12--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn16x0-bk" id="fn16x0"><sup class="textsuperscript">16</sup></a></span>    <a 
+href="https://www.modelio.org/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://www.modelio.org/</tspan></a></p><a 
+ id="x1-28006x6"></a>
+<!--l. 12--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn17x0-bk" id="fn17x0"><sup class="textsuperscript">17</sup></a></span>    <a 
+href="https://plantuml.com/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://plantuml.com/</tspan></a></p><a 
+ id="x1-28008x6"></a>
+<!--l. 13--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn18x0-bk" id="fn18x0"><sup class="textsuperscript">18</sup></a></span>    <a 
+href="https://www.visual-paradigm.com/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://www.visual-paradigm.com/</tspan></a></p><a 
+ id="x1-28010x6"></a>
+<!--l. 20--><p class="noindent" ><span class="footnote-mark"><a 
+href="#fn19x0-bk" id="fn19x0"><sup class="textsuperscript">19</sup></a></span>    <a 
+href="https://www.planttext.com/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://www.planttext.com/</tspan></a></p><a 
+ id="x1-28012x6"></a>
+<!--l. 26--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn20x0-bk" id="fn20x0"><sup class="textsuperscript">20</sup></a></span>    <a 
+href="https://www.structurizr.com/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://www.structurizr.com/</tspan></a></p><a 
+ id="x1-28014x6"></a>
+<!--l. 27--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn21x0-bk" id="fn21x0"><sup class="textsuperscript">21</sup></a></span>    <a 
+href="https://github.com/plantuml-stdlib/C4-PlantUML" class="url" ><tspan font-family="\ectt" font-size="\1000">https://github.com/plantuml-stdlib/C4-PlantUML</tspan></a></p><a 
+ id="x1-28016x6"></a>
+<!--l. 27--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn22x0-bk" id="fn22x0"><sup class="textsuperscript">22</sup></a></span>    <a 
+href="https://www.archimatetool.com/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://www.archimatetool.com/</tspan></a></p><a 
+ id="x1-28018x6"></a>
+<!--l. 28--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn23x0-bk" id="fn23x0"><sup class="textsuperscript">23</sup></a></span>    <a 
+href="https://icepanel.io/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://icepanel.io/</tspan></a></p><a 
+ id="x1-28020x6"></a>
+<!--l. 28--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn24x0-bk" id="fn24x0"><sup class="textsuperscript">24</sup></a></span>    <a 
+href="https://gaphor.org/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://gaphor.org/</tspan></a></p><a 
+ id="x1-28022x6"></a>
+<!--l. 33--><p class="noindent" ><span class="footnote-mark"><a 
+href="#fn25x0-bk" id="fn25x0"><sup class="textsuperscript">25</sup></a></span>    <a 
+href="https://structurizr.com/help/academic" class="url" ><tspan font-family="\ectt" font-size="\1000">https://structurizr.com/help/academic</tspan></a></p><a 
+ id="x1-28024x6"></a>
+<!--l. 35--><p class="noindent" ><span class="footnote-mark"><a 
+href="#fn26x0-bk" id="fn26x0"><sup class="textsuperscript">26</sup></a></span>    <a 
+href="https://github.com/structurizr/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://github.com/structurizr/</tspan></a></p><a 
+ id="x1-28026x6"></a>
+<!--l. 39--><p class="noindent" ><span class="footnote-mark"><a 
+href="#fn27x0-bk" id="fn27x0"><sup class="textsuperscript">27</sup></a></span>    <a 
+href="https://www.archimatetool.com/blog/2020/04/18/c4-model-architecture-viewpoint-and-archi-4-7/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://www.archimatetool.com/blog/2020/04/18/c4-model-architecture-viewpoint-and-archi-4-7/</tspan></a></p><a 
+ id="x1-29002x6.1"></a>
+<!--l. 47--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn28x0-bk" id="fn28x0"><sup class="textsuperscript">28</sup></a></span>    <a 
+href="https://vark-learn.com/strategies/visual-strategies/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://vark-learn.com/strategies/visual-strategies/</tspan></a></p><a 
+ id="x1-29004x6.1"></a>
+<!--l. 49--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn29x0-bk" id="fn29x0"><sup class="textsuperscript">29</sup></a></span>    <a 
+href="https://vark-learn.com/strategies/readwrite-strategies/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://vark-learn.com/strategies/readwrite-strategies/</tspan></a></p><a 
+ id="x1-29006x6.1"></a>
+<!--l. 57--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn30x0-bk" id="fn30x0"><sup class="textsuperscript">30</sup></a></span>    <a 
+href="https://opensource.com/article/20/2/domain-specific-languages" class="url" ><tspan font-family="\ectt" font-size="\1000">https://opensource.com/article/20/2/domain-specific-languages</tspan></a></p><a 
+ id="x1-29008x6.1"></a>
+<!--l. 61--><p class="noindent" ><span class="footnote-mark"><a 
+href="#fn31x0-bk" id="fn31x0"><sup class="textsuperscript">31</sup></a></span>    <a 
+href="https://github.com/structurizr/dsl/blob/master/docs/language-reference.md" class="url" ><tspan font-family="\ectt" font-size="\1000">https://github.com/structurizr/dsl/blob/master/docs/language-reference.md</tspan></a></p><a 
+ id="x1-29010x6.1"></a>
+<!--l. 62--><p class="noindent" ><span class="footnote-mark"><a 
+href="#fn32x0-bk" id="fn32x0"><sup class="textsuperscript">32</sup></a></span>    <a 
+href="https://github.com/structurizr/dsl/tree/master/docs/cookbook" class="url" ><tspan font-family="\ectt" font-size="\1000">https://github.com/structurizr/dsl/tree/master/docs/cookbook</tspan></a></p><a 
+ id="x1-29012x6.1"></a>
+<!--l. 63--><p class="noindent" ><span class="footnote-mark"><a 
+href="#fn33x0-bk" id="fn33x0"><sup class="textsuperscript">33</sup></a></span>    <a 
+href="https://structurizr.com/dsl" class="url" ><tspan font-family="\ectt" font-size="\1000">https://structurizr.com/dsl</tspan></a></p><a 
+ id="x1-29014x6.1"></a>
+<!--l. 64--><p class="noindent" ><span class="footnote-mark"><a 
+href="#fn34x0-bk" id="fn34x0"><sup class="textsuperscript">34</sup></a></span>    <a 
+href="https://github.com/structurizr/cli/blob/master/docs/getting-started.md" class="url" ><tspan font-family="\ectt" font-size="\1000">https://github.com/structurizr/cli/blob/master/docs/getting-started.md</tspan></a></p><a 
+ id="x1-29016x6.1"></a>
+<!--l. 70--><p class="noindent" ><span class="footnote-mark"><a 
+href="#fn35x0-bk" id="fn35x0"><sup class="textsuperscript">35</sup></a></span>    <a 
+href="https://plantuml.com/guide" class="url" ><tspan font-family="\ectt" font-size="\1000">https://plantuml.com/guide</tspan></a></p><a 
+ id="x1-29018x6.1"></a>
+<!--l. 71--><p class="noindent" ><span class="footnote-mark"><a 
+href="#fn36x0-bk" id="fn36x0"><sup class="textsuperscript">36</sup></a></span>    <a 
+href="https://plantuml.com/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://plantuml.com/</tspan></a></p><a 
+ id="x1-29020x6.1"></a>
+<!--l. 72--><p class="noindent" ><span class="footnote-mark"><a 
+href="#fn37x0-bk" id="fn37x0"><sup class="textsuperscript">37</sup></a></span>    <a 
+href="https://www.planttext.com/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://www.planttext.com/</tspan></a></p><a 
+ id="x1-30002x6.2"></a>
+<!--l. 77--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn38x0-bk" id="fn38x0"><sup class="textsuperscript">38</sup></a></span>    <a 
+href="https://csse6400.uqcloud.net/resources/Sahara_eCommerce.asta" class="url" ><tspan font-family="\ectt" font-size="\1000">https://csse6400.uqcloud.net/resources/Sahara_eCommerce.asta</tspan></a></p><a 
+ id="x1-30004x6.2"></a>
+<!--l. 78--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn39x0-bk" id="fn39x0"><sup class="textsuperscript">39</sup></a></span>    <a 
+href="https://astah.net/products/free-student-license/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://astah.net/products/free-student-license/</tspan></a></p><a 
+ id="x1-30006x6.2"></a>
+<!--l. 82--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn40x0-bk" id="fn40x0"><sup class="textsuperscript">40</sup></a></span>    <a 
+href="https://csse6400.uqcloud.net/resources/c4_model.zip" class="url" ><tspan font-family="\ectt" font-size="\1000">https://csse6400.uqcloud.net/resources/c4_model.zip</tspan></a></p><a 
+ id="x1-30008x6.2"></a>
+<!--l. 83--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn41x0-bk" id="fn41x0"><sup class="textsuperscript">41</sup></a></span>    <a 
+href="https://www.structurizr.com/" class="url" ><tspan font-family="\ectt" font-size="\1000">https://www.structurizr.com/</tspan></a></p><a 
+ id="x1-30010x6.2"></a>
+<!--l. 84--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn42x0-bk" id="fn42x0"><sup class="textsuperscript">42</sup></a></span>    <a 
+href="https://opensource.com/article/20/2/domain-specific-languages" class="url" ><tspan font-family="\ectt" font-size="\1000">https://opensource.com/article/20/2/domain-specific-languages</tspan></a></p>                              </div>
+ 
+</body></html> 
+
+                                                                                                    
+
+

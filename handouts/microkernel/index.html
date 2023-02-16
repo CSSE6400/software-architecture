@@ -1,0 +1,653 @@
+Last Updated on 2022/03/13     
+
+<?xml version="1.0" encoding="iso-8859-1" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+<!--http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd-->  
+<html xmlns="http://www.w3.org/1999/xhtml"  
+> 
+<head> <title>Microkernel Architecture</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
+<!-- fn-in,html,htex4ht,xhtml --> 
+<meta name="src" content="main.tex" /> 
+<link rel="stylesheet" type="text/css" href="main.css" /> 
+<link rel="stylesheet" href="https://latex.now.sh/style.css"> 
+<style>body {max-width: 100ch;} 
+dl dd {text-align: left}</style> 
+</head><body 
+>
+   <div class="maketitle"><a 
+ id="Q1-1-1"></a>
+_________________________________________________________________________________________________
+<h2 class="titleHead">Microkernel Architecture</h2>                                            Software Architecture
+   <div class="date" >March 13, 2023</div>                                                                                                   <div class="author" >Richard
+Thomas</div>
+____________________________________________________________________________________________
+   </div>
+   <h3 class="sectionHead"><span class="titlemark">1   </span> <a 
+ id="x1-10001"></a>Introduction</h3>
+<!--l. 9--><p class="noindent" >The microkernel architecture aims to deliver sophisticated software systems while maintaining the quality
+attributes of simplicity and extensibility. This is achieved by implementing a simple core system that is
+extended by plug-ins that deliver additional system behaviour. Microkernel is also known as a &#8220;plug-in&#8221;
+architecture.
+</p><!--l. 13--><p class="indent" >   Many common applications use the microkernel architecture. Web browsers, many
+IDEs (notably Eclipse), Jenkins, and other tools all use this architecture. They deliver
+their core functionality and provide a plug-in interface that allows it to be extended.
+<a 
+href="https://www.eclipse.org/downloads/packages/" >Eclipse</a><span class="footnote-mark"><a 
+href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
+ id="x1-1001f1"></a>
+is famous as a simple text editor that can be extended to be a sophisticated software development tool through
+its plug-in interface.
+<a 
+ id="x1-1003r1"></a>
+</p>
+   <div class="tcolorbox tcolorbox" id="tcolobox-1">    
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 20--><p class="noindent" ><span 
+class="ecbx-1200">Definition</span><span 
+class="ecbx-1200">&#x00A0;1. Microkernel Architecture</span>
+</p><!--l. 21--><p class="noindent" >A core system providing interfaces that allow plug-ins to extend its functionality. </p> 
+</div> 
+</div>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-1004r1"></a>
+                                                                                                    
+                                                                                                    
+<!--l. 26--><p class="noindent" ><img 
+src="diagrams/generic-microkernel.png" alt="PIC"  
+width="446" height="-5885"  />
+<br /> </p><div class="caption" 
+><span class="id">Figure&#x00A0;1: </span><span  
+class="content">Microkernel architecture &#8211; generic structure.</span></div><!--tex4ht:label?: x1-1004r1 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 31--><p class="indent" >   For example, a web browser provides the core behaviour of rendering web pages. Plug-ins extend the
+browser with specialised behaviour, such as a PDF viewer or dark mode reader.
+</p>
+   <h3 class="sectionHead"><span class="titlemark">2   </span> <a 
+ id="x1-20002"></a>Terminology</h3>
+<!--l. 37--><p class="noindent" >The microkernel architecture consists of four elements. The <span 
+class="ecti-1200">core system</span>, <span 
+class="ecti-1200">plug-ins </span>and <span 
+class="ecti-1200">plug-in interface </span>shown
+in figure <a 
+href="#x1-1004r1">1<!--tex4ht:ref: fig:microkernel --></a>, plus a <span 
+class="ecti-1200">registry</span>.
+</p><!--l. 41--><p class="indent" >
+      </p><dl class="description"><dt class="description">
+      <!--l. 41--><p class="noindent" >
+<span 
+class="ecbx-1200">Core system</span> </p></dt><dd 
+class="description">
+      <!--l. 41--><p class="noindent" >implements the system&#8217;s base functionality.
+      </p></dd><dt class="description">
+      <!--l. 42--><p class="noindent" >
+<span 
+class="ecbx-1200">Plug-ins</span> </p></dt><dd 
+class="description">
+      <!--l. 42--><p class="noindent" >extend the system by providing independent, specialised behaviour.
+      </p></dd><dt class="description">
+      <!--l. 43--><p class="noindent" >
+<span 
+class="ecbx-1200">Plug-in interface</span> </p></dt><dd 
+class="description">
+      <!--l. 43--><p class="noindent" >describes how the core system and plug-ins interact.
+      </p></dd><dt class="description">
+      <!--l. 44--><p class="noindent" >
+<span 
+class="ecbx-1200">Registry</span> </p></dt><dd 
+class="description">
+      <!--l. 44--><p class="noindent" >tracks which plug-ins are available to the core system and how to access them.</p></dd></dl>
+<!--l. 47--><p class="indent" >   The core system implements the minimal functionality that provides the base, or framework, of the system.
+This may be the core functionality of the system, like the Eclipse text editor or a web browser&#8217;s page rendering
+engine. Alternatively, the core system may implement a general processing path, like a payroll system&#8217;s
+payment process.
+</p><!--l. 51--><p class="indent" >   The payment process may be simply, identify an employee, calculate their fortnightly
+pay, and send payment to their bank account. Calculating pay can be a very complex
+process<span class="footnote-mark"><a 
+href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
+ id="x1-2001f2"></a>.
+There are different pay rates, bonuses, incentives, salaried staff, staff paid commission, staff paid hourly rates,
+overtime rates, penalty rates, deductions, taxes, and many other pay related calculations to consider for each
+individual.
+</p><!--l. 57--><p class="indent" >   Plug-ins are independent components that extend the behaviour of the core system. The simple approach is
+that the system is delivered as a monolith, including the core system and the plug-in. In this case the core
+system uses the plug-in via a method invocation.
+</p><!--l. 61--><p class="indent" >   In the payroll example, plug-ins can remove the complexity of different pay adjustment calculations
+from the core system, by moving each calculation to a separate component. This also improves
+extensibility, maintainability and testability of the system. New calculations can be added to
+the system by implementing a new plug-in. As each plug-in is independent of the others, it is
+easier to implement a new calculation, or changing an existing one, than trying to do so in a large
+                                                                                                    
+                                                                                                    
+monolith. New plug-ins can be tested independently and then integrated into the system for system
+testing.
+</p><!--l. 67--><p class="indent" >   There is usually a single standard interface between the core system and the plug-ins for a domain. The
+interface defines the methods that the core system can invoke, data passed to the plug-in, and data returned
+from the plug-in. A plug-in component implements the interface and delegates responsibilities within the
+component to deliver its behaviour.
+</p><!--l. 71--><p class="indent" >   Figure <a 
+href="#x1-2009r2">2<!--tex4ht:ref: fig:interface --></a> is an example of a possible interface for the pay adjusment calculation plug-ins. Each pay
+adjustment plug-in returns a <span 
+class="ectt-1200">MonetaryAmount </span>indicating the amount by which the employee&#8217;s base pay is to
+be adjusted in the pay period. The amount may be positive or negative. The <span 
+class="ectt-1200">employee</span>, <span 
+class="ectt-1200">periodDetails</span>,
+<span 
+class="ectt-1200">employeeConditions </span>and <span 
+class="ectt-1200">basePay </span>objects are passed as parameters to the plug-in. The plug-in can extract
+the data it needs from these objects to perform its calculation. The <span 
+class="ectt-1200">periodDetails </span>object provides data about
+the work performed by the employee during the pay period (e.g. time worked, overtime, higher duties
+adjustments, ...). The <span 
+class="ectt-1200">employeeConditions </span>set provides data about each of the employee&#8217;s pay conditions
+(e.g. before tax deductions, union membership, ...).
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-2009r2"></a>
+                                                                                                    
+                                                                                                    
+<div class="framedenv" id="shaded-1">
+<!--l. 82-->
+<pre class="lstlisting" id="listing-1"><span class="label"><a 
+ id="x1-2003r1"></a><span 
+class="ecrm-0600">1</span></span><span style="color:#006699"><span 
+class="ectt-1200">public</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">interface</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">PayAdjustmentPlugin</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-2004r2"></a><span 
+class="ecrm-0600">2</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">public</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">MonetaryAmount</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">adjustPay</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">Employee</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">employee</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span> 
+<span class="label"><a 
+ id="x1-2005r3"></a><span 
+class="ecrm-0600">3</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">WorkDetail</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">periodDetails</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span> 
+<span class="label"><a 
+ id="x1-2006r4"></a><span 
+class="ecrm-0600">4</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Set</span></span><span style="color:#000000"><span 
+class="ectt-1200">&#x003C;</span></span><span style="color:#000000"><span 
+class="ectt-1200">Condition</span></span><span style="color:#000000"><span 
+class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">employeeConditions</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span> 
+<span class="label"><a 
+ id="x1-2007r5"></a><span 
+class="ecrm-0600">5</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">MonetaryAmount</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">basePay</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">;</span></span> 
+<span class="label"><a 
+ id="x1-2008r6"></a><span 
+class="ecrm-0600">6</span></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span></pre>
+</div>
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;2: </span><span  
+class="content">Example plug-in interface for payroll system.</span></div><!--tex4ht:label?: x1-2009r2 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 95--><p class="indent" >   The registery records which plug-ins are available to the core system and how they are accessed. For the
+simple case of plug-ins being used by method invocation, the registry just needs to record the name of the
+plug-in and a reference to the object that implements the plug-in&#8217;s interface. For the payroll example, this
+could be a simple map data structure. The core system could lookup a plug-in by its name and then apply it
+by invoking the <span 
+class="ectt-1200">adjustPay </span>method on the plug-in object.
+</p>
+   <h3 class="sectionHead"><span class="titlemark">3   </span> <a 
+ id="x1-30003"></a>Microkernel Principles</h3>
+<!--l. 102--><p class="noindent" >While the concept of a microkernel architecture is straightforward, there are some principles which should be
+maintained to produce a maintainable and extendable architecture.
+<a 
+ id="x1-3001r2"></a>
+</p>
+   <div class="tcolorbox tcolorbox" id="tcolobox-2">    
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 105--><p class="noindent" ><span 
+class="ecbx-1200">Definition</span><span 
+class="ecbx-1200">&#x00A0;2. Independent Plug-in Principle</span>
+</p><!--l. 106--><p class="noindent" >Plug-ins should be independent, with no dependencies on other plug-ins. The only dependency
+on the core system is through the plug-in interface. </p> 
+</div> 
+</div>
+<!--l. 110--><p class="indent" >   Plug-ins should be independent of each other. If a plug-in depends on other
+plug-ins it increases the complexity of the design. This complexity is called
+<a 
+href="https://leanpub.com/isaqbglossary/read#term-coupling" ><span 
+class="ecti-1200">coupling</span></a><span class="footnote-mark"><a 
+href="#fn3x0" id="fn3x0-bk"><sup class="textsuperscript">3</sup></a></span><a 
+ id="x1-3002f3"></a>,
+which is a measure of how dependent different parts of a system are on each other <span class="cite">[<a 
+href="#Xglossary-architecture">1</a>]</span>. High coupling (many
+dependencies) makes it difficult to understand the software, which in turn makes it difficult to modify and test
+the software. Consequently, if a plug-in depends on other plug-ins it requires understanding the dependencies
+on the other plug-ins to modify or test the plug-in. This can lead to an architecture that resembles a &#8220;big ball
+of mud&#8221;.
+</p><!--l. 119--><p class="indent" >   Plug-ins and the core system should be <span 
+class="ecti-1200">loosely </span>coupled. The core system should only depend on the plug-in
+interface and data returned via that interface, not any implementation details of individual plug-ins. Plug-ins
+should only depend on the data passed to them via the plug-in interface. Plug-ins should not rely on
+implementation details of the core system, nor its datastore. If plug-ins and the core system are not isolated
+from each other by an interface, then any changes to the core system may require changes to some or all of the
+plug-ins. Similarly, the plug-in interface should mean that any changes to the plug-in will have no impact on
+the core system.
+<a 
+ id="x1-3004r3"></a>
+</p>
+   <div class="tcolorbox tcolorbox" id="tcolobox-3">    
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 128--><p class="noindent" ><span 
+class="ecbx-1200">Definition</span><span 
+class="ecbx-1200">&#x00A0;3. Standard Interface Principle</span>
+</p><!--l. 129--><p class="noindent" >There should be a single interface that defines how the core system uses plug-ins. </p> 
+</div> 
+</div>
+<!--l. 132--><p class="indent" >   To provide an extensible design, the core system needs a standard way to use plug-ins. This means that the
+plug-in interface needs to be the same for all plug-ins. That way the core system can use any
+plug-in without needing to know details about how the plug-in is implemented. This again is about
+reducing coupling between the core system and the plug-ins. The standard interface principle
+means that there is no additional complexity if the core system uses two plug-ins or thousands of
+plug-ins.
+</p><!--l. 139--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">4   </span> <a 
+ id="x1-40004"></a>Architecture Partitioning</h3>
+                                                                                                    
+                                                                                                    
+   <div class="wrapfig-r"><a 
+ id="x1-4001r3"></a><img 
+src="diagrams/technical-partitioning.png" alt="PIC"  
+width="157" height="101"  />
+<br />                               <div class="caption" 
+><span class="id">Figure&#x00A0;3:
+</span><span  
+class="content">Layered architecture as example
+of technical partitioning.</span></div><!--tex4ht:label?: x1-4001r3 -->           </div>
+<!--l. 149--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">4.1   </span> <a 
+ id="x1-50004.1"></a>Technical Partitioning</h4>
+<!--l. 150--><p class="noindent" >The course notes about layered architecture <span class="cite">[<a 
+href="#Xlayered-notes">2</a>]</span> described the idea of partitioning an architecture into layers, as
+in figure <a 
+href="#x1-4001r3">3<!--tex4ht:ref: fig:technical-partitioning --></a>.
+</p><!--l. 153--><p class="indent" >   This approach to partitioning the architecture is called <span 
+class="ecti-1200">technical partitioning</span>. Each layer represents a
+different technical capability. The presentation layer deals with user interaction. The business layer deals with
+the application&#8217;s core logic. The persistence layer deals with storing and loading data. The database layer deals
+with file storage and access details.
+</p><!--l. 160--><p class="indent" >   An advantage of technical partitioning is that it corresponds to how developers view the code. Another
+advantage is that all related code resides in a single layer of the architecture, making each layer
+<a 
+href="https://leanpub.com/isaqbglossary/read#term-cohesion" >cohesive</a><span class="footnote-mark"><a 
+href="#fn4x0" id="fn4x0-bk"><sup class="textsuperscript">4</sup></a></span><a 
+ id="x1-5001f4"></a>
+from a technical perspective. This makes it easier to work with different parts of the code that deal with the
+same technical capability. The <span 
+class="ecti-1200">layer isolation</span>, <span 
+class="ecti-1200">neighbour communication</span>, <span 
+class="ecti-1200">downward dependency</span>, and <span 
+class="ecti-1200">upward</span>
+<span 
+class="ecti-1200">notification </span>principles help reduce coupling between layers.
+                                                                                                    
+                                                                                                    
+</p><!--l. 168--><p class="indent" >   A disadvantage of technical partitioning is that business processes cut across technical capabilities.
+Consider when a customer adds a new product to their shopping cart in the Sahara eCommerce example from
+the architectural views notes <span class="cite">[<a 
+href="#Xview-notes">3</a>]</span>. In a technically partitioned architecture, code to implement this is required in
+all layers of the architecture. If the team is structured with specialist developers who work on different layers
+of the architecture, they all need to collaborate to implement the behaviour, which adds communication
+overheads to the project.
+</p><!--l. 175--><p class="indent" >   Another disadvantage is the potential for higher data coupling, if all domain data is stored in a single
+database. If it is decided that the system needs to be split into distributed software containers for scalability,
+the database may need to be split to have separate databases for each distributed container. If the database
+was originally designed to cater for a monolith architecture, large parts of the database may need to be
+refactored.
+</p><!--l. 180--><p class="indent" >   Note that in figure <a 
+href="#x1-4001r3">3<!--tex4ht:ref: fig:technical-partitioning --></a>, and most of the following figures, nodes from UML deployment diagrams are used to
+explicitly indicate where components are executing in different environments.
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">4.2   </span> <a 
+ id="x1-60004.2"></a>Domain Partitioning</h4>
+<!--l. 184--><p class="noindent" ><span 
+class="ecti-1200">Domain partitioning </span>is an alternative approach, where the architecture is split into partitions (or major
+components) corresponding to independent business processes or workflows (the <span 
+class="ecti-1200">domains</span>). The
+implementation of a domain is responsible for delivering all of that workflow&#8217;s behaviour. Eric Evans
+popularised domain partitioning in his book <span 
+class="ecti-1200">Domain-Driven Design </span><span class="cite">[<a 
+href="#Xddd-evans">4</a>]</span>. Figure <a 
+href="#x1-6001r4">4<!--tex4ht:ref: fig:domain-partitioning --></a> is an example of domain
+partitioning for an on-line store, similar to the Sahara eCommerce example from the architectural views notes
+<span class="cite">[<a 
+href="#Xview-notes">3</a>]</span>.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-6001r4"></a>
+                                                                                                    
+                                                                                                    
+<!--l. 193--><p class="noindent" ><img 
+src="diagrams/domain-partitioning.png" alt="PIC"  
+width="472" height="-441"  />
+<br /> </p><div class="caption" 
+><span class="id">Figure&#x00A0;4: </span><span  
+class="content">Example of domain partitioning.</span></div><!--tex4ht:label?: x1-6001r4 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 198--><p class="indent" >   An advantage of domain partitioning is that it can model how the business functions, rather than it being
+structured based on technical decisions. This results in message flows within the software matching how
+communication happens in the problem domain. This makes it easier to discuss features, and the high-level
+view of how they are implemented, with business stakeholders who are familiar with how the business
+operates.
+</p><!--l. 202--><p class="indent" >   If the domain partitions are independent of each other, it usually makes it easier to split the system into
+distributed software containers. Even if the system starts with a single database, the independence of
+domain partitions is likely to lead to a design with lower data coupling, making it easier to split the
+database.
+</p><!--l. 206--><p class="indent" >   Another advantage of domain partitioning is that it fits well with an agile or continuous delivery process. A
+single user story will be implemented entirely within one domain. This also makes it easier to implement
+multiple user stories concurrently, if they are all from different domains.
+</p><!--l. 210--><p class="indent" >   A disadvantage of domain partitioning is that <span 
+class="ecti-1200">boundary </span>code is distributed throughout all the
+partitions. This means that any large changes to a particular boundary (e.g. changing the persistence
+library) will result in changes to all domain partitions. Boundary code is code that interacts with
+actors or agents outside of the system. The two common technical partitions of the presentation
+and persistence layers are examples of boundary code. The presentation layer is the boundary
+between the system and the users. The persistence layer is the boundary between the system
+and the storage mechanisms. Other boundary partitions may be for message queues or network
+communication.
+</p><!--l. 218--><p class="indent" >   It is possible for each domain partition to use technical partitioning within it, to provide some of the lower
+coupling benefits of a layered architecture for the domain.
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">4.3   </span> <a 
+ id="x1-70004.3"></a>Achitecture Patterns and Partitioning</h4>
+<!--l. 222--><p class="noindent" >Different architecture patterns are biased more towards technical or domain partitioning. Those that focus on
+technical structure are biased towards technical partitioning (e.g. layered architecture). Those that focus on
+message passing between components are biased towards domain partitioning (e.g. microservices
+architecture). The core system of the microkernel architecture can follow either technical or domain
+partitioning.
+</p><!--l. 227--><p class="indent" >   A consequence of this leads to a variation of principle <a 
+href="#x1-3004r3">3<!--tex4ht:ref: std-intf --></a>.
+<a 
+ id="x1-7001r4"></a>
+</p>
+   <div class="tcolorbox tcolorbox" id="tcolobox-4">    
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 230--><p class="noindent" ><span 
+class="ecbx-1200">Definition</span><span 
+class="ecbx-1200">&#x00A0;4. Domain Standard Interface Principle</span>
+</p><!--l. 231--><p class="noindent" >Each <span 
+class="ecti-1200">domain </span>should have a single interface that defines how the domain uses plug-ins. </p> 
+</div> 
+</div>
+<!--l. 234--><p class="indent" >   Some domains may share a plug-in interface, but allowing domains to have different plug-in interfaces
+means that each business process can be customised independently by a set of plug-ins.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-7002r5"></a>
+                                                                                                    
+                                                                                                    
+<!--l. 239--><p class="noindent" ><img 
+src="diagrams/domain-microkernel.png" alt="PIC"  
+width="262" height="-286"  />
+<br /> </p><div class="caption" 
+><span class="id">Figure&#x00A0;5: </span><span  
+class="content">Microkernel architecture with domains.</span></div><!--tex4ht:label?: x1-7002r5 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 244--><p class="indent" >   In figure <a 
+href="#x1-7002r5">5<!--tex4ht:ref: fig:microkernel-domains --></a>, nodes are used to explicitly indicate that the core system and plug-ins are conceptually separate
+from each other. They are all contained within the Application node to indicate that they are still all part of
+one monolithic application.
+</p>
+   <h3 class="sectionHead"><span class="titlemark">5   </span> <a 
+ id="x1-80005"></a>Extensions</h3>
+<!--l. 250--><p class="noindent" >While the microkernel architecture often implements the core system as a monolith and it, along with all its
+plug-ins, is often deployed as a single monolith (e.g. a web browser), that is not the only approach to using the
+microkernel architecture.
+</p><!--l. 254--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">5.1   </span> <a 
+ id="x1-90005.1"></a>Distributed Microkernel</h4>
+<!--l. 256--><p class="noindent" >The internal partitions of the core system can be distributed to run on different computing infrastructure.
+Figure <a 
+href="#x1-9001r6">6<!--tex4ht:ref: fig:3-tier-microkernel --></a> is an example of implementing a distributed microkernel architecture using three computing
+tiers.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-9001r6"></a>
+                                                                                                    
+                                                                                                    
+<!--l. 261--><p class="noindent" ><img 
+src="diagrams/separate-ui-microkernel.png" alt="PIC"  
+width="472" height="-405"  />
+<br /> </p><div class="caption" 
+><span class="id">Figure&#x00A0;6: </span><span  
+class="content">Microkernel architecture distributed by technical partitions.</span></div><!--tex4ht:label?: x1-9001r6 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 266--><p class="indent" >   The presentation layer runs on a frontend such as a web or mobile application. It is possible that the
+presentation layer could have its own set of plug-ins. The business and persistence logic run on a backend
+server and have their own set of plug-ins. The database runs on a separate database server, and typically does
+not have any plug-ins from the application&#8217;s perspective.
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">5.2   </span> <a 
+ id="x1-100005.2"></a>Alternative Contracts</h4>
+<!--l. 273--><p class="noindent" >Figure <a 
+href="#x1-2009r2">2<!--tex4ht:ref: fig:interface --></a> was an example interface that could be used if plug-ins were invoked directly within the core system.
+This is possible if the plug-ins are implemented within the application or are loaded as code modules at run
+time (e.g. via JAR or DLL files).
+</p><!--l. 276--><p class="indent" >   There may be times when plug-ins are external services used by the core system. In those situations
+communication is via some communication protocol. Remote method invocation would still allow the core
+system to use a compiled interface. Registration of components would become a little more complicated, as
+the core system would need to a communication interface to be notified of the availability of
+plug-ins.
+</p><!--l. 282--><p class="indent" >   More commonly, the communication protocol will be some other mechanism (e.g. REST, as shown in figure
+<a 
+href="#x1-10001r7">7<!--tex4ht:ref: fig:rest-microkernel --></a>). In this case, the registry needs to record more information than just the name and interface of a plug-in.
+The registry will need information about the communication pathway (e.g. URL of the REST
+endpoint). It will also need details about the data structure passed to the plug-in and returned by the
+plug-in.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-10001r7"></a>
+                                                                                                    
+                                                                                                    
+<!--l. 289--><p class="noindent" ><img 
+src="diagrams/rest-microkernel.png" alt="PIC"  
+width="393" height="-3682"  />
+<br /> </p><div class="caption" 
+><span class="id">Figure&#x00A0;7: </span><span  
+class="content">Microkernel architecture &#8211; separate plug-in services with REST communication.</span></div><!--tex4ht:label?: x1-10001r7 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+   <h4 class="subsectionHead"><span class="titlemark">5.3   </span> <a 
+ id="x1-110005.3"></a>Plug-in Databases</h4>
+<!--l. 296--><p class="noindent" >As mentioned in the discussion of principle <a 
+href="#x1-3001r2">2<!--tex4ht:ref: independent-plug-in --></a>, plug-ins should not use the core system&#8217;s data
+directly. The core system should pass to the plug-in any data that it needs. For sophisticated
+plug-ins, they may need their own persistent storage. They should not request the core system
+to manage this. Rather, these plug-ins should maintain their own databases, as shown in figure
+<a 
+href="#x1-11001r8">8<!--tex4ht:ref: fig:plug-in-dbs --></a>.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-11001r8"></a>
+                                                                                                    
+                                                                                                    
+<!--l. 304--><p class="noindent" ><img 
+src="diagrams/plug-in-databases.png" alt="PIC"  
+width="446" height="-2635"  />
+<br /> </p><div class="caption" 
+><span class="id">Figure&#x00A0;8: </span><span  
+class="content">Microkernel architecture with plug-ins maintaining their own databases.</span></div><!--tex4ht:label?: x1-11001r8 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+   <h4 class="subsectionHead"><span class="titlemark">5.4   </span> <a 
+ id="x1-120005.4"></a>Non-Standard Interfaces</h4>
+<!--l. 311--><p class="noindent" >Principles <a 
+href="#x1-3004r3">3<!--tex4ht:ref: std-intf --></a> and <a 
+href="#x1-7001r4">4<!--tex4ht:ref: domain-intf --></a> indicate that each domain, or the entire core system, should use a single plug-in interface. This is not
+always possible when the plug-ins are services provided by external agencies. In these situations you would use the <a 
+href="https://refactoring.guru/design-patterns/adapter" >adapter
+design pattern</a><span class="footnote-mark"><a 
+href="#fn5x0" id="fn5x0-bk"><sup class="textsuperscript">5</sup></a></span><a 
+ id="x1-12001f5"></a>
+to isolate the external service&#8217;s interface from the core system.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-12003r9"></a>
+                                                                                                    
+                                                                                                    
+<!--l. 318--><p class="noindent" ><img 
+src="diagrams/adapter-plug-in.png" alt="PIC"  
+width="446" height="-990"  />
+<br /> </p><div class="caption" 
+><span class="id">Figure&#x00A0;9: </span><span  
+class="content">Adapter plug-ins to work with third party services.</span></div><!--tex4ht:label?: x1-12003r9 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 323--><p class="indent" >   As shown in figure <a 
+href="#x1-12003r9">9<!--tex4ht:ref: fig:adapter --></a>, an adapter plug-in is implemented that manages communication with the
+external service. From the core system&#8217;s perspective, the external system is just like any other
+plug-in.
+</p>
+   <h3 class="sectionHead"><span class="titlemark">6   </span> <a 
+ id="x1-130006"></a>Conclusion</h3>
+<!--l. 329--><p class="noindent" >The microkernel architecture is a suitable option for systems were extensibility is a key quality attribute.
+Following the microkernel design principles will lead to a design where the core system and plug-ins are not
+affected by changes to each other. Existing plug-ins can be replaced and new plug-ins added with no impact on
+the core system.
+</p><!--l. 1--><p class="noindent" >
+</p>
+   <h3 class="likesectionHead"><a 
+ id="x1-14000"></a>References</h3>
+<!--l. 1--><p class="noindent" >
+   </p><div class="thebibliography">
+   <p class="bibitem" ><span class="biblabel">
+ [1]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span>
+   <a 
+ id="Xglossary-architecture"></a>G.&#x00A0;Starke, U.&#x00A0;Becker, C.&#x00A0;Lilienthal, M.&#x00A0;Mahlberg, S.&#x00A0;Kölsch, A.&#x00A0;Lorz, A.&#x00A0;Rausch, R.&#x00A0;Rhoades,
+   S.&#x00A0;Fichtner, P.&#x00A0;Ghadir, M.&#x00A0;Gharbi, M.&#x00A0;Bohlen, M.&#x00A0;Hillert, P.&#x00A0;Hruschka, and W.&#x00A0;Fahl, <span 
+class="ecti-1200">iSAQB</span>
+   <span 
+class="ecti-1200">Glossary of Software Architecture Terminology</span>.  International Software Architecture Qualification
+   Board, November 2020.     <a 
+href="https://leanpub.com/isaqbglossary/read" class="url" ><span 
+class="ectt-1200">https://leanpub.com/isaqbglossary/read</span></a>.
+   </p>
+   <p class="bibitem" ><span class="biblabel">
+ [2]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xlayered-notes"></a>R.&#x00A0;Thomas       and       B.&#x00A0;Webb,       &#8220;Layered       architecture,&#8221;        February       2022.
+   <a 
+href="https://csse6400.uqcloud.net/handouts/layered.pdf" class="url" ><span 
+class="ectt-1200">https://csse6400.uqcloud.net/handouts/layered.pdf</span></a>.
+   </p>
+   <p class="bibitem" ><span class="biblabel">
+ [3]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xview-notes"></a>R.&#x00A0;Thomas        and        B.&#x00A0;Webb,        &#8220;Architectural        views,&#8221;        March        2022.
+   <a 
+href="https://csse6400.uqcloud.net/handouts/views.pdf" class="url" ><span 
+class="ectt-1200">https://csse6400.uqcloud.net/handouts/views.pdf</span></a>.
+   </p>
+   <p class="bibitem" ><span class="biblabel">
+ [4]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span>
+   <a 
+ id="Xddd-evans"></a>E.&#x00A0;Evans, <span 
+class="ecti-1200">Domain-Driven Design: Tackling Complexity in the Heart of Software</span>.  Addison-Wesley
+   Professional, August 2003.
+</p>
+   </div>
+   <div class="footnotes"><a 
+ id="x1-1002x1"></a>
+<!--l. 16--><p class="indent" >     <span class="footnote-mark"><a 
+href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span>    <a 
+href="https://www.eclipse.org/downloads/packages/" class="url" ><span 
+class="ectt-1000">https://www.eclipse.org/downloads/packages/</span></a></p><a 
+ id="x1-2002x2"></a>
+<!--l. 53--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span><span 
+class="ecrm-1000">See the Queensland Health payroll disaster    </span><a 
+href="https://www.henricodolfing.com/2019/12/project-failure-case-study-queensland-health.html" class="url" ><span 
+class="ectt-1000">https://www.henricodolfing.com/2019/12/project-failure-case-study-queensland-health.html</span></a></p><a 
+ id="x1-3003x3"></a>
+<!--l. 112--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn3x0-bk" id="fn3x0"><sup class="textsuperscript">3</sup></a></span>    <a 
+href="https://leanpub.com/isaqbglossary/read\#term-coupling" class="url" ><span 
+class="ectt-1000">https://leanpub.com/isaqbglossary/read\#term-coupling</span></a></p><a 
+ id="x1-5002x4.1"></a>
+<!--l. 162--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn4x0-bk" id="fn4x0"><sup class="textsuperscript">4</sup></a></span>    <a 
+href="https://leanpub.com/isaqbglossary/read\#term-cohesion" class="url" ><span 
+class="ectt-1000">https://leanpub.com/isaqbglossary/read\#term-cohesion</span></a></p><a 
+ id="x1-12002x5.4"></a>
+<!--l. 313--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn5x0-bk" id="fn5x0"><sup class="textsuperscript">5</sup></a></span>    <a 
+href="https://refactoring.guru/design-patterns/adapter" class="url" ><span 
+class="ectt-1000">https://refactoring.guru/design-patterns/adapter</span></a></p>                                           </div>
+                                                                                                    
+                                                                                                    
+ 
+</body></html> 
+
+                                                                                                    
+
+
