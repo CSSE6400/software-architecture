@@ -25,6 +25,9 @@ for folder in ${REPO_ROOT}/notes/*; do
         else
             mkdir -p "${REPO_ROOT}/dist/handouts/$(basename $folder)"
             cp ./main.html "${REPO_ROOT}/dist/handouts/$(basename $folder)/index.html"
+            cp ./main.css "${REPO_ROOT}/dist/handouts/$(basename $folder)/main.css"
+            cp -r ./images "${REPO_ROOT}/dist/handouts/$(basename $folder)"
+            cp ./*.svg "${REPO_ROOT}/dist/handouts/$(basename $folder)"
         fi
         popd
     fi
