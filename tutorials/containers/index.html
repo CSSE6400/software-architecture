@@ -1,0 +1,395 @@
+Last Updated on 2022/03/13      
+
+<?xml version="1.0" encoding="iso-8859-1" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+<!--http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd-->  
+<html xmlns="http://www.w3.org/1999/xhtml"  
+> 
+<head> <title>Containers</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
+<!-- fn-in,html,htex4ht,xhtml --> 
+<meta name="src" content="main.tex" /> 
+<link rel="stylesheet" type="text/css" href="main.css" /> 
+<link rel="stylesheet" href="https://latex.now.sh/style.css"> 
+<link rel="stylesheet" href="/notes.css"> 
+<style>body {max-width: 100ch;} 
+dl dd {text-align: left}</style> 
+</head><body 
+>
+   <div class="maketitle"><a 
+ id="Q1-1-1"></a>
+_________________________________________________________________________________________________
+<h2 class="titleHead">Containers</h2>                                                                                       Software Architecture
+   <div class="date" >March 13, 2023</div>                                                                                                                                                       <div class="author" >Brae
+Webb</div>
+______________________________________________________________________________________________
+   </div>
+   <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
+ id="x1-10001"></a>Before Class</h3>
+      <ul class="itemize1">
+      <li class="itemize">
+      <!--l. 23--><p class="noindent" >Ensure that you have <span 
+class="Cabin-Bold-tlf-t1-x-x-120">Docker installed </span>prior to class.
+      </p></li>
+      <li class="itemize">
+      <!--l. 24--><p class="noindent" >Preferably read the Containers lecture note <span class="cite">[<a 
+href="#Xcontainer-notes">1</a>]</span>.</p></li></ul>
+<!--l. 27--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
+ id="x1-20002"></a>Brief</h3>
+<!--l. 28--><p class="noindent" >This week we are getting our hands on using containers. Specifically we will:
+      </p><dl class="enumerate-enumitem"><dt class="enumerate-enumitem">
+   1. </dt><dd 
+class="enumerate-enumitem">Check our installation with the <span 
+class="ectt-1200">hello-world </span>image.
+      </dd><dt class="enumerate-enumitem">
+   2. </dt><dd 
+class="enumerate-enumitem">Manage our local docker images.
+      </dd><dt class="enumerate-enumitem">
+   3. </dt><dd 
+class="enumerate-enumitem">Build a Docker image from a <span 
+class="ectt-1200">Dockerfile</span>.
+      </dd><dt class="enumerate-enumitem">
+   4. </dt><dd 
+class="enumerate-enumitem">Run the Docker image interactively.
+      </dd><dt class="enumerate-enumitem">
+   5. </dt><dd 
+class="enumerate-enumitem">Publish the Docker image.</dd></dl>
+                                                                                                    
+                                                                                                    
+<!--l. 38--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
+ id="x1-30003"></a>Hello World</h3>
+<!--l. 39--><p class="noindent" >To ensure that our installation of Docker is working as expected, we&#8217;ll run the <span 
+class="ectt-1200">hello-world </span>image. The <span 
+class="ectt-1200">hello-world </span>image is an
+<a 
+href="https://hub.docker.com/search?q=&type=image&image_filter=official" >official Docker image</a><span class="footnote-mark"><a 
+href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
+ id="x1-3001f1"></a>
+that simply prints out &#8220;Hello from Docker!&#8221;. It is similar to the <span 
+class="ectt-1200">Hello FROM scratch </span>we looked at in the lecture
+notes.
+</p>
+   <div class="framedenv" id="shaded*-1">
+   <!--l. 46-->
+<pre class="lstlisting" id="listing-1"><span class="label"><a 
+ id="x1-3003r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">run</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">hello</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">world</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
+   </div>
+<!--l. 48--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
+ id="x1-40004"></a>Exploring Local Images</h3>
+<!--l. 49--><p class="noindent" >We&#8217;ll look at a few commands to explore our local images.
+</p>
+<!--l. 51--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-5000"></a><span 
+class="Cabin-Bold-tlf-t1-x-x-120">List all local Docker images</span></span>
+</p>
+   <div class="framedenv" id="shaded*-1">
+   <!--l. 53-->
+<pre class="lstlisting" id="listing-2"><span class="label"><a 
+ id="x1-5001r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">images</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
+   </div>
+<!--l. 55--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-6000"></a><span 
+class="Cabin-Bold-tlf-t1-x-x-120">Remove local image</span></span>
+</p>
+   <div class="framedenv" id="shaded*-1">
+   <!--l. 57-->
+<pre class="lstlisting" id="listing-3"><span class="label"><a 
+ id="x1-6001r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">rmi</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">f</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">hello</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">world</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
+   </div>
+<!--l. 59--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-7000"></a><span 
+class="Cabin-Bold-tlf-t1-x-x-120">Clean up unused images</span></span>
+</p>
+   <div class="framedenv" id="shaded*-1">
+   <!--l. 61-->
+<pre class="lstlisting" id="listing-4"><span class="label"><a 
+ id="x1-7001r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">image</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">prune</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">af</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
+                                                                                                    
+                                                                                                    
+   </div>
+<!--l. 63--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
+ id="x1-80005"></a>Creating an image</h3>
+<!--l. 65--><p class="noindent" >We can create images to run tools which run in an isolated environment. For this exercise,
+we will create a <span 
+class="ectt-1200">Dockerfile </span>to build an image with <a 
+href="https://github.com/ANTsX/ANTs" >Advanced Normalization Tools
+(ANTs)</a><span class="footnote-mark"><a 
+href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
+ id="x1-8001f2"></a>
+installed.
+</p><!--l. 71--><p class="indent" >   </p><div class="framedenv" id="document-1">
+<!--l. 71--><p class="indent" >   <span 
+class="ectt-1200">» cat Dockerfile</span> </p></div>   <div class="framedenv" id="document-1"><!--l. 71--><pre class="lstinputlisting" id="listing-5"><span class="label"><a 
+ id="x1-8004r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#006699"><span 
+class="ectt-1200">FROM</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ubuntu</span></span><span style="color:#000000"><span 
+class="ectt-1200">:16.04</span></span> 
+<span class="label"><a 
+ id="x1-8005r2"></a></span> 
+<span class="label"><a 
+ id="x1-8006r3"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span style="color:#006699"><span 
+class="ectt-1200">RUN</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">apt</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">get</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">update</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">qq</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">\</span></span> 
+<span class="label"><a 
+ id="x1-8007r4"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">4</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">&amp;&amp;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">apt</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">get</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">install</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">y</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">curl</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">\</span></span> 
+<span class="label"><a 
+ id="x1-8008r5"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">5</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">&amp;&amp;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">rm</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">rf</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">var</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">lib</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">apt</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">lists</span></span><span style="color:#000000"><span 
+class="ectt-1200">/*</span></span> 
+<span class="label"><a 
+ id="x1-8009r6"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">6</span></span><span style="color:#006699"><span 
+class="ectt-1200">WORKDIR</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">opt</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">ants</span></span><span style="color:#000000"><span 
+class="ectt-1200">-2.3.4</span></span> 
+<span class="label"><a 
+ id="x1-8010r7"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">7</span></span><span style="color:#006699"><span 
+class="ectt-1200">RUN</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">curl</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">fsSL</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">https</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">bit</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">ly</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">ants234</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">tar</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">xz</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">C</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">opt</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">ants</span></span><span style="color:#000000"><span 
+class="ectt-1200">-2.3.4</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">--</span></span><span style="color:#000000"><span 
+class="ectt-1200">strip</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">components</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">1</span></span> 
+<span class="label"><a 
+ id="x1-8011r8"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">8</span></span><span style="color:#006699"><span 
+class="ectt-1200">ENV</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">PATH</span></span><span style="color:#000000"><span 
+class="ectt-1200">=/</span></span><span style="color:#000000"><span 
+class="ectt-1200">opt</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">ants</span></span><span style="color:#000000"><span 
+class="ectt-1200">-2.3.4:</span></span><span style="color:#000000"><span 
+class="ectt-1200">$PATH</span></span> 
+<span class="label"><a 
+ id="x1-8012r9"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">9</span></span><span style="color:#006699"><span 
+class="ectt-1200">ENV</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ANTSPATH</span></span><span style="color:#000000"><span 
+class="ectt-1200">=/</span></span><span style="color:#000000"><span 
+class="ectt-1200">opt</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">ants</span></span><span style="color:#000000"><span 
+class="ectt-1200">-2.3.4</span></span>
+   </pre>
+</div>
+<!--l. 73--><p class="indent" >   Once the image has been specified in a <span 
+class="ectt-1200">Dockerfile</span>, we can use the <span 
+class="ectt-1200">docker build </span>command to run the
+commands and produce an image. Run the following in the same directory as the <span 
+class="ectt-1200">Dockerfile</span>.
+</p>
+   <div class="framedenv" id="shaded*-2">
+   <!--l. 77-->
+<pre class="lstlisting" id="listing-6"><span class="label"><a 
+ id="x1-8013r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">build</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">t</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ants</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">latest</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">f</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Dockerfile</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
+   </div>
+<!--l. 79--><p class="indent" >   Note that if the tag <span 
+class="ectt-1200">ants </span>is given <span 
+class="ectt-1200">:latest </span>will be appended automatically. Likewise, if the file is named
+<span 
+class="ectt-1200">Dockerfile </span>then the <span 
+class="ectt-1200">-f Dockerfile </span>flag can be dropped as Docker will automatically search for a <span 
+class="ectt-1200">Dockerfile</span>.
+Check that the image has been created:
+</p>
+   <div class="framedenv" id="shaded*-2">
+   <!--l. 83-->
+<pre class="lstlisting" id="listing-7"><span class="label"><a 
+ id="x1-8014r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">images</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
+   </div>
+<!--l. 85--><p class="indent" >   Now we are ready to run the image. When running with the <span 
+class="ectt-1200">-it </span>flag, Docker will create an interactive terminal
+inside the container and connect it to the current shell. You should notice that the shell prompt will
+change.
+</p>
+   <div class="framedenv" id="shaded*-2">
+   <!--l. 90-->
+<pre class="lstlisting" id="listing-8"><span class="label"><a 
+ id="x1-8015r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">run</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">it</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ants</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">latest</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
+   </div>
+<!--l. 92--><p class="indent" >   Now you can inspect the image, note that the current directory has all the binaries of ANTs. If you inspect other
+directories you&#8217;ll find all your normal files are inaccessible.
+</p><!--l. 96--><p class="indent" >   You can exit the interactive container at any time by running the <span 
+class="ectt-1200">exit </span>command to exit the shell within the
+container and return to the shell on your host machine.
+</p>
+                                                                                                    
+                                                                                                    
+   <div class="framedenv" id="shaded*-2">
+   <!--l. 98-->
+<pre class="lstlisting" id="listing-9"><span class="label"><a 
+ id="x1-8016r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">exit</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
+   </div>
+<!--l. 100--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">6    </span> <a 
+ id="x1-90006"></a>Publishing the container</h3>
+<!--l. 101--><p class="noindent" >&#x2026;
+</p><!--l. 1--><p class="noindent" >
+</p>
+   <h3 class="likesectionHead"><a 
+ id="x1-10000"></a>References</h3>
+<!--l. 1--><p class="noindent" >
+   </p><div class="thebibliography">
+   <p class="bibitem" ><span class="biblabel">
+ [1]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xcontainer-notes"></a>B.&#x00A0;Webb,                                       &#8220;Containers,&#8221;                                       March                                       2022.
+   <a 
+href="https://csse6400.uqcloud.net/handouts/containers.pdf" class="url" ><span 
+class="ectt-1200">https://csse6400.uqcloud.net/handouts/containers.pdf</span></a>.
+</p>
+   </div>
+   <div class="footnotes"><a 
+ id="x1-3002x3"></a>
+<!--l. 42--><p class="indent" >       <span class="footnote-mark"><a 
+href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span>    <a 
+href="https://hub.docker.com/search?q=&type=image&image_filter=official" class="url" ><span 
+class="ectt-1000">https://hub.docker.com/search?q=&amp;type=image&amp;image_filter=official</span></a></p><a 
+ id="x1-8002x5"></a>
+<!--l. 68--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span>    <a 
+href="https://github.com/ANTsX/ANTs" class="url" ><span 
+class="ectt-1000">https://github.com/ANTsX/ANTs</span></a></p>                                                               </div>
+ 
+</body></html> 
+
+                                                                                                    
+
+
