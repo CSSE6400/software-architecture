@@ -1,0 +1,1499 @@
+Last Updated on 2023/02/12      
+
+<?xml version="1.0" encoding="iso-8859-1" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+<!--http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd-->  
+<html xmlns="http://www.w3.org/1999/xhtml"  
+> 
+<head> <title>Deploying with Terraform</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
+<!-- fn-in,html,htex4ht,xhtml --> 
+<meta name="src" content="main.tex" /> 
+<link rel="stylesheet" type="text/css" href="main.css" /> 
+<link rel="stylesheet" href="https://latex.now.sh/style.css"> 
+<link rel="stylesheet" href="/notes.css"> 
+<style>body {max-width: 100ch;} 
+dl dd {text-align: left}</style> 
+</head><body 
+>
+   <div class="maketitle"><a 
+ id="Q1-1-1"></a>
+_________________________________________________________________________________________________
+<h2 class="titleHead">Deploying with Terraform</h2>                                                           Software Architecture
+   <div class="date" >March 13, 2023</div>                                                                                                                                                       <div class="author" >Brae
+Webb</div>
+______________________________________________________________________________________________
+   </div>
+   <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
+ id="x1-10001"></a>Before Class</h3>
+<!--l. 17--><p class="noindent" >Ensure you&#8217;ve had practice using the AWS Academy learner lab. It&#8217;s preferable if you already have <a 
+href="https://learn.hashicorp.com/tutorials/terraform/install-cli" >terraform
+installed</a><span class="footnote-mark"><a 
+href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
+ id="x1-1001f1"></a>.
+Please also have one of IntelliJ IDEA, PyCharm, or VSCode with the terraform plugin installed.
+</p><!--l. 21--><p class="noindent" >It is also helpful to have read the Infrastructure as Code lecture notes to understand the motivation for using a tool
+like Terraform.
+</p><!--l. 23--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
+ id="x1-20002"></a>This Week</h3>
+<!--l. 24--><p class="noindent" >This week we are going to put our Terraform and AWS knowledge together to deploy our Todo Application.
+Specifically, this week you need to: </p>
+      <ul class="itemize1">
+      <li class="itemize">
+      <!--l. 27--><p class="noindent" >Authenticate Terraform to use the AWS learner lab.
+      </p></li>
+      <li class="itemize">
+      <!--l. 28--><p class="noindent" >Configure an RDS database and use it in the Todo Application.
+      </p></li>
+      <li class="itemize">
+      <!--l. 29--><p class="noindent" >Configure a single server website in Terraform and deploy the Todo Application to it.</p></li></ul>
+<!--l. 32--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
+ id="x1-30003"></a>Using Terraform in AWS Learner Labs</h3>
+<!--l. 33--><p class="noindent" >Following the steps from the week four practical, start a learner lab in AWS Academy. For this practical, you do not
+need to create any resources in the AWS Console. The console can be used to verify that Terraform has correctly
+provisioned resources.
+</p><!--l. 37--><p class="indent" >
+                                                                                                    
+                                                                                                    
+      </p><ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x1-3002x1">
+      <!--l. 38--><p class="noindent" >Once the learner lab has started, click on &#8216;AWS Details&#8217; to display information about the lab.
+      </p><!--l. 40--><p class="noindent" ><img 
+src="images/aws-details.png" alt="PIC"  
+width="367" height="367"  />
+      </p></li>
+<li 
+  class="enumerate" id="x1-3004x2">
+      <!--l. 42--><p class="noindent" >Click  on  the  first  &#8216;Show&#8217;  button  next  to  &#8216;AWS  CLI&#8217;  which  will  display  a  text  block  starting  with
+      <span 
+class="ectt-1200">[default]</span>.
+      </p></li>
+<li 
+  class="enumerate" id="x1-3006x3">
+      <!--l. 43--><p class="noindent" >Create a directory for this week&#8217;s practical.
+      </p></li>
+<li 
+  class="enumerate" id="x1-3008x4">
+      <!--l. 44--><p class="noindent" >Within that directory create a <span 
+class="ectt-1200">credentials </span>file and copy the contents of the text block into the file.
+      <span 
+class="Cabin-Bold-tlf-t1-x-x-120">Do not share this file contents &#8212; do not commit it</span>.
+      </p></li>
+<li 
+  class="enumerate" id="x1-3010x5">
+      <!--l. 46--><p class="noindent" >Create a <span 
+class="ectt-1200">main.tf </span>file in the same directory with the following contents:    </p><div class="framedenv" id="code-1">
+      <!--l. 47--><p class="noindent" ><span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 47--><pre class="listings" id="listing-1"><span class="label"><a 
+ id="x1-3011r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#006699"><span 
+class="ectt-1200">terraform</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-3012r2"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">2</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">required_providers</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-3013r3"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">aws</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-3014r4"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">4</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">source</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">hashicorp</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-3015r5"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">5</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">version</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">~&#x003E;</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">3.0</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-3016r6"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">6</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-3017r7"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">7</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-3018r8"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">8</span></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-3019r9"></a></span> 
+<span class="label"><a 
+ id="x1-3020r10"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">10</span></span><span style="color:#006699"><span 
+class="ectt-1200">provider</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-3021r11"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">11</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">region</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">us</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">east</span></span><span style="color:#669900"><span 
+class="ectt-1200">-1</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-3022r12"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">12</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">shared_credentials_file</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">./</span></span><span style="color:#669900"><span 
+class="ectt-1200">credentials</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-3023r13"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">13</span></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+       
+<span class="label"><a 
+ id="x1-3024r14"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">14 </span></span></pre>
+      </div>
+      <!--l. 63--><p class="noindent" >The <span 
+class="ectt-1200">terraform </span>block specifies the required external dependencies, here we need to use the AWS provider.
+      The <span 
+class="ectt-1200">provider </span>block configures the AWS provider, instructing it which region to use and how to authenticate
+      (using the credentials file we created).
+      </p></li>
+<li 
+  class="enumerate" id="x1-3026x6">
+      <!--l. 66--><p class="noindent" >We need to initialise terraform which will fetch the required dependencies. This is done with the <span 
+class="ectt-1200">terraform</span>
+      <span 
+class="ectt-1200">init </span>command.  </p><div class="framedenv" id="shaded*-1">
+      <!--l. 67-->
+      <pre class="lstlisting" id="listing-2"><span class="label"><a 
+ id="x1-3027r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">terraform</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">init</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
+      
+      </div>
+      <!--l. 69--><p class="noindent" >This command will create a <span 
+class="ectt-1200">.terraform </span>directory which stores providers and a provider lock file,
+      <span 
+class="ectt-1200">.terraform.lock.hcl</span>.
+                                                                                                    
+                                                                                                    
+      </p></li>
+<li 
+  class="enumerate" id="x1-3029x7">
+      <!--l. 71--><p class="noindent" >To verify that we have setup Terraform correctly, use <span 
+class="ectt-1200">terraform plan</span>.  </p><div class="framedenv" id="shaded*-1">
+      <!--l. 72-->
+      <pre class="lstlisting" id="listing-3"><span class="label"><a 
+ id="x1-3030r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">terraform</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">plan</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
+      
+      </div>
+      <!--l. 74--><p class="noindent" >As we currently have no resources configured, it should find that no changes are required. Note that this
+      does not ensure our credentials are correctly configured as Terraform has no reason to try authenticating
+      yet.
+</p>
+      </li></ol>
+<!--l. 79--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
+ id="x1-40004"></a>Deploying a Database in AWS</h3>
+   <div class="tcolorbox tcolorbox" id="tcolobox-1">    
+<div class="tcolorbox-title">
+<!--l. 83--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 83--><p class="noindent" >This section manually deploys a Postgresql RDS instance, which is not the courses end goals but is a
+good way to get started with AWS. Latter this practical we will use terraform to create the database,
+so this section is optional and is better to be observed rather than actioned.  </p> 
+</div> 
+</div>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-4001r1"></a>
+                                                                                                    
+                                                                                                    
+<!--l. 90--><p class="noindent" ><img 
+src="diagrams/remotedb.png" alt="PIC"  
+width="525" height="525"  />
+<br /> </p><div class="caption" 
+><span class="id">Figure&#x00A0;1: </span><span  
+class="content">Remote database deployment diagram</span></div><!--tex4ht:label?: x1-4001r1 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 94--><p class="indent" >   Now we have a locally running Todo App let&#8217;s move to AWS, start up your Learner Lab environment
+now.
+</p><!--l. 96--><p class="indent" >   This is the last time we will heavily use the AWS user interface in the practicals. If you already feel confident in
+the AWS environment skip to Section <span 
+class="Cabin-Bold-tlf-t1-x-x-120">??</span> for the terraform setup.
+</p><!--l. 102--><p class="indent" >   To get started let&#8217;s jump into the lab environment and have a look at AWS RDS which is an AWS managed
+database service. To get to the RDS service either search it or browse Services -&#x003E; Database -&#x003E; RDS as shown
+below.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 105--><p class="noindent" ><img 
+src="images/aws_1.png" alt="PIC"  
+width="525" height="525"  />
+                                                                                                    
+                                                                                                    
+</p>
+   </div><hr class="endfigure" />
+<!--l. 108--><p class="indent" >   Now we are in the management page for all our database instances, for today we just want to get a small
+instance running to explore the service. Head to &#8220;DB Instances (0/40)&#8221;.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 113--><p class="noindent" ><img 
+src="images/aws_2.png" alt="PIC"  
+width="525" height="525"  />
+                                                                                                    
+                                                                                                    
+</p>
+   </div><hr class="endfigure" />
+<!--l. 116--><p class="indent" >   This page should appear familar as it&#8217;s very similar to the AWS EC2 instance page. Let us create a new database
+by hitting the &#8220;Create Database&#8221; button.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 120--><p class="noindent" ><img 
+src="images/aws_3.png" alt="PIC"  
+width="525" height="525"  />
+                                                                                                    
+                                                                                                    
+</p>
+   </div><hr class="endfigure" />
+   <div class="tcolorbox tcolorbox" id="tcolobox-2">    
+<div class="tcolorbox-title">
+<!--l. 126--><p class="indent" >   Warning</p></div> 
+<div class="tcolorbox-content"><!--l. 126--><p class="noindent" >In the next section we cannot use the Easy Create method as it tries to create a IAM account which
+is not allowed in the labs. Going forward we would typically do this using Terraform so we can easily
+avoid these restrictions.  </p> 
+</div> 
+</div>
+<!--l. 133--><p class="indent" >   We will be creating a standard database so select standard and MySQL. We will use version 8 to match the
+local version.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 137--><p class="noindent" ><img 
+src="images/db1.png" alt="PIC"  
+width="525" height="525"  />
+                                                                                                    
+                                                                                                    
+</p>
+   </div><hr class="endfigure" />
+<!--l. 140--><p class="indent" >   For today we are going to use &#8220;Free Tier&#8221; but in the future, you may wish to explore the different deployment
+options. Please peruse the available different options.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 149--><p class="noindent" ><img 
+src="images/db2.png" alt="PIC"  
+width="525" height="525"  />
+                                                                                                    
+                                                                                                    
+</p>
+   </div><hr class="endfigure" />
+<!--l. 152--><p class="indent" >   Now we need to name our database and create credentials to connect via. Please enter a reasonable password
+and keep this aside for later. We will need it for our local docker-compose file.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 157--><p class="noindent" ><img 
+src="images/db3.png" alt="PIC"  
+width="525" height="525"  />
+                                                                                                    
+                                                                                                    
+</p>
+   </div><hr class="endfigure" />
+<!--l. 160--><p class="indent" >   We will use the default class type, t2.micro, which should be sufficient for this practical.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 168--><p class="noindent" ><img 
+src="images/db4.png" alt="PIC"  
+width="525" height="525"  />
+                                                                                                    
+                                                                                                    
+</p>
+   </div><hr class="endfigure" />
+<!--l. 171--><p class="indent" >   For storage we will leave all the default options.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 174--><p class="noindent" ><img 
+src="images/db5.png" alt="PIC"  
+width="525" height="525"  />
+                                                                                                    
+                                                                                                    
+</p>
+   </div><hr class="endfigure" />
+<!--l. 177--><p class="indent" >   In connectivity we need to make sure our instance is publicly available. Usually you don&#8217;t want to expose your
+databases publicly and, would instead, have a web server sitting in-front. But for today we will be running that web
+server locally so for convenience we need public access.
+</p><!--l. 181--><p class="indent" >   When selecting public access as yes we have to create a new Security Group, give this Security Group a
+sensible name.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 185--><p class="noindent" ><img 
+src="images/db6.png" alt="PIC"  
+width="525" height="525"  />
+                                                                                                    
+                                                                                                    
+</p>
+   </div><hr class="endfigure" />
+<!--l. 188--><p class="indent" >   We will leave the authentication as password based but we need to expand the &#8220;Additional configuration&#8221;. Fill
+in the &#8220;Initial Database Name&#8221; section to be &#8220;todoapp&#8221;, this is similar to what we had in the Docker
+Compose.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 198--><p class="noindent" ><img 
+src="images/db7.png" alt="PIC"  
+width="525" height="525"  />
+                                                                                                    
+                                                                                                    
+</p>
+   </div><hr class="endfigure" />
+<!--l. 201--><p class="indent" >   Now we can click create which will take some time.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 204--><p class="noindent" ><img 
+src="images/db8.png" alt="PIC"  
+width="525" height="525"  />
+                                                                                                    
+                                                                                                    
+</p>
+   </div><hr class="endfigure" />
+<!--l. 207--><p class="indent" >   Depending on your database it may take 10 to 30minutes to create, the larger and more complicated the
+setup the longer it usually takes. The database will also do a initial backup when its created.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 212--><p class="noindent" ><img 
+src="images/aws_4.png" alt="PIC"  
+width="525" height="525"  />
+                                                                                                    
+                                                                                                    
+</p>
+   </div><hr class="endfigure" />
+<!--l. 215--><p class="indent" >   When the database has finished being created you can select it to view the configuration and details. In
+this menu we also see the endpoint address which we will need to copy into our docker compose
+file.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 219--><p class="noindent" ><img 
+src="images/aws_5.png" alt="PIC"  
+width="525" height="525"  />
+                                                                                                    
+                                                                                                    
+</p>
+   </div><hr class="endfigure" />
+   <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
+ id="x1-50005"></a>RDS Database with Terraform</h3>
+<!--l. 224--><p class="noindent" >Now would be a good time to browse the documentation for the RDS database in Terraform:
+<a 
+href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_instance" class="url" ><span 
+class="ectt-1200">https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_instance</span></a>.
+Using our manual configuration, we can come up with a resource with the appropriate parameters as
+below:
+</p><!--l. 229--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 229--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 229--><pre class="listings" id="listing-4"><span class="label"><a 
+ id="x1-5001r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#000000"><span 
+class="ectt-1200">locals</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-5002r2"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">2</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">password</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">foobarbaz</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">this</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">is</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">bad</span></span> 
+<span class="label"><a 
+ id="x1-5003r3"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-5004r4"></a></span> 
+<span class="label"><a 
+ id="x1-5005r5"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">5</span></span><span style="color:#006699"><span 
+class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_db_instance</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">database</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-5006r6"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">6</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">allocated_storage</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">20</span></span> 
+<span class="label"><a 
+ id="x1-5007r7"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">7</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">max_allocated_storage</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">1000</span></span> 
+<span class="label"><a 
+ id="x1-5008r8"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">8</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">engine</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">mysql</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-5009r9"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">9</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">engine_version</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">8.0.27</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-5010r10"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">10</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">instance_class</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">db</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">t2</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">micro</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-5011r11"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">11</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-5012r12"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">12</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">username</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-5013r13"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">13</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">password</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">local</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">password</span></span> 
+<span class="label"><a 
+ id="x1-5014r14"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">14</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">parameter_group_name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">default</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">mysql8</span></span><span style="color:#669900"><span 
+class="ectt-1200">.0</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-5015r15"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">15</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">skip_final_snapshot</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">true</span></span> 
+<span class="label"><a 
+ id="x1-5016r16"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">16</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">vpc_security_group_ids</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#000000"><span 
+class="ectt-1200">aws_security_group</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">database</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">id</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-5017r17"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">17</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">publicly_accessible</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">true</span></span> 
+<span class="label"><a 
+ id="x1-5018r18"></a></span> 
+<span class="label"><a 
+ id="x1-5019r19"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">19</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">tags</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-5020r20"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">20</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">Name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">database</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-5021r21"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">21</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-5022r22"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">22</span></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-5023r23"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">23 </span></span></pre>
+   </div>
+<!--l. 254--><p class="noindent" >Remember to create an appropriate security group as we did through the user interface.
+</p><!--l. 256--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 256--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 256--><pre class="listings" id="listing-5"><span class="label"><a 
+ id="x1-5024r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#006699"><span 
+class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_security_group</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">database</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-5025r2"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">2</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">database</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-5026r3"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">description</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">Allow</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">inbound</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">MySQL</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">traffic</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-5027r4"></a></span> 
+<span class="label"><a 
+ id="x1-5028r5"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">5</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">ingress</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-5029r6"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">6</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">from_port</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">3306</span></span> 
+<span class="label"><a 
+ id="x1-5030r7"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">7</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">to_port</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">3306</span></span> 
+<span class="label"><a 
+ id="x1-5031r8"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">8</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">protocol</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">tcp</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-5032r9"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">9</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">cidr_blocks</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">0.0.0.0/0</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-5033r10"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">10</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-5034r11"></a></span> 
+<span class="label"><a 
+ id="x1-5035r12"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">12</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">egress</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-5036r13"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">13</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">from_port</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">0</span></span> 
+<span class="label"><a 
+ id="x1-5037r14"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">14</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">to_port</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">0</span></span> 
+<span class="label"><a 
+ id="x1-5038r15"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">15</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">protocol</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">-1</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-5039r16"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">16</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">cidr_blocks</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">0.0.0.0/0</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-5040r17"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">17</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">ipv6_cidr_blocks</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">::/0</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-5041r18"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">18</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-5042r19"></a></span> 
+<span class="label"><a 
+ id="x1-5043r20"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">20</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">tags</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-5044r21"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">21</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">Name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">database</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-5045r22"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">22</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-5046r23"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">23</span></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-5047r24"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">24 </span></span></pre>
+   </div>
+   <div class="tcolorbox tcolorbox" id="tcolobox-3">       
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 282--><p class="noindent" >TODO: Add a section where we connect to the database using our locally running todo app. </p> 
+</div> 
+</div>
+<!--l. 284--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">6    </span> <a 
+ id="x1-60006"></a>Container on AWS</h3>
+<!--l. 286--><p class="noindent" >As we mentioned in the Infrastructure as Code notes <span class="cite">[<a 
+href="#Xiac-notes">1</a>]</span>, in this course we will use Docker to configure machines
+and Terraform to configure infrastructure. AWS has the ability to deploy Docker containers using a service known
+as Elastic Container Service (ECS). Unfortunately, the AWS Learner Labs provided by AWS do not support
+ECS.
+</p><!--l. 291--><p class="indent" >   To resolve this issue, we have created a Terraform module which allows us to deploy Docker images on EC2
+instances and abstract over the underlying implementation. The documentation and source for this Terraform
+module is available on Github:     <a 
+href="https://github.com/CSSE6400/terraform/tree/main/container" class="url" ><span 
+class="ectt-1200">https://github.com/CSSE6400/terraform/tree/main/container</span></a>.
+</p><!--l. 295--><p class="indent" >   Using the documentation of the module, combined with the environment variables we know our backend
+requires based on the <span 
+class="ectt-1200">docker-compose.yml </span>file, we can develop a resource as below.
+</p><!--l. 299--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 299--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 299--><pre class="listings" id="listing-6"><span class="label"><a 
+ id="x1-6001r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#006699"><span 
+class="ectt-1200">module</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">backend</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-6002r2"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">2</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">source</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">git</span></span><span style="color:#669900"><span 
+class="ectt-1200">::</span></span><span style="color:#669900"><span 
+class="ectt-1200">https</span></span><span style="color:#669900"><span 
+class="ectt-1200">://</span></span><span style="color:#669900"><span 
+class="ectt-1200">github</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">com</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">CSSE6400</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">terraform</span></span><span style="color:#669900"><span 
+class="ectt-1200">//</span></span><span style="color:#669900"><span 
+class="ectt-1200">container</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6003r3"></a></span> 
+<span class="label"><a 
+ id="x1-6004r4"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">4</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">image</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">ghcr</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">io</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">csse6400</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">todo</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">app</span></span><span style="color:#669900"><span 
+class="ectt-1200">:</span></span><span style="color:#669900"><span 
+class="ectt-1200">combined</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">latest</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6005r5"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">5</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">instance_type</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">t2</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">micro</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6006r6"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">6</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">environment</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-6007r7"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">7</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">APP_ENV</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">local</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6008r8"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">8</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">APP_KEY</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">base64</span></span><span style="color:#669900"><span 
+class="ectt-1200">:8</span></span><span style="color:#669900"><span 
+class="ectt-1200">PQEPYGlTm1t3aqWmlAw</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">ZPwCiIFvdXDBjk3mhsom</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">A</span></span><span style="color:#669900"><span 
+class="ectt-1200">=</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6009r9"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">9</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">APP_DEBUG</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">true</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6010r10"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">10</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">LOG_LEVEL</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">debug</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6011r11"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">11</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">DB_CONNECTION</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">mysql</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6012r12"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">12</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">DB_HOST</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"><span 
+class="ectt-1200">aws_db_instance</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">database</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">address</span></span> 
+<span class="label"><a 
+ id="x1-6013r13"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">13</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">DB_PORT</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">3306</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6014r14"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">14</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">DB_DATABASE</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6015r15"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">15</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">DB_USERNAME</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6016r16"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">16</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">DB_PASSWORD</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"><span 
+class="ectt-1200">local</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">password</span></span> 
+<span class="label"><a 
+ id="x1-6017r17"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">17</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-6018r18"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">18</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">ports</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-6019r19"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">19</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">80</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">8000</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6020r20"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">20</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-6021r21"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">21</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">security_groups</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#000000"><span 
+class="ectt-1200">aws_security_group</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">backend</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">name</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-6022r22"></a></span> 
+<span class="label"><a 
+ id="x1-6023r23"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">23</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">tags</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-6024r24"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">24</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">Name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">backend</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6025r25"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">25</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-6026r26"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">26</span></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-6027r27"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">27 </span></span></pre>
+   </div>
+<!--l. 328--><p class="indent" >   Note that we are passing the address of our remote database into the container as an environment variable.
+This is a module which requires a source. In our case, the source will be the Github repository created earlier. Also
+notice that we map port 80 of the EC2 machine to port 8000 within the container, we should create a security
+group to make the instance accessible.
+</p><!--l. 334--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 334--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 334--><pre class="listings" id="listing-7"><span class="label"><a 
+ id="x1-6028r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#006699"><span 
+class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_security_group</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">backend</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-6029r2"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">2</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">backend</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6030r3"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">description</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">Todo</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">App</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">HTTP</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">and</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">SSH</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">access</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6031r4"></a></span> 
+<span class="label"><a 
+ id="x1-6032r5"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">5</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">ingress</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-6033r6"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">6</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">from_port</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">80</span></span> 
+<span class="label"><a 
+ id="x1-6034r7"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">7</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">to_port</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">80</span></span> 
+<span class="label"><a 
+ id="x1-6035r8"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">8</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">protocol</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">tcp</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6036r9"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">9</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">cidr_blocks</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">0.0.0.0/0</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-6037r10"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">10</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-6038r11"></a></span> 
+<span class="label"><a 
+ id="x1-6039r12"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">12</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">ingress</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-6040r13"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">13</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">from_port</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">22</span></span> 
+<span class="label"><a 
+ id="x1-6041r14"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">14</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">to_port</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">22</span></span> 
+<span class="label"><a 
+ id="x1-6042r15"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">15</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">protocol</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">tcp</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6043r16"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">16</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">cidr_blocks</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">0.0.0.0/0</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-6044r17"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">17</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-6045r18"></a></span> 
+<span class="label"><a 
+ id="x1-6046r19"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">19</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">egress</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-6047r20"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">20</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">from_port</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">0</span></span> 
+<span class="label"><a 
+ id="x1-6048r21"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">21</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">to_port</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">0</span></span> 
+<span class="label"><a 
+ id="x1-6049r22"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">22</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">protocol</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">-1</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-6050r23"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">23</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">cidr_blocks</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">0.0.0.0/0</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-6051r24"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">24</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-6052r25"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">25</span></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-6053r26"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">26 </span></span></pre>
+   </div>
+<!--l. 362--><p class="indent" >   You will also want to create an output block to expose the address of the instance.
+</p><!--l. 364--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 364--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 364--><pre class="listings" id="listing-8"><span class="label"><a 
+ id="x1-6054r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#006699"><span 
+class="ectt-1200">output</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">url</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-6055r2"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">2</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">value</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">module</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">todoapp</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">backend</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">public_dns</span></span> 
+<span class="label"><a 
+ id="x1-6056r3"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-6057r4"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">4 </span></span></pre>
+                                                                                                    
+                                                                                                    
+   </div>
+<!--l. 370--><p class="indent" >   This should give you a <span 
+class="ectt-1200">main.tf </span>file which fully deploys a todo application. If you haven&#8217;t been
+applying as we go, try and apply the Terraform file now. If you have any issues, ask your tutor for
+guidance.
+</p><!--l. 1--><p class="noindent" >
+</p>
+   <h3 class="likesectionHead"><a 
+ id="x1-7000"></a>References</h3>
+<!--l. 1--><p class="noindent" >
+   </p><div class="thebibliography">
+   <p class="bibitem" ><span class="biblabel">
+ [1]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xiac-notes"></a>B.&#x00A0;Webb,                    &#8220;Infrastructure                    as                    code,&#8221;                    March                    2022.
+   <a 
+href="https://csse6400.uqcloud.net/handouts/iac.pdf" class="url" ><span 
+class="ectt-1200">https://csse6400.uqcloud.net/handouts/iac.pdf</span></a>.
+</p>
+   </div>
+   <div class="footnotes"><a 
+ id="x1-1002x1"></a>
+<!--l. 18--><p class="indent" >       <span class="footnote-mark"><a 
+href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span>    <a 
+href="https://learn.hashicorp.com/tutorials/terraform/install-cli" class="url" ><span 
+class="ectt-1000">https://learn.hashicorp.com/tutorials/terraform/install-cli</span></a></p>                                </div>
+ 
+</body></html> 
+
+                                                                                                    
+
+
