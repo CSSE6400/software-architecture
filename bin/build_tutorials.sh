@@ -17,7 +17,6 @@ for folder in ${REPO_ROOT}/tutorials/*; do
             exit 1
         fi
         cp ./out/main.pdf "${DIST_DIR}/$(basename $folder).pdf"
-        popd
 
         # Build HTML
         latexmk -pdf- -dvi -outdir= -halt-on-error
@@ -31,5 +30,6 @@ for folder in ${REPO_ROOT}/tutorials/*; do
             cp ./main.css ./*.svg ./*.png "${HTML_DIR}"
             cp -r ./images ./diagrams "${HTML_DIR}"
         fi
+        popd
     fi
 done
