@@ -6,6 +6,9 @@
 \newcommand{\headlinecolor}{\normalcolor}
 \LoadClass[a4paper,12pt]{article}
 
+\RequirePackage[sfdefault]{cabin}
+\RequirePackage[T1]{fontenc}
+
 % Thin margins
 \RequirePackage[left=0.5 in,right=0.5 in,top=0.5in,bottom=1in]{geometry}
 
