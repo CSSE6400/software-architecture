@@ -22,20 +22,20 @@ dl dd {text-align: left}</style>
    <div class="maketitle"><a 
  id="Q1-1-1"></a>
 _________________________________________________________________________________________________
-<h2 class="titleHead">Distributed Systems II</h2>                                               Software Architecture
-   <div class="date" >April 3, 2023</div>                                                                                                          <div class="author" >Brae
+<h2 class="titleHead">Distributed Systems II</h2>                                                                  Software Architecture
+   <div class="date" >April 3, 2023</div>                                                                                                                                                           <div class="author" >Brae
 Webb</div>
 ______________________________________________________________________________________________
    </div>
-   <h3 class="sectionHead"><span class="titlemark">1   </span> <a 
+   <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
  id="x1-10001"></a>Introduction</h3>
 <!--l. 8--><p class="noindent" >In the previous course notes <span class="cite">[<a 
 href="#Xdistributed1-notes">1</a>]</span> and lecture <span class="cite">[<a 
 href="#Xdistributed1-slides">2</a>]</span> on distributed systems, we explored how to leverage distributed
-systems to increase the reliability and scalability of a system. Specifically, we saw that when working with
-stateless services, which do not require persistent data, auto-scaling groups and load-balancers can be used to
-scale-out the service &#8212; distributing the load to arbitrary copies of the service. In the lecture, we applied
-this technique to the product browsing service of our Sahara example, as illustrated in Figure
+systems to increase the reliability and scalability of a system. Specifically, we saw that when working with stateless
+services, which do not require persistent data, auto-scaling groups and load-balancers can be used
+to scale-out the service &#8212; distributing the load to arbitrary copies of the service. In the lecture, we
+applied this technique to the product browsing service of our Sahara example, as illustrated in Figure
 <a 
 href="#x1-1001r1">1<!--tex4ht:ref: fig:scaled-sahara --></a>.
 </p>
@@ -54,35 +54,34 @@ href="#x1-1001r1">1<!--tex4ht:ref: fig:scaled-sahara --></a>.
 src="diagrams/SaharaScaled.png" alt="PIC"  
 width="378" height="378"  /></p></div>
 <br /> <div class="caption" 
-><span class="id">Figure&#x00A0;1: </span><span  
-class="content">A service-based implementation of Sahara with stateless scaling techniques applied to the
+><span class="id">Figure&#x00A0;1:  </span><span  
+class="content">A  service-based  implementation  of  Sahara  with  stateless  scaling  techniques  applied  to  the
 product browsing service.</span></div><!--tex4ht:label?: x1-1001r1 -->
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
 <!--l. 23--><p class="indent" >   One might correctly identify that by scaling the product browsing service, we have only increased the
-maximum load that the database can expect. The database becomes a major bottle-neck. We might attempt
-to scale-up the database, purchasing more powerful machines to host the database on, but this approach is
+maximum load that the database can expect. The database becomes a major bottle-neck. We might attempt to
+scale-up the database, purchasing more powerful machines to host the database on, but this approach is
 limited.
 </p><!--l. 30--><p class="indent" >   In this part of our distributed systems series, we look at how to scale stateful services which <span 
-class="ecsl-1200">do </span>require
-persistent data. We focus on state stored in a database and thus, how databases can be made more reliable
-and scalable. In these lecture notes we only outline the scope of our treatment of database scaling. For a
+class="Cabin-Italic-tlf-t1-x-x-120">do </span>require
+persistent data. We focus on state stored in a database and thus, how databases can be made more reliable and
+scalable. In these lecture notes we only outline the scope of our treatment of database scaling. For a
 detailed treatment of these topics, please refer to the <span 
-class="ecti-1200">Designing Data-Intensive Applications </span>textbook
+class="Cabin-Italic-tlf-t1-x-x-120">Designing Data-Intensive Applications </span>textbook
 <span class="cite">[<a 
 href="#Xdata-intensive">3</a>]</span>.
 </p>
-   <h3 class="sectionHead"><span class="titlemark">2   </span> <a 
+   <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
  id="x1-20002"></a>Replication</h3>
 <!--l. 39--><p class="noindent" >Replication is the most straight-forward approach to scaling databases. In many applications, read operations
-occur much more frequently than write operations, in such cases replication can enable improved
-capacity for read operations whilst keeping the write capacity roughly equivalent. Replication
-involves creating complete database copies, called replicas, that reduce the load on any single
-replica.
+occur much more frequently than write operations, in such cases replication can enable improved capacity for
+read operations whilst keeping the write capacity roughly equivalent. Replication involves creating complete
+database copies, called replicas, that reduce the load on any single replica.
 </p><!--l. 45--><p class="noindent" >
 </p>
-   <h4 class="subsectionHead"><span class="titlemark">2.1   </span> <a 
+   <h4 class="subsectionHead"><span class="titlemark">2.1    </span> <a 
  id="x1-30002.1"></a>Leader and Followers</h4>
 <!--l. 46--><p class="noindent" >The most common implementation of replication is leader-follower replication. Fortunately, it is also the
 simplest.
@@ -90,13 +89,13 @@ simplest.
       </p><dl class="description"><dt class="description">
       <!--l. 50--><p class="noindent" >
 <span 
-class="ecbx-1200">Leader</span> </p></dt><dd 
+class="Cabin-Bold-tlf-t1-x-x-120">Leader</span> </p></dt><dd 
 class="description">
       <!--l. 50--><p class="noindent" >a replica that accepts write operations and defines the order in which writes are applied.
       </p></dd><dt class="description">
       <!--l. 51--><p class="noindent" >
 <span 
-class="ecbx-1200">Follower</span> </p></dt><dd 
+class="Cabin-Bold-tlf-t1-x-x-120">Follower</span> </p></dt><dd 
 class="description">
       <!--l. 51--><p class="noindent" >replicas that are read-only copies of the data.</p></dd></dl>
 <!--l. 54--><p class="noindent" >When writes occur, they must be sent to the leader replica. Leader replicas propagate updates to all followers.
@@ -134,25 +133,26 @@ class="content">A leader-follower replication of the Sahara database.</span></di
  id="x1-4000"></a>Replication Lag</h5>
 <!--l. 79--><p class="noindent" >For leader-follower replication to be practical, write updates from the leader to the followers need to be
 <span 
-class="ecsl-1200">asynchronous</span><span class="footnote-mark"><a 
+class="Cabin-Italic-tlf-t1-x-x-120">asynchronous</span><span class="footnote-mark"><a 
 href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
  id="x1-4001f2"></a>.
-However, asynchronous propagation introduces an entirely new suite of issues. If we do not wait for write
-updates to be propagated to all replicas, then there will be times where the data retrieved from a read replica
-will be out-dated, or <span 
-class="ecsl-1200">stale</span>. Eventually, all writes will be propagated to every read replica, so we call this an
+However, asynchronous propagation introduces an entirely new suite of issues. If we do not wait for write updates
+to be propagated to all replicas, then there will be times where the data retrieved from a read replica will be
+out-dated, or <span 
+class="Cabin-Italic-tlf-t1-x-x-120">stale</span>. Eventually, all writes will be propagated to every read replica, so we call this an <span 
+class="Cabin-Italic-tlf-t1-x-x-120">eventually</span>
 <span 
-class="ecsl-1200">eventually consistent </span>system.
+class="Cabin-Italic-tlf-t1-x-x-120">consistent </span>system.
 </p><!--l. 88--><p class="indent" >   We have grown fairly accustomed to eventually consistent systems. Consider the last time you or a friend of
-yours updated their display picture. Did everyone start seeing the updated picture immediately, or, did it take
-a number of hours or even days to propagate through? Despite our increased exposure to eventually consistent
+yours updated their display picture. Did everyone start seeing the updated picture immediately, or, did it take a
+number of hours or even days to propagate through? Despite our increased exposure to eventually consistent
 systems, there are a few common practices to keep in mind when implementing such a system to preserve your
 users sanity.
 </p><!--l. 95--><p class="indent" >
       </p><dl class="description"><dt class="description">
       <!--l. 96--><p class="noindent" >
 <span 
-class="ecbx-1200">Read-your-writes Consistency</span> </p></dt><dd 
+class="Cabin-Bold-tlf-t1-x-x-120">Read-your-writes Consistency</span> </p></dt><dd 
 class="description">
       <!--l. 96--><p class="noindent" >Ensures that the user who wrote the database change will always see their update reflected, though
       other users will still have to wait for the change to be propagated. This type of consistency avoids
@@ -160,29 +160,27 @@ class="description">
       </p></dd><dt class="description">
       <!--l. 97--><p class="noindent" >
 <span 
-class="ecbx-1200">Monotonic Reads</span> </p></dt><dd 
+class="Cabin-Bold-tlf-t1-x-x-120">Monotonic Reads</span> </p></dt><dd 
 class="description">
-      <!--l. 97--><p class="noindent" >Ensures that once a user reads the updated data, they do not later see the older version of the
-      data, i.e. they do not travel back in time.
+      <!--l. 97--><p class="noindent" >Ensures that once a user reads the updated data, they do not later see the older version of the data,
+      i.e. they do not travel back in time.
       </p></dd><dt class="description">
       <!--l. 98--><p class="noindent" >
 <span 
-class="ecbx-1200">Consistent Prefix Reads</span> </p></dt><dd 
+class="Cabin-Bold-tlf-t1-x-x-120">Consistent Prefix Reads</span> </p></dt><dd 
 class="description">
-      <!--l. 98--><p class="noindent" >Ensures that sequential writes are always read in the same order. Consider a Twitter feed, each
-      post is a write. Consistent Prefix Reads guarantees that those readers do not see the posts out of
-      order.</p></dd></dl>
+      <!--l. 98--><p class="noindent" >Ensures that sequential writes are always read in the same order. Consider a Twitter feed, each post
+      is a write. Consistent Prefix Reads guarantees that those readers do not see the posts out of order.</p></dd></dl>
 <!--l. 101--><p class="noindent" >
 </p>
-   <h4 class="subsectionHead"><span class="titlemark">2.2   </span> <a 
+   <h4 class="subsectionHead"><span class="titlemark">2.2    </span> <a 
  id="x1-50002.2"></a>Multi-leader Replication</h4>
-<!--l. 103--><p class="noindent" >Leader-follower replications are sufficient for most use cases as reads often occur far more frequently
-than writes. However, there are situations where leader-follower replication is insufficient. For
-systems which need to be highly available, having a single point of failure, the leader replica, is
-not good enough. Likewise, for systems which need to be highly scalable, a write bottle-neck
-is inappropriate. For these situations, a multi-leader replication scheme may be appropriate. It
-is worth noting that multi-leader replications introduce complexity that often outweighs their
-value.
+<!--l. 103--><p class="noindent" >Leader-follower replications are sufficient for most use cases as reads often occur far more frequently than writes.
+However, there are situations where leader-follower replication is insufficient. For systems which need to be highly
+available, having a single point of failure, the leader replica, is not good enough. Likewise, for systems which need
+to be highly scalable, a write bottle-neck is inappropriate. For these situations, a multi-leader replication scheme
+may be appropriate. It is worth noting that multi-leader replications introduce complexity that often outweighs
+their value.
 </p>
    <hr class="figure" /><div class="figure" 
 >
@@ -210,38 +208,36 @@ leader, and each leader has their own follower. This type of separation might ma
 beneficial to have a separate database replica in the warehouse which can be interacted with via the fulfillment
 service. Such a system would isolate the warehouse operations team from the potential latency of the external
 customer load.
-</p><!--l. 129--><p class="indent" >   However, we now have a system where writes can occur in parallel. This can cause several
-problems. Consider a situation where the fulfillment center has noticed a defective <a 
-href="https://www.amazon.com.au/dp/B09LYDDDR1" >Nicholas Cage
-Reversible Pillow</a>. They promptly update their system to reflect the decreased stock. However, at
-around the same time, the CSSE6400 tutors placed a bulk order for all of Sahara&#8217;s remaining
-stock. Both write operations appear successful to the fulfillment team and the tutors but a conflict
-has occurred &#8212; this is known as a <span 
-class="ecsl-1200">write conflict</span>, and it is a common problem in multi-leader
-replications.
+</p><!--l. 129--><p class="indent" >   However, we now have a system where writes can occur in parallel. This can cause several problems. Consider
+a situation where the fulfillment center has noticed a defective <a 
+href="https://www.amazon.com.au/dp/B09LYDDDR1" >Nicholas Cage Reversible Pillow</a>. They promptly
+update their system to reflect the decreased stock. However, at around the same time, the CSSE6400 tutors
+placed a bulk order for all of Sahara&#8217;s remaining stock. Both write operations appear successful to the fulfillment
+team and the tutors but a conflict has occurred &#8212; this is known as a <span 
+class="Cabin-Italic-tlf-t1-x-x-120">write conflict</span>, and it is a common problem in
+multi-leader replications.
 </p>
    <h5 class="likesubsubsectionHead"><a 
  id="x1-6000"></a>Write Conflicts</h5>
-<!--l. 139--><p class="noindent" >Write conflicts occur when two or more leaders in a multi-leader replication update the same piece of
-data. In relational systems this is normally the same table row. There are a few mechanisms for
-resolving write conflicts, but the recommended approach is to avoid conflicts altogether. Conflicts
-can be avoided by ensuring that a piece of data is only ever updated by the same leader, for
-example, we might implement that all Nicholas Cage related products are written to Leader Replica
-1.
-</p><!--l. 146--><p class="indent" >   If we are not fortunate enough to be in a situation where conflicts can be avoided, there are a few
-techniques we can use.
+<!--l. 139--><p class="noindent" >Write conflicts occur when two or more leaders in a multi-leader replication update the same piece of data. In
+relational systems this is normally the same table row. There are a few mechanisms for resolving write conflicts,
+but the recommended approach is to avoid conflicts altogether. Conflicts can be avoided by ensuring that a piece
+of data is only ever updated by the same leader, for example, we might implement that all Nicholas Cage related
+products are written to Leader Replica 1.
+</p><!--l. 146--><p class="indent" >   If we are not fortunate enough to be in a situation where conflicts can be avoided, there are a few techniques
+we can use.
 </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 150--><p class="noindent" >Assign IDs to writes, and decide which conflicting write to accept based on the ID via some
-      strategy (i.e. highest ID). This results in lost data.
+      <!--l. 150--><p class="noindent" >Assign IDs to writes, and decide which conflicting write to accept based on the ID via some strategy
+      (i.e. highest ID). This results in lost data.
       </p></li>
       <li class="itemize">
-      <!--l. 151--><p class="noindent" >Assign an explicit priority to leader replicas. For example, if there is a merge we might accept
-      Leader Replica 1 as the source of truth. This also results in lost data.
+      <!--l. 151--><p class="noindent" >Assign an explicit priority to leader replicas. For example, if there is a merge we might accept Leader
+      Replica 1 as the source of truth. This also results in lost data.
       </p></li>
       <li class="itemize">
-      <!--l. 152--><p class="noindent" >Merge the values together via some strategy. This works for data such as text documents but is
+      <!--l. 152--><p class="noindent" >Merge  the  values  together  via  some  strategy.  This  works  for  data  such  as  text  documents  but  is
       inappropriate for stocks of products.
       </p></li>
       <li class="itemize">
@@ -252,17 +248,17 @@ techniques we can use.
                                                                                                     
 <!--l. 156--><p class="noindent" >
 </p>
-   <h4 class="subsectionHead"><span class="titlemark">2.3   </span> <a 
+   <h4 class="subsectionHead"><span class="titlemark">2.3    </span> <a 
  id="x1-70002.3"></a>Leaderless Replication</h4>
-<!--l. 158--><p class="noindent" >Leaderless replication does not rely on writes being sent to and processed by a single designated leader, instead
-reads and writes may be sent to any of the database replicas. To accomplish this, leaderless databases
-introduce a few additional constraints on both read and writes operations to maintain relative
+<!--l. 158--><p class="noindent" >Leaderless replication does not rely on writes being sent to and processed by a single designated leader,
+instead reads and writes may be sent to any of the database replicas. To accomplish this, leaderless
+databases introduce a few additional constraints on both read and writes operations to maintain relative
 consistency.
 </p><!--l. 162--><p class="indent" >   A core aspect of leaderless replication is that clients need to duplicate both write and read operations to
-multiple replicas. This may be implemented by each client communicating directly with the database replicas,
-as in Figure <a 
-href="#x1-7001r4">4<!--tex4ht:ref: fig:sahara-leaderless --></a>, or one of the replica nodes can act as a coordinator node and forward requests to other
-database replicas, as in Figure <a 
+multiple replicas. This may be implemented by each client communicating directly with the database replicas, as
+in Figure <a 
+href="#x1-7001r4">4<!--tex4ht:ref: fig:sahara-leaderless --></a>, or one of the replica nodes can act as a coordinator node and forward requests to other database
+replicas, as in Figure <a 
 href="#x1-7002r5">5<!--tex4ht:ref: fig:sahara-leaderless-coordinator --></a>.
 </p>
    <hr class="figure" /><div class="figure" 
@@ -312,14 +308,13 @@ this?
 </p>
    <h5 class="likesubsubsectionHead"><a 
  id="x1-8000"></a>Quorum</h5>
-<!--l. 191--><p class="noindent" >To support the extensibility of leaderless databases, we need to duplicate our read and write requests. As a
-simple example, take Figure <a 
-href="#x1-7001r4">4<!--tex4ht:ref: fig:sahara-leaderless --></a>, we have three replicas of our database. When making a write
-request, if we send our write to just one replica then at most two replicas can have outdated data.
-Therefore when we read, we need to read from all three replicas to ensure one will have the most
-recent writes. If instead, we write to two replicas then at most one replica will have outdated data.
-Then we need only read from two replicas to ensure that at least one will have the most recent
-writes.
+<!--l. 191--><p class="noindent" >To support the extensibility of leaderless databases, we need to duplicate our read and write requests. As a simple
+example, take Figure <a 
+href="#x1-7001r4">4<!--tex4ht:ref: fig:sahara-leaderless --></a>, we have three replicas of our database. When making a write request, if we send our write
+to just one replica then at most two replicas can have outdated data. Therefore when we read, we need to read
+from all three replicas to ensure one will have the most recent writes. If instead, we write to two replicas then at
+most one replica will have outdated data. Then we need only read from two replicas to ensure that at least one
+will have the most recent writes.
 </p><!--l. 203--><p class="indent" >   To generalise, if we have a leaderless database of <span 
 class="cmmi-12">n </span>replicas, we need to satisfy that,
 </p>
@@ -332,41 +327,41 @@ class="cmmi-12">w </span>is the amount of replicas to write to and <span
 class="cmmi-12">r </span>is the amount of replicas to read from. By satisfying this
 equation we have quorum consistency, the set of writes and reads must overlap, which means that reading stale data
 is <span 
-class="ecsl-1200">unlikely</span><span class="footnote-mark"><a 
+class="Cabin-Italic-tlf-t1-x-x-120">unlikely</span><span class="footnote-mark"><a 
 href="#fn3x0" id="fn3x0-bk"><sup class="textsuperscript">3</sup></a></span><a 
  id="x1-8001f3"></a>.
 </p><!--l. 214--><p class="noindent" >
 </p>
-   <h3 class="sectionHead"><span class="titlemark">3   </span> <a 
+   <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
  id="x1-90003"></a>Partitioning</h3>
-<!--l. 216--><p class="noindent" >Partitioning involves distributing the contents of a database across multiple nodes. It differs from replication
-as nodes do not store complete copies of the database. Often partitioning is combined with replication to
-prevent the lost of data if one of the partitions fails. Partitioning is required when we have a large amount of
-data to store.
-</p><!--l. 221--><p class="indent" >   When we start partitioning data onto multiple nodes, we need to consider how we decide which data
-belongs to which node. There are two primary approaches to this decision.
+<!--l. 216--><p class="noindent" >Partitioning involves distributing the contents of a database across multiple nodes. It differs from replication as
+nodes do not store complete copies of the database. Often partitioning is combined with replication to prevent
+the lost of data if one of the partitions fails. Partitioning is required when we have a large amount of data to
+store.
+</p><!--l. 221--><p class="indent" >   When we start partitioning data onto multiple nodes, we need to consider how we decide which data belongs
+to which node. There are two primary approaches to this decision.
 </p><!--l. 225--><p class="noindent" >
 </p>
    <h4 class="likesubsectionHead"><a 
  id="x1-10000"></a>Partition by Key Range</h4>
-<!--l. 226--><p class="noindent" >We assume that data is given a key, with a key-value database this is required, in relational databases the
-schema should specify a primary key column. One approach to partitioning is to divide the range of key values
+<!--l. 226--><p class="noindent" >We assume that data is given a key, with a key-value database this is required, in relational databases the schema
+should specify a primary key column. One approach to partitioning is to divide the range of key values and
+partition based on that. Consider the UQ student database, the key would be the student ID. We can then
                                                                                                     
                                                                                                     
-and partition based on that. Consider the UQ student database, the key would be the student ID. We can then
 partition the database based on student ID, say all student numbers between <span 
 class="ectt-1200">s0000000 </span>and <span 
-class="ectt-1200">s1000000 </span>are
-stored on partition 0, all numbers between <span 
+class="ectt-1200">s1000000</span>
+are stored on partition 0, all numbers between <span 
 class="ectt-1200">s1000001 </span>and <span 
 class="ectt-1200">s2000000 </span>are stored on partition 1,
 etc.
-</p><!--l. 236--><p class="indent" >   This approach appears practical, each partition has an equal share of database entires. However, as time
-goes on certain partitions become less used while others become very popular. We might imagine that at the
+</p><!--l. 236--><p class="indent" >   This approach appears practical, each partition has an equal share of database entires. However, as time goes
+on certain partitions become less used while others become very popular. We might imagine that at the
 moment, partitions 5 and 6 would be used far more frequently than partition 0. This is known as <span 
-class="ecsl-1200">skewed</span>
+class="Cabin-Italic-tlf-t1-x-x-120">skewed</span>
 <span 
-class="ecsl-1200">partitioning</span>.
+class="Cabin-Italic-tlf-t1-x-x-120">partitioning</span>.
 </p><!--l. 243--><p class="noindent" >
 </p>
    <h4 class="likesubsectionHead"><a 
@@ -374,9 +369,9 @@ class="ecsl-1200">partitioning</span>.
 <!--l. 245--><p class="noindent" >Consider hash maps, we use hashes of the keys to allocate values into buckets. A good hashing
 algorithm minimizes the amount of collision (a value stored in the same bucket). We can apply the
 same process to database partitioning, hashing the key of a record allows us to maximize the
-spread of partition usage. The disadvantage of partitioning by hash is that only queries by key
-are efficient, queries by ranges of keys are no longer efficient as they require <span 
-class="ecti-1200">all </span>partitions to be
+spread of partition usage. The disadvantage of partitioning by hash is that only queries by key are
+efficient, queries by ranges of keys are no longer efficient as they require <span 
+class="Cabin-Italic-tlf-t1-x-x-120">all </span>partitions to be
 queried.<span class="footnote-mark"><a 
 href="#fn4x0" id="fn4x0-bk"><sup class="textsuperscript">4</sup></a></span><a 
  id="x1-11001f4"></a>
@@ -385,107 +380,104 @@ href="#fn4x0" id="fn4x0-bk"><sup class="textsuperscript">4</sup></a></span><a
    <h4 class="likesubsectionHead"><a 
  id="x1-12000"></a>Secondary Indices</h4>
 <!--l. 256--><p class="noindent" >Databases often rely on secondary index to perform a range of useful queries. In our UQ student database
-example, a database field which is often useful to query might be the degree of a student record. We might
-want this query to run efficiently as schools could need to frequently query for these collections to implement
-their own services.
-</p><!--l. 261--><p class="indent" >   The two approaches to this are local or global indices. With local indices, each partition stores an index for
-their own partition of the data. With global indices, a partition is assigned to manage a particular secondary
+example, a database field which is often useful to query might be the degree of a student record. We might want
+this query to run efficiently as schools could need to frequently query for these collections to implement their
+own services.
+</p><!--l. 261--><p class="indent" >   The two approaches to this are local or global indices. With local indices, each partition stores an index for their
+own partition of the data. With global indices, a partition is assigned to manage a particular secondary
 index value. For example, partition 2 might store the index for all Bachelor of Software Engineering
 students.
-</p><!--l. 266--><p class="indent" >   Local indices allow efficient writing, as a write only has to update the index of the partition to which it is
-writing. However, it introduces slower reads as all partitions must be queried for their index. Global indices
-slow down writing as all relevant partitions need to have their partition updated. Although it can increase read
-speeds as a query only needs to look at the relevant partitions.
+</p><!--l. 266--><p class="indent" >   Local indices allow efficient writing, as a write only has to update the index of the partition to which it is writing.
+However, it introduces slower reads as all partitions must be queried for their index. Global indices slow down
+writing as all relevant partitions need to have their partition updated. Although it can increase read speeds as a
+query only needs to look at the relevant partitions.
 </p><!--l. 272--><p class="noindent" >
 </p>
-   <h4 class="subsectionHead"><span class="titlemark">3.1   </span> <a 
+   <h4 class="subsectionHead"><span class="titlemark">3.1    </span> <a 
  id="x1-130003.1"></a>Rebalancing</h4>
-<!--l. 274--><p class="noindent" >Over time some partitions may get more frequent use than others. We might also add or remove nodes. This
-can require the data to be rebalanced to update the range of values stored on any partition. Rebalancing can
-be an automated or a manual process. It is important to consider the effects of rebalancing automatically as
-they are costly operations and if triggered at an inappropriate time they can greatly impact the performance of
-a database.
+<!--l. 274--><p class="noindent" >Over time some partitions may get more frequent use than others. We might also add or remove nodes. This can
+require the data to be rebalanced to update the range of values stored on any partition. Rebalancing can be an
+automated or a manual process. It is important to consider the effects of rebalancing automatically as they are
+costly operations and if triggered at an inappropriate time they can greatly impact the performance of a
+database.
                                                                                                     
                                                                                                     
 </p><!--l. 281--><p class="noindent" >
 </p>
-   <h4 class="subsectionHead"><span class="titlemark">3.2   </span> <a 
+   <h4 class="subsectionHead"><span class="titlemark">3.2    </span> <a 
  id="x1-140003.2"></a>Routing</h4>
 <!--l. 283--><p class="noindent" >Much like auto-scaled stateless services, we need a way to route traffic that is fair. However, unlike stateless
 services, only one node of the system is capable of processing our request. We need a mechanism for choosing
 the appropriate node to which our request is sent.
-</p><!--l. 289--><p class="indent" >   We might implement a naive load balancer which just balances the load regardless of the
-request. This load balancer is will send requests to the wrong nodes. In such a system, it is the
-responsibility of the node to forward the request to the node which is capable of answering the
-query.
-</p><!--l. 293--><p class="indent" >   A more sophisticated solution would be to deploy a load balancer which is request aware. This load
-balancer can forward requests to the appropriate node.
+</p><!--l. 289--><p class="indent" >   We might implement a naive load balancer which just balances the load regardless of the request. This load
+balancer is will send requests to the wrong nodes. In such a system, it is the responsibility of the node to forward
+the request to the node which is capable of answering the query.
+</p><!--l. 293--><p class="indent" >   A more sophisticated solution would be to deploy a load balancer which is request aware. This load balancer
+can forward requests to the appropriate node.
 </p><!--l. 296--><p class="indent" >   Finally, we might offload the problem to the client. Requiring that our database clients are aware of how to
 map their query to the appropriate node.
 </p><!--l. 299--><p class="noindent" >
 </p>
-   <h3 class="sectionHead"><span class="titlemark">4   </span> <a 
+   <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
  id="x1-150004"></a>Transactions</h3>
-<!--l. 301--><p class="noindent" >All of the various failure cases and considerations when working with scalable databases can be
-overwhelming. The complexities of distributed databases make reasoning about the logic of an application
-challenging, which in turn leads to more bugs and faults. Fortunately, database developers have a
-technique to assist in this complexity and allow us to reason about our interactions with the database,
-<span 
-class="ecsl-1200">transactions</span>.
+<!--l. 301--><p class="noindent" >All of the various failure cases and considerations when working with scalable databases can be overwhelming.
+The complexities of distributed databases make reasoning about the logic of an application challenging, which in
+turn leads to more bugs and faults. Fortunately, database developers have a technique to assist in this complexity
+and allow us to reason about our interactions with the database, <span 
+class="Cabin-Italic-tlf-t1-x-x-120">transactions</span>.
 </p><!--l. 306--><p class="indent" >   Transactions bundle related groups of read/write operations together and guarantee useful properties.
 Traditionally, these properties are referred to as ACID properties, Atomicity, Consistency, Isolation, and
 Durability.
 </p><!--l. 309--><p class="noindent" >
 </p>
-   <h4 class="subsectionHead"><span class="titlemark">4.1   </span> <a 
+   <h4 class="subsectionHead"><span class="titlemark">4.1    </span> <a 
  id="x1-160004.1"></a>Atomicity</h4>
 <!--l. 310--><p class="noindent" >Atomicity guarantees that when performing multiple operations, if one operation cannot be completed
-successfully then the effects of all operations are aborted. For example, consider the purchasing process. When
-purchasing a product we may wish to both update the stock of the product and reduce the funds
-of a customer&#8217;s account. If either of those operations occurred on their own, someone would be
-very unhappy. Atomicity guarantees that either all operations in a transaction succeed or none
+successfully then the effects of all operations are aborted. For example, consider the purchasing process.
+When purchasing a product we may wish to both update the stock of the product and reduce the
+funds of a customer&#8217;s account. If either of those operations occurred on their own, someone would
+be very unhappy. Atomicity guarantees that either all operations in a transaction succeed or none
 do.
 </p><!--l. 318--><p class="noindent" >
 </p>
-   <h4 class="subsectionHead"><span class="titlemark">4.2   </span> <a 
+   <h4 class="subsectionHead"><span class="titlemark">4.2    </span> <a 
  id="x1-170004.2"></a>Consistency</h4>
-<!--l. 319--><p class="noindent" >Consistency guarantees that any application specific invariants of the database are preserved by transactions.
-For example, we might introduce the invariant that the stock of an item cannot be below zero. This invariant
-must then be maintained by all transactions.
-                                                                                                    
-                                                                                                    
+<!--l. 319--><p class="noindent" >Consistency guarantees that any application specific invariants of the database are preserved by transactions. For
+example, we might introduce the invariant that the stock of an item cannot be below zero. This invariant must
+then be maintained by all transactions.
 </p><!--l. 323--><p class="noindent" >
 </p>
-   <h4 class="subsectionHead"><span class="titlemark">4.3   </span> <a 
+                                                                                                    
+                                                                                                    
+   <h4 class="subsectionHead"><span class="titlemark">4.3    </span> <a 
  id="x1-180004.3"></a>Isolation</h4>
 <!--l. 324--><p class="noindent" >Isolation allows transactions to pretend that they are the only operation performing on the data. Transactions
 appear to preform sequentially even though they may in reality be performing concurrently. This allows
 transactions to ignore a whole host of issues related to concurrency.
 </p><!--l. 328--><p class="noindent" >
 </p>
-   <h4 class="subsectionHead"><span class="titlemark">4.4   </span> <a 
+   <h4 class="subsectionHead"><span class="titlemark">4.4    </span> <a 
  id="x1-190004.4"></a>Durability</h4>
-<!--l. 329--><p class="noindent" >Durability provides a guarantee that once transactions are completed, their updates are preserved. In
-distributed databases this is often an assurance that the updated data has been copied to other
+<!--l. 329--><p class="noindent" >Durability provides a guarantee that once transactions are completed, their updates are preserved.
+In distributed databases this is often an assurance that the updated data has been copied to other
 machines.
 </p><!--l. 333--><p class="noindent" >
 </p>
-   <h3 class="sectionHead"><span class="titlemark">5   </span> <a 
+   <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
  id="x1-200005"></a>Conclusion</h3>
 <!--l. 335--><p class="noindent" >Scaling out services that have persistent data requires far greater care than stateless services. We have seen
-approaches for coping with undue load on individual nodes via replication. We have seen approaches for
-handling greater volume of data than can be stored on a single machine via partitioning. We have noted that
-often one might want to combine the approaches of replication and partitioning for the one database system.
-Both of these techniques introduce a new range of complexity for programmers to deal with. In our final
-section we briefly introduced how transactions, and the guarantees they provide, can help developers in
-reasoning about their database interactions.
-</p><!--l. 342--><p class="indent" >   This lecture note has been a very brief introduction into the topics of replication, partitioning, and
-transactions. The content has been structured around the Chapters 5, 6, and 7 of <span 
-class="ecti-1200">Designing Data-Intensive</span>
-<span 
-class="ecti-1200">Applications </span><span class="cite">[<a 
-href="#Xdata-intensive">3</a>]</span>. You are strongly encouraged to read these chapters of the book for a much more in-depth
-look at all of the topics covered.
+approaches for coping with undue load on individual nodes via replication. We have seen approaches for handling
+greater volume of data than can be stored on a single machine via partitioning. We have noted that often one
+might want to combine the approaches of replication and partitioning for the one database system. Both of these
+techniques introduce a new range of complexity for programmers to deal with. In our final section we briefly
+introduced how transactions, and the guarantees they provide, can help developers in reasoning about their
+database interactions.
+</p><!--l. 342--><p class="indent" >   This lecture note has been a very brief introduction into the topics of replication, partitioning, and transactions.
+The content has been structured around the Chapters 5, 6, and 7 of <span 
+class="Cabin-Italic-tlf-t1-x-x-120">Designing Data-Intensive Applications </span><span class="cite">[<a 
+href="#Xdata-intensive">3</a>]</span>. You
+are strongly encouraged to read these chapters of the book for a much more in-depth look at all of the topics
+covered.
 </p><!--l. 1--><p class="noindent" >
 </p>
    <h3 class="likesectionHead"><a 
@@ -494,50 +486,50 @@ look at all of the topics covered.
    </p><div class="thebibliography">
    <p class="bibitem" ><span class="biblabel">
  [1]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
- id="Xdistributed1-notes"></a>B.&#x00A0;Webb       and       R.&#x00A0;Thomas,       &#8220;Distributed       systems       I,&#8221;       March       2022.
+ id="Xdistributed1-notes"></a>B.&#x00A0;Webb          and          R.&#x00A0;Thomas,          &#8220;Distributed          systems          I,&#8221;          March          2022.
    <a 
 href="https://csse6400.uqcloud.net/handouts/distributed1.pdf" class="url" ><span 
 class="ectt-1200">https://csse6400.uqcloud.net/handouts/distributed1.pdf</span></a>.
    </p>
    <p class="bibitem" ><span class="biblabel">
  [2]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
- id="Xdistributed1-slides"></a>B.&#x00A0;Webb,          &#8220;Distributed          systems          I          slides,&#8221;          March          2022.
+ id="Xdistributed1-slides"></a>B.&#x00A0;Webb,               &#8220;Distributed               systems               I               slides,&#8221;               March               2022.
    <a 
 href="https://csse6400.uqcloud.net/slides/distributed1.pdf" class="url" ><span 
 class="ectt-1200">https://csse6400.uqcloud.net/slides/distributed1.pdf</span></a>.
    </p>
-                                                                                                    
-                                                                                                    
    <p class="bibitem" ><span class="biblabel">
  [3]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
- id="Xdata-intensive"></a>M.&#x00A0;Kleppmann, <span 
-class="ecti-1200">Designing Data-Intensive Applications: The big ideas behind reliable, scalable,</span>
+ id="Xdata-intensive"></a>M.&#x00A0;Kleppmann,  <span 
+class="Cabin-Italic-tlf-t1-x-x-120">Designing  Data-Intensive  Applications:  The  big  ideas  behind  reliable,  scalable,  and</span>
    <span 
-class="ecti-1200">and maintainable systems</span>. O&#8217;Reilly Media, Inc., March 2017.
+class="Cabin-Italic-tlf-t1-x-x-120">maintainable systems</span>. O&#8217;Reilly Media, Inc., March 2017.
+                                                                                                    
+                                                                                                    
 </p>
    </div>
    <div class="footnotes"><a 
  id="x1-3002x2.1"></a>
-<!--l. 66--><p class="indent" >     <span class="footnote-mark"><a 
+<!--l. 66--><p class="indent" >       <span class="footnote-mark"><a 
 href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span><span 
-class="ecrm-1000">Realistically, queries would be forwarded based on their type rather than their service of origin.</span></p><a 
+class="Cabin-Regular-tlf-t1-">Realistically, queries would be forwarded based on their type rather than their service of origin.</span></p><a 
  id="x1-4002x"></a>
-<!--l. 81--><p class="indent" >     <span class="footnote-mark"><a 
+<!--l. 81--><p class="indent" >        <span class="footnote-mark"><a 
 href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span><span 
-class="ecrm-1000">We need not wait for writes to propagate to all followers before accepting that a write has succeeded</span></p><a 
+class="Cabin-Regular-tlf-t1-">We need not wait for writes to propagate to all followers before accepting that a write has succeeded</span></p><a 
  id="x1-8002x"></a>
-<!--l. 212--><p class="indent" >     <span class="footnote-mark"><a 
+<!--l. 212--><p class="indent" >        <span class="footnote-mark"><a 
 href="#fn3x0-bk" id="fn3x0"><sup class="textsuperscript">3</sup></a></span><span 
-class="ecrm-1000">The cases where stale data can still be read are enumerated in M. Kleppmann </span><span class="cite"><span 
-class="ecrm-1000">[</span><a 
+class="Cabin-Regular-tlf-t1-">The cases where stale data can still be read are enumerated in M. Kleppmann </span><span class="cite"><span 
+class="Cabin-Regular-tlf-t1-">[</span><a 
 href="#Xdata-intensive"><span 
-class="ecrm-1000">3</span></a><span 
-class="ecrm-1000">]</span></span><span 
-class="ecrm-1000">.</span></p><a 
+class="Cabin-Regular-tlf-t1-">3</span></a><span 
+class="Cabin-Regular-tlf-t1-">]</span></span><span 
+class="Cabin-Regular-tlf-t1-">.</span></p><a 
  id="x1-11002x"></a>
-<!--l. 252--><p class="indent" >     <span class="footnote-mark"><a 
+<!--l. 252--><p class="indent" >        <span class="footnote-mark"><a 
 href="#fn4x0-bk" id="fn4x0"><sup class="textsuperscript">4</sup></a></span><span 
-class="ecrm-1000">Databases such as Cassandra use compound primary keys to help resolve this issue.</span></p>                                     </div>
+class="Cabin-Regular-tlf-t1-">Databases such as Cassandra use compound primary keys to help resolve this issue.</span></p>                                                              </div>
  
 </body></html> 
 
