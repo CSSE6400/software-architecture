@@ -5,6 +5,7 @@
 \usepackage{float}
 
 \usepackage{languages}
+\usepackage{framed}
 
 \title{Application Programming Interfaces (APIs)}
 \author{Brae Webb}
@@ -253,15 +254,373 @@ you will need to join the GitHub Classroom.
 
 \subsection{The API design}
 
-\todo{Add description of all the API endpoints}
+\subsubsection{GET /api/health}
+This endpoint should return a 200 status code and a JSON object with a single field, \textbf{status}, which should be set to \textbf{ok}.
+
+Response:
+\begin{code}[language=json]{}
+{
+  "status": "ok"
+}
+\end{code}
+
+\subsubsection{GET /api/todo}
+This endpoint should return a list of all the tasks in the todo list.
+
+optional query parameters:
+\begin{itemize}
+  \item \textbf{completed} A boolean value indicating whether to return completed tasks or not. Valid values are true, false.
+  \item\textbf{window} An integer value indicating how many days past todays date a task should be due by.
+\end{itemize}
+
+Response:
+\begin{code}[language=json]{}
+[
+  {
+    "id": 1,
+    "title": "Watch CSSE6400 Lecture",
+    "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+    "completed": false,
+    "deadline_at": "2023-02-27T00:00:00",
+    "created_at": "2023-02-20T00:00:00",
+    "updated_at": "2023-02-20T00:00:00"
+  },
+  {
+    ...
+  }
+]
+\end{code}
+
+\subsubsection{GET /api/todo/\string{id\string}}
+This endpoint should return a single item from the todo list.
+
+Response:
+\begin{code}[language=json]{}
+{
+  "id": 1,
+  "title": "Watch CSSE6400 Lecture",
+  "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+  "completed": false,
+  "deadline_at": "2023-02-27T00:00:00",
+  "created_at": "2023-02-20T00:00:00",
+  "updated_at": "2023-02-20T00:00:00"
+}
+\end{code}
+
+\subsubsection{POST /api/todo}
+This endpoint should create a new task in the todo list. The title field must be included in the request and all other values are optional. The \texttt{created\_at}, \texttt{updated\_at} cannot be set by this method.
+
+Attempting to post any other fields than \texttt{title, description, completed, deadline\_at} will cause a 400 error to be returned.
+
+Request:
+\begin{code}[language=json]{}
+{
+  "title": "Watch CSSE6400 Lecture",
+  "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+  "completed": false,
+  "deadline_at": "2023-02-27T00:00:00",
+}
+\end{code}
+
+Response:
+\begin{code}[language=json]{}
+{
+  "id": 1,
+  "title": "Watch CSSE6400 Lecture",
+  "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+  "completed": false,
+  "deadline_at": "2023-02-27T00:00:00",
+  "created_at": "2023-02-20T00:00:00",
+  "updated_at": "2023-02-20T00:00:00"
+}
+\end{code}
+
+\subsubsection{PUT /api/todo/\string{id\string}}
+This endpoint should update a task in the todo list. The \texttt{created\_at}, \texttt{updated\_at} cannot be set by this method.
+
+Attempting to post any other fields than \texttt{title, description, completed, deadline\_at} will cause a 400 error to be returned.
+
+Request:
+\begin{code}[language=json]{}
+{
+  "title": "Join the Richard Thomas fan club",
+}
+\end{code}
+
+Response:
+\begin{code}[language=json]{}
+{
+  "id": 1,
+  "title": "Join the Richard Thomas fan club",
+  "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+  "completed": false,
+  "deadline_at": "2023-02-27T00:00:00",
+  "created_at": "2023-02-20T00:00:00",
+  "updated_at": "2023-02-20T00:00:00"
+}
+\end{code}
+
+\subsubsection{DELETE /api/todo/\string{id\string}}
+This endpoint should delete a task from the todo list. If the task does not exist, a 200 is returned with an empty response.
+
+Response:
+\begin{code}[language=json]{}
+{
+  "id": 1,
+  "title": "Join the Richard Thomas fan club",
+  "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+  "completed": false,
+  "deadline_at": "2023-02-27T00:00:00",
+  "created_at": "2023-02-20T00:00:00",
+  "updated_at": "2023-02-20T00:00:00"
+}
+\end{code}
+
 
 \subsection{Implementation with Flask}
 
-\todo{getting our github repo going}
-\todo{Intro to getting python up and running}
-\todo{Intro to flask}
-\todo{returning json with flask}
-\todo{Calling your api locally}
+\subsubsection{Getting our github repository}
+
+In this course we will be using git to store your assessment so if you havnt used git before, the practicals are a good chance to start getting comfortable with some of the basic commands. If you would like to have some resources on git we recommend the following:
+
+\begin{itemize}
+  \item \href{https://git-scm.com/book/en/v2}{Git Book}
+  \item \href{https://www.atlassian.com/git/tutorials}{Atlassian Git Tutorials}
+\end{itemize}
+
+\todo{Fill in the details about how to get on the courses github and get their repository.}
+
+\subsubsection{Setting up you environment}
+
+We are going to be using python for the practicals but it is not nesscary, you are able to complete these practicals in any language you wish but the course staff will only be able to support python officially.
+
+\begin{framed}
+  \textbf{Mac}
+  
+  If you are on a mac, you can install python with homebrew. If you do not have homebrew installed, you can install it with the following command:
+
+  \begin{code}[language=bash]{}
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  \end{code}
+
+  Once you have homebrew installed, you can install python with the following command:
+
+  \begin{code}[language=bash]{}
+  brew install python
+  \end{code}
+
+  then to check which version of python you have installed, you can run the following command:
+
+  \begin{code}[language=bash]{}
+  python --version
+  \end{code}
+\end{framed}
+\begin{framed}
+\textbf{Linux}
+
+If you are on linux, you can install python with your package manager. If you are on ubuntu, you can install python with the following command:
+
+\begin{code}[language=bash]{}
+sudo apt install python3
+\end{code}
+
+then to check which version of python you have installed, you can run the following command:
+
+\begin{code}[language=bash]{}
+python --version
+\end{code}
+\end{framed}
+\begin{framed}
+\textbf{Windows}
+
+If you are on windows, we recommend using a unix based environment such as WSL2 or a virtual machine. Install WSL2 with the following command:
+
+\begin{code}[language=bash]{}
+wsl --install
+\end{code}
+
+Once that is completed then follow the linux instructions above.
+\end{framed}
+
+Now with python and pip installed we can install the package manager we will be using during semester. This tool "pipenv" will help us make sure that all the python libraries we need are installed and automatically sets up a virtual environment so it doesnt conflict with any other python projects you may have.
+
+\begin{code}[language=bash]{}
+python3 -m pip install pipenv
+\end{code}
+
+Now that we have the software we require, lets go to where we cloned our repository and create the skeleton for our project.
+
+Create a folder called todo and add a file called .gitkeep to it. This is so that git will track the folder. Also create a folder called tests with a .gitkeep file aswell. This is where we will eventually put our tests for the api. Your folders should look like the following:
+
+\begin{code}[language=bash]{}
+  .
+  |-- README.md
+  |-- tests
+      |-- .gitkeep
+  |-- todo
+      |-- .gitkeep
+\end{code}
+
+In the root folder lets get our python setup by initialising the pipenv environment:
+
+\begin{code}[language=bash]{}
+pipenv --python 3
+\end{code}
+
+This will create a Pipfile and a Pipfile.lock file. The Pipfile is where we will specify the libraries we need for our project and the Pipfile.lock is where pipenv will store the versions of the libraries we have installed. We will be using the Pipfile to install the libraries we need for the API.
+
+\begin{code}{Pipfile}
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+
+[requires]
+python_version = "3.10"
+\end{code}
+
+\info{Your python version may be differnt than ours, this is fine as long as its a python 3 version.}
+
+Next we are going to add a dependency to our project which is Flask. This library is a small webserver wrapper that will allow us to quickly build our todo application with some nice features. To add a dependency to our project, we can run the following command:
+
+\begin{code}[language=bash]{}
+pipenv install flask
+\end{code}
+
+Once this is done you can see its made some changes to our Pipfile and our Pipfile.lock has some more info. For now we will ignore these and move on to making our api.
+
+\subsubsection{Starting with Flask}
+
+In the todo folder, create a file called \texttt{\_\_init\_\_.py} and add the following code to it:
+
+\begin{code}[language=python]{}
+from flask import Flask
+
+def create_app():
+    app = Flask(__name__)
+    return app
+\end{code}
+
+Now we have created a basic flask app but how do we run it? when using pipenv we need to run it in the following way:
+
+\begin{code}[language=bash]{}
+pipenv run flask --app todo run
+\end{code}
+
+This webserver is a bit boring though, lets add an endpoint so we can see that it is working. In the todo folder,crate a folder called views and create a file called \texttt{routes.py} and add the following code to it:
+
+\begin{code}[language=python]{}
+
+from flask import Blueprint
+
+api = Blueprint('api', __name__, url_prefix='/api')
+
+@api.route('/health')
+def health():
+    return "ok"
+
+\end{code}
+
+The above has made a endpoint within our api under the api prefix and we have created a health route below this. Now we need to register this with our flask app. In the \texttt{\_\_init\_\_.py} file, change the contents to the following:
+
+\begin{code}[language=python]{}
+from flask import Flask
+
+def create_app():
+    app = Flask(__name__)
+    
+    from .views.routes import api
+    app.register_blueprint(api)
+    
+    return app
+
+\end{code}
+
+Now when we run the app we should see the following:
+
+\begin{code}[language=bash]{}
+pipenv run flask --app todo run
+
+* Serving Flask app 'todo'
+* Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+* Running on http://127.0.0.1:5000
+Press CTRL+C to quit
+\end{code}
+
+Open you browser and go to http://127.0.0.1:5000/api/health and you should see a blank page with "ok" written on it.
+
+If you have run into any issues please make sure you files are in the following structure and that you are running these commands in the root folder.
+
+\begin{code}[language=bash]{}
+  .
+  |-- README.md
+  |-- tests
+      |-- .gitkeep
+  |-- todo
+      |-- .gitkeep
+      |-- __init__.py
+      |-- views
+          |-- routes.py
+\end{code}
+
+\subsubsection{Returning JSON with Flask}
+
+We have a webserver running now but we are communicating with text instead of any structured form. JSON is pretty common format to communicate data between services and is human readable. To start using JSON we are going to make a small change to our health endpoint. In the \texttt{routes.py} file, add a new import of jsonify and change the health endpoint to the following:
+
+\begin{code}[language=python]{}
+from flask import Blueprint, jsonify
+\end{code}
+
+\todo{Move the starting line number}
+\begin{code}[language=python]{}
+@api.route('/health')
+def health():
+    return jsonify({"status": "ok"})
+\end{code}
+
+Now lets go back to our browser and refresh, we should see the following:
+
+\begin{code}[language=json,numbers=none]{}
+{
+  "status": "ok"
+}
+\end{code}
+
+
+\subsubsection{Calling your API locally}
+
+We have many choices when it comes to calling our api locally. We could use curl, postman/vscode, or even a browser. We are going to focus on using curl and the rest visual studio code extension.
+
+
+\textbf{curl:}
+
+Install curl if its available for your operating system. If you are on a mac, you can install it with homebrew otherwise it is available for most linux distributions.
+
+Now that we have the tool installed lets have our api running in a terminal window and open up a new terminal so we can make requests to our api. Enter in the following into your terminal to call your api.
+
+
+\begin{code}[language=bash]{}
+curl -X GET http://localhost:6400/api/health
+\end{code}
+
+You should see the following response:
+
+\begin{code}[language=json]{}
+{
+  "status": "ok"
+}
+\end{code}
+
+\textbf{vscode:}
+
+\subsubsection{Creating more endpoints}
+
+
 
 \bibliographystyle{ieeetr}
 \bibliography{books,ours}
