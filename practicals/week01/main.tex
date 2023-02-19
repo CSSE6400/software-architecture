@@ -264,7 +264,7 @@ Response:
 }
 \end{code}
 
-\subsubsection{GET /api/todo}
+\subsubsection{GET /api/todos}
 This endpoint should return a list of all the tasks in the todo list.
 
 optional query parameters:
@@ -291,7 +291,7 @@ Response:
 ]
 \end{code}
 
-\subsubsection{GET /api/todo/\string{id\string}}
+\subsubsection{GET /api/todos/\string{id\string}}
 This endpoint should return a single item from the todo list.
 
 Response:
@@ -307,7 +307,7 @@ Response:
 }
 \end{code}
 
-\subsubsection{POST /api/todo}
+\subsubsection{POST /api/todos}
 This endpoint should create a new task in the todo list. The title field must be included in the request and all other values are optional. The \texttt{created\_at}, \texttt{updated\_at} cannot be set by this method.
 
 Attempting to post any other fields than \texttt{title, description, completed, deadline\_at} will cause a 400 error to be returned.
@@ -335,7 +335,7 @@ Response:
 }
 \end{code}
 
-\subsubsection{PUT /api/todo/\string{id\string}}
+\subsubsection{PUT /api/todos/\string{id\string}}
 This endpoint should update a task in the todo list. The \texttt{created\_at}, \texttt{updated\_at} cannot be set by this method.
 
 Attempting to post any other fields than \texttt{title, description, completed, deadline\_at} will cause a 400 error to be returned.
@@ -360,7 +360,7 @@ Response:
 }
 \end{code}
 
-\subsubsection{DELETE /api/todo/\string{id\string}}
+\subsubsection{DELETE /api/todos/\string{id\string}}
 This endpoint should delete a task from the todo list. If the task does not exist, a 200 is returned with an empty response.
 
 Response:
@@ -542,7 +542,7 @@ def create_app():
 
 Now when we run the app we should see the following:
 
-\begin{code}[language=bash]{}
+\begin{code}[language=bash,numbers=none]{}
 pipenv run flask --app todo run
 
 * Serving Flask app 'todo'
@@ -556,7 +556,7 @@ Open you browser and go to http://127.0.0.1:5000/api/health and you should see a
 
 If you have run into any issues please make sure you files are in the following structure and that you are running these commands in the root folder.
 
-\begin{code}[language=bash]{}
+\begin{code}[language=bash,numbers=none]{}
   .
   |-- README.md
   |-- tests
@@ -604,13 +604,13 @@ Install curl if its available for your operating system. If you are on a mac, yo
 Now that we have the tool installed lets have our api running in a terminal window and open up a new terminal so we can make requests to our api. Enter in the following into your terminal to call your api.
 
 
-\begin{code}[language=bash]{}
+\begin{code}[language=bash,numbers=none]{}
 curl -X GET http://localhost:6400/api/health
 \end{code}
 
 You should see the following response:
 
-\begin{code}[language=json]{}
+\begin{code}[language=json,numbers=none]{}
 {
   "status": "ok"
 }
@@ -618,9 +618,227 @@ You should see the following response:
 
 \textbf{vscode:}
 
+If you are using visual studio code for your text editor you can install the "Rest Client" by Huachao Mao. This extension allows you to have files with a bunch of requests that you can then run from vscode and the benefit is that we can also check this into our source control (git).
+
+Find the extension in the vscode marketplace and install it. Once installed, create a new file in the root of your project called \texttt{endpoints.http} and add the following code to it:
+
+\begin{code}[numbers=none]{}
+@baseUrl = http://localhost:6400
+
+### Health
+GET {{baseUrl}}/api/health
+\end{code}
+
+A suttle "Send Request" should be visible between the comment and the GET. Click on this and a new tab should open up with the response from the api. The response should be similar to below:
+
+\begin{code}[language=json,numbers=none]{}
+HTTP/1.1 200 OK
+Server: Werkzeug/2.2.3 Python/3.10.9
+Date: Sun, 19 Feb 2023 04:13:00 GMT
+Content-Type: application/json
+Content-Length: 16
+Connection: close
+  
+{
+  "status": "ok"
+}
+\end{code}
+
+We can also see in the terminal that our webserver has logged out request by the output of:
+
+\begin{code}[language=bash,numbers=none]{}
+127.0.0.1 - - [19/Feb/2023 14:13:00] "GET /api/health HTTP/1.1" 200 -
+\end{code}
+
 \subsubsection{Creating more endpoints}
 
+Lets expand our endpoints.http file to include the other endpoints that we need to create for our todo application. Expand the file to include the following GET, POST, PUT, and DELETE endpoints:
 
+\begin{code}[numbers=none]{}
+  @baseUrl = http://localhost:6400
+
+  ### Health
+  GET {{baseUrl}}/api/health
+  
+  ### List All Todos
+  GET {{baseUrl}}/api/todos
+  
+  ### Get a specific Todo
+  GET {{baseUrl}}/api/todos/1
+  
+  ### Create a Todo
+  POST {{baseUrl}}/api/todos
+  Content-Type: application/json
+  
+  {
+      "title": "string",
+      "description": "string",
+      "isComplete": true
+  }
+  
+  ### Update a Todo
+  PUT {{baseUrl}}/api/todos/{id}
+  Content-Type: application/json
+  
+  {
+      "title": "string",
+      "description": "string",
+      "isComplete": true
+  }
+  
+  ### Delete a Todo
+  DELETE {{baseUrl}}/api/todos/{id}
+  
+\end{code}
+
+Lets run the GET request and see what happens. We should see the following:
+
+\begin{code}[language=json,numbers=none]{}
+  HTTP/1.1 404 NOT FOUND
+  Server: Werkzeug/2.2.3 Python/3.10.9
+  Date: Sun, 19 Feb 2023 04:27:42 GMT
+  Content-Type: text/html; charset=utf-8
+  Content-Length: 207
+  Connection: close
+  
+  <!doctype html>
+  <html lang=en>
+  <title>404 Not Found</title>
+  <h1>Not Found</h1>
+  <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>  
+\end{code}
+
+Now we can start to create the endpoints that we need for our todo application. In the \texttt{routes.py} file, add the following code to the bottom of the file:
+
+\begin{code}[language=python]{}
+@api.route('/todos', methods=['GET'])
+def get_todos():
+    return jsonify([])
+\end{code}
+
+Now the server should reload, if it doesn't, you can manually reload it by stopping the process and restarting it. Now if we run the GET request again we should see the following:
+
+\begin{code}[language=json,numbers=none]{}
+  HTTP/1.1 200 OK
+  Server: Werkzeug/2.2.3 Python/3.10.9
+  Date: Sun, 19 Feb 2023 04:38:44 GMT
+  Content-Type: application/json
+  Content-Length: 3
+  Connection: close
+  
+  []
+\end{code}
+
+This endpoint is for listing all the todos that the user has. For now we are going to return a hard coded todo item so we can get use to having the api return data. In the \texttt{routes.py} file, modify the \texttt{get\_todos} function to return a hard coded todo item:
+
+\begin{code}[language=python]{}
+@api.route('/todos', methods=['GET'])
+def get_todos():
+    return jsonify([{
+      "id": 1,
+      "title": "Watch CSSE6400 Lecture",
+      "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+      "completed": false,
+      "deadline_at": "2023-02-27T00:00:00",
+      "created_at": "2023-02-20T00:00:00",
+      "updated_at": "2023-02-20T00:00:00"
+    }])
+\end{code}
+
+Now lets run the GET request again and we should see the following:
+
+\begin{code}[language=json,numbers=none]{}
+  HTTP/1.1 200 OK
+  Server: Werkzeug/2.2.3 Python/3.10.9
+  Date: Sun, 19 Feb 2023 04:44:00 GMT
+  Content-Type: application/json
+  Content-Length: 200
+  Connection: close
+  
+  [
+    {
+      "id": 1,
+      "title": "Watch CSSE6400 Lecture",
+      "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+      "completed": false,
+      "deadline_at": "2023-02-27T00:00:00",
+      "created_at": "2023-02-20T00:00:00",
+      "updated_at": "2023-02-20T00:00:00"
+    }
+  ]
+\end{code}
+
+Next is our endpoint to get an individual todo by its id. In the \texttt{routes.py} file, add the following code to the bottom of the file:
+
+\begin{code}[language=python]{}
+@api.route('/todos/<int:id>', methods=['GET'])
+def get_todo(id):
+    return jsonify({
+      "id": id,
+      "title": "Watch CSSE6400 Lecture",
+      "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+      "completed": false,
+      "deadline_at": "2023-02-27T00:00:00",
+      "created_at": "2023-02-20T00:00:00",
+      "updated_at": "2023-02-20T00:00:00"
+    })
+\end{code}
+
+Youll notice in this function we have a single parameter which is the ID fetched from the URL. You can see this in the \texttt{<int:id>} part of the route annotation. This is a flask feature that allows you to fetch parameters from the URL. 
+
+These were our read only methods, now lets get to the mutating methods. First is our endpoint to create a new todo. In the \texttt{routes.py} file, add the following code to the bottom of the file:
+
+\begin{code}[language=python]{}
+@api.route('/todos', methods=['POST'])
+def create_todo():
+    return jsonify({
+      "id": 1,
+      "title": "Watch CSSE6400 Lecture",
+      "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+      "completed": false,
+      "deadline_at": "2023-02-27T00:00:00",
+      "created_at": "2023-02-20T00:00:00",
+      "updated_at": "2023-02-20T00:00:00"
+    })
+\end{code}
+
+Youll notice that currently this function is the same as the GET request but in future weeks we will build out the functionality to actually create a todo. Next is our endpoint to update a todo. In the \texttt{routes.py} file, add the following code to the bottom of the file:
+
+\begin{code}[language=python]{}
+@api.route('/todos/<int:id>', methods=['PUT'])
+def update_todo(id):
+    return jsonify({
+      "id": id,
+      "title": "Watch CSSE6400 Lecture",
+      "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+      "completed": false,
+      "deadline_at": "2023-02-27T00:00:00",
+      "created_at": "2023-02-20T00:00:00",
+      "updated_at": "2023-02-20T00:00:00"
+    })
+\end{code}
+
+Likewise with the POST request, this function is the same as the GET request but in future weeks we will build out the functionality to actually update a todo. Finally is our endpoint to delete a todo. In the \texttt{routes.py} file, add the following code to the bottom of the file:
+
+\begin{code}[language=python]{}
+@api.route('/todos/<int:id>', methods=['DELETE'])
+def delete_todo(id):
+    return jsonify({
+      "id": id,
+      "title": "Watch CSSE6400 Lecture",
+      "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+      "completed": false,
+      "deadline_at": "2023-02-27T00:00:00",
+      "created_at": "2023-02-20T00:00:00",
+      "updated_at": "2023-02-20T00:00:00"
+    })
+\end{code}
+
+Likewise with the POST request, this function is the same as the GET request but in future weeks we will build out the functionality to actually delete a todo.
+
+With the endpoints you may have noticed us defining the methods, this is because we want to define which HTTP methods are allowed for each endpoint. For example, we dont want a user to be able to delete a todo by sending a GET request, we want them to send a DELETE request.
+
+This concludes this weeks practical, in the next week we will add storage to our API so that we can actually create, update and delete todos. We will also add some tests to our API to ensure that it is working as expected and meets our specification. The final files you should have for this practical are available at \url{github.com/csse6400/?}. Remember to ask for any assistance on the slack channel if you get stuck or have any questions.
 
 \bibliographystyle{ieeetr}
 \bibliography{books,ours}
