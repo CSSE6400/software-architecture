@@ -7,8 +7,17 @@
 \usepackage{languages}
 \usepackage{framed}
 
-\title{Application Programming Interfaces (APIs)}
-\author{Brae Webb}
+\usepackage{tikz}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{shapes}
+\usetikzlibrary{tikzmark}
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows}
+\usetikzlibrary{fit}
+
+\title{Web Application Programming Interface (API)}
+\author{Brae Webb \& Evan Hughes}
 
 \date{\week{1}}
 \begin{document}
@@ -16,83 +25,262 @@
 \maketitle
 
 \begin{figure}[h]
-  \href{https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/ch04.html}{
-    \includegraphics[width=\textwidth]{images/communication}
-  }
-\caption{A map of communication techniques from Designing Data-Intensive Applications \cite{data-intensive}.}
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/header}
 \end{figure}
 
 \section{This Week}
 This week our goal is to:
 \begin{itemize}
-  \item explore techniques used by developers use to communicate between components in distributed systems;
+  %\item explore techniques used by developers use to communicate between components in distributed systems;
   \item initialize our GitHub repositories where we will be working on practical exercises; and
   \item build a minimal HTTP API of a todo app using the Flask framework.
 \end{itemize}
 
 \section{Practicals}
-These practicals are designed to prepare you with the technical skills required for the cloud and team projects.
+These practicals are designed to prepare you with the technical skills required for the scalability and capstone projects.
 We will normally spend the first section of the practicals gaining the relevant conceptual background for the practical.
 The second section will be a practical exercise where you will need to write and run some code.
 
-This semester we will be working on the creation of a scalable and fault-tolerant todo application.
+This semester we will be working on the creation of a scalable and fault-tolerant \textsl{todo list} application.
 You should aim to keep up with the practicals or you will not be able to complete the projects.
 
 \teacher{
-    Spend approximately the first 30 minutes exploring the communication techniques listed below.
+    Spend approximately the first 5 minutes introducing yourself, getting to know the students, and discussing the practicals in general.
+    Spend the next 10 minutes explaining the basic concepts of HTTP and REST.
 
-    Emphasise that in this course we're focusing on large complex systems which are distributed across multiple machines,
-    as such we need to be able to communicate between components.
+    You can consider using these slides: \url{https://csse6400.uqcloud.net/slides/web-apis.pdf}
 }
 
-\section{Communication}
-The world relies (heavily) on distributed systems,
-single machines are no longer sufficient to handle the demands of modern applications.
-There is no machine in the world powerful enough to process the requests Google receives every second%
-\footnote{Current estimates are that Google requires over a million servers}.
-But you don't need to be the size of Google to require distributed systems,
-even relatively small applications require multiple machines to handle the load.
-This inter-machine teamwork requires each machine to know how to talk to the others.
+\info{
+    In this practical we will build a RESTful API that communicates over HTTP.
+    It is worth noting that while this is a common way to build APIs, it is far from the only way.
+    We will briefly explore some alternatives in subsequent weeks.
+}
 
-In this practical,
-we will be exploring the different techniques used to communicate between components in distributed systems.
-We will then build a simple HTTP API using the Flask framework which allows other applications to interact with our application.
+\section{Concepts}
+\subsection{Networking}
 
-\section{Data Formats}
-Communication requires an exchange of information.
-On single computer systems, information is often stored at runtime in memory as primitive data which your programming language can interpret;
-bytes, integers, strings, etc.
-In object-oriented languages,
-primitive data is wrapped up into useful packages: objects.
-If we want this information to escape the confines of our programming language runtime,
-we need to package it up in a language-independent format.
-To be language-independent we need many languages to implement an encoding and decoding mechanism for the format.
-We have several language-independent formats available but a few defacto standards.
+\definecolor{secondary}{rgb}{0.0, 0.4, 0.65}
 
-\subsection{XML}
-Extensible Markup Language (XML) is one of the most widely used language-independent formats.
-The use cases of XML are extensive,
-it is the \link{foundation for many popular utilities}{https://en.wikipedia.org/wiki/List_of_XML_markup_languages},
-such as SVG file formats, SAML authentication, RSS feeds, and ePub books.
-\begin{code}[language=xml]{csse6400.xml}
-<root>
-  <item>
-    <key>Course Code</key>
-    <value>CSSE6400</value>
-  </item>
-  <item>
-    <key>Course Title</key>
-    <value>Software Architecture</value>
-  </item>
-</root>
-\end{code}
+\begin{center}
+\begin{tikzpicture}[scale=0.5]
 
-XML is designed as a markup language, similar to HTML,
-it is not designed as a data exchange format.
-Developers have come to point out that the verbosity and complexity of XML,
-compared to alternatives such as JSON, are deal breakers.
-While XML can be used as a data exchange format it is not designed for it,
-and as a result APIs built around XML as a data format are becoming less common.
+    \draw[very thick,draw=secondary,top color=white] (-3,0) rectangle (3,-1.5);
+    \draw[very thick,draw=secondary,top color=white] (-3.5,-2) rectangle (3.5,-3.5);
+    \draw[very thick,draw=secondary,top color=white] (-4,-4) rectangle (4,-5.5);
+    \draw[very thick,draw=secondary,top color=white] (-4.5,-6) rectangle (4.5,-7.5);
+    \draw[very thick,draw=secondary,top color=white] (-5,-8) rectangle (5,-9.5);
+    \draw[very thick,draw=secondary,top color=white] (-5.5,-10) rectangle (5.5,-11.5);
+    \draw[very thick,draw=secondary,top color=white] (-6,-12) rectangle (6,-13.5);
+
+    \node at (0, -0.75) (app) {Application Layer};
+    \node [below of=app] (pres) {Presentation Layer};
+    \node [below of=pres] (sess) {Session Layer};
+    \node [below of=sess] (trans) {Transport Layer};
+    \node [below of=trans] (net) {Network Layer};
+    \node [below of=net] (data) {Data Link Layer};
+    \node [below of=data] {Physical Layer};
+\end{tikzpicture}
+\end{center}
+
+The above diagram shows the layers of the \textsl{OSI} model.
+These are the layers of abstraction that comprise the Internet Protocol Suite (or, how computers communicate over the Internet).
+
+At the transport layer, we have the \textsl{Transmission Control Protocol} (TCP) and \textsl{User Datagram Protocol} (UDP).
+This is a low-level protocol that you may have already used in your previous studies,
+this is the level of networking taught in \textsl{CSSE2310}.
+While it is possible to develop applications that use this protocol directly,
+it is not very practical.
+
+In this course we will be using the \textsl{Hypertext Transfer Protocol} (HTTP).
+HTTP is a higher-level protocol that is built on top of TCP, it sits in the \textsl{Application Layer} of the OSI model.
+HTTP is the protocol that is used to transfer web pages over the Internet.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.5]
+
+    \draw[very thick,draw=secondary,top color=white] (-3,0) rectangle (3,-1.5);
+    \draw[very thick,draw=black!10,top color=white] (-3.5,-2) rectangle (3.5,-3.5);
+    \draw[very thick,draw=black!10,top color=white] (-4,-4) rectangle (4,-5.5);
+    \draw[very thick,draw=secondary,top color=white] (-4.5,-6) rectangle (4.5,-7.5);
+    \draw[very thick,draw=black!10,top color=white] (-5,-8) rectangle (5,-9.5);
+    \draw[very thick,draw=black!10,top color=white] (-5.5,-10) rectangle (5.5,-11.5);
+    \draw[very thick,draw=black!10,top color=white] (-6,-12) rectangle (6,-13.5);
+
+    \node [] at (0, -0.75) (app) {Application Layer};
+    \node [color=black!30,below of=app] (pres) {Presentation Layer};
+    \node [color=black!30,below of=pres] (sess) {Session Layer};
+    \node [below of=sess] (trans) {Transport Layer};
+    \node [color=black!30,below of=trans] (net) {Network Layer};
+    \node [color=black!30,below of=net] (data) {Data Link Layer};
+    \node [color=black!30,below of=data] {Physical Layer};
+
+    \node [right=1cm of trans] {TCP/UDP (CSSE2310)};
+    \node [right=0.8cm of app] {HTTP/HTTPS (CSSE6400)};
+\end{tikzpicture}
+\end{center}
+
+\subsection{URLs}
+
+A \textsl{Uniform Resource Locator} (URL) is a string that identifies a resource on the Internet.
+
+\noindent There are three main components of a URL:
+
+\begin{description}
+    \item[Protocol] The protocol used to access the resource, e.g. \textsl{http} or \textsl{https}.
+    \item[Host] The host name of the server that hosts the resource, e.g. \textsl{example.com} or \textsl{localhost}.
+    \item[Path] The path to the resource on the server, how the server identifies the resource.
+\end{description}
+
+\newcommand{\component}[3]{%
+\tikzmarknode{#1}{\colorbox{#2}{\color{white}#3}}%
+}
+
+\definecolor{navyblue}{rgb}{0.0, 0.4, 0.65}
+\definecolor{neonfuchsia}{rgb}{1.0, 0.25, 0.39}
+\definecolor{mediumseagreen}{rgb}{0.24, 0.7, 0.44}
+\definecolor{mediumorchid}{rgb}{0.73, 0.33, 0.83}
+\definecolor{meatbrown}{rgb}{0.9, 0.72, 0.23}
+
+\vspace{1cm}
+
+\begin{center}
+\component{proto}{mediumseagreen}{http}%
+://%
+\component{host}{navyblue}{example.com}%
+/%
+\component{path}{neonfuchsia}{hello-world}%
+\end{center}
+\begin{tikzpicture}[overlay,remember picture,>=stealth,nodes={align=left,inner ysep=1pt},<-]
+    % For 'proto'
+    \path (proto.south) ++ (0,-1.5em) node[anchor=north west,color=mediumseagreen!87] (proto-lab){$Protocol$};
+    \draw [color=mediumseagreen!87](proto.south) |- ([xshift=-0.3ex,color=blue]proto-lab.south east);
+
+    % For 'host'
+    \path (host.north) ++ (0,2em) node[anchor=south east,color=navyblue!87] (scalep){$Host name$};
+    \draw [color=navyblue!87](host.north) |- ([xshift=-0.3ex,color=red]scalep.south west);
+
+    % For 'path'
+    \path (path.south) ++ (0,-1.5em) node[anchor=north west,color=neonfuchsia!87] (mean){$Path$};
+    \draw [color=neonfuchsia!87](path.south) |- ([xshift=-0.3ex,color=blue]mean.south east);
+\end{tikzpicture}
+
+\vspace{1cm}
+
+
+
+A URL can also contain a \textsl{port} number, which is the port number that the server is listening on.
+If the port number is not specified, the default port number for the protocol is used.
+For example, the default port number for \textsl{http} is 80, and the default port number for \textsl{https} is 443.
+
+\vspace{1cm}
+
+\begin{center}
+\component{proto}{mediumseagreen}{http}%
+://%
+\component{host}{navyblue}{example.com}%
+:\component{port}{mediumorchid}{80}%
+/%
+\component{path}{neonfuchsia}{hello-world}%
+\end{center}
+\begin{tikzpicture}[overlay,remember picture,>=stealth,nodes={align=left,inner ysep=1pt},<-]
+    % For 'proto'
+    \path (proto.south) ++ (0,-1.5em) node[anchor=north west,color=mediumseagreen!87] (proto-lab){$Protocol$};
+    \draw [color=mediumseagreen!87](proto.south) |- ([xshift=-0.3ex,color=blue]proto-lab.south east);
+
+    % For 'host'
+    \path (host.north) ++ (0,2em) node[anchor=south east,color=navyblue!87] (scalep){$Host name$};
+    \draw [color=navyblue!87](host.north) |- ([xshift=-0.3ex,color=red]scalep.south west);
+
+    % For 'path'
+    \path (path.south) ++ (0,-1.5em) node[anchor=north west,color=neonfuchsia!87] (mean){$Path$};
+    \draw [color=neonfuchsia!87](path.south) |- ([xshift=-0.3ex,color=blue]mean.south east);
+
+    % For 'port'
+    \path (port.north) ++ (0,1em) node[anchor=south west,color=mediumorchid!87] (mean){$Port$};
+    \draw [color=mediumorchid!87](port.north) |- ([xshift=-0.3ex,color=blue]mean.south east);
+\end{tikzpicture}
+
+\vspace{1cm}
+
+The URL \textsl{http://example.com/hello-world} is equivalent to \textsl{http://example.com:80/hello-world}.
+
+URLs can also contain \textsl{query parameters}, which are key-value pairs that are used to pass information to the server.
+Query parameters are separated from the path by a question mark (\texttt{?}).
+Each query parameter is separated from the next by an ampersand (\texttt{\&}).
+
+\vspace{1cm}
+
+\begin{center}
+\component{proto}{mediumseagreen}{http}%
+://%
+\component{host}{navyblue}{example.com}%
+/%
+\component{path}{neonfuchsia}{hello-world}%
+?%
+\component{query}{meatbrown}{key=value}%
+\end{center}
+\begin{tikzpicture}[overlay,remember picture,>=stealth,nodes={align=left,inner ysep=1pt},<-]
+    % For 'proto'
+    \path (proto.south) ++ (0,-1.5em) node[anchor=north west,color=mediumseagreen!87] (proto-lab){$Protocol$};
+    \draw [color=mediumseagreen!87](proto.south) |- ([xshift=-0.3ex,color=blue]proto-lab.south east);
+
+    % For 'host'
+    \path (host.north) ++ (0,2em) node[anchor=south east,color=navyblue!87] (scalep){$Host name$};
+    \draw [color=navyblue!87](host.north) |- ([xshift=-0.3ex,color=red]scalep.south west);
+
+    % For 'path'
+    \path (path.south) ++ (0,-1.5em) node[anchor=north west,color=neonfuchsia!87] (mean){$Path$};
+    \draw [color=neonfuchsia!87](path.south) |- ([xshift=-0.3ex,color=blue]mean.south east);
+
+    % For 'query'
+    \path (query.north) ++ (0,2em) node[anchor=south east,color=meatbrown!87] (scalep){$Query\,Variable$};
+    \draw [color=meatbrown!87](query.north) |- ([xshift=-0.3ex,color=red]scalep.south west);
+\end{tikzpicture}
+
+\vspace{1cm}
+
+\subsection{HTTP}
+
+HTTP is a request-response abstraction for networking.
+
+\subsubsection{Request}
+
+The HTTP request is a message sent to the server.
+It contains the following information:
+\begin{description}
+    \item[URL] An endpoint to send the request to.
+    \item[Method] Described later.
+    \item[Headers] Specify type of data, e.g. JSON, HTML, etc. and other metadata about the request.
+    \item[Body] The optional data to send to the server.
+\end{description}
+
+\subsubsection{Response}
+
+The HTTP response is a message sent from the server.
+It contains the following information:
+\begin{description}
+    \item[Status code] A number between 100 and 599 giving details about the response.
+    \item[Headers] Specify type of response data, e.g. JSON, HTML, etc. and other metadata about the response.
+    \item[Body] Content of the response.
+\end{description}
+
+\paragraph{Status Codes}
+\begin{description}
+    \item[200s] Indicate the request was successful, 200 is the most common.
+    \item[300s] Redirects the requester to another location.
+    \item[400s] Indicates that the request was wrong, e.g. 404 meaning that thte request was for something that doesn't exist.
+    \item[500s] Indicates that the server had a problem fulfilling the request.
+\end{description}
+
+\paragraph{Methods}
+\begin{description}
+    \item[GET] Queries the server for information.
+    \item[POST] Creates a new resource on the server.
+    \item[PUT] Updates an existing resource on the server.
+    \item[DELETE] Deletes an existing resource on the server.
+\end{description}
 
 \subsection{JSON}
 JavaScript Object Notation (JSON) is quickly replacing XML as the data format used in APIs.
@@ -110,87 +298,8 @@ they are optional, just as in XML, but are used much less than in XML.
 }
 \end{code}
 
-\subsection{MessagePack}
-It should not be a surprise that the JSON and XML formats are not resource efficient.
-Nowadays, we are less concerned with squeezing data into a tiny amount of data on the hard drive as storage is cheap.
-However, we are often concerned with how much data is being transmitted via network communication as bandwidth can be expensive.
-
-In the example JSON snippet above, we use 78 bytes to encode the message.
-\link{MessagePack}{https://msgpack.org/} is a standard for encoding and decoding JSON.
-When encoding our original JSON snippet with MessagePack we shrink to just 57 bytes.
-At our scale, a negligible difference,
-but at the scale of terrabytes or petabytes,
-a significant factor.
-
-\begin{code}[]{csse6400.msgpack}
-82 ab 43 6f 75 72 73 65 20 43 6f 64 65 a8 43 53 53 45 36 34 30 30 ac 43 6f 75 72 73 65 20 54 69 74 6c 65 b5 53 6f 66 74 77 61 72 65 20 41 72 63 68 69 74 65 63 74 75 72 65
-\end{code}
-
-\info{
-    For those interested,
-    0x82 specifies a map type (0x80) with two fields (0x02).
-    Followed by a string type (0xa0) of size eleven (0x0b).
-    The rest is left as an exercise: \url{https://github.com/msgpack/msgpack/blob/master/spec.md}.
-}
-
-\subsection{Protobuf}
-Protocol Buffers (protobuf) is another type of binary encoding.
-However, unlike MessagePack, the format was designed from scratch,
-allowing a more compact and better designed format.
-Protobufs require all data to be defined by a schema.
-For example:
-
-\begin{code}[language=protobuf]{csse6400.proto}
-message Course {
-    required string code = 1;
-    required string name = 2;
-}
-\end{code}
-
-Protobufs differ from XML, JSON, and MessagePack via their method of integration.
-In the previous examples,
-your language would have a library to encode and decode the data format into and out of your language's type system.
-With protobuf, an external tool, \textsl{protoc},
-takes the schema and generates a model of the schema in your target language.
-This gives every language a native interface for interacting with the data format,
-often allowing developers to not be aware of the underlying encoding.
-
-\bash{protoc --java\_out=. csse6400.proto}
-
-\begin{code}[language=java]{csse6400.java}
-Course softarch = Course.newBuilder()
-    .setCode("CSSE6400")
-    .setName("Software Architecture")
-    .build();
-output = new FileOutputStream(args[0]);
-softarch.writeTo(output);
-\end{code}
-
-\section{API Protocols}
-It is worth being aware of a few of the common protocols and conventions used in APIs.
-Fortunately, we do not need to understand the low-level communication protocols,
-such as TCP/IP, HTTP, and HTTPS,
-as these are handled by the underlying libraries.
-We will focus on the higher-level protocols and conventions.
-
-We outline a few but note that in this course we will primarily focus on REST APIs.
-This is only an indication that they are better understood by course staff,
-not their superiority.
-
-\subsection{XML-RPC}
-XML-RPC was one of the first API standards.
-It is a Remote Procedure Call (RPC) based API which communicates via XML.
-It is not a commonly used standard anymore.
-
-\subsection{SOAP}
-After XML-RPC came SOAP.
-SOAP was impactful for service-oriented (now microservices) architectures but has largely fallen out of favour in-place of REST APIs.
-We do not cover SOAP in any meaningful depth due to its increasing irrelevance and complexity.
-
 \subsection{REST}
-REST is not a standard like SOAP once was,
-instead REST is an architectural style guided by a set of architectural constraints that allows us to build flexible APIs.
-
+REST is an architectural style guided by a set of architectural constraints that allows us to build flexible APIs.
 In this course we do not dive too deep into the architectural style and instead opt for a more surface level understanding.
 It is a common mistake for people to refer to REST as a HTTP based web service API,
 they are different.
@@ -204,24 +313,7 @@ In this course we chose to embrace this mistake and often refer to a HTTP based 
   \item[PUT /api/v1/todo/{id}] Update the fields of an existing task
   \item[DELETE /api/v1/todo/{id}] Delete a specific task
 \end{description}
-
-\subsection{JSON-RPC}
-A JSON RPC is another RPC based API based around communication via JSON.
-When deciding whether to use an RPC-based API or a REST/SOAP based API,
-the distinction to make is that RPC APIs should be action based, i.e. ``I want to do X''.
-Whereas REST/SOAP APIs are Create Read Update Delete (CRUD) based for providing a interface to mutable data.
-
-\subsection{GraphQL}
-GraphQL is a query language which allows more dynamic querying of data than REST based APIs.
-You can create nested queries and specify the fields you want to receive in response.
-GraphQL APIs are well-suited for building APIs designed for developers to consume but when dealing with rigid inter-service based requests,
-REST APIs are generally preferable.
-
-\subsection{gRPC}
-Another RPC framework, gRPC has started gaining a lot of attention since its first release in 2016.
-gRPC is based on the protobuf format.
-In addition to a more type-safe system,
-gRPC based APIs provide authentication and streaming mechanisms.
+Note that the API specification doesn't include details on the port or hostname as these frequently change.
 
 \section{GitHub}
 
@@ -245,12 +337,15 @@ tell your tutor your GitHub username and they will add you to the organization.
 \subsection{Joining the GitHub Classroom}
 Once you have joined the organization,
 you will need to join the GitHub Classroom.
-
-\todo{Add link to GitHub Classroom}
+Follow the link provided by your tutor to join the classroom.
 
 \subsection{Creating a Practical Repository}
+Navigate to the GitHub Classroom link provided by your tutor.
+You should see a list of practicals, click on the week one practical.
+This will create a new repository for you in the course organization.
+You can now clone this repository to your local machine or work directly in the browser with GitHub codespaces.
 
-\section{TODO}
+\section{TODO App}
 
 \subsection{The API design}
 
@@ -259,9 +354,15 @@ This endpoint should return a 200 status code and a JSON object with a single fi
 
 
 \begin{code}[language=json,numbers=none]{}
-  {
-    "status": "ok"
-  }
+GET /api/v1/health HTTP/1.1
+\end{code}
+\begin{code}[language=json,numbers=none]{}
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "status": "ok"
+}
 \end{code}
 
 \subsubsection{GET /api/v1/todos}
@@ -273,9 +374,14 @@ Optional query parameters:
   \item\textbf{window} An integer value indicating how many days past todays date a task should be due by.
 \end{itemize}
 
-e.g. \url{http://localhost:6400/api/todos?completed=true&window=7}
 \begin{code}[language=json,numbers=none]{}
-  [
+GET /api/v1/todos?completed=true&window=7 HTTP/1.1
+\end{code}
+\begin{code}[language=json,numbers=none]{}
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+[
     {
       "id": 1,
       "title": "Watch CSSE6400 Lecture",
@@ -285,19 +391,21 @@ e.g. \url{http://localhost:6400/api/todos?completed=true&window=7}
       "created_at": "2023-02-20T00:00:00",
       "updated_at": "2023-02-20T00:00:00"
     },
-    {
-      ...
-    },
     ...
-  ]
+]
 \end{code}
 
 \subsubsection{GET /api/v1/todos/\string{id\string}}
 This endpoint should return a single item from the todo list.
 
-
 \begin{code}[language=json,numbers=none]{}
-  {
+GET /api/v1/todos/1 HTTP/1.1
+\end{code}
+\begin{code}[language=json,numbers=none]{}
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
     "id": 1,
     "title": "Watch CSSE6400 Lecture",
     "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
@@ -305,7 +413,7 @@ This endpoint should return a single item from the todo list.
     "deadline_at": "2023-02-27T00:00:00",
     "created_at": "2023-02-20T00:00:00",
     "updated_at": "2023-02-20T00:00:00"
-  }
+}
 \end{code}
 
 \subsubsection{POST /api/v1/todos}
@@ -315,17 +423,21 @@ Attempting to post any other fields than \texttt{title, description, completed, 
 
 
 \begin{code}[language=json,numbers=none]{}
-  {
+POST /api/v1/todos HTTP/1.1
+Content-Type: application/json
+
+{
     "title": "Watch CSSE6400 Lecture",
     "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
     "completed": false,
     "deadline_at": "2023-02-27T00:00:00",
-  }
+}
 \end{code}
-
-
 \begin{code}[language=json,numbers=none]{}
-  {
+HTTP/1.1 201 Created
+Content-Type: application/json
+
+{
     "id": 1,
     "title": "Watch CSSE6400 Lecture",
     "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
@@ -333,7 +445,7 @@ Attempting to post any other fields than \texttt{title, description, completed, 
     "deadline_at": "2023-02-27T00:00:00",
     "created_at": "2023-02-20T00:00:00",
     "updated_at": "2023-02-20T00:00:00"
-  }
+}
 \end{code}
 
 \subsubsection{PUT /api/v1/todos/\string{id\string}}
@@ -342,13 +454,19 @@ This endpoint should update a task in the todo list. The \texttt{created\_at}, \
 Attempting to post any other fields than \texttt{title, description, completed, deadline\_at} will cause a 400 error to be returned.
 
 \begin{code}[language=json,numbers=none]{}
-  {
+PUT /api/v1/todos/1 HTTP/1.1
+Content-Type: application/json
+
+{
     "title": "Join the Richard Thomas fan club",
-  }
+}
 \end{code}
 
 \begin{code}[language=json,numbers=none]{}
-  {
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
     "id": 1,
     "title": "Join the Richard Thomas fan club",
     "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
@@ -356,14 +474,21 @@ Attempting to post any other fields than \texttt{title, description, completed, 
     "deadline_at": "2023-02-27T00:00:00",
     "created_at": "2023-02-20T00:00:00",
     "updated_at": "2023-02-20T00:00:00"
-  }
+}
 \end{code}
 
 \subsubsection{DELETE /api/v1/todos/\string{id\string}}
-This endpoint should delete a task from the todo list. If the task does not exist, a 200 is returned with an empty response.
+This endpoint should delete a task from the todo list.
+If the task does not exist, a 200 is returned with an empty response.
 
 \begin{code}[language=json,numbers=none]{}
-  {
+DELETE /api/v1/todos/1 HTTP/1.1
+\end{code}
+\begin{code}[language=json,numbers=none]{}
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
     "id": 1,
     "title": "Join the Richard Thomas fan club",
     "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
@@ -371,7 +496,7 @@ This endpoint should delete a task from the todo list. If the task does not exis
     "deadline_at": "2023-02-27T00:00:00",
     "created_at": "2023-02-20T00:00:00",
     "updated_at": "2023-02-20T00:00:00"
-  }
+}
 \end{code}
 
 
@@ -379,8 +504,8 @@ This endpoint should delete a task from the todo list. If the task does not exis
 
 \subsubsection{Setting up your environment}
 
-The practicals will be using Python as our implementation language but the course is not restricted to Python. Feel free to implement the practicals and your assignments in any language you feel comfortable with but be aware that help with other languages or frameworks may be limited.
-
+The practicals will be using Python as our implementation language but the course is not restricted to Python.
+Feel free to implement the practicals and your assignments in any language you feel comfortable with but be aware that help with other languages or frameworks may be limited.
 
 \warning{
 If you are on Windows, we recommend using a Unix based environment, such as WSL2 or a virtual machine running Ubuntu.
@@ -388,21 +513,25 @@ If you are on Windows, we recommend using a Unix based environment, such as WSL2
 
 \info{
   You will require an installation of Python 3 and pip to be able to complete this practical. Install these tools now before continuing.
+  If you are unable to install these tools, you should be able to use GitHub Codespaces to complete the practical.
 }
 
-We will be using `pipenv' to manage the Python libraries we need for this project so let's install that now.
+We will be using \texttt{pipenv} to manage the Python libraries we need for this project.
 
 \begin{code}[language=bash,numbers=none]{}
-  $ python3 -m pip install pipenv
+  >> python3 -m pip install pipenv
 \end{code}
 
-Navigate to you cloned practical respository in a terminal and start your project by creating the Python environment using the following:
+Navigate to your cloned practical respository in a terminal and start your project by creating the Python environment using the following:
 
 \begin{code}[language=bash,numbers=none]{}
-  $ pipenv --python 3
+  >> pipenv --python 3
 \end{code}
 
-This will create a `Pipfile' and a `Pipfile.lock' file. The Pipfile is where we will specify the libraries we need for our project and the Pipfile.lock is where pipenv will store the versions of the libraries we have installed. We will use the Pipfile to install the libraries we need for the API.
+This will create a \texttt{Pipfile} and a \texttt{Pipfile.lock} file.
+The \texttt{Pipfile} is where we will specify the libraries we need for our project.
+The \texttt{Pipfile.lock} is where pipenv will store the versions of the libraries we have installed.
+We will use the \texttt{Pipfile} to install the libraries we need for the API.
 
 \begin{code}{Pipfile}
   [[source]]
@@ -423,14 +552,14 @@ This will create a `Pipfile' and a `Pipfile.lock' file. The Pipfile is where we 
 Next we are going to add Flask as a dependency to our project. This library is a small web server wrapper that will allow us to quickly build our todo application. To add a dependency to our project, we can run the following command:
 
 \begin{code}[language=bash,numbers=none]{}
-  $  pipenv install flask
+  >>  pipenv install flask
 \end{code}
 
-Once this is done you can see it has made some changes to our Pipfile and Pipfile.lock files.
+You will see it has made some changes to our \texttt{Pipfile} and \texttt{Pipfile.lock} files.
 
 \subsubsection{Initialising with Flask}
 
-Create a folder called  `todo' in the root of your project and create a file called \texttt{\_\_init\_\_.py} and add the following code to it:
+Create a folder called  \texttt{todo} in the root of your project and create a file called \texttt{\_\_init\_\_.py} and add the following code to it:
 
 \begin{code}[language=python]{}
   from flask import Flask
@@ -440,7 +569,7 @@ Create a folder called  `todo' in the root of your project and create a file cal
       return app
 \end{code}
 
-Your repository should now look like:
+Your repository should now look like this:
 
 \begin{code}[language=bash,numbers=none]{}
   .
@@ -451,11 +580,14 @@ Your repository should now look like:
       |-- __init__.py
 \end{code}
 
-We have created a basic Flask app but how do we run it? When using pipenv we need to run it in the following way:
+We have created a basic Flask app but how do we run it?
+When using pipenv we need to run it in the following way:
 
 \begin{code}[language=bash,numbers=none]{}
-  $ pipenv run flask --app todo run
+  >> pipenv run flask --app todo run
 \end{code}
+
+This command runs the \texttt{flask --app todo run} command inside the pipenv environment with our dependencies installed.
 
 This web server is a bit boring though, let's add an endpoint so we can see that it works. In the todo folder, create a folder called views and a file \texttt{routes.py}. Add the following code to  \texttt{routes.py}:
 
@@ -473,7 +605,6 @@ This web server is a bit boring though, let's add an endpoint so we can see that
 
 The above has made an endpoint within our API under the \texttt{/api/v1} prefix and we have created a \texttt{/health} route below this. Now we need to register this with our flask app. In the \texttt{\_\_init\_\_.py} file, change the contents to the following:
 
-\todo{Change the port to 6400}
 \begin{code}[language=python]{}
   from flask import Flask
 
@@ -490,7 +621,7 @@ The above has made an endpoint within our API under the \texttt{/api/v1} prefix 
 Now when we run the app we should see the following:
 
 \begin{code}[language=bash,numbers=none]{}
-  $ pipenv run flask --app todo run
+  >> pipenv run flask --app todo run -p 6400
 
   * Serving Flask app 'todo'
   * Debug mode: off
@@ -499,10 +630,14 @@ Now when we run the app we should see the following:
   Press CTRL+C to quit
 \end{code}
 
+Note that the \texttt{-p 6400} flag is used to specify the port we want to run the server on,
+this allows us to run multiple servers at the same time.
+
 Open your browser and go to http://localhost:6400/api/v1/health and you should see a blank page with "ok" written on it.
 
 If you run into any issues, make sure your files are in the following structure and that you are running these commands in the root folder.
 
+\noindent\begin{minipage}{\textwidth}
 \begin{code}[language=bash,numbers=none]{}
   .
   |-- README.md
@@ -513,6 +648,7 @@ If you run into any issues, make sure your files are in the following structure 
       |-- views
           |-- routes.py
 \end{code}
+\end{minipage}
 
 \subsubsection{Returning JSON with Flask}
 
@@ -536,23 +672,29 @@ Now let's go back to our browser and refresh, we should see the following:
   }
 \end{code}
 
-\info{If you are using Firefox the json will be parsed and presented in a structured form. To get this for Chrome you can install extensions from the Chrome web store.}
+\info{
+If you are using Firefox the JSON will be parsed and presented in a structured form.
+To get this for Chrome you can install extensions from the Chrome web store.
+}
 
 \subsubsection{Calling your API locally}
 
-We have many choices when it comes to calling our API locally. We could use curl, Postman, VS Code, or our browser. We are going to focus on using curl and the REST Visual Studio Code extension.
+We have many choices when it comes to calling our API locally.
+We could use curl, Postman, VS Code, or our browser.
+We are going to focus on using curl and the REST Visual Studio Code extension.
+
+\info{
+For GET requests we can use our browser to call the API but for POST, PUT, and DELETE requests we will need to use a tool like curl or Postman.
+}
 
 \vspace{0.5em}
-\textbf{curl}
+\textbf{cURL}
 
 Install curl if it is available for your operating system. If you are on a Mac, you can install it with homebrew otherwise it is available for most Linux distributions.
 
 Now that we have the tool installed let's have our API running in a terminal window and open up a new terminal so we can make requests to our API. Enter in the following into your terminal to call your API.
 
-
-\begin{code}[language=bash,numbers=none]{}
-  $ curl -X GET http://localhost:6400/api/v1/health
-\end{code}
+\bash{curl -X GET http://localhost:6400/api/v1/health}
 
 You should see the following response:
 
@@ -681,7 +823,7 @@ This endpoint is for listing all the todos that the user has. For now we are goi
         "id": 1,
         "title": "Watch CSSE6400 Lecture",
         "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
-        "completed": false,
+        "completed": False,
         "deadline_at": "2023-02-27T00:00:00",
         "created_at": "2023-02-20T00:00:00",
         "updated_at": "2023-02-20T00:00:00"
@@ -720,7 +862,7 @@ Next is our endpoint to get an individual todo by its id. In the \texttt{routes.
         "id": id,
         "title": "Watch CSSE6400 Lecture",
         "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
-        "completed": false,
+        "completed": False,
         "deadline_at": "2023-02-27T00:00:00",
         "created_at": "2023-02-20T00:00:00",
         "updated_at": "2023-02-20T00:00:00"
@@ -738,7 +880,7 @@ These were our read only methods, now let's get to the mutating methods. First i
         "id": 1,
         "title": "Watch CSSE6400 Lecture",
         "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
-        "completed": false,
+        "completed": False,
         "deadline_at": "2023-02-27T00:00:00",
         "created_at": "2023-02-20T00:00:00",
         "updated_at": "2023-02-20T00:00:00"
@@ -754,7 +896,7 @@ You will notice that currently this function is the same as the GET request but 
         "id": id,
         "title": "Watch CSSE6400 Lecture",
         "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
-        "completed": false,
+        "completed": False,
         "deadline_at": "2023-02-27T00:00:00",
         "created_at": "2023-02-20T00:00:00",
         "updated_at": "2023-02-20T00:00:00"
@@ -770,7 +912,7 @@ Likewise with the POST request, this function is the same as the GET request but
         "id": id,
         "title": "Watch CSSE6400 Lecture",
         "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
-        "completed": false,
+        "completed": False,
         "deadline_at": "2023-02-27T00:00:00",
         "created_at": "2023-02-20T00:00:00",
         "updated_at": "2023-02-20T00:00:00"
@@ -781,11 +923,13 @@ Likewise with the POST request, this function is the same as the GET request but
 
 With the endpoints you may have noticed us defining the methods, this is because we want to define which HTTP methods are allowed for each endpoint. For example, we do not want a user to be able to delete a todo by sending a GET request, we want them to send a DELETE request.
 
-This concludes this week's practical. Next week we will add storage to our API so that we can actually create, update and delete todos. We will also add some tests to our API to ensure that it is working as expected and meets our specification. The final files you should have for this practical are available at \url{github.com/csse6400/?}. Remember to ask for any assistance on the Slack channel if you get stuck or have any questions.
+This concludes this week's practical.
+Next week we will add storage to our API so that we can actually create, update, and delete todos.
+We will also add some tests to our API to ensure that it is working as expected and meets our specification.
+%The final files you should have for this practical are available at \url{github.com/csse6400/?}.
+Remember to ask for any assistance on the Slack channel if you get stuck or have any questions.
 
-\todo{Fill in the github link that is above.}
-
-\bibliographystyle{ieeetr}
-\bibliography{books,ours}
+%\bibliographystyle{ieeetr}
+%\bibliography{books,ours}
 
 \end{document}
