@@ -17,11 +17,11 @@ workspace "Sahara eCommerce" "An example C4 model of an on-line shopping system.
 					productAnimator = component "Product Animator" "Provides interactive 3d views of products." "JavaScript"
 				}
 				appBackend = container "Application Backend" "Provides backend logic for the on-line store." "Java" {
-					cart = component "Shopping Cart" "Holds products that customer may purchase." "JavaBean"
-					cust = component "Customer" "Details about a customer." "JavaBean"
-					order = component "Order" "Record of completed orders." "JavaBean"
-					product = component "Product" "Details about a product." "JavaBean"
-					cartController = component "Shopping Cart Controller" "Provides RESTful interface to use a Shopping Cart." "Java Control Class"
+					cart = component "Shopping Cart" "Holds products that customer may purchase." "Java & JPA Entity"
+					cust = component "Customers" "Details about a customer." "Java & JPA Entity"
+					order = component "Orders" "Record of completed orders." "Java & JPA Entity"
+					product = component "Products" "Details about a product." "Java & JPA Entity"
+					cartController = component "Shopping Cart Controller" "Provides RESTful interface to use a Shopping Cart." "Java"
 				}
 				appDB = container "Application Database" "Stores customer credentials, products and orders." "MySQL" "db"
 				mobileApp = container "Mobile Application" "Mobile apps on iPhone and Android providing shopping experience." "React Native" "mobile"
@@ -40,12 +40,14 @@ workspace "Sahara eCommerce" "An example C4 model of an on-line shopping system.
         customer -> mobileApp "Search, browse and purchase products."
 		
 		# Web App relationships.
-		webApp -> browserApp "Delivers content to the customer's browser." "HTTPS"
-		webApp -> productAnimator "Downloads to customer's browser." "HTTPS"
-		webApp -> appBackend "Sends messages" "RMI"
+		webApp -> browserApp "Deliver content to the customer's browser." "HTTPS"
+		webApp -> productAnimator "Download to customer's browser." "HTTPS"
+		webApp -> appBackend "Send messages" "RMI"
 		browsing -> cartView "Uses"
-		browsing -> cart "Sends messages" "RMI"
-		cartView -> cart "Sends messages" "RMI"
+		browsing -> cart "Add items to cart." "RMI"
+		browsing -> product "Find products." "RMI"
+		browsing -> cust "Identify customer." "RMI"
+		cartView -> cart "Display cart details." "RMI"
 		
 		mobileApp -> cartController "REST API" "JSON/HTTPS"
 		
@@ -54,10 +56,11 @@ workspace "Sahara eCommerce" "An example C4 model of an on-line shopping system.
 		cart -> cust "Uses"
 		cart -> order "Uses"
 		cart -> product "Uses"
+		cart -> appDB "Store cart state between user events." "JPA"
 		cartController -> cart "Uses"
-		order -> appDB "Stores order details" "JPA"
-		cust -> appDB "Retrieves customer credentials" "JPA"
-		product -> appDB "Retrieves product details" "JPA"
+		order -> appDB "Store order details." "JPA"
+		cust -> appDB "Retrieve customer credentials." "JPA"
+		product -> appDB "Retrieve product details." "JPA"
 		
 		# Data Mining Service relationships.
         onlineStore -> dataMining "Customer Browsing History"
@@ -150,15 +153,15 @@ workspace "Sahara eCommerce" "An example C4 model of an on-line shopping system.
 		
 		component browserApp "browser_component_diagram" {
 			include *
-			autoLayout lr
+#			autoLayout lr
 		}
 
         dynamic appBackend "add_to_cart" "Overview of how a customer using the web interface adds a product to their shopping cart." {
-            browsing -> cart "Sends product id to be added to cart id" "RMI"
+            browsing -> cart "Send product id to be added to cart id" "RMI"
             cart -> appDB "select * from carts where cartid = ?" "JPA"
             cart -> appDB "select * from products where productid = ?" "JPA"
             cart -> appDB "insert into cartProducts values (cartId, productId)" "JPA"
-            cart -> browsing "Confirms success of updating cart" "RMI"
+            cart -> browsing "Confirm success of updating cart" "RMI"
 #            autoLayout lr
         }
 		
