@@ -345,6 +345,10 @@ You should see a list of practicals, click on the week one practical.
 This will create a new repository for you in the course organisation.
 You can now clone this repository to your local machine or work directly in the browser with GitHub codespaces.
 
+\teacher{
+  If you have trouble with students setting up their environments locally then point them to the GitHub codespaces option. With the amount of students in your class you will probably not have enough time to troubleshoot everything week 1.
+}
+
 \section{TODO App}
 
 \subsection{The API design}
@@ -518,6 +522,16 @@ If you are on Windows, we recommend using a Unix based environment, such as WSL2
   If you are unable to install these tools, you should be able to use GitHub Codespaces to complete the practical.
 }
 
+\teacher{
+  Let the students setup their initial python environment. It has been some time since these students would have used Python so they might have to do a full install including installing pip. Some common issues that come up are:
+
+  \begin{itemize}
+    \item Pip is not installed.
+    \item PipEnv is installed via apt instead of through pip. This one is hard to tell without having some intution. Look for being able to uninstall pipenv via pip and its still runnable or by doing an apt list-installed. Fix is to remove pipenv via apt and reinstall via pip.
+    \item PipEnv can take a significant amount of time on a fresh WSL2 for some reason. Unknown if theres a real fix for this or if its an ongoing issue.
+  \end{itemize}
+}
+
 We will be using \texttt{pipenv} to manage the Python libraries we need for this project.
 
 \begin{code}[language=bash,numbers=none]{}
@@ -552,6 +566,10 @@ We will use the \texttt{Pipfile} to install the libraries we need for the API.
 \end{code}
 
 \info{Your Python version may be different, this is fine as long as it is Python 3. For our automated tests we would like you to change the version number from the \texttt{Pipfile} so that it is \texttt{python\_version = "3"}}
+
+\teacher{
+  Try to get the students to do the above otherwise you will be answering questions about it towards the end when the tests dont run.
+}
 
 Next we are going to add Flask as a dependency to our project. This library is a small web server wrapper that will allow us to quickly build our todo application. To add a dependency to our project, we can run the following command:
 
@@ -638,6 +656,10 @@ Note that the \texttt{-p 6400} flag is used to specify the port we want to run t
 this allows us to run multiple servers at the same time.
 
 Open your browser and go to http://localhost:6400/api/v1/health and you should see a blank page with "ok" written on it.
+
+\teacher{
+  If this is in the Github Codespaces environment then you will have to go to the ports tab and click on the port that the flask server is running on. If this port is set to private then you wont be able to see it, set the port to public and then click on the link to open it in a new tab.
+}
 
 If you run into any issues, make sure your files are in the following structure and that you are running these commands in the root folder.
 
@@ -827,7 +849,7 @@ This endpoint is for listing all the todos that the user has. For now we are goi
         "id": 1,
         "title": "Watch CSSE6400 Lecture",
         "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
-        "completed": False,
+        "completed": True,
         "deadline_at": "2023-02-27T00:00:00",
         "created_at": "2023-02-20T00:00:00",
         "updated_at": "2023-02-20T00:00:00"
@@ -849,7 +871,7 @@ Now let's run the GET request again and we should see the following:
       "id": 1,
       "title": "Watch CSSE6400 Lecture",
       "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
-      "completed": false,
+      "completed": true,
       "deadline_at": "2023-02-27T00:00:00",
       "created_at": "2023-02-20T00:00:00",
       "updated_at": "2023-02-20T00:00:00"
@@ -866,7 +888,7 @@ Next is our endpoint to get an individual todo by its id. In the \texttt{routes.
         "id": id,
         "title": "Watch CSSE6400 Lecture",
         "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
-        "completed": False,
+        "completed": True,
         "deadline_at": "2023-02-27T00:00:00",
         "created_at": "2023-02-20T00:00:00",
         "updated_at": "2023-02-20T00:00:00"
@@ -884,11 +906,11 @@ These were our read only methods, now let's get to the mutating methods. First i
         "id": 1,
         "title": "Watch CSSE6400 Lecture",
         "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
-        "completed": False,
+        "completed": True,
         "deadline_at": "2023-02-27T00:00:00",
         "created_at": "2023-02-20T00:00:00",
         "updated_at": "2023-02-20T00:00:00"
-      })
+      }, 201)
 \end{code}
 
 You will notice that currently this function is the same as the GET request but in future weeks we will build out the functionality to actually create a todo. Next is our endpoint to update a todo. In the \texttt{routes.py} file, add the following code to the bottom of the file:
@@ -900,7 +922,7 @@ You will notice that currently this function is the same as the GET request but 
         "id": id,
         "title": "Watch CSSE6400 Lecture",
         "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
-        "completed": False,
+        "completed": True,
         "deadline_at": "2023-02-27T00:00:00",
         "created_at": "2023-02-20T00:00:00",
         "updated_at": "2023-02-20T00:00:00"
@@ -916,7 +938,7 @@ Likewise with the POST request, this function is the same as the GET request but
         "id": id,
         "title": "Watch CSSE6400 Lecture",
         "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
-        "completed": False,
+        "completed": True,
         "deadline_at": "2023-02-27T00:00:00",
         "created_at": "2023-02-20T00:00:00",
         "updated_at": "2023-02-20T00:00:00"
