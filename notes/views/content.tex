@@ -56,6 +56,7 @@ The hierarchical structure is based on the idea that a software system is compos
 The C4 model does not explicitly identify different architectural views,
 but views are implicit in the types of diagrams produced to describe an architecture.
 
+\newpage
 The static \emph{structural} view of software architecture is described through four levels of abstraction.
 Each level providing detail about parts of the previous level.
 \begin{description}
@@ -82,7 +83,6 @@ Sahara provides both web and mobile applications to deliver the shopping experie
 or constraints or principles, which influence the design of the system architecture.
 The structure of a software architecture has to be designed to ensure that the ASRs can be delivered.
 
-\noindent
 Not all requirements for a system will be architecturally significant, but those that are need to be identified.
 Once ASRs are identified, an architecture needs to be designed to deliver them.
 This may require some research, and experimentation with prototypes, to determine which options are appropriate.
@@ -206,7 +206,6 @@ to invoke functional behaviour in the \texttt{Application Backend} container.
 It provides the shared logic of the on-line store.
 This supports implementing the functional requirement that a customer can start shopping on one device and continue on another.
 
-\noindent
 The mobile application communicates with the application backend via a
 \link{REST API}{https://www.ibm.com/cloud/learn/rest-apis}.
 The application backend uses \href{https://jakarta.ee/specifications/persistence/3.1/}
@@ -471,6 +470,72 @@ A sequence diagram focusses on the time or ordered sequence of events that occur
 In documenting a software architecture,
 there may be some types of constraints that are more clearly expressed through a sequence diagram.
 
+\subsubsection{Detailed Behaviour}\label{sec:detailedSeqDiagram}
+\begin{figure}[h!]
+    \centering
+    \begin{adjustwidth}{-11mm}{-11mm}
+        \includegraphics[trim=35 69 24 47,clip,width=0.98\paperwidth]{images/uml/detailed_sequence_diagram.png}
+    \end{adjustwidth}
+    \caption{Example detailed sequence diagram showing the implementation of customer adding a product to their shopping cart.}
+    \label{fig:detailedSequenceDiagram}
+\end{figure}
+
+\noindent
+Figure \ref{fig:detailedSequenceDiagram} is a detailed sequence showing how the class model in
+figure \ref{fig:classDiagram} implements the behaviour of a customer adding a product to their shopping cart.
+This is a more detailed, or code-level, view of the scenario of adding a product to a customer's shopping cart shown in figure \ref{fig:c4_dynamic}.
+You would only provide detailed behavioural diagrams to describe architecturally important details of the detailed design.
+
+The scenario starts with the JSF session-scoped bean \texttt{WebCart} receiving the \texttt{updateCart} message from the browser.
+\texttt{WebCart} retrieves the product id and uses the \texttt{ManageCart} interface to send it, along with the cart id,
+to the \texttt{Shopping Cart} component in the application backend.
+The \texttt{\textsl{ManageCart}} interface is implemented by the \texttt{CartManager} class in the \texttt{Shopping Cart} component.
+
+The \texttt{CartManager} uses the JPA \texttt{EntityManager} to retrieve the cart and product entities from the application database.
+Once the product is added to the cart, the \texttt{EntityManager} saves the updated cart details to the database.
+Upon successfully saving the updated cart, the \texttt{CartManager} notifies the \texttt{WebCart} object
+in the \texttt{Product Browsing} component in the web application.
+
+\subsubsection{Sequence Diagram Notation}
+Sequence diagrams are read from the top down.
+The top of the diagram represents the start of the scenario, and execution time progresses down the diagram.
+The bottom of the diagram is the end of the scenario.
+Duration constraints can be placed between messages indicating information like the maximum allowed time between the start and end of a message.
+
+Rectangles with dashed lines descending from them are \emph{lifelines}.
+They represent an instance of a participant in the scenario being described.
+The name at the top of a lifeline describes the participant.
+In figure~\ref{fig:detailedSequenceDiagram}, these are objects of classes from the detailed design.
+The class diagram in figure~\ref{fig:classDiagram} shows the classes for the detailed design of the \texttt{Shopping Cart} component used in this scenario.
+
+The horizontal lines are \emph{messages} sent between participants.
+Messages use hierarchical numbers to indicate both nesting and sequence of messages.
+Message 1.1 is sent by message 1. Message 1.1.1 comes before message 1.1.2.
+Message 1 in figure~\ref{fig:detailedSequenceDiagram} is a \emph{found message},
+meaning that the sender of the message is not shown in the diagram.
+
+A closed arrowhead on a message (e.g. message 1.1) indicates that it is a synchronous message.
+An open arrowhead on a message (e.g. message 1.2) indicates that it is an asynchronous message.
+In figure~\ref{fig:detailedSequenceDiagram}, stereotypes have been placed on messages between containers
+(i.e. messages 1.2 and 1.2.5) to indicate the protocol used to send the message.
+
+The vertical rectangles sitting on top of lifelines are \emph{execution specifications}.
+They indicate when an instance is executing logic.
+For example, after the asynchronous message 1.2 is sent to the \texttt{CartManager} object,
+message 1 finishes executing.
+When the synchronous message 1.2.1 is sent to the \texttt{EntityManager}, message 1.2 is still active
+as it is waiting for message 1.2.1 to finish before message 1.2 can continue to the next part of the logic.
+
+The \guillemotleft create\guillemotright~stereotype indicates when an instance is created.
+When an instance is created, its lifeline starts at the level of the sequence diagram that indicates the point in time when it is created.
+When an instance is destroyed, its lifeline finishes, with a large \texttt{X}.
+Lifelines that are at the top of the diagram indicate instances that existed before the start of the scenario.
+Lifelines that reach the bottom of the diagram indicate instances that still exist after the end of the scenario.
+
+System boundary boxes in figure \ref{fig:detailedSequenceDiagram} indicate the components being implemented by the objects.
+The \texttt{Product Browsing} component is shaded in pink.
+The \texttt{Shopping Cart} component is white.
+
 \subsection{Deployment}\label{sec:c4_deployment}
 While not one of the ``four C's'', deployment diagrams are important for most systems.
 They describe the physical architecture or infrastructure on which the system will be deployed.
@@ -487,6 +552,7 @@ They may also contain infrastructure nodes or software system instances\footnote
     \label{fig:c4_deployment}
 \end{figure}
 
+\noindent
 Figure \ref{fig:c4_deployment} is an example C4 deployment diagram for the Sahara eCommerce system.
 It shows that the on-line store software system runs in Sahara's data centre.
 The data mining service runs on Oracle's cloud infrastructure.
@@ -651,6 +717,7 @@ Runtime communication is the connector of components.
 For example, a service which registers users to a website might have new registrations communicated via a REST request.
 The service may then communicate the new user information to a database via SQL queries.
 
+\noindent
 When we look at software architecture, component-and-connector views are the most commonly used views.
 They are common because they contain runtime information which is not easily automatically extracted.
 Module views can be generated after the fact, i.e. it is easy enough for a project to generate a UML class diagram.
