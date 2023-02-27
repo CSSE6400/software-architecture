@@ -1,7 +1,7 @@
 \documentclass{slide}
-% \usepackage{pgfpages}
 
-% \setbeameroption{show notes on second screen}
+\usepackage{pgfpages}
+\setbeameroption{show notes on second screen}
 
 \title{Pipeline Architecture}
 \subtitle{Software Architecture}
@@ -21,9 +21,9 @@
 
 \point[So far\dots]{Layered architectures reduce the impact of changing a layer}
 
-\note{We're emphasizing that pipeline architecture is a layered architecture taken to an extreme, minus the ability to have upward notifications.}
+%\note{We're emphasizing that pipeline architecture is a layered architecture taken to an extreme, minus the ability to have upward notifications.}
 
-\questionanswer{Why does the layer order matter?}{Each layer implements a different interface.}
+\questionanswer{Why does the layer order matter?\note{A consequence is layers have order.}}{Each layer implements a different interface.}
 
 \point[So\dots]{If every layer implements the same interface?}
 
@@ -180,8 +180,6 @@ $>>$ cat assignment.py | grep "hack" | wc -l | tee code-quality.txt
 
 \note{Quick discussion about how the bash philosophy enables many small components which work well together.}
 
-\question{What does \highlight{BASH} stand for?}
-
 \begin{frame}
 \centering
 \includegraphics[width=0.9\textwidth]{bashcomponents.jpg}
@@ -210,14 +208,23 @@ $>>$ cat assignment.py | grep "hack" | wc -l | tee code-quality.txt
     \par\bigskip
         {\color{primary}McIlroy's Solution}
     \begin{code}[language=bash]{}
-tr -cs A-Za-z '\n'
-tr A-Z a-z |
-sort |
-uniq -c |
-sort -rn |
-sed ${1}q
+tr -cs A-Za-z '\n' | \
+    tr A-Z a-z | \
+    sort | \
+    uniq -c | \
+    sort -rn | \
+    sed ${1}q
     \end{code}
 \end{frame}
+
+\note[enumerate]{
+    \item Make one-word lines by transliterating the complement (-c) of the alphabet into newlines (note the quoted newline), and squeezing out (-s) multiple newlines. 
+    \item Transliterate upper case to lower case.
+    \item Sort to bring identical words together.
+    \item Replace each run of duplicate words with a single representative and include a count (-c).
+    \item Sort in reverse (-r) numeric (-n) order.
+    \item Pass through a stream editor; quit (q) after printing the number of lines designated by the script’s first parameter (\${1})
+}
 
 \questionanswer{Is literate programming bad?}{No, the Unix philosophy is just good.}
 
@@ -256,17 +263,17 @@ sed ${1}q
 
 \note{Just an aside looking at it more practically rather than philosophically.}
 
-\point[Case Study]{Compilers}
+%\point[Case Study]{Compilers}
 
-\note{Exploring how the pipeline architecture can be integrated with other architectural styles like blackboard.}
+%\note{Exploring how the pipeline architecture can be integrated with other architectural styles like blackboard.}
 
-\point[Case Study]{MapReduce}
+%\point[Case Study]{MapReduce}
 
-\note{Exploring the power in simplicity.}
+%\note{Exploring the power in simplicity.}
 
-\questionanswer{What's the advantage of the map reduce pattern?}{Parallelism \cite{mapreduce}}
+%\questionanswer{What's the advantage of the map reduce pattern?}{Parallelism \cite{mapreduce}}
 
-\question{Using pipeline terminology, what filters do the \highlight{map} and \highlight{reduce} operators correspond to?}
+%\question{Using pipeline terminology, what filters do the \highlight{map} and \highlight{reduce} operators correspond to?}
 
 \point[Reading...]{``Pipeline Architecture'' Notes \cite{pipeline-notes}}
 
