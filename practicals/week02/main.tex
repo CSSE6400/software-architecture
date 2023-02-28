@@ -26,7 +26,7 @@ This week our goal is to:
 \begin{itemize}
   \item explore the various techniques developers use to store data; and
   %\item investigate the storage options implementing these techniques on the AWS platform;
-  \item upgrade our todo application to use a sqlite relational database.
+  \item upgrade our todo application to use a local sqlite relational database.
 \end{itemize}
 
 \clearpage
@@ -50,7 +50,7 @@ see Chapter 2 of the \textit{Designing Data-Intensive Applications} book \cite{d
 
 \subsection{Relational Storage}
 
-Relational databases what have been exposed to the most in your University career --- think MySQL, Postgres, Oracle DB, etc.
+Relational databases are what you have been exposed to the most in your University career --- think MySQL, Postgres, Oracle DB, etc.
 This type of database is good at modelling the real world which is often a highly connected environment.
 % The data model that is suggested for this type of storage is a normalised approach where data duplication should be reduced.
 
@@ -120,6 +120,7 @@ One of the most popular time series databases is Prometheus which is used to sto
   \item TimescaleDB ( Postgres + Addon ).
   \item Prometheus.
   \item InfluxDB.
+  \item PostgreSQL
 \end{itemize}
 
 \subsection{Document Storage}
@@ -152,6 +153,13 @@ These databases also allow the implementation of graph algorithms to query data.
   \item Janus Graph.
 \end{itemize}
 
+\begin{figure}[h]
+  \href{https://neo4j.com/developer/example-project/}{
+    \includegraphics[width=\textwidth]{images/graph}
+  }
+  \caption{Graph Database Example from the Neo4J documentation.}
+\end{figure}
+
 \section{Enhancing the Todo App with Storage}
 
 Last week we created a simple web server that can listen on a port and respond to HTTP requests. The endpoints that we created are all stubs the return a simple JSON response. This week we will be adding a database to our application to store the todo items.
@@ -174,11 +182,11 @@ We will be using a python library called SQLAlchemy to interact with our databas
   >> pipenv install flask-sqlalchemy
 \end{code}
 
-\subsection{Creating the Database Models}
+\subsection{Creating the Database and Models}
 
 We will be using a database called SQLite for this practical. SQLite is a file based database which is very easy to setup and use. It is also a good choice for development as it can be blown away by simply deleting a file or by residing in memory.
 
-Now that our dependencies are installed, lets start by navigating to our new cloned practical folder and creating a new folder called models. Inside this folder we will create a new file called todo.py and a new file called \texttt{\_\_init\_\_.py}.
+Now that our dependencies are installed, lets start by navigating to our new cloned practical folder and creating a new folder within the todo folder called models. Inside this folder create a new file called todo.py and a new file called \texttt{\_\_init\_\_.py}.
 
 Inside the \texttt{\_\_init\_\_.py} file we will add the following code:
 
@@ -194,15 +202,24 @@ All this file does is setup a new SQLAlchemy object which we will use to interac
   import datetime
   from models import db
 
+  # Inheriting from db.Model tells SQLAlchemy that this class is a model
   class Todo(db.Model):
+
+      # This is how we define a column, this is also the primary key
       id = db.Column(db.Integer, primary_key=True)
+      # This is a manadatory column of 80 characters
       title = db.Column(db.String(80), nullable=False)
+      # This is an optional column of 120 characters
       description = db.Column(db.String(120), nullable=True)
+      # This column has a default value of False
       completed = db.Column(db.Boolean, nullable=False, default=False)
       deadline_at = db.Column(db.DateTime, nullable=True)
+      # This column has a default value which is a function call
       created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+      # This column has a default value which is a function call and also updates on update
       updated_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
+      # This is a helper method to convert the model to a dictionary
       def to_dict(self):
           return {
               'id': self.id,
@@ -214,81 +231,13 @@ All this file does is setup a new SQLAlchemy object which we will use to interac
               'updated_at': self.updated_at.isoformat() if self.updated_at else None,
           }
 
+      # String representation of our model
       def __repr__(self):
-          return f'<Todo {self.title}>'
+          return f'<Todo {self.id} {self.title}>'
 \end{code}
 
-The above code is doing a lot of the heavy lifting for us in our database table generation so lets walk through and see what some of the key lines are doing.
+The above code is doing a lot of the heavy lifting for us in our database table generation, have a look at the comments above to see what each line is doing.
 
-\begin{code}[language=python,numbers=none]{}
-  class Todo(db.Model):
-\end{code}
-
-This line is defining a new class called Todo which inherits from the db.Model class. This class will be used to represent our todo items in our database.
-
-\begin{code}[language=python,numbers=none]{}
-  id = db.Column(db.Integer, primary_key=True)
-\end{code}
-
-This line is defining a new column in our database table called id. The column type is an integer and it is the primary key for the table. As we insert more items into our database, the id will be automatically incremented for us.
-
-\begin{code}[language=python,numbers=none]{}
-  title = db.Column(db.String(80), nullable=False)
-\end{code}
-
-This line is defining a new column in our database table called title. The column type is a string with a maximum length of 80 characters. The nullable parameter is set to false which means that this column cannot be null. Essentially this is a required field.
-
-\begin{code}[language=python,numbers=none]{}
-  description = db.Column(db.String(120), nullable=True)
-\end{code}
-
-This line is defining a new column in our database table called description. The column type is a string with a maximum length of 120 characters. The nullable parameter is set to true which means that this column can be null. Essentially this is an optional field.
-
-\begin{code}[language=python,numbers=none]{}
-  completed = db.Column(db.Boolean, nullable=False, default=False)
-\end{code}
-
-This line is defining a new column in our database table called completed. The column type is a boolean which can be either true or false. The nullable parameter is set to false which means that this column cannot be null. The default parameter is set to false which means that if no value is provided for this column, it will default to false.
-
-\begin{code}[language=python,numbers=none]{}
-  deadline_at = db.Column(db.DateTime, nullable=True)
-\end{code}
-
-This line is defining a new column in our database table called \texttt{deadline\_at}. The column type is a datetime so we can represent the time when the todo is due.
-
-\begin{code}[language=python,numbers=none]{}
-  created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
-\end{code}
-
-This line is defining a new column in our database table called \texttt{created\_at}. The column type is a datetime so we can represent the time when the todo was created. The extra addition here is that the default parameter is a reference to a function called \texttt{utcnow} which will automatically set the value of this column to the current time when the todo is created.
-
-\begin{code}[language=python,numbers=none]{}
-  updated_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
-\end{code}
-
-This line is defining a new column in our database table called \texttt{updated\_at}. The column type is a datetime so we can represent the time when the todo was last updated. The extra addition onupdate parameter is a reference to a function called \texttt{utcnow} which will automatically set the value of this column to the current time when the todo is updated.
-
-\begin{code}[language=python,numbers=none]{}
-  def to_dict(self):
-      return {
-          'id': self.id,
-          'title': self.title,
-          'description': self.description,
-          'completed': self.completed,
-          'deadline_at': self.deadline_at.isoformat() if self.deadline_at else None,
-          'created_at': self.created_at.isoformat() if self.created_at else None,
-          'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-      }
-\end{code}
-
-This is a method on our Todo class which will return a dictionary representation of the todo item. This is useful for when we want to return the todo item as JSON in our API as it deals with converting the datetime objects into a particular string format.
-
-\begin{code}[language=python,numbers=none]{}
-  def __repr__(self):
-      return f'<Todo {self.id} - {self.title}>'
-\end{code}
-
-This is a method on our Todo class which will return a string representation of the todo item. This is useful for debugging purposes as it will print out the ID and title of the Todo.
 
 \subsection{Configuring the Database}
 
@@ -297,7 +246,6 @@ Now that we have defined our database table, we need to configure our applicatio
 \begin{code}[language=python,numbers=none]{}
   from flask import Flask
   from flask_sqlalchemy import SQLAlchemy
-  from flask_migrate import Migrate
 
   def create_app():
       app = Flask(__name__)
@@ -319,7 +267,7 @@ Now that we have defined our database table, we need to configure our applicatio
 
 \end{code}
 
-This will load the models we defined in the previous section and create the database tables for us. We also need to tell our application where the database is located. We can do this by setting the \texttt{SQLALCHEMY\_DATABASE\_URI} config variable. In this case we are using a SQLite database which is a file based database. We can set the location of the database by setting the \texttt{SQLALCHEMY\_DATABASE\_URI} config variable to the path of the database file. In this case we are using a relative path to the \texttt{db.sqlite} file in the root of our project.
+In the above we set a default location for our database. Cause we using sqlite we can set the database to be a file on the file system. In most production cases you will be setting this to a URI that defines the credentials and hostname of your database server. In latter practicals we will be exploring this more but for now we will be using a file based database.
 
 If we run our application now, we will see that the database file has been created for us.
 
@@ -379,7 +327,10 @@ Open the \texttt{todo/views/routes.py} file and change the \texttt{get\_todos} e
   @api.route('/todos', methods=['GET'])
   def get_todos():
       todos = Todo.query.all()
-      return jsonify([todo.to_dict() for todo in todos])
+      result = []
+      for todo in todos:
+          result.append(todo.to_dict())
+      return jsonify(result)
 \end{code}
 
 This will query the database for all the todos and return them as JSON. We can then change the \texttt{get\_todo} endpoint to the following:
@@ -399,7 +350,7 @@ So we have upgraded these endpoints to use the database. Lets test that our appl
   []
 \end{code}
 
-Of course our API does not have any todo items in it yet. Lets add some todo items to our database. Open the \texttt{todo/views/routes.py} file and change the \texttt{create\_todo} endpoint to the following:
+Of course our API does not have any todo items in it yet. Lets enable the ability to add some todo items to our database. Open the \texttt{todo/views/routes.py} file and change the \texttt{create\_todo} endpoint to the following:
 
 \begin{code}[language=python,numbers=none]{}
   @api.route('/todos', methods=['POST'])
@@ -410,7 +361,9 @@ Of course our API does not have any todo items in it yet. Lets add some todo ite
           completed=request.json.get('completed', False),
           deadline_at=request.json.get('deadline_at')
       )
+      # Adds a new record to the database or will update an existing record
       db.session.add(todo)
+      # Commits the changes to the database, this must be called for the changes to be saved
       db.session.commit()
       return make_response(jsonify(todo.to_dict()), 201)
 \end{code}
@@ -429,7 +382,7 @@ This endpoint now lets us create a todo item in the database. Lets test this end
   }
 \end{code}
 
-Now if we go to our \texttt{/todos} endpoint we should see the todo item we just created. You should see the following response:
+Now if we go to our \texttt{/api/v1/todos} endpoint we should see the todo item we just created. You should see the following response:
 
 \begin{code}[language=json,numbers=none]{}
   [
@@ -445,7 +398,7 @@ Now if we go to our \texttt{/todos} endpoint we should see the todo item we just
   ]
 \end{code}
 
-Now lets add the remaining endpoints. Open the \texttt{todo/views/routes.py} file and change the \texttt{update\_todo} endpoint to the following:
+Now lets add the remaining endpoints. Change the \texttt{update\_todo} endpoint to the following:
 
 \begin{code}[language=python,numbers=none]{}
   @api.route('/todos/<int:id>', methods=['PUT'])
@@ -477,7 +430,7 @@ This endpoint will update a todo item in the database. Lets test this endpoint b
 
 \end{code}
 
-The delete endpoint we will write is very similar to the update endpoint. Open the \texttt{todo/views/routes.py} file and change the \texttt{delete\_todo} endpoint to the following:
+To do the delete method we use the delete method on the database session instead of the add method. Open the \texttt{todo/views/routes.py} file and change the \texttt{delete\_todo} endpoint to the following:
 
 \begin{code}[language=python,numbers=none]{}
   @api.route('/todos/<int:id>', methods=['DELETE'])
@@ -525,9 +478,9 @@ In the root folder of this practical make a \texttt{tests} folder. Inside the \t
 \end{code}
 
 
-This base class is what we will use to help setup our tests and provide some helper methods. We will be using the \texttt{unittest} library to write our tests. The \texttt{setUp} method is called before each test and is used to setup the testing environment. The \texttt{assertTodoPartialEqual} method is a helper method that we will use to compare the todo items we get from the API with the todo items we expect to get from the API.
+This base class is what we will use to help setup our tests and provide some helper methods. The \texttt{setUp} method is called before each test and is used to get the in-memory database initialised. The \texttt{assertTodoPartialEqual} method is a helper method that we will use to compare the todo items we get from the API with the todo items we expect to get from the API.
 
-As you can see we have a slight modification to the \texttt{create\_app} function. We are passing in a dictionary of config overrides. This allows us to override the config values for the testing environment. We are overriding the \texttt{SQLALCHEMY\_DATABASE\_URI} to use an in memory database. This means that the database will be created in memory and will be destroyed when the tests are finished. We are also overriding the \texttt{TESTING} config value to be true. This will allow us to use the \texttt{test\_client} method on our app to make requests to our API.
+As you can see we have a slight modification to the \texttt{create\_app} function. We are passing in a dictionary of config overrides. This allows us to override the config values for the testing environment.
 
 \subsection{Prepping the config for testing}
 
@@ -557,7 +510,7 @@ Open the \texttt{todo/\_\_init\_\_.py} file and adjust the \texttt{create\_app} 
 
 \subsection{Writing our first tests}
 
-Now lets write our first tests. Open the \texttt{tests} folder and create a \texttt{test\_health.py} file. Inside the \texttt{test\_health.py} file add the following code:
+Now lets write our first tests. Open the \texttt{tests} folder and create a \texttt{test\_health.py} file. Add the following code:
 
 \begin{code}[language=python,numbers=none]{}
   from tests.base import TodoTest
@@ -565,7 +518,7 @@ Now lets write our first tests. Open the \texttt{tests} folder and create a \tex
   
   class TestHealth(TodoTest):
       def test_health(self):
-          response = self.client.get('/health')
+          response = self.client.get('/api/v1/health')
           self.assertEqual(response.status_code, 200)
           self.assertEqual(response.json, {'status': 'ok'})
 
@@ -632,16 +585,6 @@ To check if the request is a JSON request you can use the following code:
 
 If you get stuck feel free to have a look at the solution in the github repository or ask your peers / staff for help.
 
-\section{[Optional] Setting up Migrations}
-
-\info{
-  The following section is optional and will be covered if there is enough time in the practical. The content here is worth reviewing on your own time especially if you are interested in working with databases in the future or in your future assessment items.
-}
-
-\todo{
-  Setup Flask-Migrate to allow us to manage database migrations.
-}
-
 \section{Finishing Up}
 
 We now have a working API which we can use to create, read, update and delete todo items. We can also use the API to:
@@ -651,6 +594,8 @@ We now have a working API which we can use to create, read, update and delete to
   \item filter todo items by whether they are completed or not
   \item filter todo items by whether they are due before or after a particular date
 \end{itemize}
+
+Next week we will dockerise our API and use docker-compose to run our API and a database in containers.
 
 
 \bibliographystyle{ieeetr}
