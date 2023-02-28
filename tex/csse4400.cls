@@ -143,8 +143,11 @@
 % Misc environments
 \RequirePackage{tcolorbox}
 
+\definecolor{info}{RGB}{135, 206, 235}
 \newcommand{\hint}[1]{
+    \begin{tcolorbox}[title=Hint,colframe=info]
     #1
+    \end{tcolorbox}
 }
 
 % Extra content? Do I use this?
@@ -180,7 +183,6 @@
 }
 
 % Info
-\definecolor{info}{RGB}{135, 206, 235}
 \newcommand\info[1]{
     \begin{tcolorbox}[title=Info,colframe=info]
     #1

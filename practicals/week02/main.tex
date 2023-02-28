@@ -211,43 +211,40 @@ All this file does is setup a new SQLAlchemy object which we will use to interac
 In the \texttt{todo.py} file we will add the following code:
 
 \begin{code}[language=python,numbers=none]{}
-  import datetime
-  from . import db
+import datetime
+from . import db
 
-  # Inheriting from db.Model tells SQLAlchemy that this class is a model
-  class Todo(db.Model):
-      # Sets the tables name from the default
-      __tablename__ = 'todos'
+class Todo(db.Model):
+    __tablename__ = 'todos'
 
-      # This is how we define a column, this is also the primary key
-      id = db.Column(db.Integer, primary_key=True)
-      # This is a manadatory column of 80 characters
-      title = db.Column(db.String(80), nullable=False)
-      # This is an optional column of 120 characters
-      description = db.Column(db.String(120), nullable=True)
-      # This column has a default value of False
-      completed = db.Column(db.Boolean, nullable=False, default=False)
-      deadline_at = db.Column(db.DateTime, nullable=True)
-      # This column has a default value which is a function call
-      created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
-      # This column has a default value which is a function call and also updates on update
-      updated_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    # This is how we define a column, this is also the primary key
+    id = db.Column(db.Integer, primary_key=True)
+    # This is a manadatory column of 80 characters
+    title = db.Column(db.String(80), nullable=False)
+    # This is an optional column of 120 characters
+    description = db.Column(db.String(120), nullable=True)
+    # This column has a default value of False
+    completed = db.Column(db.Boolean, nullable=False, default=False)
+    deadline_at = db.Column(db.DateTime, nullable=True)
+    # This column has a default value which is a function call
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    # This column has a default value which is a function call and also updates on update
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    
+    # This is a helper method to convert the model to a dictionary
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'completed': self.completed,
+            'deadline_at': self.deadline_at.isoformat() if self.deadline_at else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+        }
 
-      # This is a helper method to convert the model to a dictionary
-      def to_dict(self):
-          return {
-              'id': self.id,
-              'title': self.title,
-              'description': self.description,
-              'completed': self.completed,
-              'deadline_at': self.deadline_at.isoformat() if self.deadline_at else None,
-              'created_at': self.created_at.isoformat() if self.created_at else None,
-              'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-          }
-
-      # String representation of our model
-      def __repr__(self):
-          return f'<Todo {self.id} {self.title}>'
+    def __repr__(self):
+        return f'<Todo {self.id} {self.title}>'
 \end{code}
 
 The above code is doing a lot of the heavy lifting for us in our database table generation,
@@ -261,30 +258,31 @@ we need to configure our application to use the database.
 Open the \texttt{todo/\_\_init\_\_.py} file and change the code to the following:
 
 \begin{code}[language=python,numbers=none]{}
-  from flask import Flask
-  from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
-  def create_app():
-      app = Flask(__name__)
+def create_app():
+    app = Flask(__name__)
 
-      app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///db.sqlite"
+    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///db.sqlite"
+    if config_overrides:
+        app.config.update(config_overrides)
 
-      # Load the models
-      from todo.models import db
-      from todo.models.todo import Todo
-      db.init_app(app)
+    # Load the models
+    from todo.models import db
+    from todo.models.todo import Todo
+    db.init_app(app)
 
-      # Create the database tables
-      with app.app_context():
+    # Create the database tables
+    with app.app_context():
         db.create_all()
         db.session.commit()
 
-      # Register the blueprints
-      from todo.views.routes import api
-      app.register_blueprint(api)
+    # Register the blueprints
+    from todo.views.routes import api
+    app.register_blueprint(api)
 
-      return app
-
+    return app
 \end{code}
 
 In the above we set a default location, defined as a URI, for our database.
@@ -295,7 +293,7 @@ In latter practicals, we will get experience using more complex URIs.
 If we run our application now, we will see that the database file has been created for us.
 Your project structure should have a least the follow structure (there may be additional files):
 
-\begin{alltt}
+\begin{code}[language=bash,numbers=none]{}
 -- README.md
 -- Pipfile
 -- Pipfile.lock
@@ -309,7 +307,7 @@ Your project structure should have a least the follow structure (there may be ad
   | -- models
       | -- __init__.py
       | -- todo.py
-\end{alltt}
+\end{code}
 
 \subsection{Inspecting the Database}
 
@@ -363,33 +361,34 @@ we will modify our endpoints to take advantage of it.
 Open the \texttt{todo/views/routes.py} file and add the following imports to the top of the file:
 
 \begin{code}[language=python,numbers=none]{}
-  from flask import Blueprint, jsonify, request
-  from todo.models import db
-  from todo.models.todo import Todo
+from flask import Blueprint, jsonify, request
+from todo.models import db
+from todo.models.todo import Todo
+from datetime import datetime
 \end{code}
 
 Open the \texttt{todo/views/routes.py} file and change the \texttt{get\_todos} endpoint to the following:
 
 \begin{code}[language=python,numbers=none]{}
-  @api.route('/todos', methods=['GET'])
-  def get_todos():
-      todos = Todo.query.all()
-      result = []
-      for todo in todos:
-          result.append(todo.to_dict())
-      return jsonify(result)
+@api.route('/todos', methods=['GET'])
+def get_todos():
+    todos = Todo.query.all()
+    result = []
+    for todo in todos:
+        result.append(todo.to_dict())
+    return jsonify(result)
 \end{code}
 
 This will query the database for all the todos and return them as JSON.
 We can then change the \texttt{get\_todo} endpoint to the following:
 
 \begin{code}[language=python,numbers=none]{}
-  @api.route('/todos/<int:id>', methods=['GET'])
-  def get_todo(id):
-      todo = Todo.query.get(id)
-      if todo is None:
-          return jsonify({'error': 'Todo not found'}), 404
-      return jsonify(todo.to_dict())
+@api.route('/todos/<int:todo_id>', methods=['GET'])
+def get_todo(todo_id):
+    todo = Todo.query.get(todo_id)
+    if todo is None:
+        return jsonify({'error': 'Todo not found'}), 404
+    return jsonify(todo.to_dict())
 \end{code}
 
 Now we have modified these endpoints to use the database --- let's test that our application is still functioning correctly.
@@ -405,19 +404,21 @@ We will now add the ability to insert todo items to our database.
 Open the \texttt{todo/views/routes.py} file and change the \texttt{create\_todo} endpoint to the following:
 
 \begin{code}[language=python,numbers=none]{}
-  @api.route('/todos', methods=['POST'])
-  def create_todo():
-      todo = Todo(
-          title=request.json.get('title'),
-          description=request.json.get('description'),
-          completed=request.json.get('completed', False),
-          deadline_at=request.json.get('deadline_at')
-      )
-      # Adds a new record to the database or will update an existing record
-      db.session.add(todo)
-      # Commits the changes to the database, this must be called for the changes to be saved
-      db.session.commit()
-      return jsonify(todo.to_dict()), 201
+@api.route('/todos', methods=['POST'])
+def create_todo():
+    todo = Todo(
+        title=request.json.get('title'),
+        description=request.json.get('description'),
+        completed=request.json.get('completed', False),
+    )
+    if 'deadline_at' in request.json:
+        todo.deadline_at = datetime.fromisoformat(request.json.get('deadline_at'))
+
+    # Adds a new record to the database or will update an existing record
+    db.session.add(todo)
+    # Commits the changes to the database, this must be called for the changes to be saved
+    db.session.commit()
+    return jsonify(todo.to_dict()), 201
 \end{code}
 
 This endpoint now allows us create a todo item in the database.
@@ -456,18 +457,19 @@ Now let's add the remaining endpoints.
 Change the \texttt{update\_todo} endpoint to the following:
 
 \begin{code}[language=python,numbers=none]{}
-  @api.route('/todos/<int:id>', methods=['PUT'])
-  def update_todo(id):
-      todo = Todo.query.get(id)
-      if todo is None:
-          return jsonify({'error': 'Todo not found'}), 404
-      todo.title = request.json.get('title', todo.title)
-      todo.description = request.json.get('description', todo.description)
-      todo.completed = request.json.get('completed', todo.completed)
-      todo.deadline_at = request.json.get('deadline_at', todo.deadline_at)
-      db.session.commit()
-      return jsonify(todo.to_dict())
+@api.route('/todos/<int:todo_id>', methods=['PUT'])
+def update_todo(todo_id):
+    todo = Todo.query.get(todo_id)
+    if todo is None:
+        return jsonify({'error': 'Todo not found'}), 404
 
+    todo.title = request.json.get('title', todo.title)
+    todo.description = request.json.get('description', todo.description)
+    todo.completed = request.json.get('completed', todo.completed)
+    todo.deadline_at = request.json.get('deadline_at', todo.deadline_at)
+    db.session.commit()
+
+    return jsonify(todo.to_dict())
 \end{code}
 
 This endpoint will update a todo item in the database.
@@ -491,16 +493,15 @@ To implement delete functionalitty, we will use the HTTP DELETE method and the d
 Open the \texttt{todo/views/routes.py} file and change the \texttt{delete\_todo} endpoint to the following:
 
 \begin{code}[language=python,numbers=none]{}
-  @api.route('/todos/<int:id>', methods=['DELETE'])
-  def delete_todo(id):
-      todo = Todo.query.get(id)
-      if todo is None:
-          return jsonify({}), 200
+@api.route('/todos/<int:todo_id>', methods=['DELETE'])
+def delete_todo(todo_id):
+    todo = Todo.query.get(todo_id)
+    if todo is None:
+        return jsonify({}), 200
 
-      db.session.delete(todo)
-      db.session.commit()
-      return jsonify(todo.to_dict()), 200
-
+    db.session.delete(todo)
+    db.session.commit()
+    return jsonify(todo.to_dict()), 200
 \end{code}
 
 We now have a set of endpoints that can perform the CRUD operations of our API but some functionality is missing.
@@ -528,11 +529,6 @@ Inside the \texttt{tests} folder create a \texttt{base.py} file. Inside the \tex
               'TESTING': True
           })
   
-          with self.app.app_context():
-              from todo.models import db
-              db.create_all()
-              db.session.commit()
-          
           self.client = self.app.test_client()
   
       def assertDictSubset(self, expected_subset: dict, whole: dict):
