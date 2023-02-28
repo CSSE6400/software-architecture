@@ -3,6 +3,7 @@
 % \teachermodetrue
 
 \usepackage{float}
+\usepackage{alltt}
 
 \usepackage{languages}
 
@@ -139,8 +140,9 @@ One advantage of document databases is that they match a programmers existing me
 \subsection{Graph Storage}
 
 \teacher{
-  If you havnt experienced graph databases, a good usecase is ``recommendation systems'',
-  which use the connected nature of items to figure out what to suggest to a person.Another example is the \url{https://neo4j.com/blog/analyzing-panama-papers-neo4j/}
+  If you haven't experienced graph databases, a good usecase is ``recommendation systems'',
+  which use the connected nature of items to figure out what to suggest to a person.
+  Another example is the \url{https://neo4j.com/blog/analyzing-panama-papers-neo4j/}
   Panama Papers.
 }
 
@@ -162,31 +164,40 @@ These databases also allow the implementation of graph algorithms to query data.
 
 \section{Enhancing the Todo App with Storage}
 
-Last week we created a simple web server that can listen on a port and respond to HTTP requests. The endpoints that we created are all stubs the return a simple JSON response. This week we will be adding a database to our application to store the todo items.
+Last week we created a simple web server that can listen on a port and respond to HTTP requests.
+The endpoints that we created are all stubs the return a hardcoded JSON response.
+This week we will add a database to our application to support persistent storage.
 
 \subsection{Creating a Practical Repository}
-Navigate to the GitHub Classroom link provided by your tutor.
-You should see a list of practicals, click on the week one practical.
-This will create a new repository for you in the course organisation.
+Navigate to the GitHub Classroom link for this practical provided by your tutor in Slack.
+As with last week, this will create a new repository for you in the course organisation.
 You can now clone this repository to your local machine or work directly in the browser with GitHub codespaces.
+This repository will be populated with our solution to last weeks practical exercise.
+You may modify this solution or replace it with your own.
 
-\info{
-  If using Github CodeSpaces the environment will be pre-installed with the libraries you used last week. You will still need to follow on with the instructions below to install the database libraries.
-}
+% \info{
+%   If using Github CodeSpaces the environment will be pre-installed with the libraries you used last week.
+%   You will still need to follow on with the instructions below to install the database libraries.
+% }
 
 \subsection{Installing the Database Dependencies}
 
-We will be using a python library called SQLAlchemy to interact with our database. This library abstracts the low level SQL queries away from us and allows us to interact with the database using python objects. We will be using SQLAlchemy using a packaged called Flask-SQLAlchemy which is a wrapper around SQLAlchemy that is designed to work with Flask our WebServer library.
+We will be using a Python library called SQLAlchemy to interact with our database.
+This library abstracts the SQL queries away and allows us to interact with the database using Python objects.
+We will be using SQLAlchemy using a package called Flask-SQLAlchemy, a wrapper around SQLAlchemy,
+that is designed to work with Flask our WebServer library.
 
-\begin{code}[language=bash,numbers=none]{}
-  >> pipenv install flask-sqlalchemy
-\end{code}
+\bash{pipenv install flask-sqlalchemy}
 
 \subsection{Creating the Database and Models}
 
-We will be using a database called SQLite for this practical. SQLite is a file based database which is very easy to setup and use. It is also a good choice for development as it can be blown away by simply deleting a file or by residing in memory.
+We will be using a database called SQLite for this practical.
+SQLite is a file-based database which is easy to setup and use.
+As the database is isolated to a file, SQLite is a good choice for initial development.
 
-Now that our dependencies are installed, lets start by navigating to our new cloned practical folder and creating a new folder within the todo folder called models. Inside this folder create a new file called todo.py and a new file called \texttt{\_\_init\_\_.py}.
+Now that our dependencies are installed,
+navigate to the cloned practical directory and create a new folder within the todo folder called \texttt{models}.
+Inside this folder create a new file called \texttt{todo.py} and a new file called \texttt{\_\_init\_\_.py}.
 
 Inside the \texttt{\_\_init\_\_.py} file we will add the following code:
 
@@ -196,14 +207,17 @@ Inside the \texttt{\_\_init\_\_.py} file we will add the following code:
   db = SQLAlchemy()
 \end{code}
 
-All this file does is setup a new SQLAlchemy object which we will use to interact with our database. In the \texttt{todo.py} file we will add the following code:
+All this file does is setup a new SQLAlchemy object which we will use to interact with our database.
+In the \texttt{todo.py} file we will add the following code:
 
 \begin{code}[language=python,numbers=none]{}
   import datetime
-  from models import db
+  from . import db
 
   # Inheriting from db.Model tells SQLAlchemy that this class is a model
   class Todo(db.Model):
+      # Sets the tables name from the default
+      __tablename__ = 'todos'
 
       # This is how we define a column, this is also the primary key
       id = db.Column(db.Integer, primary_key=True)
@@ -236,12 +250,15 @@ All this file does is setup a new SQLAlchemy object which we will use to interac
           return f'<Todo {self.id} {self.title}>'
 \end{code}
 
-The above code is doing a lot of the heavy lifting for us in our database table generation, have a look at the comments above to see what each line is doing.
+The above code is doing a lot of the heavy lifting for us in our database table generation,
+have a look at the comments above to see what each line is doing.
 
 
 \subsection{Configuring the Database}
 
-Now that we have defined our database table, we need to configure our application to use the database. Open the \texttt{todo/\_\_init\_\_.py} file and change the code to the following:
+Now that we have defined our database schema using an ORM,
+we need to configure our application to use the database.
+Open the \texttt{todo/\_\_init\_\_.py} file and change the code to the following:
 
 \begin{code}[language=python,numbers=none]{}
   from flask import Flask
@@ -254,10 +271,13 @@ Now that we have defined our database table, we need to configure our applicatio
 
       # Load the models
       from todo.models import db
+      from todo.models.todo import Todo
       db.init_app(app)
 
       # Create the database tables
-      db.create_all()
+      with app.app_context():
+        db.create_all()
+        db.session.commit()
 
       # Register the blueprints
       from todo.views.routes import api
@@ -267,56 +287,83 @@ Now that we have defined our database table, we need to configure our applicatio
 
 \end{code}
 
-In the above we set a default location for our database. Cause we using sqlite we can set the database to be a file on the file system. In most production cases you will be setting this to a URI that defines the credentials and hostname of your database server. In latter practicals we will be exploring this more but for now we will be using a file based database.
+In the above we set a default location, defined as a URI, for our database.
+As we using SQLite we can set the database to be a file on the file system.
+In production systems, you would set this to a URI that defines the credentials and hostname of your database server.
+In latter practicals, we will get experience using more complex URIs.
 
 If we run our application now, we will see that the database file has been created for us.
+Your project structure should have a least the follow structure (there may be additional files):
 
-\todo{
-  Add a screenshot of the database file being created.
-}
+\begin{alltt}
+-- README.md
+-- Pipfile
+-- Pipfile.lock
+-- endpoints.http
+-- instance
+  | -- db.sqlite
+-- todo
+  | -- __init__.py
+  | -- views
+      | -- routes.py
+  | -- models
+      | -- __init__.py
+      | -- todo.py
+\end{alltt}
 
 \subsection{Inspecting the Database}
 
-We can use the \texttt{sqlite3} command line tool to inspect the database. Open a terminal and navigate to the root of your project. Then run the following command:
+We can use the \texttt{sqlite3} command line tool to inspect the database.
+Open a terminal and navigate to the root of your project.
+Then run the following command:
 
-\begin{code}[language=bash,numbers=none]{}
-  sqlite3 db.sqlite
-\end{code}
+\bash{sqlite3 instance/db.sqlite}
 
-This will open the SQLite command line tool and connect to the database file. We can then run the following command to see the tables in our database:
+\info{
+  Most platforms including MacOS, WSL2, and most Linux environments come with SQLite installed.
+  If you get an error running the above command, you may have to install SQLite.
+}
+
+This will open the SQLite command line tool and connect to the database file.
+We can then run the following command to see the tables in our database:
 
 \begin{code}[language=sql,numbers=none]{}
   .tables
 \end{code}
 
-This will show us the tables in our database. We can then run the following command to see the columns in our table:
+This will show us the tables in our database.
+We can then run the following command to see the schema of our table:
 
 \begin{code}[language=sql,numbers=none]{}
   .schema todos
 \end{code}
 
-This will show us the columns in our table. We can then run the following command to see the data in our table:
+This will show us the columns in our table.
+We can then run the following command to see the data in our table:
 
 \begin{code}[language=sql,numbers=none]{}
   SELECT * FROM todos;
 \end{code}
 
-This will show us the data in our table. We can then run the following command to exit the SQLite command line tool:
+This should initially show us no rows.
+We can then run the following command to exit the SQLite command line tool:
 
 \begin{code}[language=sql,numbers=none]{}
   .exit
 \end{code}
 
-You may have noticed that our table is called todos and not todo. This is because SQLAlchemy will automatically pluralise the name of the table for us. This is a common behaviour you will see many database libraries.
+You should notice that our table is called todos and not todo because we specified todos with the \texttt{\_\_tablename\_\_} attribute.
 
 
 \subsection{Using the Database}
 
-Now that we have a database intergrated into our application, lets modify our endpoints to take advantage of it. 
+Now that we have a database intergrated into our application,
+we will modify our endpoints to take advantage of it. 
 
 Open the \texttt{todo/views/routes.py} file and add the following imports to the top of the file:
 
 \begin{code}[language=python,numbers=none]{}
+  from flask import Blueprint, jsonify, request
   from todo.models import db
   from todo.models.todo import Todo
 \end{code}
@@ -333,24 +380,29 @@ Open the \texttt{todo/views/routes.py} file and change the \texttt{get\_todos} e
       return jsonify(result)
 \end{code}
 
-This will query the database for all the todos and return them as JSON. We can then change the \texttt{get\_todo} endpoint to the following:
+This will query the database for all the todos and return them as JSON.
+We can then change the \texttt{get\_todo} endpoint to the following:
 
 \begin{code}[language=python,numbers=none]{}
   @api.route('/todos/<int:id>', methods=['GET'])
   def get_todo(id):
       todo = Todo.query.get(id)
       if todo is None:
-          return make_response(jsonify({'error': 'Todo not found'}, 404)
-      return make_response(jsonify(todo.to_dict()))
+          return jsonify({'error': 'Todo not found'}), 404
+      return jsonify(todo.to_dict())
 \end{code}
 
-So we have upgraded these endpoints to use the database. Lets test that our application is still functioning correctly. Restart your webserver and navigate to the \texttt{/todos} endpoint. You should see the following JSON response:
+Now we have modified these endpoints to use the database --- let's test that our application is still functioning correctly.
+Restart your webserver and navigate to the \texttt{/api/v1/todos} endpoint.
+You should see the following JSON response:
 
 \begin{code}[language=json,numbers=none]{}
   []
 \end{code}
 
-Of course our API does not have any todo items in it yet. Lets enable the ability to add some todo items to our database. Open the \texttt{todo/views/routes.py} file and change the \texttt{create\_todo} endpoint to the following:
+Of course our API does not have any todo items in it yet.
+We will now add the ability to insert todo items to our database.
+Open the \texttt{todo/views/routes.py} file and change the \texttt{create\_todo} endpoint to the following:
 
 \begin{code}[language=python,numbers=none]{}
   @api.route('/todos', methods=['POST'])
@@ -365,10 +417,12 @@ Of course our API does not have any todo items in it yet. Lets enable the abilit
       db.session.add(todo)
       # Commits the changes to the database, this must be called for the changes to be saved
       db.session.commit()
-      return make_response(jsonify(todo.to_dict()), 201)
+      return jsonify(todo.to_dict()), 201
 \end{code}
 
-This endpoint now lets us create a todo item in the database. Lets test this endpoint by going to our endpoints.http and running the POST request. You should see the following response:
+This endpoint now allows us create a todo item in the database.
+Test this endpoint by going to endpoints.http (or your API query tool of choice) and running the POST request.
+You should see the following response (with different created\_at and updated\_at values):
 
 \begin{code}[language=json,numbers=none]{}
   {
@@ -382,7 +436,7 @@ This endpoint now lets us create a todo item in the database. Lets test this end
   }
 \end{code}
 
-Now if we go to our \texttt{/api/v1/todos} endpoint we should see the todo item we just created. You should see the following response:
+Now if we go to our \texttt{/api/v1/todos} endpoint we should see the todo item we just created:
 
 \begin{code}[language=json,numbers=none]{}
   [
@@ -398,24 +452,27 @@ Now if we go to our \texttt{/api/v1/todos} endpoint we should see the todo item 
   ]
 \end{code}
 
-Now lets add the remaining endpoints. Change the \texttt{update\_todo} endpoint to the following:
+Now let's add the remaining endpoints.
+Change the \texttt{update\_todo} endpoint to the following:
 
 \begin{code}[language=python,numbers=none]{}
   @api.route('/todos/<int:id>', methods=['PUT'])
   def update_todo(id):
       todo = Todo.query.get(id)
       if todo is None:
-          return make_response(jsonify({'error': 'Todo not found'}, 404)
+          return jsonify({'error': 'Todo not found'}), 404
       todo.title = request.json.get('title', todo.title)
       todo.description = request.json.get('description', todo.description)
       todo.completed = request.json.get('completed', todo.completed)
       todo.deadline_at = request.json.get('deadline_at', todo.deadline_at)
       db.session.commit()
-      return make_response(jsonify(todo.to_dict()))
+      return jsonify(todo.to_dict())
 
 \end{code}
 
-This endpoint will update a todo item in the database. Lets test this endpoint by going to our endpoints.http and running the PUT request. You should see the following response:
+This endpoint will update a todo item in the database.
+Let's test this endpoint by going to our endpoints.http and running the PUT request.
+You should see the following response:
 
 \begin{code}[language=json,numbers=none]{}
   {
@@ -430,28 +487,34 @@ This endpoint will update a todo item in the database. Lets test this endpoint b
 
 \end{code}
 
-To do the delete method we use the delete method on the database session instead of the add method. Open the \texttt{todo/views/routes.py} file and change the \texttt{delete\_todo} endpoint to the following:
+To implement delete functionalitty, we will use the HTTP DELETE method and the delete .method of the database session.
+Open the \texttt{todo/views/routes.py} file and change the \texttt{delete\_todo} endpoint to the following:
 
 \begin{code}[language=python,numbers=none]{}
   @api.route('/todos/<int:id>', methods=['DELETE'])
   def delete_todo(id):
       todo = Todo.query.get(id)
       if todo is None:
-          return make_response(jsonify(), 200)
+          return jsonify({}), 200
 
       db.session.delete(todo)
       db.session.commit()
-      return make_response(jsonify({'message': 'Todo deleted'}), 200)
+      return jsonify(todo.to_dict()), 200
 
 \end{code}
 
-We now have a set of endpoints that can perform the CRUD operations of our API but some functionality is missing. We are gonna add that functionality after writing some tests to help us do \textbf{Test Driven Development}.
+We now have a set of endpoints that can perform the CRUD operations of our API but some functionality is missing.
+We are gonna add that functionality after setting up some tests to help us do \textbf{Test Driven Development}.
 
 \section{Testing the API}
 
 \subsection{Setting up the testing environment}
 
-In the root folder of this practical make a \texttt{tests} folder. Inside the \texttt{tests} folder create a \texttt{base.py} file. Inside the \texttt{base.py} file add the following code:
+In the project, you will have a \texttt{tests} folder.
+This contains \texttt{test\_todo.py} which has a range of provided tests for the todo endpoints.
+However, we need to setup a few components to make it work.
+
+Inside the \texttt{tests} folder create a \texttt{base.py} file. Inside the \texttt{base.py} file add the following code:
 
 \begin{code}[language=python,numbers=none]{}
   from todo import create_app
@@ -472,15 +535,19 @@ In the root folder of this practical make a \texttt{tests} folder. Inside the \t
           
           self.client = self.app.test_client()
   
-      def assertTodoPartialEqual(self, todo: dict, expected: dict):
-          for key, value in expected.items():
-              self.assertEqual(todo[key], value)
+      def assertDictSubset(self, expected_subset: dict, whole: dict):
+          for key, value in expected_subset.items():
+              self.assertEqual(whole[key], value)
 \end{code}
 
 
-This base class is what we will use to help setup our tests and provide some helper methods. The \texttt{setUp} method is called before each test and is used to get the in-memory database initialised. The \texttt{assertTodoPartialEqual} method is a helper method that we will use to compare the todo items we get from the API with the todo items we expect to get from the API.
+This base class is what we will use to help setup our tests and provide an assertion helper method.
+The \texttt{setUp} method is called before each test and is used to initialise the in-memory database.
+The \texttt{assertDictSubset} method is a helper method that we will use to compare the todo items we get from the API with the todo items we expect to get from the API.
 
-As you can see we have a slight modification to the \texttt{create\_app} function. We are passing in a dictionary of config overrides. This allows us to override the config values for the testing environment.
+As you can see we use a slight modification to the \texttt{create\_app} function.
+We are passing in a dictionary of config overrides.
+This allows us to override the config values for the testing environment.
 
 \subsection{Prepping the config for testing}
 
@@ -489,28 +556,33 @@ Open the \texttt{todo/\_\_init\_\_.py} file and adjust the \texttt{create\_app} 
 \begin{code}[language=python,numbers=none]{}
   def create_app(config_overrides=None):
       app = Flask(__name__)
-
+  
       app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///db.sqlite"
       if config_overrides:
           app.config.update(config_overrides)
-
+          
       # Load the models
       from todo.models import db
+      from todo.models.todo import Todo
       db.init_app(app)
-
+  
       # Create the database tables
-      db.create_all()
-
+      with app.app_context():
+          db.create_all()
+          db.session.commit()
+  
       # Register the blueprints
-      from todo.views.routes import api
+      from .views.routes import api
       app.register_blueprint(api)
-
+  
       return app
 \end{code}
 
 \subsection{Writing our first tests}
 
-Now lets write our first tests. Open the \texttt{tests} folder and create a \texttt{test\_health.py} file. Add the following code:
+Now we will write our first tests.
+Open the \texttt{tests} folder and create a \texttt{test\_health.py} file.
+Add the following code:
 
 \begin{code}[language=python,numbers=none]{}
   from tests.base import TodoTest
@@ -524,16 +596,20 @@ Now lets write our first tests. Open the \texttt{tests} folder and create a \tex
 
 \end{code}
 
-This test will make a GET request to the \texttt{/health} endpoint and check that the response is a 200 status code and that the response is a JSON object with the key \texttt{status} and the value \texttt{ok}. To run this test stop your server if it is running and run the following command:
+This test will make a GET request to the \texttt{/api/v1/health} endpoint and check 
+\begin{itemize}
+  \item that the response is a 200 status code; and
+  \item that the response is a JSON object with the key \texttt{status} and the value \texttt{ok}.
+\end{itemize}
 
-\begin{code}[language=bash,numbers=none]{}
-  pipenv run python3 -m unittest discover -s tests
-\end{code}
+To run this test stop your server, if it is running, and run the following command:
+
+\bash{pipenv run python3 -m unittest tests/test_health.py}
 
 You should see the following output:
 
 \begin{code}[language=bash,numbers=none]{}
-  $ pipenv run python3 -m unittest discover -s tests
+  >> pipenv run python3 -m unittest tests/test_health.py
   ....
   ----------------------------------------------------------------------
   Ran 1 tests in 0.011s
@@ -541,62 +617,37 @@ You should see the following output:
   OK
 \end{code}
 
-One endpoint down, lets write a test for post todo endpoint. Open the \texttt{tests} folder and create a \texttt{test\_todos.py} file. Inside the \texttt{test\_todos.py} file add the following code:
-
-\begin{code}[language=python,numbers=none]{}
-  from tests.base import TodoTest
-  
-  
-  class TestTodos(TodoTest):
-      def test_create_todo(self):
-          response = self.client.post('/api/v1/todos', json={
-              'title': 'Test Todo',
-              'description': 'Test Description',
-          })
-          self.assertEqual(response.status_code, 201)
-          self.assertTodoPartialEqual(response.json, {
-              'title': 'Test Todo',
-              'description': 'Test Description',
-          })
-\end{code}
-
-Now when we run our tests we should see the following output:
-
-\begin{code}[language=bash,numbers=none]{}
-  $ pipenv run python3 -m unittest discover -s tests
-  ....
-  ----------------------------------------------------------------------
-  Ran 2 tests in 0.012s
-
-  OK
-
-\end{code}
-
 \subsection{Test Driven Development}
 
-We have provided a selection of tests in the github repository which you can now copy into your project. These tests are made from the specification, we would like you to change your API to make the tests pass. To give you a hand here are some hints:
+Now you've created a test for the health endpoint and run it.
+To run the suite of provided tests,
+use the following command:
 
-To check if the request is a JSON request you can use the following code:
+\bash{pipenv run python3 -m unittest discover -s tests}
 
-\begin{code}[language=python,numbers=none]{}
-  if not request.is_json:
-      return make_response(jsonify({'error': 'invalid content type'}), 400)
-\end{code}
+If you've used only the code we've provided,
+you should see some of the tests fail.
 
-If you get stuck feel free to have a look at the solution in the github repository or ask your peers / staff for help.
+The tests are based on the specification from week one,
+we would like you to change your API to make the tests pass.
+
+\hint{
+To check if the request is a JSON request you can use the \texttt{request.is\_json} method.
+}
+
+If you get stuck feel free to ask your peers / staff for help.
 
 \section{Finishing Up}
 
-We now have a working API which we can use to create, read, update and delete todo items. We can also use the API to:
-
+We now have a working API which we can use to create, read, update, and delete todo items.
+We can also use the API to:
 \begin{itemize}
-  \item mark todo items as completed
-  \item filter todo items by whether they are completed or not
-  \item filter todo items by whether they are due before or after a particular date
+  \item mark todo items as completed;
+  \item filter todo items by whether they are completed or not; and
+  \item filter todo items by whether they are within the next N days.
 \end{itemize}
 
-Next week we will dockerise our API and use docker-compose to run our API and a database in containers.
-
+Next week we will dockerise our API and use docker-compose to run our API and a database within containers.
 
 \bibliographystyle{ieeetr}
 \bibliography{books,ours}
