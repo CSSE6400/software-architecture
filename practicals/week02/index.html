@@ -1,4 +1,4 @@
-Last Updated on 2023/02/25      
+Last Updated on 2023/02/28      
 
 <?xml version="1.0" encoding="iso-8859-1" ?> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
@@ -6,7 +6,7 @@ Last Updated on 2023/02/25
 <!--http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd-->  
 <html xmlns="http://www.w3.org/1999/xhtml"  
 > 
-<head> <title>TLDR of Databases in Applications</title> 
+<head> <title>Databases in Applications</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> 
 <meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
 <meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
@@ -21,8 +21,8 @@ dl dd {text-align: left}</style>
 >
    <div class="maketitle"><a 
  id="Q1-1-1"></a>
-_________________________________________________________________________________________________ <h2 class="titleHead">TLDR
-of Databases in Applications</h2>                                                      Software Architecture
+_________________________________________________________________________________________________
+<h2 class="titleHead">Databases in Applications</h2>                                                           Software Architecture
    <div class="date" >March 6, 2023</div>                                                                                                                              <div class="author" >Brae Webb &amp; Evan
 Hughes</div>
 _____________________________________________________________________________________________
@@ -51,18 +51,15 @@ href="#Xdata-intensive">1</a>]</span>.</span></div><!--tex4ht:label?: x1-2r1 -->
 <!--l. 25--><p class="noindent" >This week our goal is to: </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 27--><p class="noindent" >explore the various techniques developers use to store data;
+      <!--l. 27--><p class="noindent" >explore the various techniques developers use to store data; and
       </p></li>
       <li class="itemize">
-      <!--l. 28--><p class="noindent" >investigate the storage options implementing these techniques on the AWS platform;
-      </p></li>
-      <li class="itemize">
-      <!--l. 29--><p class="noindent" >upgrade our todo application to use a relational database;</p></li></ul>
-<!--l. 32--><p class="noindent" >
-</p>
+      <!--l. 29--><p class="noindent" >upgrade our todo application to use a sqlite relational database.</p></li></ul>
+                                                                                                    
+                                                                                                    
    <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
  id="x1-20002"></a>Databases and Data Models</h3>
-<!--l. 33--><p class="noindent" >Unfortunately, to build interesting software we often need to store and use data. The storage of data introduces a
+<!--l. 35--><p class="noindent" >Unfortunately, to build interesting software we often need to store and use data. The storage of data introduces a
 number of challenges when designing, creating, and maintaining our software. However, not all data storage
 techniques are created equal; the choice of data storage model can have a profound impact on our
 software&#8217;s complexity and maintainability. In this practical, we want to take a superficial exploration of
@@ -71,171 +68,174 @@ outside the scope of this course, see Chapter 2 of the <span
 class="Cabin-Italic-tlf-t1-x-x-120">Designing Data-Intensive Applications </span>book
 <span class="cite">[<a 
 href="#Xdata-intensive">1</a>]</span>.
-</p><!--l. 49--><p class="noindent" >
+</p><!--l. 51--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.1    </span> <a 
  id="x1-30002.1"></a>Relational Storage</h4>
-<!--l. 51--><p class="noindent" >Relational databases what have been exposed to the most in your University career &#8212; think MySQL, Postgres,
+<!--l. 53--><p class="noindent" >Relational databases what have been exposed to the most in your University career &#8212; think MySQL, Postgres,
 Oracle DB, etc. This type of database is good at modelling the real world which is often a highly connected
 environment.
-</p><!--l. 55--><p class="indent" >   Some popular offerings are below:
+</p><!--l. 57--><p class="indent" >   Some popular offerings are below:
 </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 58--><p class="noindent" >MySQL/MariaDB [ Amazon RDS / Amazon Aurora ].
+      <!--l. 60--><p class="noindent" >MySQL/MariaDB [ Amazon RDS / Amazon Aurora ].
       </p></li>
       <li class="itemize">
-      <!--l. 59--><p class="noindent" >Postgres [ Amazon RDS / Amazon Aurora ].</p></li></ul>
-                                                                                                    
-                                                                                                    
-<!--l. 62--><p class="indent" >   The AWS offerings of these services come in two different types, we have the traditional approach of
+      <!--l. 61--><p class="noindent" >Postgres [ Amazon RDS / Amazon Aurora ].
+      </p></li>
+      <li class="itemize">
+      <!--l. 62--><p class="noindent" >SQLite.</p></li></ul>
+<!--l. 65--><p class="indent" >   The AWS offerings of these services come in two different types, we have the traditional approach of
 server capacity ( x cores, y ram ) and we have a server-less approach. The server-less approach is a
 more dynamic database that can scale to large amounts of load when needed though at a cost per
 request.
-</p><!--l. 67--><p class="noindent" >
+</p><!--l. 70--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">2.1.1    </span> <a 
  id="x1-40002.1.1"></a>ORM</h5>
-<!--l. 68--><p class="noindent" >Object Relational Mapping (ORM) is a fairly common tool for programmers to use to make developing with
+<!--l. 71--><p class="noindent" >Object Relational Mapping (ORM) is a fairly common tool for programmers to use to make developing with
 databases smoother. One fairly prevalent example of this is SQLAlchemy which is a very widely used database
 abstraction for python. SQLAlchemy allows us to move to a higher level of abstraction than SQL queries and
 perform database actions using standard python code.
-</p><!--l. 73--><p class="indent" >   The benefits of ORMs are the ability to model database objects in our existing programming language instead
+</p><!--l. 76--><p class="indent" >   The benefits of ORMs are the ability to model database objects in our existing programming language instead
 of having large blocks of SQL text within our source code. The disadvantages come in when we need to do specific
 SQL work or where the abstractions cost is greater than the benefits.
-</p><!--l. 76--><p class="noindent" >
+                                                                                                    
+                                                                                                    
+</p><!--l. 79--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.2    </span> <a 
  id="x1-50002.2"></a>Wide-Column Storage</h4>
-<!--l. 82--><p class="noindent" >Wide-Column databases are a form of NoSQL or non-relational data stores. In these data stores the data model
+<!--l. 85--><p class="noindent" >Wide-Column databases are a form of NoSQL or non-relational data stores. In these data stores the data model
 design is focused more on having efficient queries at the cost of data duplication. A warning to the reader that
 these models are not flexible after creation, it is much easier to answer a new use case in a relational
 model.
 </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 89--><p class="noindent" >Apache Cassandra [ Amazon Keyspaces for Cassandra ].
+      <!--l. 92--><p class="noindent" >Apache Cassandra [ Amazon Keyspaces for Cassandra ].
       </p></li>
       <li class="itemize">
-      <!--l. 90--><p class="noindent" >Apache HBase.</p></li></ul>
-<!--l. 93--><p class="noindent" >
+      <!--l. 93--><p class="noindent" >Apache HBase.</p></li></ul>
+<!--l. 96--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.3    </span> <a 
  id="x1-60002.3"></a>Key-Value Storage</h4>
-<!--l. 95--><p class="noindent" >Key-Value stores are very popular for cache or remote config use cases, some of the most notable are
+<!--l. 98--><p class="noindent" >Key-Value stores are very popular for cache or remote config use cases, some of the most notable are
 Redis and Memcached. These stores allow efficient lookup of values via keys and are usually stored
 in-memory.
 </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 99--><p class="noindent" >Redis [ Amazon ElastiCache for Redis ].
+      <!--l. 102--><p class="noindent" >Redis [ Amazon ElastiCache for Redis ].
+      </p></li>
+      <li class="itemize">
+      <!--l. 103--><p class="noindent" >Memcached [ Amazon ElastiCache for Memcached].
+      </p></li>
+      <li class="itemize">
+      <!--l. 104--><p class="noindent" >Amazon DynamoDB.
+      </p></li>
+      <li class="itemize">
+      <!--l. 105--><p class="noindent" >Amazon MemoryDB for Redis.</p></li></ul>
                                                                                                     
                                                                                                     
-      </p></li>
-      <li class="itemize">
-      <!--l. 100--><p class="noindent" >Memcached [ Amazon ElastiCache for Memcached].
-      </p></li>
-      <li class="itemize">
-      <!--l. 101--><p class="noindent" >Amazon DynamoDB.
-      </p></li>
-      <li class="itemize">
-      <!--l. 102--><p class="noindent" >Amazon MemoryDB for Redis.</p></li></ul>
-<!--l. 105--><p class="noindent" >
+<!--l. 108--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.4    </span> <a 
  id="x1-70002.4"></a>Time Series Storage</h4>
-<!--l. 111--><p class="noindent" >Time series databases are highly focused storage which is tailored to retrieving results by timestamp ranges. Many
+<!--l. 114--><p class="noindent" >Time series databases are highly focused storage which is tailored to retrieving results by timestamp ranges. Many
 implementations also take advantage of the data model to allow efficient rollover of data and partitioning.
 One of the most popular time series databases is Prometheus which is used to store monitoring
 metrics.
 </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 116--><p class="noindent" >Amazon Timestream.
+      <!--l. 119--><p class="noindent" >Amazon Timestream.
       </p></li>
       <li class="itemize">
-      <!--l. 117--><p class="noindent" >TimescaleDB ( Postgres + Addon ).
+      <!--l. 120--><p class="noindent" >TimescaleDB ( Postgres + Addon ).
       </p></li>
       <li class="itemize">
-      <!--l. 118--><p class="noindent" >Prometheus.
+      <!--l. 121--><p class="noindent" >Prometheus.
       </p></li>
       <li class="itemize">
-      <!--l. 119--><p class="noindent" >InfluxDB.</p></li></ul>
-<!--l. 122--><p class="noindent" >
+      <!--l. 122--><p class="noindent" >InfluxDB.</p></li></ul>
+<!--l. 125--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.5    </span> <a 
  id="x1-80002.5"></a>Document Storage</h4>
-<!--l. 124--><p class="noindent" >Document databases are a subset of NoSQL databases with a focus on a flexible data model. MongoDB for
+<!--l. 127--><p class="noindent" >Document databases are a subset of NoSQL databases with a focus on a flexible data model. MongoDB for
 instance allows the user to store JSON documents and perform queries on those documents. One advantage of
 document databases is that they match a programmers existing mental model of storing data in formats such as
 JSON.
 </p>
-                                                                                                    
-                                                                                                    
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 129--><p class="noindent" >MongoDB.
+      <!--l. 132--><p class="noindent" >MongoDB.
       </p></li>
       <li class="itemize">
-      <!--l. 130--><p class="noindent" >Apache CouchDB.
+      <!--l. 133--><p class="noindent" >Apache CouchDB.
       </p></li>
       <li class="itemize">
-      <!--l. 131--><p class="noindent" >Amazon DocumentDB.
+      <!--l. 134--><p class="noindent" >Amazon DocumentDB.
+                                                                                                    
+                                                                                                    
       </p></li>
       <li class="itemize">
-      <!--l. 132--><p class="noindent" >Amazon DynamoDB.</p></li></ul>
-<!--l. 135--><p class="noindent" >
+      <!--l. 135--><p class="noindent" >Amazon DynamoDB.</p></li></ul>
+<!--l. 138--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.6    </span> <a 
  id="x1-90002.6"></a>Graph Storage</h4>
-<!--l. 143--><p class="noindent" >Graph Databases are relational storage with a few enhancements to allow fast neighbour look-ups. These
+<!--l. 146--><p class="noindent" >Graph Databases are relational storage with a few enhancements to allow fast neighbour look-ups. These
 databases also allow the implementation of graph algorithms to query data.
 </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 147--><p class="noindent" >Amazon Neptune.
+      <!--l. 150--><p class="noindent" >Amazon Neptune.
       </p></li>
       <li class="itemize">
-      <!--l. 148--><p class="noindent" >Neo4J.
+      <!--l. 151--><p class="noindent" >Neo4J.
       </p></li>
       <li class="itemize">
-      <!--l. 149--><p class="noindent" >Janus Graph.</p></li></ul>
-<!--l. 152--><p class="noindent" >
+      <!--l. 152--><p class="noindent" >Janus Graph.</p></li></ul>
+<!--l. 155--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
  id="x1-100003"></a>Enhancing the Todo App with Storage</h3>
-<!--l. 154--><p class="noindent" >Last week we created a simple web server that can listen on a port and respond to HTTP requests. The endpoints
+<!--l. 157--><p class="noindent" >Last week we created a simple web server that can listen on a port and respond to HTTP requests. The endpoints
 that we created are all stubs the return a simple JSON response. This week we will be adding a database to our
 application to store the todo items.
-                                                                                                    
-                                                                                                    
-</p><!--l. 156--><p class="noindent" >
+</p><!--l. 159--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.1    </span> <a 
  id="x1-110003.1"></a>Creating a Practical Repository</h4>
-<!--l. 157--><p class="noindent" >Navigate to the GitHub Classroom link provided by your tutor. You should see a list of practicals,
+<!--l. 160--><p class="noindent" >Navigate to the GitHub Classroom link provided by your tutor. You should see a list of practicals,
 click on the week one practical. This will create a new repository for you in the course organisation.
 You can now clone this repository to your local machine or work directly in the browser with GitHub
 codespaces.
 </p>
    <div class="tcolorbox tcolorbox" id="tcolobox-1">    
 <div class="tcolorbox-title">
-<!--l. 164--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 164--><p class="noindent" >If using Github CodeSpaces the environment will be pre-installed with the libraries you used last
+<!--l. 167--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 167--><p class="noindent" >If using Github CodeSpaces the environment will be pre-installed with the libraries you used last
 week. You will still need to follow on with the instructions below to install the database libraries.  </p> 
 </div> 
 </div>
-<!--l. 166--><p class="noindent" >
+                                                                                                    
+                                                                                                    
+<!--l. 169--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.2    </span> <a 
  id="x1-120003.2"></a>Installing the Database Dependencies</h4>
-<!--l. 168--><p class="noindent" >We will be using a python library called SQLAlchemy to interact with our database. This library abstracts the low
+<!--l. 171--><p class="noindent" >We will be using a python library called SQLAlchemy to interact with our database. This library abstracts the low
 level SQL queries away from us and allows us to interact with the database using python objects. We will be using
 SQLAlchemy using a packaged called Flask-SQLAlchemy which is a wrapper around SQLAlchemy that is designed
 to work with Flask our WebServer library.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 170--><pre class="listings" id="listing-1"><span class="label"><a 
+<!--l. 173--><pre class="listings" id="listing-1"><span class="label"><a 
  id="x1-12001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -248,22 +248,22 @@ class="ectt-1200">sqlalchemy</span></span>
 <span class="label"><a 
  id="x1-12002r2"></a></span></pre>
    </div>
-<!--l. 174--><p class="noindent" >
+<!--l. 177--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.3    </span> <a 
  id="x1-130003.3"></a>Creating the Database Models</h4>
-<!--l. 176--><p class="noindent" >We will be using a database called SQLite for this practical. SQLite is a file based database which is very easy to
+<!--l. 179--><p class="noindent" >We will be using a database called SQLite for this practical. SQLite is a file based database which is very easy to
 setup and use. It is also a good choice for development as it can be blown away by simply deleting a file or by
 residing in memory.
-</p><!--l. 178--><p class="indent" >   Now that our dependencies are installed, lets start by navigating to our new cloned practical folder and
+</p><!--l. 181--><p class="indent" >   Now that our dependencies are installed, lets start by navigating to our new cloned practical folder and
 creating a new folder called models. Inside this folder we will create a new file called todo.py and a new file called
 <span 
 class="ectt-1200">__init__.py</span>.
-</p><!--l. 180--><p class="indent" >   Inside the <span 
+</p><!--l. 183--><p class="indent" >   Inside the <span 
 class="ectt-1200">__init__.py </span>file we will add the following code:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 182--><pre class="listings" id="listing-2"><span class="label"><a 
+<!--l. 185--><pre class="listings" id="listing-2"><span class="label"><a 
  id="x1-13001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -283,12 +283,12 @@ class="ectt-1200">()</span></span>
 <span class="label"><a 
  id="x1-13004r4"></a></span></pre>
    </div>
-<!--l. 188--><p class="indent" >   All this file does is setup a new SQLAlchemy object which we will use to interact with our database. In the
+<!--l. 191--><p class="indent" >   All this file does is setup a new SQLAlchemy object which we will use to interact with our database. In the
 <span 
 class="ectt-1200">todo.py </span>file we will add the following code:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 190--><pre class="listings" id="listing-3"><span class="label"><a 
+<!--l. 193--><pre class="listings" id="listing-3"><span class="label"><a 
  id="x1-13005r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -722,14 +722,12 @@ class="tctt-1200">'</span></span>
  
 <span class="label"><a 
  id="x1-13030r26"></a></span></pre>
-                                                                                                    
-                                                                                                    
    </div>
-<!--l. 218--><p class="indent" >   The above code is doing a lot of the heavy lifting for us in our database table generation so lets walk through
+<!--l. 221--><p class="indent" >   The above code is doing a lot of the heavy lifting for us in our database table generation so lets walk through
 and see what some of the key lines are doing.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 220--><pre class="listings" id="listing-4"><span class="label"><a 
+<!--l. 223--><pre class="listings" id="listing-4"><span class="label"><a 
  id="x1-13031r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">class</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -744,11 +742,13 @@ class="ectt-1200">:</span></span>
 <span class="label"><a 
  id="x1-13032r2"></a></span></pre>
    </div>
-<!--l. 224--><p class="indent" >   This line is defining a new class called Todo which inherits from the db.Model class. This class will be used to
+<!--l. 227--><p class="indent" >   This line is defining a new class called Todo which inherits from the db.Model class. This class will be used to
 represent our todo items in our database.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 226--><pre class="listings" id="listing-5"><span class="label"><a 
+                                                                                                    
+                                                                                                    
+<!--l. 229--><pre class="listings" id="listing-5"><span class="label"><a 
  id="x1-13033r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">id</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -769,12 +769,12 @@ class="ectt-1200">)</span></span>
 <span class="label"><a 
  id="x1-13034r2"></a></span></pre>
    </div>
-<!--l. 230--><p class="indent" >   This line is defining a new column in our database table called id. The column type is an integer and it is the
+<!--l. 233--><p class="indent" >   This line is defining a new column in our database table called id. The column type is an integer and it is the
 primary key for the table. As we insert more items into our database, the id will be automatically incremented for
 us.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 232--><pre class="listings" id="listing-6"><span class="label"><a 
+<!--l. 235--><pre class="listings" id="listing-6"><span class="label"><a 
  id="x1-13035r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">title</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -796,12 +796,12 @@ class="ectt-1200">)</span></span>
 <span class="label"><a 
  id="x1-13036r2"></a></span></pre>
    </div>
-<!--l. 236--><p class="indent" >   This line is defining a new column in our database table called title. The column type is a string with a
+<!--l. 239--><p class="indent" >   This line is defining a new column in our database table called title. The column type is a string with a
 maximum length of 80 characters. The nullable parameter is set to false which means that this column cannot be
 null. Essentially this is a required field.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 238--><pre class="listings" id="listing-7"><span class="label"><a 
+<!--l. 241--><pre class="listings" id="listing-7"><span class="label"><a 
  id="x1-13037r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">description</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -823,12 +823,12 @@ class="ectt-1200">)</span></span>
 <span class="label"><a 
  id="x1-13038r2"></a></span></pre>
    </div>
-<!--l. 242--><p class="indent" >   This line is defining a new column in our database table called description. The column type is a string with a
+<!--l. 245--><p class="indent" >   This line is defining a new column in our database table called description. The column type is a string with a
 maximum length of 120 characters. The nullable parameter is set to true which means that this column can be
 null. Essentially this is an optional field.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 244--><pre class="listings" id="listing-8"><span class="label"><a 
+<!--l. 247--><pre class="listings" id="listing-8"><span class="label"><a 
  id="x1-13039r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">completed</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -853,13 +853,13 @@ class="ectt-1200">)</span></span>
 <span class="label"><a 
  id="x1-13040r2"></a></span></pre>
    </div>
-<!--l. 248--><p class="indent" >   This line is defining a new column in our database table called completed. The column type is a boolean which
+<!--l. 251--><p class="indent" >   This line is defining a new column in our database table called completed. The column type is a boolean which
 can be either true or false. The nullable parameter is set to false which means that this column cannot be null. The
 default parameter is set to false which means that if no value is provided for this column, it will default to
 false.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 250--><pre class="listings" id="listing-9"><span class="label"><a 
+<!--l. 253--><pre class="listings" id="listing-9"><span class="label"><a 
  id="x1-13041r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">deadline_at</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -879,15 +879,13 @@ class="ectt-1200">)</span></span>
  
 <span class="label"><a 
  id="x1-13042r2"></a></span></pre>
-                                                                                                    
-                                                                                                    
    </div>
-<!--l. 254--><p class="indent" >   This line is defining a new column in our database table called <span 
+<!--l. 257--><p class="indent" >   This line is defining a new column in our database table called <span 
 class="ectt-1200">deadline_at</span>. The column type is a datetime so
 we can represent the time when the todo is due.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 256--><pre class="listings" id="listing-10"><span class="label"><a 
+<!--l. 259--><pre class="listings" id="listing-10"><span class="label"><a 
  id="x1-13043r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">created_at</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -916,15 +914,17 @@ class="ectt-1200">)</span></span>
 <span class="label"><a 
  id="x1-13044r2"></a></span></pre>
    </div>
-<!--l. 260--><p class="indent" >   This line is defining a new column in our database table called <span 
+<!--l. 263--><p class="indent" >   This line is defining a new column in our database table called <span 
 class="ectt-1200">created_at</span>. The column type is a datetime so
 we can represent the time when the todo was created. The extra addition here is that the default parameter is a
 reference to a function called <span 
 class="ectt-1200">utcnow </span>which will automatically set the value of this column to the current time
 when the todo is created.
+                                                                                                    
+                                                                                                    
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 262--><pre class="listings" id="listing-11"><span class="label"><a 
+<!--l. 265--><pre class="listings" id="listing-11"><span class="label"><a 
  id="x1-13045r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">updated_at</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -961,7 +961,7 @@ class="ectt-1200">)</span></span>
 <span class="label"><a 
  id="x1-13046r2"></a></span></pre>
    </div>
-<!--l. 266--><p class="indent" >   This line is defining a new column in our database table called <span 
+<!--l. 269--><p class="indent" >   This line is defining a new column in our database table called <span 
 class="ectt-1200">updated_at</span>. The column type is a datetime so
 we can represent the time when the todo was last updated. The extra addition onupdate parameter is a reference
 to a function called <span 
@@ -969,7 +969,7 @@ class="ectt-1200">utcnow </span>which will automatically set the value of this c
 todo is updated.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 268--><pre class="listings" id="listing-12"><span class="label"><a 
+<!--l. 271--><pre class="listings" id="listing-12"><span class="label"><a 
  id="x1-13047r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1143,12 +1143,12 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-13057r11"></a></span></pre>
    </div>
-<!--l. 281--><p class="indent" >   This is a method on our Todo class which will return a dictionary representation of the todo item. This is useful
+<!--l. 284--><p class="indent" >   This is a method on our Todo class which will return a dictionary representation of the todo item. This is useful
 for when we want to return the todo item as JSON in our API as it deals with converting the datetime objects into
 a particular string format.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 283--><pre class="listings" id="listing-13"><span class="label"><a 
+<!--l. 286--><pre class="listings" id="listing-13"><span class="label"><a 
  id="x1-13058r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1184,18 +1184,18 @@ class="tctt-1200">'</span></span>
 <span class="label"><a 
  id="x1-13060r3"></a></span></pre>
    </div>
-<!--l. 288--><p class="indent" >   This is a method on our Todo class which will return a string representation of the todo item. This is useful for
+<!--l. 291--><p class="indent" >   This is a method on our Todo class which will return a string representation of the todo item. This is useful for
 debugging purposes as it will print out the ID and title of the Todo.
-</p><!--l. 290--><p class="noindent" >
+</p><!--l. 293--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.4    </span> <a 
  id="x1-140003.4"></a>Configuring the Database</h4>
-<!--l. 292--><p class="noindent" >Now that we have defined our database table, we need to configure our application to use the database. Open the
+<!--l. 295--><p class="noindent" >Now that we have defined our database table, we need to configure our application to use the database. Open the
 <span 
 class="ectt-1200">todo/__init__.py </span>file and change the code to the following:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 294--><pre class="listings" id="listing-14"><span class="label"><a 
+<!--l. 297--><pre class="listings" id="listing-14"><span class="label"><a 
  id="x1-14001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1371,10 +1371,8 @@ class="ectt-1200">app</span></span>
  
 <span class="label"><a 
  id="x1-14024r24"></a></span></pre>
-                                                                                                    
-                                                                                                    
    </div>
-<!--l. 319--><p class="indent" >   This will load the models we defined in the previous section and create the database tables for us.
+<!--l. 322--><p class="indent" >   This will load the models we defined in the previous section and create the database tables for us.
 We also need to tell our application where the database is located. We can do this by setting the
 <span 
 class="ectt-1200">SQLALCHEMY_DATABASE_URI </span>config variable. In this case we are using a SQLite database which is a file based
@@ -1383,24 +1381,26 @@ class="ectt-1200">SQLALCHEMY_DATABASE_URI </span>config variable to
 the path of the database file. In this case we are using a relative path to the <span 
 class="ectt-1200">db.sqlite </span>file in the root of our
 project.
-</p><!--l. 321--><p class="indent" >   If we run our application now, we will see that the database file has been created for us.
+</p><!--l. 324--><p class="indent" >   If we run our application now, we will see that the database file has been created for us.
 </p>
    <div class="tcolorbox tcolorbox" id="tcolobox-2">    
 <div class="tcolorbox-title">
    </div> 
-<div class="tcolorbox-content"><!--l. 325--><p class="noindent" >TODO:  Add a screenshot of the database file being created.  </p> 
+<div class="tcolorbox-content"><!--l. 328--><p class="noindent" >TODO:  Add a screenshot of the database file being created.  </p> 
 </div> 
 </div>
-<!--l. 327--><p class="noindent" >
+                                                                                                    
+                                                                                                    
+<!--l. 330--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.5    </span> <a 
  id="x1-150003.5"></a>Inspecting the Database</h4>
-<!--l. 329--><p class="noindent" >We can use the <span 
+<!--l. 332--><p class="noindent" >We can use the <span 
 class="ectt-1200">sqlite3 </span>command line tool to inspect the database. Open a terminal and navigate to the root of
 your project. Then run the following command:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 331--><pre class="listings" id="listing-15"><span class="label"><a 
+<!--l. 334--><pre class="listings" id="listing-15"><span class="label"><a 
  id="x1-15001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">sqlite3</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1411,11 +1411,11 @@ class="ectt-1200">sqlite</span></span>
 <span class="label"><a 
  id="x1-15002r2"></a></span></pre>
    </div>
-<!--l. 335--><p class="indent" >   This will open the SQLite command line tool and connect to the database file. We can then run the following
+<!--l. 338--><p class="indent" >   This will open the SQLite command line tool and connect to the database file. We can then run the following
 command to see the tables in our database:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 337--><pre class="listings" id="listing-16"><span class="label"><a 
+<!--l. 340--><pre class="listings" id="listing-16"><span class="label"><a 
  id="x1-15003r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
@@ -1424,11 +1424,11 @@ class="ectt-1200">tables</span></span>
 <span class="label"><a 
  id="x1-15004r2"></a></span></pre>
    </div>
-<!--l. 341--><p class="indent" >   This will show us the tables in our database. We can then run the following command to see the columns in
+<!--l. 344--><p class="indent" >   This will show us the tables in our database. We can then run the following command to see the columns in
 our table:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 343--><pre class="listings" id="listing-17"><span class="label"><a 
+<!--l. 346--><pre class="listings" id="listing-17"><span class="label"><a 
  id="x1-15005r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
@@ -1438,11 +1438,11 @@ class="ectt-1200">todos</span></span>
 <span class="label"><a 
  id="x1-15006r2"></a></span></pre>
    </div>
-<!--l. 347--><p class="indent" >   This will show us the columns in our table. We can then run the following command to see the data in our
+<!--l. 350--><p class="indent" >   This will show us the columns in our table. We can then run the following command to see the data in our
 table:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 349--><pre class="listings" id="listing-18"><span class="label"><a 
+<!--l. 352--><pre class="listings" id="listing-18"><span class="label"><a 
  id="x1-15007r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">SELECT</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1454,13 +1454,11 @@ class="ectt-1200">;</span></span>
 <span class="label"><a 
  id="x1-15008r2"></a></span></pre>
    </div>
-<!--l. 353--><p class="indent" >   This will show us the data in our table. We can then run the following command to exit the SQLite command
+<!--l. 356--><p class="indent" >   This will show us the data in our table. We can then run the following command to exit the SQLite command
 line tool:
 </p>
    <div class="framedenv" id="code-1">
-                                                                                                    
-                                                                                                    
-<!--l. 355--><pre class="listings" id="listing-19"><span class="label"><a 
+<!--l. 358--><pre class="listings" id="listing-19"><span class="label"><a 
  id="x1-15009r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
@@ -1469,20 +1467,22 @@ class="ectt-1200">exit</span></span>
 <span class="label"><a 
  id="x1-15010r2"></a></span></pre>
    </div>
-<!--l. 359--><p class="indent" >   You may have noticed that our table is called todos and not todo. This is because SQLAlchemy will
+<!--l. 362--><p class="indent" >   You may have noticed that our table is called todos and not todo. This is because SQLAlchemy will
 automatically pluralise the name of the table for us. This is a common behaviour you will see many database
 libraries.
-</p><!--l. 362--><p class="noindent" >
+</p><!--l. 365--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.6    </span> <a 
  id="x1-160003.6"></a>Using the Database</h4>
-<!--l. 364--><p class="noindent" >Now that we have a database intergrated into our application, lets modify our endpoints to take advantage of
+                                                                                                    
+                                                                                                    
+<!--l. 367--><p class="noindent" >Now that we have a database intergrated into our application, lets modify our endpoints to take advantage of
 it.
-</p><!--l. 366--><p class="indent" >   Open the <span 
+</p><!--l. 369--><p class="indent" >   Open the <span 
 class="ectt-1200">todo/views/routes.py </span>file and add the following imports to the top of the file:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 368--><pre class="listings" id="listing-20"><span class="label"><a 
+<!--l. 371--><pre class="listings" id="listing-20"><span class="label"><a 
  id="x1-16001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1506,12 +1506,12 @@ class="ectt-1200">Todo</span></span>
 <span class="label"><a 
  id="x1-16003r3"></a></span></pre>
    </div>
-<!--l. 373--><p class="indent" >   Open the <span 
+<!--l. 376--><p class="indent" >   Open the <span 
 class="ectt-1200">todo/views/routes.py </span>file and change the <span 
 class="ectt-1200">get_todos </span>endpoint to the following:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 375--><pre class="listings" id="listing-21"><span class="label"><a 
+<!--l. 378--><pre class="listings" id="listing-21"><span class="label"><a 
  id="x1-16004r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">@api</span></span><span style="color:#000000"><span 
@@ -1572,12 +1572,12 @@ class="ectt-1200">])</span></span>
 <span class="label"><a 
  id="x1-16008r5"></a></span></pre>
    </div>
-<!--l. 382--><p class="indent" >   This will query the database for all the todos and return them as JSON. We can then change the <span 
+<!--l. 385--><p class="indent" >   This will query the database for all the todos and return them as JSON. We can then change the <span 
 class="ectt-1200">get_todo</span>
 endpoint to the following:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 384--><pre class="listings" id="listing-22"><span class="label"><a 
+<!--l. 387--><pre class="listings" id="listing-22"><span class="label"><a 
  id="x1-16009r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">@api</span></span><span style="color:#000000"><span 
@@ -1682,13 +1682,13 @@ class="ectt-1200">)</span></span>
 <span class="label"><a 
  id="x1-16015r7"></a></span></pre>
    </div>
-<!--l. 393--><p class="indent" >   So we have upgraded these endpoints to use the database. Lets test that our application is still functioning
+<!--l. 396--><p class="indent" >   So we have upgraded these endpoints to use the database. Lets test that our application is still functioning
 correctly. Restart your webserver and navigate to the <span 
 class="ectt-1200">/todos </span>endpoint. You should see the following JSON
 response:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 395--><pre class="listings" id="listing-23"><span class="label"><a 
+<!--l. 398--><pre class="listings" id="listing-23"><span class="label"><a 
  id="x1-16016r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">[</span></span><span style="color:#000000"><span 
@@ -1697,13 +1697,13 @@ class="ectt-1200">]</span></span>
 <span class="label"><a 
  id="x1-16017r2"></a></span></pre>
    </div>
-<!--l. 399--><p class="indent" >   Of course our API does not have any todo items in it yet. Lets add some todo items to our database. Open the
+<!--l. 402--><p class="indent" >   Of course our API does not have any todo items in it yet. Lets add some todo items to our database. Open the
 <span 
 class="ectt-1200">todo/views/routes.py </span>file and change the <span 
 class="ectt-1200">create_todo </span>endpoint to the following:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 401--><pre class="listings" id="listing-24"><span class="label"><a 
+<!--l. 404--><pre class="listings" id="listing-24"><span class="label"><a 
  id="x1-16018r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">@api</span></span><span style="color:#000000"><span 
@@ -1881,14 +1881,12 @@ class="ectt-1200">201)</span></span>
  
 <span class="label"><a 
  id="x1-16029r12"></a></span></pre>
-                                                                                                    
-                                                                                                    
    </div>
-<!--l. 415--><p class="indent" >   This endpoint now lets us create a todo item in the database. Lets test this endpoint by going to our
+<!--l. 418--><p class="indent" >   This endpoint now lets us create a todo item in the database. Lets test this endpoint by going to our
 endpoints.http and running the POST request. You should see the following response:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 417--><pre class="listings" id="listing-25"><span class="label"><a 
+<!--l. 420--><pre class="listings" id="listing-25"><span class="label"><a 
  id="x1-16030r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
@@ -1999,12 +1997,14 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-16039r10"></a></span></pre>
    </div>
-<!--l. 429--><p class="indent" >   Now if we go to our <span 
+<!--l. 432--><p class="indent" >   Now if we go to our <span 
 class="ectt-1200">/todos </span>endpoint we should see the todo item we just created. You should see the
 following response:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 431--><pre class="listings" id="listing-26"><span class="label"><a 
+                                                                                                    
+                                                                                                    
+<!--l. 434--><pre class="listings" id="listing-26"><span class="label"><a 
  id="x1-16040r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">[</span></span> 
@@ -2134,13 +2134,13 @@ class="ectt-1200">]</span></span>
 <span class="label"><a 
  id="x1-16051r12"></a></span></pre>
    </div>
-<!--l. 445--><p class="indent" >   Now lets add the remaining endpoints. Open the <span 
+<!--l. 448--><p class="indent" >   Now lets add the remaining endpoints. Open the <span 
 class="ectt-1200">todo/views/routes.py </span>file and change the <span 
 class="ectt-1200">update_todo</span>
 endpoint to the following:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 447--><pre class="listings" id="listing-27"><span class="label"><a 
+<!--l. 450--><pre class="listings" id="listing-27"><span class="label"><a 
  id="x1-16052r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">@api</span></span><span style="color:#000000"><span 
@@ -2353,11 +2353,11 @@ class="ectt-1200">)</span></span>
 <span class="label"><a 
  id="x1-16065r14"></a></span></pre>
    </div>
-<!--l. 462--><p class="indent" >   This endpoint will update a todo item in the database. Lets test this endpoint by going to our endpoints.http
+<!--l. 465--><p class="indent" >   This endpoint will update a todo item in the database. Lets test this endpoint by going to our endpoints.http
 and running the PUT request. You should see the following response:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 464--><pre class="listings" id="listing-28"><span class="label"><a 
+<!--l. 467--><pre class="listings" id="listing-28"><span class="label"><a 
  id="x1-16066r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
@@ -2470,13 +2470,13 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-16077r12"></a></span></pre>
    </div>
-<!--l. 477--><p class="indent" >   The delete endpoint we will write is very similar to the update endpoint. Open the <span 
+<!--l. 480--><p class="indent" >   The delete endpoint we will write is very similar to the update endpoint. Open the <span 
 class="ectt-1200">todo/views/routes.py </span>file
 and change the <span 
 class="ectt-1200">delete_todo </span>endpoint to the following:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 479--><pre class="listings" id="listing-29"><span class="label"><a 
+<!--l. 482--><pre class="listings" id="listing-29"><span class="label"><a 
  id="x1-16078r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">@api</span></span><span style="color:#000000"><span 
@@ -2605,22 +2605,20 @@ class="ectt-1200">200)</span></span>
 <span class="label"><a 
  id="x1-16089r12"></a></span></pre>
    </div>
-<!--l. 492--><p class="indent" >   We now have a set of endpoints that can perform the CRUD operations of our API but some functionality
+<!--l. 495--><p class="indent" >   We now have a set of endpoints that can perform the CRUD operations of our API but some functionality
 is missing. We are gonna add that functionality after writing some tests to help us do <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Test Driven</span>
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Development</span>.
-</p><!--l. 494--><p class="noindent" >
+</p><!--l. 497--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
  id="x1-170004"></a>Testing the API</h3>
-                                                                                                    
-                                                                                                    
-<!--l. 496--><p class="noindent" >
+<!--l. 499--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.1    </span> <a 
  id="x1-180004.1"></a>Setting up the testing environment</h4>
-<!--l. 498--><p class="noindent" >In the root folder of this practical make a <span 
+<!--l. 501--><p class="noindent" >In the root folder of this practical make a <span 
 class="ectt-1200">tests </span>folder. Inside the <span 
 class="ectt-1200">tests </span>folder create a <span 
 class="ectt-1200">base.py </span>file. Inside the
@@ -2628,7 +2626,7 @@ class="ectt-1200">base.py </span>file. Inside the
 class="ectt-1200">base.py </span>file add the following code:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 500--><pre class="listings" id="listing-30"><span class="label"><a 
+<!--l. 503--><pre class="listings" id="listing-30"><span class="label"><a 
  id="x1-18001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2893,7 +2891,9 @@ class="ectt-1200">)</span></span>
 <span class="label"><a 
  id="x1-18022r22"></a></span></pre>
    </div>
-<!--l. 525--><p class="indent" >   This base class is what we will use to help setup our tests and provide some helper methods. We will be using
+                                                                                                    
+                                                                                                    
+<!--l. 528--><p class="indent" >   This base class is what we will use to help setup our tests and provide some helper methods. We will be using
 the <span 
 class="ectt-1200">unittest </span>library to write our tests. The <span 
 class="ectt-1200">setUp </span>method is called before each test and is used to setup
@@ -2901,7 +2901,7 @@ the testing environment. The <span
 class="ectt-1200">assertTodoPartialEqual </span>method is a helper method that we will
 use to compare the todo items we get from the API with the todo items we expect to get from the
 API.
-</p><!--l. 527--><p class="indent" >   As you can see we have a slight modification to the <span 
+</p><!--l. 530--><p class="indent" >   As you can see we have a slight modification to the <span 
 class="ectt-1200">create_app </span>function. We are passing in a dictionary of
 config overrides. This allows us to override the config values for the testing environment. We are overriding the
 <span 
@@ -2911,16 +2911,16 @@ class="ectt-1200">TESTING </span>config value
 to be true. This will allow us to use the <span 
 class="ectt-1200">test_client </span>method on our app to make requests to our
 API.
-</p><!--l. 529--><p class="noindent" >
+</p><!--l. 532--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.2    </span> <a 
  id="x1-190004.2"></a>Prepping the config for testing</h4>
-<!--l. 531--><p class="noindent" >Open the <span 
+<!--l. 534--><p class="noindent" >Open the <span 
 class="ectt-1200">todo/__init__.py </span>file and adjust the <span 
 class="ectt-1200">create_app </span>function to the following:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 533--><pre class="listings" id="listing-31"><span class="label"><a 
+<!--l. 536--><pre class="listings" id="listing-31"><span class="label"><a 
  id="x1-19001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -3104,18 +3104,18 @@ class="ectt-1200">app</span></span>
 <span class="label"><a 
  id="x1-19020r20"></a></span></pre>
    </div>
-<!--l. 555--><p class="noindent" >
+<!--l. 558--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.3    </span> <a 
  id="x1-200004.3"></a>Writing our first tests</h4>
-<!--l. 557--><p class="noindent" >Now lets write our first tests. Open the <span 
+<!--l. 560--><p class="noindent" >Now lets write our first tests. Open the <span 
 class="ectt-1200">tests </span>folder and create a <span 
 class="ectt-1200">test_health.py </span>file. Inside the
 <span 
 class="ectt-1200">test_health.py </span>file add the following code:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 559--><pre class="listings" id="listing-32"><span class="label"><a 
+<!--l. 562--><pre class="listings" id="listing-32"><span class="label"><a 
  id="x1-20001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -3219,17 +3219,15 @@ class="ectt-1200">})</span></span>
 <span class="label"><a 
  id="x1-20011r11"></a></span></pre>
    </div>
-<!--l. 571--><p class="indent" >   This test will make a GET request to the <span 
+<!--l. 574--><p class="indent" >   This test will make a GET request to the <span 
 class="ectt-1200">/health </span>endpoint and check that the response is a 200 status code
 and that the response is a JSON object with the key <span 
 class="ectt-1200">status </span>and the value <span 
 class="ectt-1200">ok</span>. To run this test stop your server if it
 is running and run the following command:
-                                                                                                    
-                                                                                                    
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 573--><pre class="listings" id="listing-33"><span class="label"><a 
+<!--l. 576--><pre class="listings" id="listing-33"><span class="label"><a 
  id="x1-20012r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">pipenv</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -3246,10 +3244,10 @@ class="ectt-1200">tests</span></span>
 <span class="label"><a 
  id="x1-20013r2"></a></span></pre>
    </div>
-<!--l. 577--><p class="indent" >   You should see the following output:
+<!--l. 580--><p class="indent" >   You should see the following output:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 579--><pre class="listings" id="listing-34"><span class="label"><a 
+<!--l. 582--><pre class="listings" id="listing-34"><span class="label"><a 
  id="x1-20014r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -3289,15 +3287,17 @@ class="ectt-1200">OK</span></span>
  
 <span class="label"><a 
  id="x1-20020r7"></a></span></pre>
+                                                                                                    
+                                                                                                    
    </div>
-<!--l. 588--><p class="indent" >   One endpoint down, lets write a test for post todo endpoint. Open the <span 
+<!--l. 591--><p class="indent" >   One endpoint down, lets write a test for post todo endpoint. Open the <span 
 class="ectt-1200">tests </span>folder and create a
 <span 
 class="ectt-1200">test_todos.py </span>file. Inside the <span 
 class="ectt-1200">test_todos.py </span>file add the following code:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 590--><pre class="listings" id="listing-35"><span class="label"><a 
+<!--l. 593--><pre class="listings" id="listing-35"><span class="label"><a 
  id="x1-20021r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -3503,10 +3503,10 @@ class="ectt-1200">})</span></span>
 <span class="label"><a 
  id="x1-20035r15"></a></span></pre>
    </div>
-<!--l. 607--><p class="indent" >   Now when we run our tests we should see the following output:
+<!--l. 610--><p class="indent" >   Now when we run our tests we should see the following output:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 609--><pre class="listings" id="listing-36"><span class="label"><a 
+<!--l. 612--><pre class="listings" id="listing-36"><span class="label"><a 
  id="x1-20036r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -3547,17 +3547,17 @@ class="ectt-1200">OK</span></span>
 <span class="label"><a 
  id="x1-20044r9"></a></span></pre>
    </div>
-<!--l. 619--><p class="noindent" >
+<!--l. 622--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.4    </span> <a 
  id="x1-210004.4"></a>Test Driven Development</h4>
-<!--l. 621--><p class="noindent" >We have provided a selection of tests in the github repository which you can now copy into your project. These
+<!--l. 624--><p class="noindent" >We have provided a selection of tests in the github repository which you can now copy into your project. These
 tests are made from the specification, we would like you to change your API to make the tests pass. To give you a
 hand here are some hints:
-</p><!--l. 623--><p class="indent" >   To check if the request is a JSON request you can use the following code:
+</p><!--l. 626--><p class="indent" >   To check if the request is a JSON request you can use the following code:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 625--><pre class="listings" id="listing-37"><span class="label"><a 
+<!--l. 628--><pre class="listings" id="listing-37"><span class="label"><a 
  id="x1-21001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">if</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
@@ -3593,18 +3593,16 @@ class="ectt-1200">400)</span></span>
 <span class="label"><a 
  id="x1-21003r3"></a></span></pre>
    </div>
-<!--l. 630--><p class="indent" >   If you get stuck feel free to have a look at the solution in the github repository or ask your peers / staff for
+<!--l. 633--><p class="indent" >   If you get stuck feel free to have a look at the solution in the github repository or ask your peers / staff for
 help.
-</p><!--l. 632--><p class="noindent" >
+</p><!--l. 635--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
  id="x1-220005"></a>[Optional] Setting up Migrations</h3>
-                                                                                                    
-                                                                                                    
    <div class="tcolorbox tcolorbox" id="tcolobox-3">    
 <div class="tcolorbox-title">
-<!--l. 636--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 636--><p class="noindent" >The following section is optional and will be covered if there is enough time in the practical. The
+<!--l. 639--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 639--><p class="noindent" >The following section is optional and will be covered if there is enough time in the practical. The
 content here is worth reviewing on your own time especially if you are interested in working with
 databases in the future or in your future assessment items.  </p> 
 </div> 
@@ -3612,25 +3610,27 @@ databases in the future or in your future assessment items.  </p>
    <div class="tcolorbox tcolorbox" id="tcolobox-4">    
 <div class="tcolorbox-title">
    </div> 
-<div class="tcolorbox-content"><!--l. 640--><p class="noindent" >TODO:  Setup Flask-Migrate to allow us to manage database migrations.  </p> 
+<div class="tcolorbox-content"><!--l. 643--><p class="noindent" >TODO:  Setup Flask-Migrate to allow us to manage database migrations.  </p> 
 </div> 
 </div>
-<!--l. 642--><p class="noindent" >
+<!--l. 645--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">6    </span> <a 
  id="x1-230006"></a>Finishing Up</h3>
-<!--l. 644--><p class="noindent" >We now have a working API which we can use to create, read, update and delete todo items. We can also use the
+                                                                                                    
+                                                                                                    
+<!--l. 647--><p class="noindent" >We now have a working API which we can use to create, read, update and delete todo items. We can also use the
 API to:
 </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 647--><p class="noindent" >mark todo items as completed
+      <!--l. 650--><p class="noindent" >mark todo items as completed
       </p></li>
       <li class="itemize">
-      <!--l. 648--><p class="noindent" >filter todo items by whether they are completed or not
+      <!--l. 651--><p class="noindent" >filter todo items by whether they are completed or not
       </p></li>
       <li class="itemize">
-      <!--l. 649--><p class="noindent" >filter todo items by whether they are due before or after a particular date</p></li></ul>
+      <!--l. 652--><p class="noindent" >filter todo items by whether they are due before or after a particular date</p></li></ul>
 <!--l. 1--><p class="noindent" >
 </p>
    <h3 class="likesectionHead"><a 
