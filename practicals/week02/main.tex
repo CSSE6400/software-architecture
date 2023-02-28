@@ -265,8 +265,6 @@ def create_app():
     app = Flask(__name__)
 
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///db.sqlite"
-    if config_overrides:
-        app.config.update(config_overrides)
 
     # Load the models
     from todo.models import db
@@ -291,6 +289,7 @@ In production systems, you would set this to a URI that defines the credentials 
 In latter practicals, we will get experience using more complex URIs.
 
 If we run our application now, we will see that the database file has been created for us.
+\bash{pipenv run flask --app todo run -p 6400 --debug}
 Your project structure should have a least the follow structure (there may be additional files):
 
 \begin{code}[language=bash,numbers=none]{}
@@ -343,7 +342,7 @@ We can then run the following command to see the data in our table:
   SELECT * FROM todos;
 \end{code}
 
-This should initially show us no rows.
+This should initially show us no output, indicating that the table is currently empty.
 We can then run the following command to exit the SQLite command line tool:
 
 \begin{code}[language=sql,numbers=none]{}
