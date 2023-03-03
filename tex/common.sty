@@ -5,17 +5,21 @@
 
 % Semester based timestamping
 \RequirePackage{datenumber}
+\RequirePackage{ifthen}
 
-\newcommand{\week}[1]{%
+\newcommand{\week}[2][]{%
     \setdatenumber{2023}{02}{13}% semester one, 2023 O-week
-    \ifnum#1>7% Cater for mid-semester break
-        \addtocounter{datenumber}{\the\numexpr(#1+2)*7}%
-    \else \ifnum#1>1% Cater for week of cancelled classes
-            \addtocounter{datenumber}{\the\numexpr(#1+1)*7}%
-        \else
-            \addtocounter{datenumber}{\the\numexpr#1*7}%
-        \fi
+    \ifnum#2>7% Cater for mid-semester break
+        \addtocounter{datenumber}{\the\numexpr(#2+2)*7}%
+    \else 
+        \addtocounter{datenumber}{\the\numexpr#2*7}%
     \fi
+    \ifthenelse{\equal{#1}{practical}}%
+    {\addtocounter{datenumber}{2}}%
+    {}%
+    \ifthenelse{\equal{#1}{tutorial}}%
+    {\addtocounter{datenumber}{3}}%
+    {}%
     \setdatebynumber{\thedatenumber}%
     \datedate
 }
