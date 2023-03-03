@@ -13,8 +13,8 @@ Microkernel is also known as a ``plug-in'' architecture.
 Many common applications use the microkernel architecture.
 Web browsers, many IDEs (notably Eclipse), Jenkins, and other tools all use this architecture.
 They deliver their core functionality and provide a plug-in interface that allows it to be extended.
-\link{Eclipse}{https://www.eclipse.org/downloads/packages/} is famous as a simple text editor that
-can be extended to be a sophisticated software development tool through its plug-in interface.
+\link{Eclipse}{https://www.eclipse.org/downloads/packages/} is famous for being a simple editor that
+can be extended to become a sophisticated software development tool through its plug-in interface.
 
 \vspace{2mm}
 \begin{definition}[Microkernel Architecture]
@@ -23,8 +23,8 @@ can be extended to be a sophisticated software development tool through its plug
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=38 180 22 50,clip,width=0.85\textwidth]{diagrams/generic-microkernel.png}
-    \caption{Microkernel architecture -- generic structure.}
+    \includegraphics[trim=195 195 195 195,clip,width=0.85\textwidth]{diagrams/generic-microkernel.png}
+    \caption{Generic structure of the microkernel architecture.}
     \label{fig:microkernel}
 \end{figure}
 
@@ -45,23 +45,25 @@ The \emph{core system}, \emph{plug-ins} and \emph{plug-in interface} shown in fi
 \end{description}
 
 The core system implements the minimal functionality that provides the base, or framework, of the system.
-This may be the core functionality of the system, like the Eclipse text editor or a web browser's page rendering engine.
+This may be the core functionality of the system, like the Eclipse editor or a web browser's page rendering engine.
 Alternatively, the core system may implement a general processing path, like a payroll system's payment process.
 
 The payment process may be simply, identify an employee, calculate their fortnightly pay, and send payment to their bank account.
-Calculating pay can be a very complex process\footnote{See the Queensland Health payroll disaster
+Calculating pay can be a very complex process\footnote{\raggedright See the Queensland Health payroll disaster
 \url{https://www.henricodolfing.com/2019/12/project-failure-case-study-queensland-health.html}}.
 There are different pay rates, bonuses, incentives, salaried staff, staff paid commission, staff paid hourly rates,
 overtime rates, penalty rates, deductions, taxes, and many other pay related calculations to consider for each individual.
 
 Plug-ins are independent components that extend the behaviour of the core system.
-The simple approach is that the system is delivered as a monolith, including the core system and the plug-in.
-In this case the core system uses the plug-in via a method invocation.
+The simple approach is that the system is delivered as a monolith, including the core system and the plug-ins.
+In this case the core system uses the plug-ins via a method invocation.
 
-In the payroll example, plug-ins can remove the complexity of different pay adjustment calculations from the core system, by moving each calculation to a separate component.
+In the payroll example, plug-ins can remove the complexity of different pay adjustment calculations from the core system
+by moving each calculation to a separate component.
 This also improves extensibility, maintainability and testability of the system.
-New calculations can be added to the system by implementing a new plug-in.
-As each plug-in is independent of the others, it is easier to implement a new calculation, or changing an existing one, than trying to do so in a large monolith.
+New calculations can be added to the system by implementing new plug-ins.
+As each plug-in is independent of the others, it is easier to implement a new calculation, or change an existing one,
+than trying to do so in a large monolith.
 New plug-ins can be tested independently and then integrated into the system for system testing.
 
 There is usually a single standard interface between the core system and the plug-ins for a domain.
@@ -72,7 +74,7 @@ Figure \ref{fig:interface} is an example of a possible interface for the pay adj
 Each pay adjustment plug-in returns a \texttt{MonetaryAmount} indicating the amount by which the employee's base pay is to be adjusted in the pay period.
 The amount may be positive or negative.
 The \texttt{employee}, \texttt{periodDetails}, \texttt{employeeConditions} and \texttt{basePay} objects are passed as parameters to the plug-in.
-The plug-in can extract the data it needs from these objects to perform its calculation.
+The plug-in can request the data it needs from these objects to perform its calculation.
 The \texttt{periodDetails} object provides data about the work performed by the employee during the pay period (e.g. time worked, overtime, higher duties adjustments, ...).
 The \texttt{employeeConditions} set provides data about each of the employee's pay conditions (e.g. before tax deductions, union membership, ...).
 
@@ -129,22 +131,23 @@ Similarly, the plug-in interface should mean that any changes to the plug-in wil
     There should be a single interface that defines how the core system uses plug-ins.
 \end{definition}
 
+\begin{wrapfigure}{r}{0.24\textwidth}
+    \vspace{-18pt}
+    \centering
+    \includegraphics[trim=197 197 197 197,clip,width=0.24\textwidth]{diagrams/technical-partitioning.png}
+    \vspace{-20pt}
+    \caption{Layered architecture as example of technical partitioning.}
+    \label{fig:technical-partitioning}
+\end{wrapfigure}
+
 To provide an extensible design, the core system needs a standard way to use plug-ins.
 This means that the plug-in interface needs to be the same for all plug-ins.
 That way the core system can use any plug-in without needing to know details about how the plug-in is implemented.
 This again is about reducing coupling between the core system and the plug-ins.
-The standard interface principle means that there is no additional complexity if the core system uses two plug-ins or thousands of plug-ins.
+The standard interface principle means that there is no additional complexity if the core system uses two plug-ins or two thousand plug-ins.
 
 
 \section{Architecture Partitioning}
-
-\begin{wrapfigure}{r}{0.32\textwidth}
-    \vspace{-20pt}
-    \centering
-    \includegraphics[trim=74 58 40 41,clip,width=0.3\textwidth]{diagrams/technical-partitioning.png}
-    \caption{Layered architecture as example of technical partitioning.}
-    \label{fig:technical-partitioning}
-\end{wrapfigure}
 
 \subsection{Technical Partitioning}
 The course notes about layered architecture \cite{layered-notes}
@@ -157,6 +160,7 @@ The business layer deals with the application's core logic.
 The persistence layer deals with storing and loading data.
 The database layer deals with file storage and access details.
 
+\clearpage
 An advantage of technical partitioning is that it corresponds to how developers view the code.
 Another advantage is that all related code resides in a single layer of the architecture, making each layer
 \link{cohesive}{https://leanpub.com/isaqbglossary/read\#term-cohesion} from a technical perspective.
@@ -164,7 +168,6 @@ This makes it easier to work with different parts of the code that deal with the
 The \emph{layer isolation}, \emph{neighbour communication}, \emph{downward dependency},
 and \emph{upward notification} principles help reduce coupling between layers.
 
-\clearpage
 A disadvantage of technical partitioning is that business processes cut across technical capabilities.
 Consider when a customer adds a new product to their shopping cart in the Sahara eCommerce example
 from the architectural views notes \cite{view-notes}.
@@ -178,7 +181,7 @@ the database may need to be split to have separate databases for each distribute
 If the database was originally designed to cater for a monolith architecture, large parts of the database may need to be refactored.
 
 Note that in figure \ref{fig:technical-partitioning}, and most of the following figures,
-nodes from UML deployment diagrams are used to explicitly indicate where components are executing in different environments.
+deployment nodes are used to explicitly indicate where components are executing in different environments.
 
 \subsection{Domain Partitioning}
 \emph{Domain partitioning} is an alternative approach, where the architecture is split into partitions (or major components)
