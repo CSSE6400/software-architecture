@@ -208,6 +208,7 @@
     }
     {\end{tcolorbox}}
 
+% Corollary
 \newcounter{corollary}[part]
 \newenvironment{corollary}[1][]
     {\refstepcounter{corollary}
