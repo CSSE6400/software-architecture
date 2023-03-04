@@ -7,7 +7,7 @@
 \usepackage{languages}
 
 \title{Docker and Docker Compose}
-\author{Evan Hughes \& Brae Webb}
+\author{Brae Webb \& Evan Hughes}
 
 \date{\week{3}}
 \begin{document}
@@ -15,7 +15,9 @@
 \maketitle
 
 \begin{figure}[h]
-  \includegraphics[width=\textwidth]{images/docker}
+  \begin{center}
+    \includegraphics[scale=0.4]{images/docker}
+  \end{center}
   \caption{Docker containers by MidJourney with Prompt ""}
 \end{figure}
 
@@ -28,6 +30,7 @@ This week our goal is to:
   \item Testing and Packaging our application on commit.
 \end{itemize}
 
+\pagebreak
 \section{Getting Started with Docker}
 
 In the lectures we have delved into the world of containers and how they can be used to create a consistent environment for our applications. Depending on the courses you have taken you may have been exposed to them as either a user or a consumer, for instance if you have submitted assessment to gradescope in CSSE1001 or CSSE2002 the submission system uses docker to run your code.\\
@@ -68,7 +71,7 @@ When building a Dockerfile you need to start with a base image. This is the imag
 
 Now that we have a base image we can start to add our own dependencies. In this case we are installing python3 and pip. The RUN command is used to run a command in the container. Since we are using ubuntu we can use apt-get to install our dependencies and we are chaining the commands so that they are run as one block. You will notice that we are running \texttt{apt-get update} before we install our dependencies. This is because the base image probably has no package caches as that would take up unnesscary space. So we need to update the package cache before we can install anything.
 
-\todo{continue fleshing this out}
+\todo{continue fleshing this out with copy, add, workdir, cmd, entrypoint}
 
 \subsubsection{Dockerfile Layers}
 
@@ -158,10 +161,30 @@ As an example the image that we have been using is available at \url{https://hub
 
 \subsection{Installing Docker}
 
-To install docker on your machine you can follow the instructions on the docker website: \url{https://docs.docker.com/get-docker/}.
+To install docker on your Mac or Windows machine you can follow the instructions on the docker website: \url{https://docs.docker.com/get-docker/}. If you are using a Linux machine you can install docker using your package manager. For example on Ubuntu you can use the following command:
+
+\begin{code}[language=bash,numbers=none]{}
+  sudo apt-get install docker.io
+\end{code}
+
+\info{
+  If you are using a Linux machine you may need to add your user to the docker group so that you can run docker commands without sudo. While the docker website suggests using docker-desktop for Linux, the course highly recommends using the native docker installation.
+}
 
 
 \subsection{Running a Docker Container}
+
+To verify that docker is installed correctly you can run the following command:
+
+\begin{code}[language=bash,numbers=none]{}
+  docker run hello-world
+
+  # Example output
+  ...
+
+  Hello from Docker!
+  This message shows that your installation appears to be working correctly.
+\end{code}
 
 
 \section{Dockerising our Todo Application}
@@ -170,7 +193,83 @@ To install docker on your machine you can follow the instructions on the docker 
   For this section let the students work through the practical on their own. The content above should be enough to guide them through the process with the provided instructions.
 }
 
+\subsection{Creating a Practical Repository}
+Navigate to the GitHub Classroom link for this practical provided by your tutor in Slack.
+As with last week, this will create a new repository for you in the course organisation.
+You can now clone this repository to your local machine or work directly in the browser with GitHub codespaces.
+This repository will be populated with our solution to last weeks practical exercise.
+You may modify this solution or replace it with your own.
+
 \subsection{Creating a Dockerfile}
+
+Now that we have covered the basics of Docker we can Dockerise our Todo App to prepare it for deployment. Inside our practical folder we will create a new file called \texttt{Dockerfile}. To start us off we will use the following Dockerfile:
+
+\begin{code}[language=docker,numbers=none]{}
+  # syntax=docker/dockerfile:1
+  FROM ubuntu:latest
+
+  # Installing dependencies for running a python application
+  RUN apt-get update && apt-get install -y python3 python3-pip
+\end{code}
+
+The above image is what your local environments may have been like when you started the course. To follow the same setup as we have had in the practicals lets install pipenv. We can do this by adding the following line to our Dockerfile:
+
+\begin{code}[language=docker,numbers=none]{}
+  # Install pipenv
+  RUN pip3 install -y pipenv
+\end{code}
+
+Lets now change our working directory to \texttt{/app} and copy our \texttt{Pipfile} and \texttt{Pipfile.lock} into the container. We can then install our dependencies using pipenv. We can do this by adding the following lines to our Dockerfile:
+
+\begin{code}[language=docker,numbers=none]{}
+  # Setting the working directory
+  WORKDIR /app
+
+  # Install pipenv dependencies
+  COPY Pipfile Pipfile.lock /app/
+  RUN pipenv install --system --deploy
+\end{code}
+
+Now that we have installed our dependencies we can copy our application into the container. We can do this by adding the following line to our Dockerfile:
+
+\begin{code}[language=docker,numbers=none]{}
+  # Copying our application into the container
+  COPY todo/ /app
+
+\end{code}
+
+Finally we can run our application by adding the following line to our Dockerfile:
+
+\begin{code}[language=docker,numbers=none]{}
+  # Running our application
+  CMD ["python3", "flask", "--app", "todo", "run", "--host", "0.0.0.0", "--port", "6400"]
+\end{code}
+
+We should now have a complete Dockerfile, as shown below:
+
+\begin{code}[language=docker,numbers=none]{}
+  # syntax=docker/dockerfile:1
+  FROM ubuntu:latest
+
+  # Installing dependencies for running a python application
+  RUN apt-get update && apt-get install -y python3 python3-pip
+
+  # Install pipenv
+  RUN pip3 install -y pipenv
+
+  # Setting the working directory
+  WORKDIR /app
+
+  # Install pipenv dependencies
+  COPY Pipfile Pipfile.lock /app/
+  RUN pipenv install --system --deploy
+
+  # Copying our application into the container
+  COPY todo/ /app
+  
+  # Running our application
+  CMD ["python3", "flask", "--app", "todo", "run", "--host", "0.0.0.0", "--port", "6400"]
+\end{code}
 
 \subsection{Building our Docker Image}
 
