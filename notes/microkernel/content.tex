@@ -23,7 +23,7 @@ can be extended to become a sophisticated software development tool through its 
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=195 195 195 195,clip,width=0.85\textwidth]{diagrams/generic-microkernel.png}
+    \includegraphics[trim=195 195 195 195,clip,width=\textwidth]{diagrams/generic-microkernel.png}
     \caption{Generic structure of the microkernel architecture.}
     \label{fig:microkernel}
 \end{figure}
@@ -132,11 +132,11 @@ Similarly, the plug-in interface should mean that any changes to the plug-in wil
 \end{definition}
 
 \begin{wrapfigure}{r}{0.24\textwidth}
-    \vspace{-18pt}
+    \vspace{-19pt}
     \centering
     \includegraphics[trim=197 197 197 197,clip,width=0.24\textwidth]{diagrams/technical-partitioning.png}
-    \vspace{-20pt}
-    \caption{Layered architecture as example of technical partitioning.}
+    \vspace{-22pt}
+    \caption{\centering\footnotesize Layered architecture as example of technical partitioning.}
     \label{fig:technical-partitioning}
 \end{wrapfigure}
 
@@ -160,9 +160,12 @@ The business layer deals with the application's core logic.
 The persistence layer deals with storing and loading data.
 The database layer deals with file storage and access details.
 
-\clearpage
 An advantage of technical partitioning is that it corresponds to how developers view the code.
-Another advantage is that all related code resides in a single layer of the architecture, making each layer
+Another advantage is that all related code resides in a 
+
+\clearpage
+\noindent
+single layer of the architecture, making each layer
 \link{cohesive}{https://leanpub.com/isaqbglossary/read\#term-cohesion} from a technical perspective.
 This makes it easier to work with different parts of the code that deal with the same technical capability.
 The \emph{layer isolation}, \emph{neighbour communication}, \emph{downward dependency},
@@ -193,8 +196,8 @@ Sahara eCommerce example from the architectural views notes \cite{view-notes}.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=38 42 19 44,clip,width=0.9\textwidth]{diagrams/domain-partitioning.png}
-    \caption{Example of domain partitioning.}
+    \includegraphics[trim=197 197 197 195,clip,width=0.73\textwidth]{diagrams/domain-partitioning.png}
+    \caption{Domain partitioning example.}
     \label{fig:domain-partitioning}
 \end{figure}
 
@@ -219,14 +222,13 @@ The persistence layer is the boundary between the system and the storage mechani
 Other boundary partitions may be for message queues or network communication.
 
 It is possible for each domain partition to use technical partitioning within it,
-to provide some of the lower coupling benefits of a layered architecture for the domain.
+to provide some of the lower coupling benefits of a layered architecture within the domain.
 
 \subsection{Achitecture Patterns and Partitioning}
 Different architecture patterns are biased more towards technical or domain partitioning.
 Those that focus on technical structure are biased towards technical partitioning (e.g. layered architecture).
 Those that focus on message passing between components are biased towards domain partitioning (e.g. microservices architecture).
 The core system of the microkernel architecture can follow either technical or domain partitioning.
-
 A consequence of this leads to a variation of principle \ref{std-intf}.
 
 \vspace{1mm}
@@ -234,25 +236,30 @@ A consequence of this leads to a variation of principle \ref{std-intf}.
     Each \emph{domain} should have a single interface that defines how the domain uses plug-ins.
 \end{definition}
 
+\begin{wrapfigure}{r}{0.5\textwidth}
+    \vspace{-15pt}
+    \centering
+    \includegraphics[trim=195 197 197 195,clip,width=0.55\textwidth]{diagrams/domain-microkernel.png}
+    \vspace{-20pt}
+    \caption{\centering Microkernel architecture with domains.}
+    \label{fig:microkernel-domains}
+\end{wrapfigure}
+
 Some domains may share a plug-in interface, but allowing domains to have different plug-in interfaces
 means that each business process can be customised independently by a set of plug-ins.
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[trim=38 42 23 42,clip,width=0.5\textwidth]{diagrams/domain-microkernel.png}
-    \caption{Microkernel architecture with domains.}
-    \label{fig:microkernel-domains}
-\end{figure}
-
-In figure \ref{fig:microkernel-domains}, nodes are used to explicitly indicate that the core system and plug-ins are conceptually separate from each other.
+In figure \ref{fig:microkernel-domains}, deployment nodes are used to explicitly indicate that the core system and plug-ins are conceptually separate from each other.
 They are all contained within the Application node to indicate that they are still all part of one monolithic application.
 
 
 \section{Extensions}
 
 While the microkernel architecture often implements the core system as a monolith
-and it, along with all its plug-ins, is often deployed as a single monolith
-(e.g. a web browser), that is not the only approach to using the microkernel architecture.
+and it, along with all its plug-ins, is often deployed as a single 
+
+\clearpage
+\noindent
+monolith (e.g. a web browser), that is not the only approach to using the microkernel architecture.
 
 \subsection{Distributed Microkernel}
 
@@ -261,7 +268,7 @@ Figure \ref{fig:3-tier-microkernel} is an example of implementing a distributed 
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=40 41 18 43,clip,width=0.9\textwidth]{diagrams/separate-ui-microkernel.png}
+    \includegraphics[trim=197 197 197 195,clip,width=0.77\textwidth]{diagrams/separate-ui-microkernel.png}
     \caption{Microkernel architecture distributed by technical partitions.}
     \label{fig:3-tier-microkernel}
 \end{figure}
@@ -277,10 +284,10 @@ Figure \ref{fig:interface} was an example interface that could be used if plug-i
 This is possible if the plug-ins are implemented within the application or are loaded as code modules at run time (e.g. via JAR or DLL files).
 
 There may be times when plug-ins are external services used by the core system.
-In those situations communication is via some communication protocol.
+In these situations communication is via some communication protocol.
 Remote method invocation would still allow the core system to use a compiled interface.
 Registration of components would become a little more complicated,
-as the core system would need to a communication interface to be notified of the availability of plug-ins.
+as the core system would need a communication interface to be notified of the availability of plug-ins.
 
 More commonly, the communication protocol will be some other mechanism (e.g. REST, as shown in figure \ref{fig:rest-microkernel}).
 In this case, the registry needs to record more information than just the name and interface of a plug-in.
@@ -289,8 +296,8 @@ It will also need details about the data structure passed to the plug-in and ret
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=38 167 19 45,clip,width=0.75\textwidth]{diagrams/rest-microkernel.png}
-    \caption{Microkernel architecture -- separate plug-in services with REST communication.}
+    \includegraphics[trim=197 197 197 195,clip,width=0.85\textwidth]{diagrams/rest-microkernel.png}
+    \caption{Microkernel architecture -- separate plug-in services using REST.}
     \label{fig:rest-microkernel}
 \end{figure}
 
@@ -304,7 +311,7 @@ Rather, these plug-ins should maintain their own databases, as shown in figure \
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=38 81 24 50,clip,width=0.85\textwidth]{diagrams/plug-in-databases.png}
+    \includegraphics[trim=195 196 196 195,clip,width=0.85\textwidth]{diagrams/plug-in-databases.png}
     \caption{Microkernel architecture with plug-ins maintaining their own databases.}
     \label{fig:plug-in-dbs}
 \end{figure}
@@ -318,7 +325,9 @@ to isolate the external service's interface from the core system.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=38 58 20 45,clip,width=0.85\textwidth]{diagrams/adapter-plug-in.png}
+    \begin{adjustwidth}{-7.5mm}{-7.5mm}
+        \includegraphics[trim=195 197 195 195,clip,width=0.95\paperwidth]{diagrams/adapter-plug-in.png}
+    \end{adjustwidth}
     \caption{Adapter plug-ins to work with third party services.}
     \label{fig:adapter}
 \end{figure}
