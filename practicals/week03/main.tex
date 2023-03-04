@@ -1,39 +1,193 @@
 \documentclass{csse4400}
 
-% \teachermodetrue
+\teachermodetrue
 
 \usepackage{float}
 
 \usepackage{languages}
 
-\title{Empty Practical}
+\title{Docker and Docker Compose}
 \author{Evan Hughes \& Brae Webb}
 
-\date{\week{0}}
+\date{\week{3}}
 \begin{document}
 
 \maketitle
 
+\begin{figure}[h]
+  \includegraphics[width=\textwidth]{images/docker}
+  \caption{Docker containers by MidJourney with Prompt ""}
+\end{figure}
+
 \section{This Week}
 This week our goal is to:
 \begin{itemize}
+  \item Learn docker basics.
   \item Dockerise our Todo application from last week.
   \item Move to a postgresql database from the SQLite database we used last week.
   \item Testing and Packaging our application on commit.
 \end{itemize}
 
-\section{Pre-reading}
-If you have not completed the Docker course then you should do that first. You can find it here: \url{https://ylearn.uq.edu.au}. The following practical builds upon the Docker course and wraps the Todo application in a Docker container with some nice extras.
+\section{Getting Started with Docker}
+
+In the lectures we have delved into the world of containers and how they can be used to create a consistent environment for our applications. Depending on the courses you have taken you may have been exposed to them as either a user or a consumer, for instance if you have submitted assessment to gradescope in CSSE1001 or CSSE2002 the submission system uses docker to run your code.\\
+
+\notice{
+This practical will assume you have not used docker before but we will be skipping over some aspects since its not needed for our purposes. Though since docker is a tool that many courses can use we have created a mini-course on it. You can find it here: \url{https://extend.uq.edu.au}. We recommend checking out the mini-course if you have any difficulties with the practical.
+}
+
+\teacher{
+  Sections 2.1 and 2.2 are presentation based where you should be covering the fundementals of docker images and containers. Where we are using container to describe the implemented image running in an environment.
+}
+
+\subsection{Docker Images}
+
+Images are the building block of the principals on containerisation. They are a self contained environment that can be run that contains the depenedencies and code for an application. A common way to build an image is to use a Dockerfile. Though Docker was not the first to make this concept, it is very popular and relativly easy to use.
+
+\subsubsection{Dockerfile}
+
+The Dockerfile is a plain text file with its own markup language that is used to describe the image. It is a series of instructions that are run in order to build the image. The instructions are run in a layered fashion, each instruction is run on top of the previous instruction. This means that if you change a line in the Dockerfile you only need to rebuild the layers that have changed. This is a huge time saver when developing your application.
+
+A reference of all possible Dockerfile instructions can be found here: \url{https://docs.docker.com/engine/reference/builder/}. For the purposes of the course we are just gonna cover some of the basics and some common recipes.
+
+
+\begin{code}[language=docker,numbers=none]{}
+# syntax=docker/dockerfile:1
+FROM ubuntu:latest
+\end{code}
+
+When building a Dockerfile you need to start with a base image. This is the image that you will build on top of. In this case we are using the latest version of ubuntu. This ubutu is a very minimal image that is used intended to be used as a starting point and is itself an image.
+
+\begin{code}[language=docker,numbers=none]{}
+  # syntax=docker/dockerfile:1
+  FROM ubuntu:latest
+
+  # Installing dependencies for running a python application
+  RUN apt-get update && apt-get install -y python3 python3-pip
+\end{code}
+
+Now that we have a base image we can start to add our own dependencies. In this case we are installing python3 and pip. The RUN command is used to run a command in the container. Since we are using ubuntu we can use apt-get to install our dependencies and we are chaining the commands so that they are run as one block. You will notice that we are running \texttt{apt-get update} before we install our dependencies. This is because the base image probably has no package caches as that would take up unnesscary space. So we need to update the package cache before we can install anything.
+
+\todo{continue fleshing this out}
+
+\subsubsection{Dockerfile Layers}
+
+In the previous sections we have been using the RUN, ADD and COPY to build up our image to run an example application. When the container is built each of these instructions is run on a layer of the image. This means that if you change a line in the Dockerfile you only need to rebuild the layers that have changed. This is a huge time saver when developing your application.
+
+Lets have a look at an example of the layers that are created when we build our Dockerfile from the previous section.
+
+\begin{code}[language=docker,numbers=none]{}
+  # syntax=docker/dockerfile:1
+  FROM ubuntu:latest
+
+  # Installing dependencies for running a python application
+  RUN apt-get update && apt-get install -y python3 python3-pip
+
+  # Copying our application into the container
+  COPY . /app
+
+  # Installing our application dependencies
+  RUN pip3 install -r /app/requirements.txt
+
+  # Setting the working directory
+  WORKDIR /app
+
+  # Running our application
+  CMD ["python3", "src/app.py"]
+\end{code}
+
+We see that we are copying in the entire application directory before we install our requirements. We can improve this so that we only copy in the requirements file and then install the requirements. This means that if we change our application code we don't need to reinstall the requirements.
+
+\begin{code}[language=docker,numbers=none]{}
+  # syntax=docker/dockerfile:1
+  FROM ubuntu:latest
+
+  # Installing dependencies for running a python application
+  RUN apt-get update && apt-get install -y python3 python3-pip
+
+  # Copying our application into the container
+  COPY requirements.txt /app/requirements.txt
+
+  # Installing our application dependencies
+  RUN pip3 install -r /app/requirements.txt
+
+  # Copying our application into the container
+  COPY src/ /app
+
+  # Setting the working directory
+  WORKDIR /app
+
+  # Running our application
+  CMD ["python3", "src/app.py"]
+\end{code}
+
+For the containers we will be building this may not be a large issue, but once your project becomes larger and you have more dependencies it can become a large time saver.
+
+To see the layers that are created when you build your Dockerfile you can use the following command:
+
+\begin{code}[language=bash,numbers=none]{}
+  docker history <image name>
+
+  # Example
+  docker history ubuntu:latest
+\end{code}
+
+
+\subsubsection{Image Registries}
+
+When we introduced the Dockerfile we glossed over the details of where \texttt{ubuntu:latest} is being sourced from. This image is coming from a registry. There are a few different registries that you can use. The default registry is one hosted by Docker themselves. This is the registry that is used when you don't specify a registry and is available at \url{https://hub.docker.com/}. There are also registries hosted by other companies such as Google and Amazon. These are available at \url{https://cloud.google.com/container-registry} and \url{https://aws.amazon.com/ecr/} respectively.
+
+As an example the image that we have been using is available at \url{https://hub.docker.com/_/ubuntu}. When browsing this page we can also see differnt tags that are available for this image, such as \texttt{latest} and \texttt{20.04}. These tags are used to specify different versions of the image so you can pin your image instead of using the \texttt{latest} tag which will always point to the latest version of the image. Note that not all images will have different tags or even a \texttt{latest} tag.
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{images/dockerhub}
+  \caption{Ubuntu image on Docker Hub}
+\end{figure}
+
+\subsection{Docker Containers}
+
+\todo{continue fleshing this out}
+
+\subsubsection{Docker Networking}
+
+\todo{continue fleshing this out}
+
+\subsubsection{Docker Volumes}
+
+\todo{continue fleshing this out}
+
+\subsection{Installing Docker}
+
+To install docker on your machine you can follow the instructions on the docker website: \url{https://docs.docker.com/get-docker/}.
+
+
+\subsection{Running a Docker Container}
+
 
 \section{Dockerising our Todo Application}
 
-\subsection{Moving to a MultiStage Dockerfile}
+\teacher{
+  For this section let the students work through the practical on their own. The content above should be enough to guide them through the process with the provided instructions.
+}
+
+\subsection{Creating a Dockerfile}
+
+\subsection{Building our Docker Image}
+
+\subsection{Running our Docker Container}
+
+\subsection{Docker Compose}
 
 \subsection{Moving to a Postgresql Database}
 
-\subsection{Running migrations in our Dockerfile}
+\section{Testing and Packaging our Application on Commit}
 
-\section{Intro to Continuous Integration}
+\teacher{
+  Here we will describe the basics of CI and how we can use it to test and package our application. Run through this section and let the students use the provided completed file to get their repos running the tests and packaging on commit.
+}
+
+\subsection{Intro to Continuous Integration}
+
 
 \subsection{Intro to GitHub Actions}
 
