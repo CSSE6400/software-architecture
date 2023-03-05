@@ -19,12 +19,22 @@
 
 \usepackage{languages}
 
+\newcommand{\commandnoarg}[2]{
+\begin{frame}
+    \bash{#1}
+    {\color{primary}Summary}
+
+    #2
+\end{frame}
+}
+
 \newcommand{\command}[3]{
 \begin{frame}
     \bash{#1}
     {\color{primary}Summary}
 
     #2
+    \vspace{1em}
 
     {\color{primary}Key parameters}
     \begin{description}
@@ -221,7 +231,7 @@ ls
 
 \begin{frame}[fragile]{Chroot Limitations}
     \begin{itemize}
-        \item \highlight{Only filesystem isolation}, processes, network, etc. still accessible.
+        \item \highlight{Only filesystem isolation} --- processes, network, etc. still accessible.
         \item Not very \highlight{user friendly}.
         \item Not very \highlight{portable}.
         \item \highlight{Jailbreak} is possible.
@@ -670,7 +680,6 @@ CMD ["/usr/games/cowsay", "Hello World"]
 \begin{columns}
     \begin{column}{0.5\textwidth}
     {\color{primary} Virtual Machine}
-
     \begin{align*}
         \text{Image Size} &= 3.8GB + 232MB \\
                           &+ 11.1MB + 12K\\
@@ -681,10 +690,9 @@ CMD ["/usr/games/cowsay", "Hello World"]
     \end{column}
     \begin{column}{0.5\textwidth}
     {\color{primary} Container}
-
     \begin{align*}
         \text{Image Size} &= 12K \\
-        \text{Layer Space} &= 3.8GB + 232MB + 11.1MB \\
+        \text{Layer Size} &= 3.8GB + 232MB + 11.1MB \\
                              &= 4.04GB \\
         \text{Total Space} &= (12K * 10) + 4.04GB \\
                            &\simeq 4.04GB
@@ -776,11 +784,9 @@ Containers are the basis for \highlight{serverless computing}
 }
 
 \command{docker exec [container]}{
-    Run a command in a running \highlight{container}.
+    Run a command in a \highlight{running container}.
 }{
-    \item[-d] Run the container in the background
-\item[-p] Publish a container's port to the host
-\item[-v] Mount a volume
+    \item[-d] Run the command in the background
 \item[-e] Set environment variables
 \item[-i] Keep STDIN open even if not attached
 \item[-t] Allocate a pseudo-TTY
@@ -803,8 +809,14 @@ Containers are the basis for \highlight{serverless computing}
     Remove a container.
 }{
     \item[-f] Force the removal of a running container (uses SIGKILL)
-\item[-l] Remove the specified link
 \item[-v] Remove the volumes associated with the container
+}
+
+\command{docker images}{
+    List images.
+}{
+    \item[-a] Show all images (default hides intermediate images)
+    \item[-f] Filter output based on conditions provided
 }
 
 \command{docker rmi [image]}{
@@ -813,24 +825,12 @@ Containers are the basis for \highlight{serverless computing}
     \item[-f] Force removal of the image
 }
 
-\command{docker images}{
-    List images.
-}{
-    \item[-a] Show all images (default hides intermediate images)
-\item[-f] Filter output based on conditions provided
-\item[-q] Only display numeric IDs
-}
-
-\command{docker pull [image]}{
+\commandnoarg{docker pull [image]}{
     Pull an image or a repository from a registry.
-}{
-    \item[-a] Download all tagged images in the repository
 }
 
-\command{docker push [image]}{
+\commandnoarg{docker push [image]}{
     Push an image or a repository to a registry.
-}{
-    \item[-a] Upload all tagged images in the repository
 }
 
 \section{Examples}
@@ -859,7 +859,7 @@ docker run -p 80:80 -v ./nginx.conf:/etc/nginx/nginx.conf -d nginx
     \end{code}
 \end{frame}
 
-\point{This turned out to be very common\dots
+\point{This turns out to be very common\dots
 
 \pause
 Introducing\dots \highlight{Docker Compose}
@@ -922,46 +922,49 @@ services:
 \end{frame}
 
 \command{docker-compose up}{
-    Create and start containers.
+    Create and run containers.
 }{
     \item[-d] Detached mode: Run containers in the background, print new container names
-\item[-f] Specify an alternate compose file (default: docker-compose.yml)
+    \item[--build] Rebuild containers if necessary.
 }
 
 \command{docker-compose down}{
     Stop and remove containers, networks, images, and volumes.
 }{
-    \item[-v] Remove named volumes declared in the `volumes' section of the Compose file and anonymous volumes attached to containers
-\item[-t] Specify a shutdown timeout in seconds
+    \item[-v] Remove named volumes declared in the `volumes' section of the Compose file and anonymous volumes attached to containers.
+\item[-t] Specify a shutdown timeout in seconds.
 }
 
-\command{docker-compose ps}{
+\commandnoarg{docker-compose ps}{
     List containers.
-}{
-    \item[-q] Only display IDs
 }
 
 \command{docker-compose logs}{
     View output from containers.
 }{
-    \item[-f] Follow log output
-\item[-t] Show timestamps
+    \item[-f] Follow log output.
 }
 
 \command{docker-compose exec [service]}{
     Run a command in a running container.
 }{
     \item[-d] Detached mode: Run command in the background
-\item[-T] Disable pseudo-tty allocation. By default `docker-compose exec` allocates a TTY.
+\item[-T] Disable pseudo-tty allocation. By default `docker-compose exec' allocates a TTY.
 \item[-e] Set environment variables
 }
 
 \command{docker-compose build}{
     Build or rebuild services.
 }{
-    \item[--no-cache] Do not use cache when building the image
-\item[--pull] Always attempt to pull a newer version of the image
+    \item[--no-cache] Do not use cache when building the image.
+\item[--pull] Always attempt to pull a newer version of the image.
+    
 }
+
+\begin{frame}{In the practical this week...}
+    \centering
+    \includegraphics[width=.95\textwidth]{images/practical}
+\end{frame}
 
 
 \begin{frame}
