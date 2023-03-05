@@ -273,26 +273,114 @@ We should now have a complete Dockerfile, as shown below:
 
 \subsection{Building our Docker Image}
 
+Now that we have created our Dockerfile we can build our Docker image. To do this we will use the following command:
+
+\begin{code}[language=bash,numbers=none]{}
+  docker build -t todo .
+
+  # Example output
+  ...
+  Successfully tagged todo:latest
+\end{code}
+
+We can then inspect our layers with the following command:
+
+\begin{code}[language=bash,numbers=none]{}
+  docker image history todo
+\end{code}
+
+
 \subsection{Running our Docker Container}
+
+Now that we have built our Docker image we can run our Docker container. To do this we will use the following command:
+
+\begin{code}[language=bash,numbers=none]{}
+  docker run -p 6400:6400 todo
+
+  # Example output
+  ...
+  * Running on ...
+\end{code}
+
+We can now navigate to \url{http://localhost:6400} to see our application running. We can stop our container by pressing \texttt{Ctrl+C}. This should show the todo app that we have been working with for the past couple of practicals.
+
+\info{
+  It is important for us to use the host of 0.0.0.0 when running our application. This is because we are running our application inside a container and we need to expose the port to the host machine. If we were to use the default host of 127.0.0.1 we would not be able to access our application from outside the container.
+}
+
+\warning{
+  You do need to make sure that you were not running the webserver from the previous practical on port 6400. If you were you will need to stop that webserver before running the docker container. If you also have other containers running they can conflict with this container.
+}
 
 \subsection{Docker Compose}
 
+Docker is a useful tool itself but in terms of local development, Docker Compose is a much more useful tool. Docker Compose allows us to run multiple containers together which can be extremely useful if your developing multiple projects or have multiple components that need to be put together. For instance for a story close to home, maybe you are working on INFS2200 with you database schema in one container and you can be running your DECO3801 projects database in another container. 
+
+For us, we are going to be using a database closer to our production environment. We will be using a Postgresql database which will eventually be a managed database hosted option from AWS.
+
 \subsection{Moving to a Postgresql Database}
 
-\section{Testing and Packaging our Application on Commit}
+This week we have actually made a small change to our application so that it can receive the SQLAlchemy database URI as an environment variable. This means that we can now use Docker Compose to run our application and database together. To do this we will create a new file called \texttt{docker-compose.yml} and add the following content:
 
-\teacher{
-  Here we will describe the basics of CI and how we can use it to test and package our application. Run through this section and let the students use the provided completed file to get their repos running the tests and packaging on commit.
-}
+\begin{code}[numbers=none]{}
+  version: "3.9"
 
-\subsection{Intro to Continuous Integration}
+  services:
+    database:
+      image: postgres:latest
+      restart: always
+      environment:
+        POSTGRES_PASSWORD: verySecretPassword
+        POSTGRES_USER: administrator
+        POSTGRES_DB: todo
+      volumes:
+        - ./data:/var/lib/postgresql/data
+    app:
+      build: .
+      restart: always
+      environment:
+        DATABASE_URI: postgresql://administrator:verySecretPassword@database:5432/todo
+      ports:
+        - "6400:6400"
+      depends_on:
+        - database
+\end{code}
+
+We can now run our application and database with the following command:
+
+\begin{code}[language=bash,numbers=none]{}
+  docker-compose up
+\end{code}
+
+You should observe the output of this command and you can see two processes running. One is the database and the other is our application. We can now navigate to \url{http://localhost:6400} to see our application running. In reality though our database probably did not have enough time to start up before our application tried to connect to it. We can fix this by adding a delay to our application startup. To do this we will add the following line to our Dockerfile:
+
+\begin{code}[language=docker,numbers=none]{}
+  # Adding a delay to our application startup
+  CMD ["sleep", "10", "&&", "python3", "flask", "--app", "todo", "run", "--host", "0.0.0.0", "--port", "6400"]
+\end{code}
+
+In the long run you would want your application to be able to retry connecting to the database if it fails but for now we will just add a delay. We can now rebuild our Docker image and run our application and database with the following commands:
+
+\begin{code}[language=bash,numbers=none]{}
+  docker-compose up --build
+\end{code}
+
+You may have noticed that when we defined the todo application service above we didnt specify a container. This is because Docker Compose can be instructed to use our Dockerfile to build at time so that we dont have to keep using the build command.
+
+% \section{Packaging our Application on Commit}
+
+% \teacher{
+%   Here we will describe the basics of CI for building our container, we teach this here so that next week we can start using it for the AWS deployment.
+% }
+
+% \todo{Running out of time so potentially cut this and move it to the week that we deploy our container}
+
+% \subsection{Intro to Continuous Integration}
 
 
-\subsection{Intro to GitHub Actions}
+% \subsection{Intro to GitHub Actions}
 
-\subsection{Testing on commit}
-
-\subsection{Packaging on commit}
+% \subsection{Packaging on commit}
 
 \bibliographystyle{ieeetr}
 \bibliography{books,ours}
