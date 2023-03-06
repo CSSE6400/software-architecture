@@ -1,4 +1,4 @@
-Last Updated on 2023/03/05      
+Last Updated on 2023/03/06     
 
 <?xml version="1.0" encoding="iso-8859-1" ?> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
@@ -102,10 +102,19 @@ application.
 </p><!--l. 54--><p class="indent" >   A reference of all possible Dockerfile instructions can be found here: <a 
 href="https://docs.docker.com/engine/reference/builder/" class="url" ><span 
 class="ectt-1200">https://docs.docker.com/engine/reference/builder/</span></a>.
-For the purposes of the course we are just gonna cover some of the basics and some common recipes.
-</p>
+For the purposes of the course we are just gonna cover some of the basics of [FROM, RUN, COPY, ADD,
+WORKDIR, CMD, ENTRYPOINT]
+</p><!--l. 56--><p class="indent" >
+      </p><dl class="description"><dt class="description">
+      <!--l. 57--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">FROM</span> </p></dt><dd 
+class="description">
+      <!--l. 57--><p class="noindent" >The  FROM  instruction  initializes  a  new  build  stage  and  sets  the  Base  Image  for  subsequent
+      instructions. As such, a valid Dockerfile must start with a FROM instruction. <span class="cite">[<a 
+href="#XDockerfile">1</a>]</span></p></dd></dl>
    <div class="framedenv" id="code-1">
-<!--l. 57--><pre class="listings" id="listing-1"><span class="label"><a 
+<!--l. 60--><pre class="listings" id="listing-1"><span class="label"><a 
  id="x1-4001r1"></a></span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
 class="ectt-1200">syntax</span></span><span style="color:#33997E"><span 
@@ -123,13 +132,24 @@ class="ectt-1200">latest</span></span>
  
 <span class="label"><a 
  id="x1-4003r3"></a></span></pre>
+                                                                                                    
+                                                                                                    
    </div>
-<!--l. 62--><p class="indent" >   When building a Dockerfile you need to start with a base image. This is the image that you will build on top of.
+<!--l. 65--><p class="indent" >   When building a Dockerfile you need to start with a base image. This is the image that you will build on top of.
 In this case we are using the latest version of ubuntu. This ubutu is a very minimal image that is used intended to
 be used as a starting point and is itself an image.
-</p>
+</p><!--l. 67--><p class="indent" >
+      </p><dl class="description"><dt class="description">
+      <!--l. 68--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">RUN</span> </p></dt><dd 
+class="description">
+      <!--l. 68--><p class="noindent" >The RUN instruction will execute any commands in a new layer on top of the current image and
+      commit the results. The resulting committed image will be used for the next step in the Dockerfile.
+      <span class="cite">[<a 
+href="#XDockerfile">1</a>]</span></p></dd></dl>
    <div class="framedenv" id="code-1">
-<!--l. 64--><pre class="listings" id="listing-2"><span class="label"><a 
+<!--l. 71--><pre class="listings" id="listing-2"><span class="label"><a 
  id="x1-4004r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
@@ -181,37 +201,666 @@ class="ectt-1200">pip</span></span>
  
 <span class="label"><a 
  id="x1-4009r6"></a></span></pre>
-                                                                                                    
-                                                                                                    
    </div>
-<!--l. 72--><p class="indent" >   Now that we have a base image we can start to add our own dependencies. In this case we are
-installing python3 and pip. The RUN command is used to run a command in the container. Since we are
-using ubuntu we can use apt-get to install our dependencies and we are chaining the commands
-so that they are run as one block. You will notice that we are running <span 
-class="ectt-1200">apt-get update </span>before we
-install our dependencies. This is because the base image probably has no package caches as that
-would take up unnesscary space. So we need to update the package cache before we can install
-anything.
+<!--l. 79--><p class="indent" >   As stated in the definition, the RUN command allows us to perform actions that will happen when the
+container is built. The example above is installing python dependencies for a fake application. When
+installing software through a traditional package manager dont forget to update the package list
+first.
+</p><!--l. 81--><p class="indent" >
+      </p><dl class="description"><dt class="description">
+      <!--l. 82--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">COPY</span> </p></dt><dd 
+class="description">
+      <!--l. 82--><p class="noindent" >The COPY instruction copies new files or directories from &#x003C;src&#x003E; and adds them to the filesystem of
+      the container at the path &#x003C;dest&#x003E;. <span class="cite">[<a 
+href="#XDockerfile">1</a>]</span></p></dd></dl>
+   <div class="framedenv" id="code-1">
+<!--l. 85--><pre class="listings" id="listing-3"><span class="label"><a 
+ id="x1-4010r1"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">syntax</span></span><span style="color:#33997E"><span 
+class="ectt-1200">=</span></span><span style="color:#33997E"><span 
+class="ectt-1200">docker</span></span><span style="color:#33997E"><span 
+class="ectt-1200">/</span></span><span style="color:#33997E"><span 
+class="ectt-1200">dockerfile</span></span><span style="color:#33997E"><span 
+class="ectt-1200">:1</span></span> 
+<span class="label"><a 
+ id="x1-4011r2"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">FROM</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ubuntu</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">latest</span></span> 
+<span class="label"><a 
+ id="x1-4012r3"></a></span> 
+<span class="label"><a 
+ id="x1-4013r4"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Installing</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">dependencies</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">for</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">running</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">a</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">python</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">application</span></span> 
+<span class="label"><a 
+ id="x1-4014r5"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">RUN</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">apt</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">get</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">update</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">&amp;&amp;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">apt</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">get</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">install</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">y</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">python3</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">python3</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">pip</span></span> 
+<span class="label"><a 
+ id="x1-4015r6"></a></span> 
+<span class="label"><a 
+ id="x1-4016r7"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Copying</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">our</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">application</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">into</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">the</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">container</span></span> 
+<span class="label"><a 
+ id="x1-4017r8"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">COPY</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">fan</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">club</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">runner</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span>
+ 
+<span class="label"><a 
+ id="x1-4018r9"></a></span></pre>
+   </div>
+<!--l. 96--><p class="indent" >   The copy command is one way to pull in resources into the container and is probably the simpliest way. This
+command allows copying individual files and you can also copy entire directories. Do be aware that when you
+COPY files in they will exist in the layer forever. The following example will still expose the secrets.txt file even
+though we removed it in another layer.
 </p>
-   <div class="tcolorbox tcolorbox" id="tcolobox-2">    
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 74--><p class="noindent" >TODO: continue fleshing this out with copy, add, workdir, cmd, entrypoint </p> 
-</div> 
-</div>
-<!--l. 76--><p class="noindent" >
+   <div class="framedenv" id="code-1">
+<!--l. 98--><pre class="listings" id="listing-4"><span class="label"><a 
+ id="x1-4019r1"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">syntax</span></span><span style="color:#33997E"><span 
+class="ectt-1200">=</span></span><span style="color:#33997E"><span 
+class="ectt-1200">docker</span></span><span style="color:#33997E"><span 
+class="ectt-1200">/</span></span><span style="color:#33997E"><span 
+class="ectt-1200">dockerfile</span></span><span style="color:#33997E"><span 
+class="ectt-1200">:1</span></span> 
+<span class="label"><a 
+ id="x1-4020r2"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">FROM</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ubuntu</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">latest</span></span> 
+<span class="label"><a 
+ id="x1-4021r3"></a></span> 
+<span class="label"><a 
+ id="x1-4022r4"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Installing</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">dependencies</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">for</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">running</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">a</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">python</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">application</span></span> 
+<span class="label"><a 
+ id="x1-4023r5"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">RUN</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">apt</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">get</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">update</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">&amp;&amp;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">apt</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">get</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">install</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">y</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">python3</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">python3</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">pip</span></span> 
+<span class="label"><a 
+ id="x1-4024r6"></a></span> 
+<span class="label"><a 
+ id="x1-4025r7"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Copying</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">our</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">application</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">into</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">the</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">container</span></span> 
+<span class="label"><a 
+ id="x1-4026r8"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">COPY</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">fan</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">club</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">runner</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span> 
+<span class="label"><a 
+ id="x1-4027r9"></a></span> 
+<span class="label"><a 
+ id="x1-4028r10"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Removing</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">the</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">secrets</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">file</span></span> 
+<span class="label"><a 
+ id="x1-4029r11"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">RUN</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">rm</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">secrets</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">txt</span></span>
+ 
+<span class="label"><a 
+ id="x1-4030r12"></a></span></pre>
+   </div>
+<!--l. 112--><p class="indent" >
+      </p><dl class="description"><dt class="description">
+      <!--l. 113--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">ADD</span> </p></dt><dd 
+class="description">
+      <!--l. 113--><p class="noindent" >The ADD instruction copies new files, directories or remote file URLs from &#x003C;src&#x003E; and adds them to
+      the filesystem of the image at the path &#x003C;dest&#x003E;. <span class="cite">[<a 
+href="#XDockerfile">1</a>]</span></p></dd></dl>
+                                                                                                    
+                                                                                                    
+<!--l. 116--><p class="indent" >   ADD can behave like COPY but it can also pull in files and tars from remote locations. This can be
+handy if your application requires external static files and you dont want to store them in your git
+repository. Though the ADD command is usually not recommended and is often replaced with curl or
+wget.
+</p><!--l. 118--><p class="indent" >
+      </p><dl class="description"><dt class="description">
+      <!--l. 119--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">WORKDIR</span> </p></dt><dd 
+class="description">
+      <!--l. 119--><p class="noindent" >The WORKDIR instruction sets the working directory for any RUN, CMD, ENTRYPOINT, COPY and
+      ADD instructions that follow it in the Dockerfile. If the WORKDIR doesn&#8217;t exist, it will be created even
+      if it&#8217;s not used in any subsequent Dockerfile instruction. <span class="cite">[<a 
+href="#XDockerfile">1</a>]</span></p></dd></dl>
+   <div class="framedenv" id="code-1">
+<!--l. 122--><pre class="listings" id="listing-5"><span class="label"><a 
+ id="x1-4031r1"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">syntax</span></span><span style="color:#33997E"><span 
+class="ectt-1200">=</span></span><span style="color:#33997E"><span 
+class="ectt-1200">docker</span></span><span style="color:#33997E"><span 
+class="ectt-1200">/</span></span><span style="color:#33997E"><span 
+class="ectt-1200">dockerfile</span></span><span style="color:#33997E"><span 
+class="ectt-1200">:1</span></span> 
+<span class="label"><a 
+ id="x1-4032r2"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">FROM</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ubuntu</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">latest</span></span> 
+<span class="label"><a 
+ id="x1-4033r3"></a></span> 
+<span class="label"><a 
+ id="x1-4034r4"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Installing</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">dependencies</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">for</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">running</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">a</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">python</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">application</span></span> 
+<span class="label"><a 
+ id="x1-4035r5"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">RUN</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">apt</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">get</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">update</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">&amp;&amp;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">apt</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">get</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">install</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">y</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">python3</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">python3</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">pip</span></span> 
+<span class="label"><a 
+ id="x1-4036r6"></a></span> 
+<span class="label"><a 
+ id="x1-4037r7"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Setting</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">the</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">working</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">directory</span></span> 
+<span class="label"><a 
+ id="x1-4038r8"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">WORKDIR</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span> 
+<span class="label"><a 
+ id="x1-4039r9"></a></span> 
+<span class="label"><a 
+ id="x1-4040r10"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Copying</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">our</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">application</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">into</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">the</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">container</span></span> 
+<span class="label"><a 
+ id="x1-4041r11"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">COPY</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">fan</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">club</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">runner</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span>
+ 
+<span class="label"><a 
+ id="x1-4042r12"></a></span></pre>
+   </div>
+<!--l. 136--><p class="indent" >   The WORKDIR command is a friendly readability feature to help you reduce the amount of shuffling around
+within the container.
+      </p><dl class="description"><dt class="description">
+      <!--l. 138--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">ENTRYPOINT</span> </p></dt><dd 
+class="description">
+      <!--l. 138--><p class="noindent" >An ENTRYPOINT allows you to configure a container that will run as an executable. <span class="cite">[<a 
+href="#XDockerfile">1</a>]</span></p></dd></dl>
+   <div class="framedenv" id="code-1">
+<!--l. 141--><pre class="listings" id="listing-6"><span class="label"><a 
+ id="x1-4043r1"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">syntax</span></span><span style="color:#33997E"><span 
+class="ectt-1200">=</span></span><span style="color:#33997E"><span 
+class="ectt-1200">docker</span></span><span style="color:#33997E"><span 
+class="ectt-1200">/</span></span><span style="color:#33997E"><span 
+class="ectt-1200">dockerfile</span></span><span style="color:#33997E"><span 
+class="ectt-1200">:1</span></span> 
+<span class="label"><a 
+ id="x1-4044r2"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">FROM</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ubuntu</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">latest</span></span> 
+<span class="label"><a 
+ id="x1-4045r3"></a></span> 
+<span class="label"><a 
+ id="x1-4046r4"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Installing</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">dependencies</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">for</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">running</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">a</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">python</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">application</span></span> 
+<span class="label"><a 
+ id="x1-4047r5"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">RUN</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">apt</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">get</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">update</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">&amp;&amp;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">apt</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">get</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">install</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">y</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">python3</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">python3</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">pip</span></span> 
+<span class="label"><a 
+ id="x1-4048r6"></a></span> 
+<span class="label"><a 
+ id="x1-4049r7"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Setting</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">the</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">working</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">directory</span></span> 
+<span class="label"><a 
+ id="x1-4050r8"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">WORKDIR</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span> 
+<span class="label"><a 
+ id="x1-4051r9"></a></span> 
+<span class="label"><a 
+ id="x1-4052r10"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Copying</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">our</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">application</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">into</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">the</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">container</span></span> 
+<span class="label"><a 
+ id="x1-4053r11"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">COPY</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">fan</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">club</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">runner</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span> 
+<span class="label"><a 
+ id="x1-4054r12"></a></span> 
+<span class="label"><a 
+ id="x1-4055r13"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Setting</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">the</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">default</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">command</span></span> 
+<span class="label"><a 
+ id="x1-4056r14"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">ENTRYPOINT</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">python3</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">fan</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">club</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">runner</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">py</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span>
+ 
+<span class="label"><a 
+ id="x1-4057r15"></a></span></pre>
+   </div>
+<!--l. 158--><p class="indent" >   The ENTRYPOINT instruction is the executable that will be run when the container starts. The CMD
+instruction accompanises the ENTRYPOINT and is the default arguments that will be passed to the
+ENTRYPOINT.
+</p>
+   <div class="framedenv" id="code-1">
+<!--l. 160--><pre class="listings" id="listing-7"><span class="label"><a 
+ id="x1-4058r1"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">run</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">test</span></span>
+ 
+<span class="label"><a 
+ id="x1-4059r2"></a></span></pre>
+   </div>
+<!--l. 164--><p class="indent" >   example output:
+</p>
+   <div class="framedenv" id="code-1">
+<!--l. 166--><pre class="listings" id="listing-8"><span class="label"><a 
+ id="x1-4060r1"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">Richard</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Thomas</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Fan</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Club</span></span><span style="color:#000000"><span 
+class="ectt-1200">!</span></span>
+ 
+<span class="label"><a 
+ id="x1-4061r2"></a></span></pre>
+   </div>
+<!--l. 170--><p class="indent" >
+      </p><dl class="description"><dt class="description">
+      <!--l. 171--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">CMD</span> </p></dt><dd 
+class="description">
+      <!--l. 171--><p class="noindent" >The main purpose of a CMD is to provide defaults for an executing container. <span class="cite">[<a 
+href="#XDockerfile">1</a>]</span></p></dd></dl>
+                                                                                                    
+                                                                                                    
+   <div class="framedenv" id="code-1">
+<!--l. 174--><pre class="listings" id="listing-9"><span class="label"><a 
+ id="x1-4062r1"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">syntax</span></span><span style="color:#33997E"><span 
+class="ectt-1200">=</span></span><span style="color:#33997E"><span 
+class="ectt-1200">docker</span></span><span style="color:#33997E"><span 
+class="ectt-1200">/</span></span><span style="color:#33997E"><span 
+class="ectt-1200">dockerfile</span></span><span style="color:#33997E"><span 
+class="ectt-1200">:1</span></span> 
+<span class="label"><a 
+ id="x1-4063r2"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">FROM</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ubuntu</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">latest</span></span> 
+<span class="label"><a 
+ id="x1-4064r3"></a></span> 
+<span class="label"><a 
+ id="x1-4065r4"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Installing</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">dependencies</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">for</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">running</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">a</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">python</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">application</span></span> 
+<span class="label"><a 
+ id="x1-4066r5"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">RUN</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">apt</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">get</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">update</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">&amp;&amp;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">apt</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">get</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">install</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">y</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">python3</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">python3</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">pip</span></span> 
+<span class="label"><a 
+ id="x1-4067r6"></a></span> 
+<span class="label"><a 
+ id="x1-4068r7"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Setting</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">the</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">working</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">directory</span></span> 
+<span class="label"><a 
+ id="x1-4069r8"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">WORKDIR</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span> 
+<span class="label"><a 
+ id="x1-4070r9"></a></span> 
+<span class="label"><a 
+ id="x1-4071r10"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Copying</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">our</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">application</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">into</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">the</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">container</span></span> 
+<span class="label"><a 
+ id="x1-4072r11"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">COPY</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">fan</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">club</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">runner</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span> 
+<span class="label"><a 
+ id="x1-4073r12"></a></span> 
+<span class="label"><a 
+ id="x1-4074r13"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Setting</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">the</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">default</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">command</span></span> 
+<span class="label"><a 
+ id="x1-4075r14"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">ENTRYPOINT</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">python3</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">fan</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">club</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">runner</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">py</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-4076r15"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">CMD</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">--</span></span><span style="color:#669900"><span 
+class="ectt-1200">help</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span>
+ 
+<span class="label"><a 
+ id="x1-4077r16"></a></span></pre>
+   </div>
+<!--l. 192--><p class="indent" >   As stated above the CMD instruction sets default parameters for the ENTRYPOINT but is easily overriden
+when the container is run. The following example will override the default &#8211;help argument and run the application
+with the &#8211;version argument.
+</p>
+   <div class="framedenv" id="code-1">
+<!--l. 194--><pre class="listings" id="listing-10"><span class="label"><a 
+ id="x1-4078r1"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">run</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">test</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">--</span></span><span style="color:#000000"><span 
+class="ectt-1200">version</span></span>
+ 
+<span class="label"><a 
+ id="x1-4079r2"></a></span></pre>
+   </div>
+<!--l. 198--><p class="indent" >   example output:
+</p>
+   <div class="framedenv" id="code-1">
+<!--l. 200--><pre class="listings" id="listing-11"><span class="label"><a 
+ id="x1-4080r1"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">Fan</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Club</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Runner</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">1.0.0</span></span>
+ 
+<span class="label"><a 
+ id="x1-4081r2"></a></span></pre>
+   </div>
+<!--l. 204--><p class="indent" >   That concludes the docker instructions we will be looking at so far but there are more that you may
+need to explore in the future. The full list of instructions can be found in the official documentation
+<span class="cite">[<a 
+href="#XDockerfile">1</a>]</span>.
+</p><!--l. 206--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">2.1.2    </span> <a 
  id="x1-50002.1.2"></a>Dockerfile Layers</h5>
-<!--l. 78--><p class="noindent" >In the previous sections we have been using the RUN, ADD and COPY to build up our image to run an example
+<!--l. 208--><p class="noindent" >In the previous sections we have been using the RUN, ADD and COPY to build up our image to run an example
 application. When the container is built each of these instructions is run on a layer of the image. This means that if
 you change a line in the Dockerfile you only need to rebuild the layers that have changed. This is a huge time saver
 when developing your application.
-</p><!--l. 80--><p class="indent" >   Lets have a look at an example of the layers that are created when we build our Dockerfile from the previous
+</p><!--l. 210--><p class="indent" >   Lets have a look at an example of the layers that are created when we build our Dockerfile from the previous
 section.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 82--><pre class="listings" id="listing-3"><span class="label"><a 
+<!--l. 212--><pre class="listings" id="listing-12"><span class="label"><a 
  id="x1-5001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
@@ -349,12 +998,12 @@ class="ectt-1200">]</span></span>
 <span class="label"><a 
  id="x1-5018r18"></a></span></pre>
    </div>
-<!--l. 102--><p class="indent" >   We see that we are copying in the entire application directory before we install our requirements. We can
+<!--l. 232--><p class="indent" >   We see that we are copying in the entire application directory before we install our requirements. We can
 improve this so that we only copy in the requirements file and then install the requirements. This means that if we
 change our application code we don&#8217;t need to reinstall the requirements.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 104--><pre class="listings" id="listing-4"><span class="label"><a 
+<!--l. 234--><pre class="listings" id="listing-13"><span class="label"><a 
  id="x1-5019r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
@@ -518,12 +1167,14 @@ class="ectt-1200">]</span></span>
 <span class="label"><a 
  id="x1-5039r21"></a></span></pre>
    </div>
-<!--l. 127--><p class="indent" >   For the containers we will be building this may not be a large issue, but once your project becomes larger and
+<!--l. 257--><p class="indent" >   For the containers we will be building this may not be a large issue, but once your project becomes larger and
 you have more dependencies it can become a large time saver.
-</p><!--l. 129--><p class="indent" >   To see the layers that are created when you build your Dockerfile you can use the following command:
+                                                                                                    
+                                                                                                    
+</p><!--l. 259--><p class="indent" >   To see the layers that are created when you build your Dockerfile you can use the following command:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 131--><pre class="listings" id="listing-5"><span class="label"><a 
+<!--l. 261--><pre class="listings" id="listing-14"><span class="label"><a 
  id="x1-5040r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
@@ -551,13 +1202,11 @@ class="ectt-1200">latest</span></span>
 <span class="label"><a 
  id="x1-5044r5"></a></span></pre>
    </div>
-<!--l. 139--><p class="noindent" >
+<!--l. 269--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">2.1.3    </span> <a 
  id="x1-60002.1.3"></a>Image Registries</h5>
-                                                                                                    
-                                                                                                    
-<!--l. 141--><p class="noindent" >When we introduced the Dockerfile we glossed over the details of where <span 
+<!--l. 271--><p class="noindent" >When we introduced the Dockerfile we glossed over the details of where <span 
 class="ectt-1200">ubuntu:latest </span>is being sourced from.
 This image is coming from a registry. There are a few different registries that you can use. The default registry is
 one hosted by Docker themselves. This is the registry that is used when you don&#8217;t specify a registry and is available
@@ -570,7 +1219,7 @@ class="ectt-1200">https://cloud.google.com/container-registry</span></a> and
 <a 
 href="https://aws.amazon.com/ecr/" class="url" ><span 
 class="ectt-1200">https://aws.amazon.com/ecr/</span></a> respectively.
-</p><!--l. 143--><p class="indent" >   As an example the image that we have been using is available at <a 
+</p><!--l. 273--><p class="indent" >   As an example the image that we have been using is available at <a 
 href="https://hub.docker.com/_/ubuntu" class="url" ><span 
 class="ectt-1200">https://hub.docker.com/_/ubuntu</span></a>.
 When browsing this page we can also see differnt tags that are available for this image, such as <span 
@@ -590,7 +1239,7 @@ class="ectt-1200">latest </span>tag.
  id="x1-6001r2"></a>
                                                                                                     
                                                                                                     
-<!--l. 146--><p class="noindent" ><img 
+<!--l. 276--><p class="noindent" ><img 
 src="images/dockerhub.png" alt="PIC"  
 width="525" height="525"  />
 <br /> </p><div class="caption" 
@@ -601,44 +1250,44 @@ class="content">Ubuntu image on Docker Hub</span></div><!--tex4ht:label?: x1-600
    </div><hr class="endfigure" />
    <h4 class="subsectionHead"><span class="titlemark">2.2    </span> <a 
  id="x1-70002.2"></a>Docker Containers</h4>
-   <div class="tcolorbox tcolorbox" id="tcolobox-3">    
+   <div class="tcolorbox tcolorbox" id="tcolobox-2">    
 <div class="tcolorbox-title">
    </div> 
-<div class="tcolorbox-content"><!--l. 152--><p class="noindent" >TODO: continue fleshing this out </p> 
+<div class="tcolorbox-content"><!--l. 282--><p class="noindent" >TODO: continue fleshing this out </p> 
 </div> 
 </div>
-<!--l. 154--><p class="noindent" >
+<!--l. 284--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">2.2.1    </span> <a 
  id="x1-80002.2.1"></a>Docker Networking</h5>
-   <div class="tcolorbox tcolorbox" id="tcolobox-4">    
+   <div class="tcolorbox tcolorbox" id="tcolobox-3">    
 <div class="tcolorbox-title">
    </div> 
-<div class="tcolorbox-content"><!--l. 156--><p class="noindent" >TODO: continue fleshing this out </p> 
+<div class="tcolorbox-content"><!--l. 286--><p class="noindent" >TODO: continue fleshing this out </p> 
 </div> 
 </div>
-<!--l. 158--><p class="noindent" >
+<!--l. 288--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">2.2.2    </span> <a 
  id="x1-90002.2.2"></a>Docker Volumes</h5>
-   <div class="tcolorbox tcolorbox" id="tcolobox-5">    
+   <div class="tcolorbox tcolorbox" id="tcolobox-4">    
 <div class="tcolorbox-title">
    </div> 
-<div class="tcolorbox-content"><!--l. 160--><p class="noindent" >TODO: continue fleshing this out </p> 
+<div class="tcolorbox-content"><!--l. 290--><p class="noindent" >TODO: continue fleshing this out </p> 
 </div> 
 </div>
-<!--l. 162--><p class="noindent" >
+<!--l. 292--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.3    </span> <a 
  id="x1-100002.3"></a>Installing Docker</h4>
-<!--l. 164--><p class="noindent" >To install docker on your Mac or Windows machine you can follow the instructions on the docker website: 
+<!--l. 294--><p class="noindent" >To install docker on your Mac or Windows machine you can follow the instructions on the docker website: 
 <a 
 href="https://docs.docker.com/get-docker/" class="url" ><span 
 class="ectt-1200">https://docs.docker.com/get-docker/</span></a>. If you are using a Linux machine you can install docker using your
 package manager. For example on Ubuntu you can use the following command:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 166--><pre class="listings" id="listing-6"><span class="label"><a 
+<!--l. 296--><pre class="listings" id="listing-15"><span class="label"><a 
  id="x1-10001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">sudo</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -653,22 +1302,22 @@ class="ectt-1200">io</span></span>
 <span class="label"><a 
  id="x1-10002r2"></a></span></pre>
    </div>
-   <div class="tcolorbox tcolorbox" id="tcolobox-6"> 
+   <div class="tcolorbox tcolorbox" id="tcolobox-5"> 
 <div class="tcolorbox-title">
-<!--l. 172--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 172--><p class="noindent" >If you are using a Linux machine you may need to add your user to the docker group so that you can
+<!--l. 302--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 302--><p class="noindent" >If you are using a Linux machine you may need to add your user to the docker group so that you can
 run docker commands without sudo. While the docker website suggests using docker-desktop for
 Linux, the course highly recommends using the native docker installation.  </p> 
 </div> 
 </div>
-<!--l. 175--><p class="noindent" >
+<!--l. 305--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.4    </span> <a 
  id="x1-110002.4"></a>Running a Docker Container</h4>
-<!--l. 177--><p class="noindent" >To verify that docker is installed correctly you can run the following command:
+<!--l. 307--><p class="noindent" >To verify that docker is installed correctly you can run the following command:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 179--><pre class="listings" id="listing-7"><span class="label"><a 
+<!--l. 309--><pre class="listings" id="listing-16"><span class="label"><a 
  id="x1-11001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -718,30 +1367,30 @@ class="ectt-1200">.</span></span>
                                                                                                     
                                                                                                     
    </div>
-<!--l. 190--><p class="noindent" >
+<!--l. 320--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
  id="x1-120003"></a>Dockerising our Todo Application</h3>
-<!--l. 196--><p class="noindent" >
+<!--l. 326--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.1    </span> <a 
  id="x1-130003.1"></a>Creating a Practical Repository</h4>
-<!--l. 197--><p class="noindent" >Navigate to the GitHub Classroom link for this practical provided by your tutor in Slack. As with last week, this will
+<!--l. 327--><p class="noindent" >Navigate to the GitHub Classroom link for this practical provided by your tutor in Slack. As with last week, this will
 create a new repository for you in the course organisation. You can now clone this repository to your local
 machine or work directly in the browser with GitHub codespaces. This repository will be populated with
 our solution to last weeks practical exercise. You may modify this solution or replace it with your
 own.
-</p><!--l. 203--><p class="noindent" >
+</p><!--l. 333--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.2    </span> <a 
  id="x1-140003.2"></a>Creating a Dockerfile</h4>
-<!--l. 205--><p class="noindent" >Now that we have covered the basics of Docker we can Dockerise our Todo App to prepare it for deployment.
+<!--l. 335--><p class="noindent" >Now that we have covered the basics of Docker we can Dockerise our Todo App to prepare it for deployment.
 Inside our practical folder we will create a new file called <span 
 class="ectt-1200">Dockerfile</span>. To start us off we will use the following
 Dockerfile:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 207--><pre class="listings" id="listing-8"><span class="label"><a 
+<!--l. 337--><pre class="listings" id="listing-17"><span class="label"><a 
  id="x1-14001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
@@ -794,12 +1443,12 @@ class="ectt-1200">pip</span></span>
 <span class="label"><a 
  id="x1-14006r6"></a></span></pre>
    </div>
-<!--l. 215--><p class="indent" >   The above image is what your local environments may have been like when you started the course. To follow
+<!--l. 345--><p class="indent" >   The above image is what your local environments may have been like when you started the course. To follow
 the same setup as we have had in the practicals lets install pipenv. We can do this by adding the following line to
 our Dockerfile:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 217--><pre class="listings" id="listing-9"><span class="label"><a 
+<!--l. 347--><pre class="listings" id="listing-18"><span class="label"><a 
  id="x1-14007r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
@@ -818,7 +1467,7 @@ class="ectt-1200">pipenv</span></span>
 <span class="label"><a 
  id="x1-14009r3"></a></span></pre>
    </div>
-<!--l. 222--><p class="indent" >   Lets now change our working directory to <span 
+<!--l. 352--><p class="indent" >   Lets now change our working directory to <span 
 class="ectt-1200">/app </span>and copy our <span 
 class="ectt-1200">Pipfile </span>and <span 
 class="ectt-1200">Pipfile.lock </span>into the container.
@@ -826,7 +1475,7 @@ We can then install our dependencies using pipenv. We can do this by adding the 
 Dockerfile:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 224--><pre class="listings" id="listing-10"><span class="label"><a 
+<!--l. 354--><pre class="listings" id="listing-19"><span class="label"><a 
  id="x1-14010r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
@@ -876,11 +1525,11 @@ class="ectt-1200">deploy</span></span>
    </div>
                                                                                                     
                                                                                                     
-<!--l. 233--><p class="indent" >   Now that we have installed our dependencies we can copy our application into the container. We can do this
+<!--l. 363--><p class="indent" >   Now that we have installed our dependencies we can copy our application into the container. We can do this
 by adding the following line to our Dockerfile:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 235--><pre class="listings" id="listing-11"><span class="label"><a 
+<!--l. 365--><pre class="listings" id="listing-20"><span class="label"><a 
  id="x1-14017r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
@@ -902,10 +1551,10 @@ class="ectt-1200">app</span></span>
 <span class="label"><a 
  id="x1-14021r5"></a></span></pre>
    </div>
-<!--l. 241--><p class="indent" >   Finally we can run our application by adding the following line to our Dockerfile:
+<!--l. 371--><p class="indent" >   Finally we can run our application by adding the following line to our Dockerfile:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 243--><pre class="listings" id="listing-12"><span class="label"><a 
+<!--l. 373--><pre class="listings" id="listing-21"><span class="label"><a 
  id="x1-14022r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
@@ -960,10 +1609,10 @@ class="ectt-1200">]</span></span>
 <span class="label"><a 
  id="x1-14024r3"></a></span></pre>
    </div>
-<!--l. 248--><p class="indent" >   We should now have a complete Dockerfile, as shown below:
+<!--l. 378--><p class="indent" >   We should now have a complete Dockerfile, as shown below:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 250--><pre class="listings" id="listing-13"><span class="label"><a 
+<!--l. 380--><pre class="listings" id="listing-22"><span class="label"><a 
  id="x1-14025r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
@@ -1152,15 +1801,15 @@ class="ectt-1200">]</span></span>
 <span class="label"><a 
  id="x1-14046r22"></a></span></pre>
    </div>
-<!--l. 274--><p class="noindent" >
+<!--l. 404--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.3    </span> <a 
  id="x1-150003.3"></a>Building our Docker Image</h4>
-<!--l. 276--><p class="noindent" >Now that we have created our Dockerfile we can build our Docker image. To do this we will use the following
+<!--l. 406--><p class="noindent" >Now that we have created our Dockerfile we can build our Docker image. To do this we will use the following
 command:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 278--><pre class="listings" id="listing-14"><span class="label"><a 
+<!--l. 408--><pre class="listings" id="listing-23"><span class="label"><a 
  id="x1-15001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1193,10 +1842,10 @@ class="ectt-1200">latest</span></span>
 <span class="label"><a 
  id="x1-15006r6"></a></span></pre>
    </div>
-<!--l. 286--><p class="indent" >   We can then inspect our layers with the following command:
+<!--l. 416--><p class="indent" >   We can then inspect our layers with the following command:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 288--><pre class="listings" id="listing-15"><span class="label"><a 
+<!--l. 418--><pre class="listings" id="listing-24"><span class="label"><a 
  id="x1-15007r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1207,17 +1856,17 @@ class="ectt-1200">todo</span></span>
 <span class="label"><a 
  id="x1-15008r2"></a></span></pre>
    </div>
-<!--l. 293--><p class="noindent" >
+<!--l. 423--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.4    </span> <a 
  id="x1-160003.4"></a>Running our Docker Container</h4>
-<!--l. 295--><p class="noindent" >Now that we have built our Docker image we can run our Docker container. To do this we will use the following
+<!--l. 425--><p class="noindent" >Now that we have built our Docker image we can run our Docker container. To do this we will use the following
 command:
 </p>
    <div class="framedenv" id="code-1">
                                                                                                     
                                                                                                     
-<!--l. 297--><pre class="listings" id="listing-16"><span class="label"><a 
+<!--l. 427--><pre class="listings" id="listing-25"><span class="label"><a 
  id="x1-16001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1249,53 +1898,53 @@ class="ectt-1200">...</span></span>
 <span class="label"><a 
  id="x1-16006r6"></a></span></pre>
    </div>
-<!--l. 305--><p class="indent" >   We can now navigate to <a 
+<!--l. 435--><p class="indent" >   We can now navigate to <a 
 href="http://localhost:6400" class="url" ><span 
 class="ectt-1200">http://localhost:6400</span></a> to see our application running. We can stop our container
 by pressing <span 
 class="ectt-1200">Ctrl+C</span>. This should show the todo app that we have been working with for the past couple of
 practicals.
 </p>
-   <div class="tcolorbox tcolorbox" id="tcolobox-7">    
+   <div class="tcolorbox tcolorbox" id="tcolobox-6">    
 <div class="tcolorbox-title">
-<!--l. 309--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 309--><p class="noindent" >It is important for us to use the host of 0.0.0.0 when running our application. This is because we
+<!--l. 439--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 439--><p class="noindent" >It is important for us to use the host of 0.0.0.0 when running our application. This is because we
 are running our application inside a container and we need to expose the port to the host machine.
 If we were to use the default host of 127.0.0.1 we would not be able to access our application from
 outside the container.  </p> 
 </div> 
 </div>
-   <div class="tcolorbox tcolorbox" id="tcolobox-8">    
+   <div class="tcolorbox tcolorbox" id="tcolobox-7">    
 <div class="tcolorbox-title">
-<!--l. 313--><p class="indent" >   Warning</p></div> 
-<div class="tcolorbox-content"><!--l. 313--><p class="noindent" >You do need to make sure that you were not running the webserver from the previous practical on
+<!--l. 443--><p class="indent" >   Warning</p></div> 
+<div class="tcolorbox-content"><!--l. 443--><p class="noindent" >You do need to make sure that you were not running the webserver from the previous practical on
 port 6400. If you were you will need to stop that webserver before running the docker container. If
 you also have other containers running they can conflict with this container.  </p> 
 </div> 
 </div>
-<!--l. 315--><p class="noindent" >
+<!--l. 445--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.5    </span> <a 
  id="x1-170003.5"></a>Docker Compose</h4>
-<!--l. 317--><p class="noindent" >Docker is a useful tool itself but in terms of local development, Docker Compose is a much more useful tool.
+<!--l. 447--><p class="noindent" >Docker is a useful tool itself but in terms of local development, Docker Compose is a much more useful tool.
 Docker Compose allows us to run multiple containers together which can be extremely useful if your developing
 multiple projects or have multiple components that need to be put together. For instance for a story close to
 home, maybe you are working on INFS2200 with you database schema in one container and you can be running
 your DECO3801 projects database in another container.
-</p><!--l. 319--><p class="indent" >   For us, we are going to be using a database closer to our production environment. We will be using a Postgresql
+</p><!--l. 449--><p class="indent" >   For us, we are going to be using a database closer to our production environment. We will be using a Postgresql
 database which will eventually be a managed database hosted option from AWS.
-</p><!--l. 321--><p class="noindent" >
+</p><!--l. 451--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.6    </span> <a 
  id="x1-180003.6"></a>Moving to a Postgresql Database</h4>
-<!--l. 323--><p class="noindent" >This week we have actually made a small change to our application so that it can receive the SQLAlchemy
+<!--l. 453--><p class="noindent" >This week we have actually made a small change to our application so that it can receive the SQLAlchemy
 database URI as an environment variable. This means that we can now use Docker Compose to run our
 application and database together. To do this we will create a new file called <span 
 class="ectt-1200">docker-compose.yml </span>and add the
 following content:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 325--><pre class="listings" id="listing-17"><span class="label"><a 
+<!--l. 455--><pre class="listings" id="listing-26"><span class="label"><a 
  id="x1-18001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">version</span></span><span style="color:#000000"><span 
@@ -1493,10 +2142,10 @@ class="ectt-1200">database</span></span>
 <span class="label"><a 
  id="x1-18022r22"></a></span></pre>
    </div>
-<!--l. 349--><p class="indent" >   We can now run our application and database with the following command:
+<!--l. 479--><p class="indent" >   We can now run our application and database with the following command:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 351--><pre class="listings" id="listing-18"><span class="label"><a 
+<!--l. 481--><pre class="listings" id="listing-27"><span class="label"><a 
  id="x1-18023r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"><span 
@@ -1509,7 +2158,7 @@ class="ectt-1200">up</span></span>
                                                                                                     
                                                                                                     
    </div>
-<!--l. 355--><p class="indent" >   You should observe the output of this command and you can see two processes running. One is the database
+<!--l. 485--><p class="indent" >   You should observe the output of this command and you can see two processes running. One is the database
 and the other is our application. We can now navigate to <a 
 href="http://localhost:6400" class="url" ><span 
 class="ectt-1200">http://localhost:6400</span></a> to see our application
@@ -1518,7 +2167,7 @@ to connect to it. We can fix this by adding a delay to our application startup. 
 line to our Dockerfile:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 357--><pre class="listings" id="listing-19"><span class="label"><a 
+<!--l. 487--><pre class="listings" id="listing-28"><span class="label"><a 
  id="x1-18025r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
@@ -1589,12 +2238,12 @@ class="ectt-1200">]</span></span>
 <span class="label"><a 
  id="x1-18027r3"></a></span></pre>
    </div>
-<!--l. 362--><p class="indent" >   In the long run you would want your application to be able to retry connecting to the database if it fails but for
+<!--l. 492--><p class="indent" >   In the long run you would want your application to be able to retry connecting to the database if it fails but for
 now we will just add a delay. We can now rebuild our Docker image and run our application and database with the
 following commands:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 364--><pre class="listings" id="listing-20"><span class="label"><a 
+<!--l. 494--><pre class="listings" id="listing-29"><span class="label"><a 
  id="x1-18028r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"><span 
@@ -1607,15 +2256,37 @@ class="ectt-1200">build</span></span>
 <span class="label"><a 
  id="x1-18029r2"></a></span></pre>
    </div>
-<!--l. 368--><p class="indent" >   You may have noticed that when we defined the todo application service above we didnt specify a container.
+<!--l. 498--><p class="indent" >   You may have noticed that when we defined the todo application service above we didnt specify a container.
 This is because Docker Compose can be instructed to use our Dockerfile to build at time so that we dont have to
 keep using the build command.
+</p><!--l. 515--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
+ id="x1-190004"></a>Conclusion</h3>
+<!--l. 517--><p class="noindent" >Over the past couple of weeks we have built a full todo api that is ready to be deployed to a remote environment.
+We started with a Flask API returning static responses and now we have a dynamic API that is running in a
+containerised environment with a external database.
+</p><!--l. 519--><p class="indent" >   The teaching team do want to emphasise that we have cheated with our docker deployment by using the flask
+development server. For a production environment you will want to use a production webserver such as
+gunicorn or uwsgi. These web servers are designed to handle multiple requests at the same time and are
+much more efficient than the flask development server. We recommend you have a look at how to
+productionise your flask application as it may help you in your future projects if you choose to use
+Flask.
 </p><!--l. 1--><p class="noindent" >
 </p>
    <h3 class="likesectionHead"><a 
- id="x1-19000"></a>References</h3>
+ id="x1-20000"></a>References</h3>
 <!--l. 1--><p class="noindent" >
+   </p><div class="thebibliography">
+   <p class="bibitem" ><span class="biblabel">
+ [1]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="XDockerfile"></a>Docker, &#8220;Dockerfile reference.&#8221; <a 
+href="https://docs.docker.com/engine/reference/builder" class="url" ><span 
+class="ectt-1200">https://docs.docker.com/engine/reference/builder</span></a>.
 </p>
+   </div>
+                                                                                                    
+                                                                                                    
     
 </body></html> 
 
