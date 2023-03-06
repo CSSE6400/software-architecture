@@ -51,8 +51,11 @@ Images are the building block of the principals on containerisation. They are a 
 
 The Dockerfile is a plain text file with its own markup language that is used to describe the image. It is a series of instructions that are run in order to build the image. The instructions are run in a layered fashion, each instruction is run on top of the previous instruction. This means that if you change a line in the Dockerfile you only need to rebuild the layers that have changed. This is a huge time saver when developing your application.
 
-A reference of all possible Dockerfile instructions can be found here: \url{https://docs.docker.com/engine/reference/builder/}. For the purposes of the course we are just gonna cover some of the basics and some common recipes.
+A reference of all possible Dockerfile instructions can be found here: \url{https://docs.docker.com/engine/reference/builder/}. For the purposes of the course we are just gonna cover some of the basics of [FROM, RUN, COPY, ADD, WORKDIR, CMD, ENTRYPOINT]
 
+\begin{description}
+  \item[FROM] The FROM instruction initializes a new build stage and sets the Base Image for subsequent instructions. As such, a valid Dockerfile must start with a FROM instruction. \cite{Dockerfile}
+\end{description}
 
 \begin{code}[language=docker,numbers=none]{}
 # syntax=docker/dockerfile:1
@@ -60,6 +63,10 @@ FROM ubuntu:latest
 \end{code}
 
 When building a Dockerfile you need to start with a base image. This is the image that you will build on top of. In this case we are using the latest version of ubuntu. This ubutu is a very minimal image that is used intended to be used as a starting point and is itself an image.
+
+\begin{description}
+  \item[RUN] The RUN instruction will execute any commands in a new layer on top of the current image and commit the results. The resulting committed image will be used for the next step in the Dockerfile. \cite{Dockerfile}
+\end{description}
 
 \begin{code}[language=docker,numbers=none]{}
   # syntax=docker/dockerfile:1
@@ -69,9 +76,132 @@ When building a Dockerfile you need to start with a base image. This is the imag
   RUN apt-get update && apt-get install -y python3 python3-pip
 \end{code}
 
-Now that we have a base image we can start to add our own dependencies. In this case we are installing python3 and pip. The RUN command is used to run a command in the container. Since we are using ubuntu we can use apt-get to install our dependencies and we are chaining the commands so that they are run as one block. You will notice that we are running \texttt{apt-get update} before we install our dependencies. This is because the base image probably has no package caches as that would take up unnesscary space. So we need to update the package cache before we can install anything.
+As stated in the definition, the RUN command allows us to perform actions that will happen when the container is built. The example above is installing python dependencies for a fake application. When installing software through a traditional package manager dont forget to update the package list first.
 
-\todo{continue fleshing this out with copy, add, workdir, cmd, entrypoint}
+\begin{description}
+  \item[COPY] The COPY instruction copies new files or directories from <src> and adds them to the filesystem of the container at the path <dest>. \cite{Dockerfile}
+\end{description}
+
+\begin{code}[language=docker,numbers=none]{}
+  # syntax=docker/dockerfile:1
+  FROM ubuntu:latest
+
+  # Installing dependencies for running a python application
+  RUN apt-get update && apt-get install -y python3 python3-pip
+
+  # Copying our application into the container
+  COPY fan-club-runner /app
+\end{code}
+
+The copy command is one way to pull in resources into the container and is probably the simpliest way. This command allows copying individual files and you can also copy entire directories. Do be aware that when you COPY files in they will exist in the layer forever. The following example will still expose the secrets.txt file even though we removed it in another layer.
+
+\begin{code}[language=docker,numbers=none]{}
+  # syntax=docker/dockerfile:1
+  FROM ubuntu:latest
+
+  # Installing dependencies for running a python application
+  RUN apt-get update && apt-get install -y python3 python3-pip
+
+  # Copying our application into the container
+  COPY fan-club-runner /app
+
+  # Removing the secrets file
+  RUN rm /app/secrets.txt
+\end{code}
+
+\begin{description}
+  \item[ADD] The ADD instruction copies new files, directories or remote file URLs from <src> and adds them to the filesystem of the image at the path <dest>. \cite{Dockerfile}
+\end{description}
+
+ADD can behave like COPY but it can also pull in files and tars from remote locations. This can be handy if your application requires external static files and you dont want to store them in your git repository. Though the ADD command is usually not recommended and is often replaced with curl or wget.
+
+\begin{description}
+  \item[WORKDIR] The WORKDIR instruction sets the working directory for any RUN, CMD, ENTRYPOINT, COPY and ADD instructions that follow it in the Dockerfile. If the WORKDIR doesn't exist, it will be created even if it's not used in any subsequent Dockerfile instruction. \cite{Dockerfile}
+\end{description}
+
+\begin{code}[language=docker,numbers=none]{}
+  # syntax=docker/dockerfile:1
+  FROM ubuntu:latest
+
+  # Installing dependencies for running a python application
+  RUN apt-get update && apt-get install -y python3 python3-pip
+
+  # Setting the working directory
+  WORKDIR /app
+
+  # Copying our application into the container
+  COPY fan-club-runner .
+\end{code}
+
+The WORKDIR command is a friendly readability feature to help you reduce the amount of shuffling around within the container.
+\begin{description}
+  \item[ENTRYPOINT] An ENTRYPOINT allows you to configure a container that will run as an executable. \cite{Dockerfile}
+\end{description}
+
+\begin{code}[language=docker,numbers=none]{}
+  # syntax=docker/dockerfile:1
+  FROM ubuntu:latest
+
+  # Installing dependencies for running a python application
+  RUN apt-get update && apt-get install -y python3 python3-pip
+
+  # Setting the working directory
+  WORKDIR /app
+
+  # Copying our application into the container
+  COPY fan-club-runner .
+
+  # Setting the default command
+  ENTRYPOINT ["python3", "fan-club-runner.py"]
+\end{code}
+
+The ENTRYPOINT instruction is the executable that will be run when the container starts. The CMD instruction accompanises the ENTRYPOINT and is the default arguments that will be passed to the ENTRYPOINT.
+
+\begin{code}[language=shell,numbers=none]{}
+  docker run test
+\end{code}
+
+example output:
+
+\begin{code}[language=shell,numbers=none]{}
+  Richard Thomas Fan Club!
+\end{code}
+
+\begin{description}
+  \item[CMD] The main purpose of a CMD is to provide defaults for an executing container. \cite{Dockerfile}
+\end{description}
+
+\begin{code}[language=docker,numbers=none]{}
+  # syntax=docker/dockerfile:1
+  FROM ubuntu:latest
+
+  # Installing dependencies for running a python application
+  RUN apt-get update && apt-get install -y python3 python3-pip
+
+  # Setting the working directory
+  WORKDIR /app
+
+  # Copying our application into the container
+  COPY fan-club-runner .
+
+  # Setting the default command
+  ENTRYPOINT ["python3", "fan-club-runner.py"]
+  CMD ["--help"]
+\end{code}
+
+As stated above the CMD instruction sets default parameters for the ENTRYPOINT but is easily overriden when the container is run. The following example will override the default --help argument and run the application with the --version argument.
+
+\begin{code}[language=shell,numbers=none]{}
+  docker run test --version
+\end{code}
+
+example output:
+
+\begin{code}[language=shell,numbers=none]{}
+  Fan Club Runner 1.0.0
+\end{code}
+
+That concludes the docker instructions we will be looking at so far but there are more that you may need to explore in the future. The full list of instructions can be found in the official documentation \cite{Dockerfile}.
 
 \subsubsection{Dockerfile Layers}
 
@@ -382,7 +512,13 @@ You may have noticed that when we defined the todo application service above we 
 
 % \subsection{Packaging on commit}
 
+\section{Conclusion}
+
+Over the past couple of weeks we have built a full todo api that is ready to be deployed to a remote environment. We started with a Flask API returning static responses and now we have a dynamic API that is running in a containerised environment with a external database.
+
+The teaching team do want to emphasise that we have cheated with our docker deployment by using the flask development server. For a production environment you will want to use a production webserver such as gunicorn or uwsgi. These web servers are designed to handle multiple requests at the same time and are much more efficient than the flask development server. We recommend you have a look at how to productionise your flask application as it may help you in your future projects if you choose to use Flask.
+
 \bibliographystyle{ieeetr}
-\bibliography{books,ours}
+\bibliography{books,ours,references}
 
 \end{document}
