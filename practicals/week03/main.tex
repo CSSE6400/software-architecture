@@ -45,7 +45,8 @@ For example on Ubuntu you can use the following command:
 
 \info{
 If you are using a Linux machine you may need to add your user to the docker group so that you can run docker commands without sudo.
-While the docker website suggests using docker-desktop for Linux, the course recommends using the native docker installation.
+While the docker website suggests using docker-desktop for Linux,
+this course recommends using the native docker installation.
 }
 }
 
@@ -92,7 +93,7 @@ FROM ubuntu:latest
 \end{code}
 
 In this case we are using the latest version of ubuntu.
-This ubuntu is a very minimal image that is used intended to be used as a starting point and is itself an image.
+This ubuntu is a very minimal image that is intended to be used as a starting point and is itself an image.
 Unless you are working in an obscure language,
 you will often want to start from an image that already has your language or framework installed.
 For example, you can start from the \texttt{nodejs} image,
@@ -135,9 +136,10 @@ COPY fan-club-runner /app
 \end{code}
 
 The COPY instruction is one of the simplier way to put resources into the container.
-This command allows copying individual files and you can also copy entire directories.
-Be aware that when you COPY files they will exist in a layer forever.
-The following example will still expose the secrets.txt file even though we removed it in another layer.
+This command allows copying individual files.
+You can also copy entire directories.
+Be aware that when you COPY files into the container they will exist in a layer forever.
+The following example will still expose the \texttt{secrets.txt} file even though we removed it in another layer.
 
 \begin{code}[language=docker,numbers=none]{Dockerfile}
 # syntax=docker/dockerfile:1
@@ -169,7 +171,7 @@ RUN curl https://csse6400.uqcloud.net/slides/containers.pdf -o containers.pdf
 
 \paragraph{WORKDIR}
 The WORKDIR instruction sets the working directory for any subsequent RUN, CMD, ENTRYPOINT, COPY, or ADD instruction.
-If the WORKDIR doesn't exist, it will be created even if it's not used in any subsequent Dockerfile instruction.
+If the WORKDIR does not exist, it will be created even if it is not used in any subsequent Dockerfile instruction.
 
 \begin{code}[language=docker,numbers=none]{Dockerfile}
 # syntax=docker/dockerfile:1
@@ -299,7 +301,7 @@ CMD ["python3", "src/app.py"]
 
 We are copying in the entire application directory before we install our requirements.
 We can improve this so that we only copy in the requirements file and then install the requirements.
-This means that if we change our application code we don't need to reinstall the requirements.
+This means that if we change our application code we do not need to reinstall the requirements.
 
 \begin{code}[language=docker,numbers=none]{}
 # syntax=docker/dockerfile:1
@@ -325,7 +327,7 @@ CMD ["python3", "src/app.py"]
 \end{code}
 
 For the containers we will be building this may not be a large issue,
-but once your project becomes larger and you have more dependencies it can become a real time saver,
+but once your project becomes larger and you have more dependencies it can be a real time saver,
 so it is worth getting into the habit early.
 
 To see the layers that are created when you build your Dockerfile you can use the following command:
@@ -355,11 +357,11 @@ You can then go to \url{http://localhost:224} and connect to the VNC server with
 
 \subsubsection{Image Registries}
 
-When we introduced the Dockerfile we glossed over the details of where \texttt{ubuntu:latest} is coming from.
-This image is comes from a registry.
+When we introduced the Dockerfile we glossed over the details of from where \texttt{ubuntu:latest} is coming.
+This image comes from a registry.
 There are a few different registries that you can use.
 The default registry is hosted by Docker,
-this is the registry that is used when you don't specify a registry and is available at \url{https://hub.docker.com/}.
+this is the registry that is used when you do not specify a registry and is available at \url{https://hub.docker.com/}.
 
 There are also registries hosted by other companies such as Google and Amazon.
 These are available at \url{https://cloud.google.com/container-registry} and \url{https://aws.amazon.com/ecr/} respectively.
@@ -368,7 +370,8 @@ The Ubuntu image that we have been using is available at \url{https://hub.docker
 When browsing this page we can also see different tags that are available for this image,
 such as \texttt{latest} and \texttt{20.04}.
 
-These tags are used to specify different versions of the image so you can pin your image instead of using the \texttt{latest} tag which will always point to the latest version of the image.
+These tags are used to specify different versions of the image so you can pin your image instead of using the \texttt{latest} tag,
+which will always point to the latest version of the image.
 Note that not all images will have different tags or even a \texttt{latest} tag.
 
 \begin{figure}[H]
@@ -463,14 +466,14 @@ Again, Docker volumes are a much more complex beast but host mounting is all we 
 Navigate to the GitHub Classroom link for this practical provided by your tutor in Slack.
 As with last week, this will create a new repository for you in the course organisation.
 You can now clone this repository to your local machine or work directly in the browser with GitHub codespaces.
-This repository will be populated with our solution to last weeks practical exercise.
+This repository will be populated with our solution to last week's practical exercise.
 You may modify this solution or replace it with your own.
 
 \subsection{Creating a Dockerfile}
 
 Now that we have covered the basics of Docker we can Dockerise our Todo App to prepare it for deployment.
 Inside our practical folder we will create a new file called \texttt{Dockerfile}.
-To start we will use the following Dockerfile:
+To start, we will use the following Dockerfile:
 
 \begin{code}[language=docker,numbers=none]{Dockerfile}
 # syntax=docker/dockerfile:1
@@ -489,7 +492,7 @@ We can do this by adding the following line to our Dockerfile:
 RUN pip3 install -y pipenv
 \end{code}
 
-Lets now change our working directory to \texttt{/app} and copy our \texttt{Pipfile} and \texttt{Pipfile.lock} into the container.
+Let's now change our working directory to \texttt{/app} and copy our \texttt{Pipfile} and \texttt{Pipfile.lock} into the container.
 We can then install our dependencies using pipenv.
 
 \begin{code}[language=docker,numbers=none]{}
@@ -651,8 +654,8 @@ We can now rebuild our Docker image and run our application and database with th
 
 \bash{docker-compose up --build}
 
-You may have noticed that when we defined the todo application service above we didn't specify a container.
-This is because Docker Compose can be instructed to use our Dockerfile to build at time so that we dont have to keep using the build command.
+You may have noticed that when we defined the todo application service above we did not specify a container.
+This is because Docker Compose can be instructed to use our Dockerfile to build at time so that we do not have to keep using the build command.
 
 % \section{Packaging our Application on Commit}
 
@@ -672,7 +675,7 @@ This is because Docker Compose can be instructed to use our Dockerfile to build 
 \section{Conclusion}
 
 Over the past couple of weeks we have built a full todo app API that is ready to be deployed to a remote production environment.
-We started with a Flask API returning static responses and now we have a dynamic API that is running in a containerised environment with a external database.
+We started with a Flask API returning static responses and now we have a dynamic API that is running in a containerised environment with an external database.
 
 We have cheated with our Docker deployment by using the flask development server.
 For a production environment you will want to use a production webserver such as \texttt{gunicorn} or \texttt{uwsgi}.
