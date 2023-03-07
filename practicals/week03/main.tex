@@ -40,7 +40,7 @@ This practical will assume you have not used docker before but we will be skippi
 }
 
 \teacher{
-  Sections 2.1 and 2.2 are presentation based where you should be covering the fundementals of docker images and containers. Where we are using container to describe the implemented image running in an environment.
+  Sections 2.1 and 2.2 are presentation based where you should be covering the fundamentals of docker images and containers. Where we are using container to describe the implemented image running in an environment.
 }
 
 \subsection{Docker Images}
@@ -51,10 +51,10 @@ Images are the building block of the principals on containerisation. They are a 
 
 The Dockerfile is a plain text file with its own markup language that is used to describe the image. It is a series of instructions that are run in order to build the image. The instructions are run in a layered fashion, each instruction is run on top of the previous instruction. This means that if you change a line in the Dockerfile you only need to rebuild the layers that have changed. This is a huge time saver when developing your application.
 
-A reference of all possible Dockerfile instructions can be found here: \url{https://docs.docker.com/engine/reference/builder/}. For the purposes of the course we are just gonna cover some of the basics of [FROM, RUN, COPY, ADD, WORKDIR, CMD, ENTRYPOINT]
+A reference of all possible Dockerfile instructions can be found here: \url{https://docs.docker.com/engine/reference/builder/}. For the purposes of the course we are just going to cover some of the basics of [FROM, RUN, COPY, ADD, WORKDIR, CMD, ENTRYPOINT]
 
 \begin{description}
-  \item[FROM] The FROM instruction initializes a new build stage and sets the Base Image for subsequent instructions. As such, a valid Dockerfile must start with a FROM instruction. \cite{Dockerfile}
+  \item[FROM] The FROM instruction initialises a new build stage and sets the Base Image for subsequent instructions. As such, a valid Dockerfile must start with a FROM instruction. \cite{Dockerfile}
 \end{description}
 
 \begin{code}[language=docker,numbers=none]{}
@@ -62,7 +62,7 @@ A reference of all possible Dockerfile instructions can be found here: \url{http
 FROM ubuntu:latest
 \end{code}
 
-When building a Dockerfile you need to start with a base image. This is the image that you will build on top of. In this case we are using the latest version of ubuntu. This ubutu is a very minimal image that is used intended to be used as a starting point and is itself an image.
+When building a Dockerfile you need to start with a base image. This is the image that you will build on top of. In this case we are using the latest version of ubuntu. This ubuntu is a very minimal image that is intended to be used as a starting point and is itself an image.
 
 \begin{description}
   \item[RUN] The RUN instruction will execute any commands in a new layer on top of the current image and commit the results. The resulting committed image will be used for the next step in the Dockerfile. \cite{Dockerfile}
@@ -76,7 +76,7 @@ When building a Dockerfile you need to start with a base image. This is the imag
   RUN apt-get update && apt-get install -y python3 python3-pip
 \end{code}
 
-As stated in the definition, the RUN command allows us to perform actions that will happen when the container is built. The example above is installing python dependencies for a fake application. When installing software through a traditional package manager dont forget to update the package list first.
+As stated in the definition, the RUN command allows us to perform actions that will happen when the container is built. The example above is installing python dependencies for a fake application. When installing software through a traditional package manager do not forget to update the package list first.
 
 \begin{description}
   \item[COPY] The COPY instruction copies new files or directories from <src> and adds them to the filesystem of the container at the path <dest>. \cite{Dockerfile}
@@ -93,7 +93,7 @@ As stated in the definition, the RUN command allows us to perform actions that w
   COPY fan-club-runner /app
 \end{code}
 
-The copy command is one way to pull in resources into the container and is probably the simpliest way. This command allows copying individual files and you can also copy entire directories. Do be aware that when you COPY files in they will exist in the layer forever. The following example will still expose the secrets.txt file even though we removed it in another layer.
+The copy command is one way to pull resources into the container, and is probably the simplest way. This command allows copying individual files. You can also copy entire directories. Be aware that when you COPY files into the container they will exist in the layer forever. The following example will still expose the \texttt{secrets.txt} file even though we removed it in another layer.
 
 \begin{code}[language=docker,numbers=none]{}
   # syntax=docker/dockerfile:1
@@ -113,10 +113,10 @@ The copy command is one way to pull in resources into the container and is proba
   \item[ADD] The ADD instruction copies new files, directories or remote file URLs from <src> and adds them to the filesystem of the image at the path <dest>. \cite{Dockerfile}
 \end{description}
 
-ADD can behave like COPY but it can also pull in files and tars from remote locations. This can be handy if your application requires external static files and you dont want to store them in your git repository. Though the ADD command is usually not recommended and is often replaced with curl or wget.
+ADD can behave like COPY but it can also pull in files and tars from remote locations. This can be handy if your application requires external static files and you do not want to store them in your git repository. Though the ADD command is usually not recommended and is often replaced with curl or wget.
 
 \begin{description}
-  \item[WORKDIR] The WORKDIR instruction sets the working directory for any RUN, CMD, ENTRYPOINT, COPY and ADD instructions that follow it in the Dockerfile. If the WORKDIR doesn't exist, it will be created even if it's not used in any subsequent Dockerfile instruction. \cite{Dockerfile}
+  \item[WORKDIR] The WORKDIR instruction sets the working directory for any RUN, CMD, ENTRYPOINT, COPY and ADD instructions that follow it in the Dockerfile. If the WORKDIR does not exist, it will be created even if it is not used in any subsequent Dockerfile instruction. \cite{Dockerfile}
 \end{description}
 
 \begin{code}[language=docker,numbers=none]{}
@@ -189,7 +189,7 @@ example output:
   CMD ["--help"]
 \end{code}
 
-As stated above the CMD instruction sets default parameters for the ENTRYPOINT but is easily overriden when the container is run. The following example will override the default --help argument and run the application with the --version argument.
+As stated above the CMD instruction sets default parameters for the ENTRYPOINT but is easily overriden when the container is run. The following example will override the default \verb|--help| argument and run the application with the \verb|--version| argument.
 
 \begin{code}[language=shell,numbers=none]{}
   docker run test --version
@@ -205,9 +205,9 @@ That concludes the docker instructions we will be looking at so far but there ar
 
 \subsubsection{Dockerfile Layers}
 
-In the previous sections we have been using the RUN, ADD and COPY to build up our image to run an example application. When the container is built each of these instructions is run on a layer of the image. This means that if you change a line in the Dockerfile you only need to rebuild the layers that have changed. This is a huge time saver when developing your application.
+In the previous sections we used the RUN, ADD and COPY to build up our image to run an example application. When the container is built each of these instructions is run on a layer of the image. This means that if you change a line in the Dockerfile you only need to rebuild the layers that have changed. This is a huge time saver when developing your application.
 
-Lets have a look at an example of the layers that are created when we build our Dockerfile from the previous section.
+Let's have a look at an example of the layers that are created when we build our Dockerfile from the previous section.
 
 \begin{code}[language=docker,numbers=none]{}
   # syntax=docker/dockerfile:1
@@ -229,7 +229,7 @@ Lets have a look at an example of the layers that are created when we build our 
   CMD ["python3", "src/app.py"]
 \end{code}
 
-We see that we are copying in the entire application directory before we install our requirements. We can improve this so that we only copy in the requirements file and then install the requirements. This means that if we change our application code we don't need to reinstall the requirements.
+We see that we are copying in the entire application directory before we install our requirements. We can improve this so that we only copy in the requirements file and then install the requirements. This means that if we change our application code we do not need to reinstall the requirements.
 
 \begin{code}[language=docker,numbers=none]{}
   # syntax=docker/dockerfile:1
@@ -254,7 +254,7 @@ We see that we are copying in the entire application directory before we install
   CMD ["python3", "src/app.py"]
 \end{code}
 
-For the containers we will be building this may not be a large issue, but once your project becomes larger and you have more dependencies it can become a large time saver.
+For the containers we will be building this may not be a large issue, but once your project becomes larger and you have more dependencies it can be a large time saver.
 
 To see the layers that are created when you build your Dockerfile you can use the following command:
 
@@ -268,9 +268,9 @@ To see the layers that are created when you build your Dockerfile you can use th
 
 \subsubsection{Image Registries}
 
-When we introduced the Dockerfile we glossed over the details of where \texttt{ubuntu:latest} is being sourced from. This image is coming from a registry. There are a few different registries that you can use. The default registry is one hosted by Docker themselves. This is the registry that is used when you don't specify a registry and is available at \url{https://hub.docker.com/}. There are also registries hosted by other companies such as Google and Amazon. These are available at \url{https://cloud.google.com/container-registry} and \url{https://aws.amazon.com/ecr/} respectively.
+When we introduced the Dockerfile we glossed over the details of from where \texttt{ubuntu:latest} is being sourced. This image comes from a registry. There are a few different registries that you can use. The default registry is one hosted by Docker themselves. This is the registry that is used when you do not specify a registry and is available at \url{https://hub.docker.com/}. There are also registries hosted by other companies such as Google and Amazon. These are available at \url{https://cloud.google.com/container-registry} and \url{https://aws.amazon.com/ecr/} respectively.
 
-As an example the image that we have been using is available at \url{https://hub.docker.com/_/ubuntu}. When browsing this page we can also see differnt tags that are available for this image, such as \texttt{latest} and \texttt{20.04}. These tags are used to specify different versions of the image so you can pin your image instead of using the \texttt{latest} tag which will always point to the latest version of the image. Note that not all images will have different tags or even a \texttt{latest} tag.
+As an example the image that we have been using is available at \url{https://hub.docker.com/_/ubuntu}. When browsing this page we can see different tags that are available for this image, such as \texttt{latest} and \texttt{20.04}. These tags are used to specify different versions of the image so you can pin your image instead of using the \texttt{latest} tag, which will always point to the latest version of the image. Note that not all images will have different tags or even a \texttt{latest} tag.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/dockerhub}
@@ -298,7 +298,7 @@ To install docker on your Mac or Windows machine you can follow the instructions
 \end{code}
 
 \info{
-  If you are using a Linux machine you may need to add your user to the docker group so that you can run docker commands without sudo. While the docker website suggests using docker-desktop for Linux, the course highly recommends using the native docker installation.
+  If you are using a Linux machine you may need to add your user to the docker group so that you can run docker commands without sudo. While the docker website suggests using docker-desktop for Linux, this course highly recommends using the native docker installation.
 }
 
 
@@ -327,12 +327,12 @@ To verify that docker is installed correctly you can run the following command:
 Navigate to the GitHub Classroom link for this practical provided by your tutor in Slack.
 As with last week, this will create a new repository for you in the course organisation.
 You can now clone this repository to your local machine or work directly in the browser with GitHub codespaces.
-This repository will be populated with our solution to last weeks practical exercise.
+This repository will be populated with our solution to last week's practical exercise.
 You may modify this solution or replace it with your own.
 
 \subsection{Creating a Dockerfile}
 
-Now that we have covered the basics of Docker we can Dockerise our Todo App to prepare it for deployment. Inside our practical folder we will create a new file called \texttt{Dockerfile}. To start us off we will use the following Dockerfile:
+Now that we have covered the basics of Docker we can Dockerise our Todo App to prepare it for deployment. Inside our practical folder we will create a new file called \texttt{Dockerfile}. To start us off, we will use the following Dockerfile:
 
 \begin{code}[language=docker,numbers=none]{}
   # syntax=docker/dockerfile:1
@@ -342,14 +342,14 @@ Now that we have covered the basics of Docker we can Dockerise our Todo App to p
   RUN apt-get update && apt-get install -y python3 python3-pip
 \end{code}
 
-The above image is what your local environments may have been like when you started the course. To follow the same setup as we have had in the practicals lets install pipenv. We can do this by adding the following line to our Dockerfile:
+The above image is what your local environments may have been like when you started the course. To follow the same setup as we have had in the practicals let's install pipenv. We can do this by adding the following line to our Dockerfile:
 
 \begin{code}[language=docker,numbers=none]{}
   # Install pipenv
   RUN pip3 install -y pipenv
 \end{code}
 
-Lets now change our working directory to \texttt{/app} and copy our \texttt{Pipfile} and \texttt{Pipfile.lock} into the container. We can then install our dependencies using pipenv. We can do this by adding the following lines to our Dockerfile:
+Let's now change our working directory to \texttt{/app} and copy our \texttt{Pipfile} and \texttt{Pipfile.lock} into the container. We can then install our dependencies using pipenv. We can do this by adding the following lines to our Dockerfile:
 
 \begin{code}[language=docker,numbers=none]{}
   # Setting the working directory
@@ -495,7 +495,7 @@ In the long run you would want your application to be able to retry connecting t
   docker-compose up --build
 \end{code}
 
-You may have noticed that when we defined the todo application service above we didnt specify a container. This is because Docker Compose can be instructed to use our Dockerfile to build at time so that we dont have to keep using the build command.
+You may have noticed that when we defined the todo application service above we did not specify a container. This is because Docker Compose can be instructed to use our Dockerfile to build at time so that we do not have to keep using the build command.
 
 % \section{Packaging our Application on Commit}
 
@@ -514,7 +514,7 @@ You may have noticed that when we defined the todo application service above we 
 
 \section{Conclusion}
 
-Over the past couple of weeks we have built a full todo api that is ready to be deployed to a remote environment. We started with a Flask API returning static responses and now we have a dynamic API that is running in a containerised environment with a external database.
+Over the past couple of weeks we have built a full todo api that is ready to be deployed to a remote environment. We started with a Flask API returning static responses and now we have a dynamic API that is running in a containerised environment with an external database.
 
 The teaching team do want to emphasise that we have cheated with our docker deployment by using the flask development server. For a production environment you will want to use a production webserver such as gunicorn or uwsgi. These web servers are designed to handle multiple requests at the same time and are much more efficient than the flask development server. We recommend you have a look at how to productionise your flask application as it may help you in your future projects if you choose to use Flask.
 
