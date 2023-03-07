@@ -48,6 +48,10 @@ If you are using a Linux machine you may need to add your user to the docker gro
 While the docker website suggests using docker-desktop for Linux,
 this course recommends using the native docker installation.
 }
+
+\info{
+The GitHub Codespaces environment has Docker and Docker-Compose installed.
+}
 }
 
 \section{Getting Started with Docker}
@@ -88,7 +92,6 @@ use the \texttt{scratch} image.
 Otherwise, you likely want to start from an image that has a number of the common utilities pre-packaged.
 
 \begin{code}[language=docker,numbers=none]{Dockerfile}
-# syntax=docker/dockerfile:1
 FROM ubuntu:latest
 \end{code}
 
@@ -105,7 +108,6 @@ The RUN instruction will execute commands on top of the current layer and store 
 The layer will be used for the next step in the Dockerfile.
 
 \begin{code}[language=docker,numbers=none]{Dockerfile}
-# syntax=docker/dockerfile:1
 FROM ubuntu:latest
 
 # Installing dependencies for running a python application
@@ -125,7 +127,6 @@ We've made a mistake in the above example resulting in our image size being larg
 The COPY instruction copies files or directories from <src> on the host machine where the image is being built to the filesystem of the container at the path <dest>.
 
 \begin{code}[language=docker,numbers=none]{Dockerfile}
-# syntax=docker/dockerfile:1
 FROM ubuntu:latest
 
 # Installing dependencies for running a python application
@@ -140,7 +141,6 @@ Be aware that when you COPY files into the container they will exist in a layer 
 The following example will still expose the \texttt{secrets.txt} file even though we removed it in another layer.
 
 \begin{code}[language=docker,numbers=none]{Dockerfile}
-# syntax=docker/dockerfile:1
 FROM ubuntu:latest
 
 # Installing dependencies for running a python application
@@ -173,7 +173,6 @@ If the WORKDIR does not exist, it will be created even if it is not used in any 
 This instruction is a readability feature to help you reduce the amount of moving around within the container.
 
 \begin{code}[language=docker,numbers=none]{Dockerfile}
-# syntax=docker/dockerfile:1
 FROM ubuntu:latest
 
 # Installing dependencies for running a python application
@@ -191,7 +190,6 @@ COPY fan-club-runner .
 The ENTRYPOINT instruction allows you to configure what process is executed when a container is run.
 
 \begin{code}[language=docker,numbers=none]{Dockerfile}
-# syntax=docker/dockerfile:1
 FROM ubuntu:latest
 
 # Installing dependencies for running a python application
@@ -225,7 +223,6 @@ Richard Thomas Fan Club!
 CMD provides defaults for an executing container.
 
 \begin{code}[language=docker,numbers=none]{Dockerfile}
-# syntax=docker/dockerfile:1
 FROM ubuntu:latest
 
 # Installing dependencies for running a python application
@@ -278,7 +275,6 @@ Let's take a look at the Dockerfile below.
 In this Dockerfile, our application now has Python dependencies that need to be installed.
 
 \begin{code}[language=docker,numbers=none]{Dockerfile}
-# syntax=docker/dockerfile:1
 FROM ubuntu:latest
 
 # Installing dependencies for running a python application
@@ -302,7 +298,6 @@ We can improve this so that we only copy in the requirements file and then insta
 This means that if we change our application code we do not need to reinstall the requirements.
 
 \begin{code}[language=docker,numbers=none]{}
-# syntax=docker/dockerfile:1
 FROM ubuntu:latest
 
 # Installing dependencies for running a python application
@@ -435,8 +430,6 @@ we can do so without changing the port inside of the container with:
 
 Docker networking is much more complicated than just this but it is a starting point so that we can start using containers that talk to the outside world.
 
-\todo{Evan want to do more networking?}
-
 \subsubsection{Docker Volumes}
 
 The next tool to escape from a container is to use Docker volumes.
@@ -474,11 +467,10 @@ Inside our practical folder we will create a new file called \texttt{Dockerfile}
 To start, we will use the following Dockerfile:
 
 \begin{code}[language=docker,numbers=none]{Dockerfile}
-# syntax=docker/dockerfile:1
 FROM ubuntu:latest
 
 # Installing dependencies for running a python application
-RUN apt-get update && apt-get install -y python3 python3-pip
+RUN apt-get update && apt-get install -y python3 python3-pip postgresql-client libpq-dev
 \end{code}
 
 The above image is what your local environment may have been like when you started the course.
@@ -498,7 +490,7 @@ We can then install our dependencies using pipenv.
 WORKDIR /app
 
 # Install pipenv dependencies
-COPY Pipfile Pipfile.lock /app/
+COPY Pipfile Pipfile.lock ./
 RUN pipenv install --system --deploy
 \end{code}
 
@@ -509,40 +501,33 @@ Now that we have installed our dependencies we can copy our application into the
 
 \begin{code}[language=docker,numbers=none]{}
 # Copying our application into the container
-COPY todo/ /app
+COPY todo todo
 \end{code}
 
 Finally we can run our application by adding the following line to our Dockerfile:
 
 \begin{code}[language=docker,numbers=none]{}
 # Running our application
-CMD ["python3", "flask", "--app", "todo", "run", "--host", "0.0.0.0", "--port", "6400"]
+CMD ["flask", "--app", "todo", "run", "--host", "0.0.0.0", "--port", "6400"]
 \end{code}
 
 We should now have a complete Dockerfile, as shown below:
 
 \begin{code}[language=docker,numbers=none]{}
-# syntax=docker/dockerfile:1
-FROM ubuntu:latest
-
-# Installing dependencies for running a python application
-RUN apt-get update && apt-get install -y python3 python3-pip
-
-# Install pipenv
-RUN pip3 install -y pipenv
-
-# Setting the working directory
-WORKDIR /app
-
-# Install pipenv dependencies
-COPY Pipfile Pipfile.lock /app/
-RUN pipenv install --system --deploy
-
-# Copying our application into the container
-COPY todo/ /app
-
-# Running our application
-CMD ["python3", "flask", "--app", "todo", "run", "--host", "0.0.0.0", "--port", "6400"]
+  FROM ubuntu:latest
+  # Installing dependencies for running a python application
+  RUN apt-get update && apt-get install -y python3 python3-pip postgresql-client libpq-dev
+  # Install pipenv
+  RUN pip3 install pipenv
+  # Setting the working directory
+  WORKDIR /app
+  # Install pipenv dependencies
+  COPY Pipfile Pipfile.lock ./
+  RUN pipenv install --system --deploy
+  # Copying our application into the container
+  COPY todo todo
+  # Running our application
+  CMD ["flask", "--app", "todo", "run", "--host", "0.0.0.0", "--port", "6400"]
 \end{code}
 
 \subsection{Building our Docker Image}
@@ -608,27 +593,27 @@ This means that we can now use Docker Compose to run our application and databas
 To do this we will create a new file called \texttt{docker-compose.yml} and add the following content:
 
 \begin{code}[numbers=none]{}
-version: "3.9"
+  version: "3.9"
 
-services:
-database:
-  image: postgres:latest
-  restart: always
-  environment:
-    POSTGRES_PASSWORD: verySecretPassword
-    POSTGRES_USER: administrator
-    POSTGRES_DB: todo
-  volumes:
-    - ./data:/var/lib/postgresql/data
-app:
-  build: .
-  restart: always
-  environment:
-    SQLALCHEMY_DATABASE_URI: postgresql://administrator:verySecretPassword@database:5432/todo
-  ports:
-    - "6400:6400"
-  depends_on:
-    - database
+  services:
+    database:
+      image: postgres:latest
+      restart: always
+      environment:
+        POSTGRES_PASSWORD: verySecretPassword
+        POSTGRES_USER: administrator
+        POSTGRES_DB: todo
+      volumes:
+        - ./data/db:/var/lib/postgresql/data
+    app:
+      build: .
+      restart: always
+      environment:
+        SQLALCHEMY_DATABASE_URI: postgresql://administrator:verySecretPassword@database:5432/todo
+      ports:
+        - "6400:6400"
+      depends_on:
+        - database
 \end{code}
 
 We can now run our application and database with the following command within the root directory.
@@ -644,7 +629,7 @@ To do this we will add the following line to our Dockerfile:
 
 \begin{code}[language=docker,numbers=none]{}
 # Adding a delay to our application startup
-CMD ["sleep", "10", "&&", "python3", "flask", "--app", "todo", "run", "--host", "0.0.0.0", "--port", "6400"]
+CMD ["sleep", "10", "&&", "flask", "--app", "todo", "run", "--host", "0.0.0.0", "--port", "6400"]
 \end{code}
 
 In the long run you would want your application to be able to retry connecting to the database if it fails but for now we will just add a delay.
