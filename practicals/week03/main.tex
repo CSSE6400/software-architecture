@@ -112,7 +112,7 @@ FROM ubuntu:latest
 RUN apt-get update && apt-get install -y python3 python3-pip
 \end{code}
 
-The RUN command allows us to execute commands when the container is built.
+The RUN instruction allows us to execute commands when the container is built.
 The example above is installing python dependencies for a fake application.
 \info{
 When using the \texttt{apt} package manager on the ubuntu image,
@@ -135,9 +135,7 @@ RUN apt-get update && apt-get install -y python3 python3-pip
 COPY fan-club-runner /app
 \end{code}
 
-The COPY instruction is one of the simplier way to put resources into the container.
-This command allows copying individual files.
-You can also copy entire directories.
+The COPY instruction is one of the simplier ways to put resources into the container.
 Be aware that when you COPY files into the container they will exist in a layer forever.
 The following example will still expose the \texttt{secrets.txt} file even though we removed it in another layer.
 
@@ -158,7 +156,7 @@ RUN rm /app/secrets.txt
 \paragraph{ADD}
 The ADD instruction copies files, directories, or remote file URLs from <src> to the filesystem of the image at the path <dest>.
 
-ADD can behave like COPY but it can also pull in files and tars from remote locations.
+ADD can behave like COPY but it can also pull in files from remote locations and extract tars.
 This can be handy if your application requires external static files and you dont want to store them in your git repository.
 Though the ADD command is usually not recommended and is often replaced with curl or wget.
 
@@ -172,6 +170,7 @@ RUN curl https://csse6400.uqcloud.net/slides/containers.pdf -o containers.pdf
 \paragraph{WORKDIR}
 The WORKDIR instruction sets the working directory for any subsequent RUN, CMD, ENTRYPOINT, COPY, or ADD instruction.
 If the WORKDIR does not exist, it will be created even if it is not used in any subsequent Dockerfile instruction.
+This instruction is a readability feature to help you reduce the amount of moving around within the container.
 
 \begin{code}[language=docker,numbers=none]{Dockerfile}
 # syntax=docker/dockerfile:1
@@ -187,7 +186,6 @@ WORKDIR /app
 COPY fan-club-runner .
 \end{code}
 
-The WORKDIR command is a friendly readability feature to help you reduce the amount of moving around within the container.
 
 \paragraph{ENTRYPOINT}
 The ENTRYPOINT instruction allows you to configure what process is executed when a container is run.
@@ -626,7 +624,7 @@ app:
   build: .
   restart: always
   environment:
-    DATABASE_URI: postgresql://administrator:verySecretPassword@database:5432/todo
+    SQLALCHEMY_DATABASE_URI: postgresql://administrator:verySecretPassword@database:5432/todo
   ports:
     - "6400:6400"
   depends_on:
