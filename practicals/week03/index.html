@@ -232,7 +232,7 @@ class="ectt-1200">pip</span></span>
 <span class="label"><a 
  id="x1-7006r6"></a></span></pre>
    </div>
-<!--l. 115--><p class="indent" >   The RUN command allows us to execute commands when the container is built. The example above is
+<!--l. 115--><p class="indent" >   The RUN instruction allows us to execute commands when the container is built. The example above is
 installing python dependencies for a fake application.  </p> <div class="tcolorbox tcolorbox" id="tcolobox-4">    
 <div class="tcolorbox-title">
 <!--l. 122--><p class="indent" >   Info</p></div> 
@@ -320,14 +320,13 @@ class="ectt-1200">app</span></span>
 <span class="label"><a 
  id="x1-8009r9"></a></span></pre>
    </div>
-<!--l. 138--><p class="indent" >   The COPY instruction is one of the simplier way to put resources into the container. This command allows
-copying individual files. You can also copy entire directories. Be aware that when you COPY files into the container
-they will exist in a layer forever. The following example will still expose the <span 
-class="ectt-1200">secrets.txt </span>file even though we
-removed it in another layer.
-</p><!--l. 144--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 144--><p class="indent" >   <span 
-class="ectt-1200">» cat Dockerfile</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 144--><pre class="listings" id="listing-5"><span class="label"><a 
+<!--l. 138--><p class="indent" >   The COPY instruction is one of the simplier ways to put resources into the container. Be aware that when you
+COPY files into the container they will exist in a layer forever. The following example will still expose the
+<span 
+class="ectt-1200">secrets.txt </span>file even though we removed it in another layer.
+</p><!--l. 142--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 142--><p class="indent" >   <span 
+class="ectt-1200">» cat Dockerfile</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 142--><pre class="listings" id="listing-5"><span class="label"><a 
  id="x1-8010r1"></a></span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
 class="ectt-1200">syntax</span></span><span style="color:#33997E"><span 
@@ -418,18 +417,18 @@ class="ectt-1200">txt</span></span>
    </div>
                                                                                                     
                                                                                                     
-<!--l. 158--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 156--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-9000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">ADD</span></span>
    The ADD instruction copies files, directories, or remote file URLs from &#x003C;src&#x003E; to the filesystem of the image at
 the path &#x003C;dest&#x003E;.
-</p><!--l. 161--><p class="indent" >   ADD can behave like COPY but it can also pull in files and tars from remote locations. This can be
+</p><!--l. 159--><p class="indent" >   ADD can behave like COPY but it can also pull in files from remote locations and extract tars. This can be
 handy if your application requires external static files and you dont want to store them in your git
 repository. Though the ADD command is usually not recommended and is often replaced with curl or
 wget.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 165--><pre class="listings" id="listing-6"><span class="label"><a 
+<!--l. 163--><pre class="listings" id="listing-6"><span class="label"><a 
  id="x1-9001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">ADD</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">https</span></span><span style="color:#000000"><span 
@@ -450,7 +449,7 @@ class="ectt-1200">.</span></span>
 <span class="label"><a 
  id="x1-9002r2"></a></span></pre>
    </div>   <div class="framedenv" id="code-1">
-<!--l. 168--><pre class="listings" id="listing-7"><span class="label"><a 
+<!--l. 166--><pre class="listings" id="listing-7"><span class="label"><a 
  id="x1-9003r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">RUN</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">curl</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -476,15 +475,16 @@ class="ectt-1200">pdf</span></span>
 <span class="label"><a 
  id="x1-9004r2"></a></span></pre>
    </div>
-<!--l. 172--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 170--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-10000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">WORKDIR</span></span>
    The WORKDIR instruction sets the working directory for any subsequent RUN, CMD, ENTRYPOINT, COPY, or
 ADD instruction. If the WORKDIR does not exist, it will be created even if it is not used in any subsequent
-Dockerfile instruction.
-</p><!--l. 176--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 176--><p class="indent" >   <span 
-class="ectt-1200">» cat Dockerfile</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 176--><pre class="listings" id="listing-8"><span class="label"><a 
+Dockerfile instruction. This instruction is a readability feature to help you reduce the amount of moving around
+within the container.
+</p><!--l. 175--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 175--><p class="indent" >   <span 
+class="ectt-1200">» cat Dockerfile</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 175--><pre class="listings" id="listing-8"><span class="label"><a 
  id="x1-10001r1"></a></span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
 class="ectt-1200">syntax</span></span><span style="color:#33997E"><span 
@@ -567,17 +567,14 @@ class="ectt-1200">.</span></span>
 <span class="label"><a 
  id="x1-10012r12"></a></span></pre>
    </div>
-<!--l. 190--><p class="indent" >   The WORKDIR command is a friendly readability feature to help you reduce the amount of moving around
-within the container.
-</p>
-<!--l. 192--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 190--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-11000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">ENTRYPOINT</span></span>
    The ENTRYPOINT instruction allows you to configure what process is executed when a container is
 run.
-</p><!--l. 195--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 195--><p class="indent" >   <span 
-class="ectt-1200">» cat Dockerfile</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 195--><pre class="listings" id="listing-9"><span class="label"><a 
+</p><!--l. 193--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 193--><p class="indent" >   <span 
+class="ectt-1200">» cat Dockerfile</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 193--><pre class="listings" id="listing-9"><span class="label"><a 
  id="x1-11001r1"></a></span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
 class="ectt-1200">syntax</span></span><span style="color:#33997E"><span 
@@ -687,12 +684,12 @@ class="ectt-1200">]</span></span>
 <span class="label"><a 
  id="x1-11015r15"></a></span></pre>
    </div>
-<!--l. 212--><p class="indent" >   The ENTRYPOINT instruction is the executable that will be run when the container starts. The CMD
+<!--l. 210--><p class="indent" >   The ENTRYPOINT instruction is the executable that will be run when the container starts. The CMD
 instruction accompanises the ENTRYPOINT and is the default arguments that will be passed to the
 ENTRYPOINT.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 215--><pre class="listings" id="listing-10"><span class="label"><a 
+<!--l. 213--><pre class="listings" id="listing-10"><span class="label"><a 
  id="x1-11016r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -717,12 +714,10 @@ class="ectt-1200">clib</span></span>
 <span class="label"><a 
  id="x1-11018r3"></a></span></pre>
    </div>
-<!--l. 220--><p class="indent" >   example output:
+<!--l. 218--><p class="indent" >   example output:
 </p>
    <div class="framedenv" id="code-1">
-                                                                                                    
-                                                                                                    
-<!--l. 222--><pre class="listings" id="listing-11"><span class="label"><a 
+<!--l. 220--><pre class="listings" id="listing-11"><span class="label"><a 
  id="x1-11019r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">Richard</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Thomas</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -732,14 +727,16 @@ class="ectt-1200">!</span></span>
  
 <span class="label"><a 
  id="x1-11020r2"></a></span></pre>
+                                                                                                    
+                                                                                                    
    </div>
-<!--l. 226--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 224--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-12000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">CMD</span></span>
    CMD provides defaults for an executing container.
-</p><!--l. 229--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 229--><p class="indent" >   <span 
-class="ectt-1200">» cat Dockerfile</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 229--><pre class="listings" id="listing-12"><span class="label"><a 
+</p><!--l. 227--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 227--><p class="indent" >   <span 
+class="ectt-1200">» cat Dockerfile</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 227--><pre class="listings" id="listing-12"><span class="label"><a 
  id="x1-12001r1"></a></span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
 class="ectt-1200">syntax</span></span><span style="color:#33997E"><span 
@@ -858,14 +855,14 @@ class="ectt-1200">]</span></span>
 <span class="label"><a 
  id="x1-12016r16"></a></span></pre>
    </div>
-<!--l. 247--><p class="indent" >   The CMD instruction sets default parameters for the ENTRYPOINT but is easily overriden when the container
+<!--l. 245--><p class="indent" >   The CMD instruction sets default parameters for the ENTRYPOINT but is easily overriden when the container
 is run. The following example will override the default <span 
 class="ectt-1200">--help </span>argument and run the application with the
 <span 
 class="ectt-1200">--version </span>argument.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 250--><pre class="listings" id="listing-13"><span class="label"><a 
+<!--l. 248--><pre class="listings" id="listing-13"><span class="label"><a 
  id="x1-12017r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -882,7 +879,7 @@ class="ectt-1200">version</span></span>
  id="x1-12018r2"></a></span></pre>
    </div>
    <div class="framedenv" id="code-1">
-<!--l. 254--><pre class="listings" id="listing-14"><span class="label"><a 
+<!--l. 252--><pre class="listings" id="listing-14"><span class="label"><a 
  id="x1-12019r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">Fan</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -895,34 +892,34 @@ class="ectt-1200">1.0.0</span></span>
    </div>
    <div class="tcolorbox tcolorbox" id="tcolobox-5"> 
 <div class="tcolorbox-title">
-<!--l. 264--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 264--><p class="noindent" >Occasionally you will see the CMD instruction used without the ENTRYPOINT instruction.
-</p><!--l. 264--><p class="noindent" >This is only possible because the default ENTRYPOINT is <span 
+<!--l. 262--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 262--><p class="noindent" >Occasionally you will see the CMD instruction used without the ENTRYPOINT instruction.
+</p><!--l. 262--><p class="noindent" >This is only possible because the default ENTRYPOINT is <span 
 class="ectt-1200">/bin/sh -c</span>.
-</p><!--l. 264--><p class="noindent" >So <span 
+</p><!--l. 262--><p class="noindent" >So <span 
 class="ectt-1200">docker run &#8211;rm -it ubuntu /bin/bash </span>actually runs the process <span 
 class="ectt-1200">/bin/sh -c /bin/bash</span>.  </p> 
 </div> 
 </div>
-<!--l. 266--><p class="indent" >   This concludes the Dockerfile instructions required for this practical, however, there are more
+<!--l. 264--><p class="indent" >   This concludes the Dockerfile instructions required for this practical, however, there are more
 that you may need to explore in the future. The full list of instructions can be found in the official
 documentation:
-</p><!--l. 270--><p class="indent" >   <a 
+</p><!--l. 268--><p class="indent" >   <a 
 href="https://docs.docker.com/engine/reference/builder/" class="url" ><span 
 class="ectt-1200">https://docs.docker.com/engine/reference/builder/</span></a>
-</p><!--l. 272--><p class="noindent" >
+</p><!--l. 270--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.1.2    </span> <a 
  id="x1-130003.1.2"></a>Dockerfile Layers</h5>
-<!--l. 274--><p class="noindent" >In the previous sections we used the RUN, ADD, and COPY to build an image to run our example application.
+<!--l. 272--><p class="noindent" >In the previous sections we used the RUN, ADD, and COPY to build an image to run our example application.
 When the container is built, each of these instructions is run to create layer of the image. This means that if you
 change a line in the Dockerfile you only need to rebuild the layers that come after the altered line. This is a huge
 time saver when developing your Dockerfile.
-</p><!--l. 279--><p class="indent" >   Let&#8217;s take a look at the Dockerfile below. In this Dockerfile, our application now has Python dependencies that
+</p><!--l. 277--><p class="indent" >   Let&#8217;s take a look at the Dockerfile below. In this Dockerfile, our application now has Python dependencies that
 need to be installed.
-</p><!--l. 282--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 282--><p class="indent" >   <span 
-class="ectt-1200">» cat Dockerfile</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 282--><pre class="listings" id="listing-15"><span class="label"><a 
+</p><!--l. 280--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 280--><p class="indent" >   <span 
+class="ectt-1200">» cat Dockerfile</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 280--><pre class="listings" id="listing-15"><span class="label"><a 
  id="x1-13001r1"></a></span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
 class="ectt-1200">syntax</span></span><span style="color:#33997E"><span 
@@ -1048,14 +1045,14 @@ class="ectt-1200">]</span></span>
 <span class="label"><a 
  id="x1-13018r18"></a></span></pre>
    </div>
-<!--l. 302--><p class="indent" >   We are copying in the entire application directory before we install our requirements. We can improve this so
+<!--l. 300--><p class="indent" >   We are copying in the entire application directory before we install our requirements. We can improve this so
 that we only copy in the requirements file and then install the requirements. This means that if we change our
 application code we do not need to reinstall the requirements.
-                                                                                                    
-                                                                                                    
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 306--><pre class="listings" id="listing-16"><span class="label"><a 
+                                                                                                    
+                                                                                                    
+<!--l. 304--><pre class="listings" id="listing-16"><span class="label"><a 
  id="x1-13019r1"></a></span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
 class="ectt-1200">syntax</span></span><span style="color:#33997E"><span 
@@ -1205,13 +1202,13 @@ class="ectt-1200">]</span></span>
 <span class="label"><a 
  id="x1-13039r21"></a></span></pre>
    </div>
-<!--l. 329--><p class="indent" >   For the containers we will be building this may not be a large issue, but once your project becomes larger
+<!--l. 327--><p class="indent" >   For the containers we will be building this may not be a large issue, but once your project becomes larger
 and you have more dependencies it can be a real time saver, so it is worth getting into the habit
 early.
-</p><!--l. 333--><p class="indent" >   To see the layers that are created when you build your Dockerfile you can use the following command:
+</p><!--l. 331--><p class="indent" >   To see the layers that are created when you build your Dockerfile you can use the following command:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 335--><pre class="listings" id="listing-17"><span class="label"><a 
+<!--l. 333--><pre class="listings" id="listing-17"><span class="label"><a 
  id="x1-13040r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
 class="ectt-1200">history</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1238,16 +1235,16 @@ class="ectt-1200">latest</span></span>
    </div>
    <div class="tcolorbox tcolorbox" id="tcolobox-6"> 
 <div class="tcolorbox-title">
-<!--l. 356--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 356--><p class="noindent" >Note how the Ubuntu image cheats and copies the whole file structure in one layer rather than
+<!--l. 354--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 354--><p class="noindent" >Note how the Ubuntu image cheats and copies the whole file structure in one layer rather than
 running commands to build it incrementally.
-</p><!--l. 356--><p class="noindent" >This is a common tactic in core images that the developers expect others to build on top of. One
+</p><!--l. 354--><p class="noindent" >This is a common tactic in core images that the developers expect others to build on top of. One
 reason being the 127 layer limit of Docker.
-</p><!--l. 356--><p class="noindent" >For an example of a container that has left their whole thought process in the layers they produce,
+</p><!--l. 354--><p class="noindent" >For an example of a container that has left their whole thought process in the layers they produce,
 try running the Doom image.
 </p>
 <div class="framedenv" id="shaded*-1">
-<!--l. 356-->
+<!--l. 354-->
 <pre class="lstlisting" id="listing-18"><span class="label"><a 
  id="x1-13045r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1271,7 +1268,7 @@ class="ectt-1200">doom</span></span><span style="color:#000000"><span
 class="ectt-1200">:1.12.0</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
 </div>
-<!--l. 356--><p class="noindent" >You can then go to <a 
+<!--l. 354--><p class="noindent" >You can then go to <a 
 href="http://localhost:224" class="url" ><span 
 class="ectt-1200">http://localhost:224</span></a> and connect to the VNC server with the username
 <span 
@@ -1279,7 +1276,7 @@ class="ectt-1200">kasm_user </span>password <span
 class="ectt-1200">password</span>.
 </p>
 <div class="framedenv" id="shaded*-1">
-<!--l. 356-->
+<!--l. 354-->
 <pre class="lstlisting" id="listing-19"><span class="label"><a 
  id="x1-13046r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1293,34 +1290,34 @@ class="ectt-1200">&#x00A0;</span></pre>
 </div>  
 </div> 
 </div>
-<!--l. 358--><p class="noindent" >
+<!--l. 356--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.1.3    </span> <a 
  id="x1-140003.1.3"></a>Image Registries</h5>
-<!--l. 360--><p class="noindent" >When we introduced the Dockerfile we glossed over the details of from where <span 
+<!--l. 358--><p class="noindent" >When we introduced the Dockerfile we glossed over the details of from where <span 
 class="ectt-1200">ubuntu:latest </span>is coming. This
 image comes from a registry. There are a few different registries that you can use. The default registry is
 hosted by Docker, this is the registry that is used when you do not specify a registry and is available at 
 <a 
 href="https://hub.docker.com/" class="url" ><span 
 class="ectt-1200">https://hub.docker.com/</span></a>.
-</p><!--l. 366--><p class="indent" >   There are also registries hosted by other companies such as Google and Amazon. These are available at
+</p><!--l. 364--><p class="indent" >   There are also registries hosted by other companies such as Google and Amazon. These are available at
 <a 
 href="https://cloud.google.com/container-registry" class="url" ><span 
 class="ectt-1200">https://cloud.google.com/container-registry</span></a> and <a 
 href="https://aws.amazon.com/ecr/" class="url" ><span 
 class="ectt-1200">https://aws.amazon.com/ecr/</span></a>
 respectively.
-                                                                                                    
-                                                                                                    
-</p><!--l. 369--><p class="indent" >   The Ubuntu image that we have been using is available at <a 
+</p><!--l. 367--><p class="indent" >   The Ubuntu image that we have been using is available at <a 
 href="https://hub.docker.com/_/ubuntu" class="url" ><span 
 class="ectt-1200">https://hub.docker.com/_/ubuntu</span></a>. When
 browsing this page we can also see different tags that are available for this image, such as <span 
 class="ectt-1200">latest </span>and
 <span 
 class="ectt-1200">20.04</span>.
-</p><!--l. 373--><p class="indent" >   These tags are used to specify different versions of the image so you can pin your image instead of using the
+                                                                                                    
+                                                                                                    
+</p><!--l. 371--><p class="indent" >   These tags are used to specify different versions of the image so you can pin your image instead of using the
 <span 
 class="ectt-1200">latest </span>tag, which will always point to the latest version of the image. Note that not all images will have different
 tags or even a <span 
@@ -1334,7 +1331,7 @@ class="ectt-1200">latest </span>tag.
  id="x1-14001r1"></a>
                                                                                                     
                                                                                                     
-<!--l. 379--><p class="noindent" ><img 
+<!--l. 377--><p class="noindent" ><img 
 src="images/dockerhub.png" alt="PIC"  
 width="315" height="315"  />
 <br /> </p><div class="caption" 
@@ -1345,20 +1342,20 @@ class="content">Ubuntu image on DockerHub</span></div><!--tex4ht:label?: x1-1400
    </div><hr class="endfigure" />
    <h4 class="subsectionHead"><span class="titlemark">3.2    </span> <a 
  id="x1-150003.2"></a>Docker Containers</h4>
-<!--l. 386--><p class="noindent" >Docker containers are the runtime instantiation of a Docker image. They are the process that is running inside the
+<!--l. 384--><p class="noindent" >Docker containers are the runtime instantiation of a Docker image. They are the process that is running inside the
 filesystem environment that has been created as an image.
-</p><!--l. 389--><p class="indent" >   Once you have a suitable Docker image, you can start and run a Docker container by using the <span 
+</p><!--l. 387--><p class="indent" >   Once you have a suitable Docker image, you can start and run a Docker container by using the <span 
 class="ectt-1200">docker run</span>
 command.
-</p><!--l. 392--><p class="noindent" >
+</p><!--l. 390--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.3    </span> <a 
  id="x1-160003.3"></a>Running a Docker Container</h4>
-<!--l. 394--><p class="noindent" >The below shows how to run the <span 
+<!--l. 392--><p class="noindent" >The below shows how to run the <span 
 class="ectt-1200">hello-world </span>Docker image from DockerHub.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 396--><pre class="listings" id="listing-20"><span class="label"><a 
+<!--l. 394--><pre class="listings" id="listing-20"><span class="label"><a 
  id="x1-16001r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1390,10 +1387,10 @@ class="ectt-1200">.</span></span>
 <span class="label"><a 
  id="x1-16004r4"></a></span></pre>
    </div>
-<!--l. 402--><p class="indent" >   It is worth nothing that if you do not use the <span 
+<!--l. 400--><p class="indent" >   It is worth nothing that if you do not use the <span 
 class="ectt-1200">--rm </span>flag when using Docker run, the container will still exist after
 it has finished running. You can view the running containers with:  </p><div class="framedenv" id="shaded*-1">
-   <!--l. 405-->
+   <!--l. 403-->
 <pre class="lstlisting" id="listing-21"><span class="label"><a 
  id="x1-16005r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1401,8 +1398,8 @@ class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span 
 class="ectt-1200">ps</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 407--><p class="indent" >   You can view the running and stopped containers with:  </p><div class="framedenv" id="shaded*-1">
-   <!--l. 408-->
+<!--l. 405--><p class="indent" >   You can view the running and stopped containers with:  </p><div class="framedenv" id="shaded*-1">
+   <!--l. 406-->
 <pre class="lstlisting" id="listing-22"><span class="label"><a 
  id="x1-16006r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1412,9 +1409,9 @@ class="ectt-1200">-</span></span><span style="color:#000000"><span
 class="ectt-1200">a</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 410--><p class="indent" >   We can modify our original command so that the container is not kept around after it terminates as show
+<!--l. 408--><p class="indent" >   We can modify our original command so that the container is not kept around after it terminates as show
 below:  </p><div class="framedenv" id="shaded*-1">
-   <!--l. 411-->
+   <!--l. 409-->
 <pre class="lstlisting" id="listing-23"><span class="label"><a 
  id="x1-16007r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1427,13 +1424,13 @@ class="ectt-1200">-</span></span><span style="color:#000000"><span
 class="ectt-1200">world</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 413--><p class="indent" >   Another commonly useful set of arguments is <span 
+<!--l. 411--><p class="indent" >   Another commonly useful set of arguments is <span 
 class="ectt-1200">-i </span>and <span 
 class="ectt-1200">-t </span>which combined allow you to interact with the
 running container process using your terminal. If we want to enter a Ubuntu environment, then we would use the
 combined flags, <span 
 class="ectt-1200">-it </span>to do so.  </p><div class="framedenv" id="shaded*-1">
-   <!--l. 416-->
+   <!--l. 414-->
 <pre class="lstlisting" id="listing-24"><span class="label"><a 
  id="x1-16008r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1446,20 +1443,20 @@ class="ectt-1200">it</span></span><span style="color:#000000"> </span><span styl
 class="ectt-1200">ubuntu</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 418--><p class="indent" >   Next we will look at allowing the outside world into our isolated environment. Remember that containers live
+<!--l. 416--><p class="indent" >   Next we will look at allowing the outside world into our isolated environment. Remember that containers live
 in an isolated networking space and filesystem, however we often want to access files from our container or talk
 to processes running on the network inside the container.
                                                                                                     
                                                                                                     
-</p><!--l. 422--><p class="noindent" >
+</p><!--l. 420--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.3.1    </span> <a 
  id="x1-170003.3.1"></a>Docker Networking</h5>
-<!--l. 424--><p class="noindent" >To allow our Docker containers to communicate via a network we can use the <span 
+<!--l. 422--><p class="noindent" >To allow our Docker containers to communicate via a network we can use the <span 
 class="ectt-1200">-p </span>flag to specify ports we wish to
 publish. For example, if we are running an application in our container on port 6400, we can make it accessible
 outside of the container with:  </p><div class="framedenv" id="shaded*-1">
-   <!--l. 427-->
+   <!--l. 425-->
 <pre class="lstlisting" id="listing-25"><span class="label"><a 
  id="x1-17001r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1473,12 +1470,12 @@ class="ectt-1200">-</span></span><span style="color:#000000"><span
 class="ectt-1200">club</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 429--><p class="indent" >   Note that we&#8217;ve repeated the port. The first occurence of the port is the binding on the host machine, so from
+<!--l. 427--><p class="indent" >   Note that we&#8217;ve repeated the port. The first occurence of the port is the binding on the host machine, so from
 the host we can go to localhost:6400 to access it. The second occurence is the port being listened to
 within the container. This means that we can use different ports on the host. If we want to go to
 port 80 to access our service, we can do so without changing the port inside of the container with:
 </p><div class="framedenv" id="shaded*-1">
-   <!--l. 436-->
+   <!--l. 434-->
 <pre class="lstlisting" id="listing-26"><span class="label"><a 
  id="x1-17002r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1492,28 +1489,28 @@ class="ectt-1200">-</span></span><span style="color:#000000"><span
 class="ectt-1200">club</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 438--><p class="indent" >   Docker networking is much more complicated than just this but it is a starting point so that we can start using
+<!--l. 436--><p class="indent" >   Docker networking is much more complicated than just this but it is a starting point so that we can start using
 containers that talk to the outside world.
 </p>
    <div class="tcolorbox tcolorbox" id="tcolobox-7">    
 <div class="tcolorbox-title">
    </div> 
-<div class="tcolorbox-content"><!--l. 440--><p class="noindent" >TODO: Evan want to do more networking? </p> 
+<div class="tcolorbox-content"><!--l. 438--><p class="noindent" >TODO: Evan want to do more networking? </p> 
 </div> 
 </div>
-<!--l. 442--><p class="noindent" >
+<!--l. 440--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.3.2    </span> <a 
  id="x1-180003.3.2"></a>Docker Volumes</h5>
-<!--l. 444--><p class="noindent" >The next tool to escape from a container is to use Docker volumes. Docker volumes allow a way for us to share the
+<!--l. 442--><p class="noindent" >The next tool to escape from a container is to use Docker volumes. Docker volumes allow a way for us to share the
 same folder between the host machine and the container. This is particularly useful for development of an
 application where the code we want to run is updated often. It is also useful if we are running an application which
 we would like to be persistent, like a database.
-</p><!--l. 449--><p class="indent" >   In our fan club example, we are storing our application within the <span 
+</p><!--l. 447--><p class="indent" >   In our fan club example, we are storing our application within the <span 
 class="ectt-1200">/app </span>directory of the container. If we want
 this to live update with the contents of our application on the host (assuming we run this command from the
 applications directory), we can do so with:  </p><div class="framedenv" id="shaded*-1">
-   <!--l. 452-->
+   <!--l. 450-->
 <pre class="lstlisting" id="listing-27"><span class="label"><a 
  id="x1-18001r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1532,38 +1529,38 @@ class="ectt-1200">-</span></span><span style="color:#000000"><span
 class="ectt-1200">club</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 454--><p class="indent" >   This command mounts our current working directory (<span 
+<!--l. 452--><p class="indent" >   This command mounts our current working directory (<span 
 class="ectt-1200">$(pwd)</span>) to the <span 
 class="ectt-1200">/app </span>directory inside the container. This
 allows us to update our application and have the change reflected inside the container.
-</p><!--l. 457--><p class="indent" >   Again, Docker volumes are a much more complex beast but host mounting is all we require for this
+</p><!--l. 455--><p class="indent" >   Again, Docker volumes are a much more complex beast but host mounting is all we require for this
 practical.
                                                                                                     
                                                                                                     
-</p><!--l. 459--><p class="noindent" >
+</p><!--l. 457--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
  id="x1-190004"></a>Containerising our Todo Application</h3>
-<!--l. 465--><p class="noindent" >
+<!--l. 463--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.1    </span> <a 
  id="x1-200004.1"></a>Creating a Practical Repository</h4>
-<!--l. 466--><p class="noindent" >Navigate to the GitHub Classroom link for this practical provided by your tutor in Slack. As with last week, this will
+<!--l. 464--><p class="noindent" >Navigate to the GitHub Classroom link for this practical provided by your tutor in Slack. As with last week, this will
 create a new repository for you in the course organisation. You can now clone this repository to your local
 machine or work directly in the browser with GitHub codespaces. This repository will be populated with
 our solution to last week&#8217;s practical exercise. You may modify this solution or replace it with your
 own.
-</p><!--l. 472--><p class="noindent" >
+</p><!--l. 470--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.2    </span> <a 
  id="x1-210004.2"></a>Creating a Dockerfile</h4>
-<!--l. 474--><p class="noindent" >Now that we have covered the basics of Docker we can Dockerise our Todo App to prepare it for deployment.
+<!--l. 472--><p class="noindent" >Now that we have covered the basics of Docker we can Dockerise our Todo App to prepare it for deployment.
 Inside our practical folder we will create a new file called <span 
 class="ectt-1200">Dockerfile</span>. To start, we will use the following
 Dockerfile:
-</p><!--l. 478--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 478--><p class="indent" >   <span 
-class="ectt-1200">» cat Dockerfile</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 478--><pre class="listings" id="listing-28"><span class="label"><a 
+</p><!--l. 476--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 476--><p class="indent" >   <span 
+class="ectt-1200">» cat Dockerfile</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 476--><pre class="listings" id="listing-28"><span class="label"><a 
  id="x1-21001r1"></a></span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
 class="ectt-1200">syntax</span></span><span style="color:#33997E"><span 
@@ -1612,12 +1609,12 @@ class="ectt-1200">pip</span></span>
 <span class="label"><a 
  id="x1-21006r6"></a></span></pre>
    </div>
-<!--l. 486--><p class="indent" >   The above image is what your local environment may have been like when you started the course. To follow
+<!--l. 484--><p class="indent" >   The above image is what your local environment may have been like when you started the course. To follow
 the same setup as we have had in the practicals let&#8217;s install pipenv. We can do this by adding the following line to
 our Dockerfile:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 490--><pre class="listings" id="listing-29"><span class="label"><a 
+<!--l. 488--><pre class="listings" id="listing-29"><span class="label"><a 
  id="x1-21007r1"></a></span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
 class="ectt-1200">Install</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
@@ -1634,14 +1631,14 @@ class="ectt-1200">pipenv</span></span>
 <span class="label"><a 
  id="x1-21009r3"></a></span></pre>
    </div>
-<!--l. 495--><p class="indent" >   Let&#8217;s now change our working directory to <span 
+<!--l. 493--><p class="indent" >   Let&#8217;s now change our working directory to <span 
 class="ectt-1200">/app </span>and copy our <span 
 class="ectt-1200">Pipfile </span>and <span 
 class="ectt-1200">Pipfile.lock </span>into the container.
 We can then install our dependencies using pipenv.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 498--><pre class="listings" id="listing-30"><span class="label"><a 
+<!--l. 496--><pre class="listings" id="listing-30"><span class="label"><a 
  id="x1-21010r1"></a></span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
 class="ectt-1200">Setting</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
@@ -1684,12 +1681,12 @@ class="ectt-1200">deploy</span></span>
 <span class="label"><a 
  id="x1-21016r7"></a></span></pre>
    </div>
-<!--l. 507--><p class="indent" >   Note that we are installing dependencies in a layer separate to our application. This allows us to quickly rebuild
+<!--l. 505--><p class="indent" >   Note that we are installing dependencies in a layer separate to our application. This allows us to quickly rebuild
 the image if we change anything other than the Pipfile or Pipfile.lock.
-</p><!--l. 510--><p class="indent" >   Now that we have installed our dependencies we can copy our application into the container.
+</p><!--l. 508--><p class="indent" >   Now that we have installed our dependencies we can copy our application into the container.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 512--><pre class="listings" id="listing-31"><span class="label"><a 
+<!--l. 510--><pre class="listings" id="listing-31"><span class="label"><a 
  id="x1-21017r1"></a></span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
 class="ectt-1200">Copying</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
@@ -1711,10 +1708,10 @@ class="ectt-1200">app</span></span>
                                                                                                     
                                                                                                     
    </div>
-<!--l. 517--><p class="indent" >   Finally we can run our application by adding the following line to our Dockerfile:
+<!--l. 515--><p class="indent" >   Finally we can run our application by adding the following line to our Dockerfile:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 519--><pre class="listings" id="listing-32"><span class="label"><a 
+<!--l. 517--><pre class="listings" id="listing-32"><span class="label"><a 
  id="x1-21020r1"></a></span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
 class="ectt-1200">Running</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
@@ -1767,10 +1764,10 @@ class="ectt-1200">]</span></span>
 <span class="label"><a 
  id="x1-21022r3"></a></span></pre>
    </div>
-<!--l. 524--><p class="indent" >   We should now have a complete Dockerfile, as shown below:
+<!--l. 522--><p class="indent" >   We should now have a complete Dockerfile, as shown below:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 526--><pre class="listings" id="listing-33"><span class="label"><a 
+<!--l. 524--><pre class="listings" id="listing-33"><span class="label"><a 
  id="x1-21023r1"></a></span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
 class="ectt-1200">syntax</span></span><span style="color:#33997E"><span 
@@ -1944,15 +1941,15 @@ class="ectt-1200">]</span></span>
 <span class="label"><a 
  id="x1-21044r22"></a></span></pre>
    </div>
-<!--l. 550--><p class="noindent" >
+<!--l. 548--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.3    </span> <a 
  id="x1-220004.3"></a>Building our Docker Image</h4>
-<!--l. 552--><p class="noindent" >Now that we have created our Dockerfile we can build our Docker image. To do this we will use the following
+<!--l. 550--><p class="noindent" >Now that we have created our Dockerfile we can build our Docker image. To do this we will use the following
 command:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 554--><pre class="listings" id="listing-34"><span class="label"><a 
+<!--l. 552--><pre class="listings" id="listing-34"><span class="label"><a 
  id="x1-22001r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1972,10 +1969,10 @@ class="ectt-1200">latest</span></span>
 <span class="label"><a 
  id="x1-22003r3"></a></span></pre>
    </div>
-<!--l. 559--><p class="indent" >   We can then inspect our layers with the following command:
+<!--l. 557--><p class="indent" >   We can then inspect our layers with the following command:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 561--><pre class="listings" id="listing-35"><span class="label"><a 
+<!--l. 559--><pre class="listings" id="listing-35"><span class="label"><a 
  id="x1-22004r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1986,15 +1983,15 @@ class="ectt-1200">todo</span></span>
 <span class="label"><a 
  id="x1-22005r2"></a></span></pre>
    </div>
-<!--l. 566--><p class="noindent" >
+<!--l. 564--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.4    </span> <a 
  id="x1-230004.4"></a>Running our Docker Container</h4>
-<!--l. 568--><p class="noindent" >Now that we have built our Docker image we can run our Docker container. To do this we will use the following
+<!--l. 566--><p class="noindent" >Now that we have built our Docker image we can run our Docker container. To do this we will use the following
 command:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 570--><pre class="listings" id="listing-36"><span class="label"><a 
+<!--l. 568--><pre class="listings" id="listing-36"><span class="label"><a 
  id="x1-23001r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2017,7 +2014,7 @@ class="ectt-1200">...</span></span>
 <span class="label"><a 
  id="x1-23003r3"></a></span></pre>
    </div>
-<!--l. 575--><p class="indent" >   We can now navigate to <a 
+<!--l. 573--><p class="indent" >   We can now navigate to <a 
 href="http://localhost:6400" class="url" ><span 
 class="ectt-1200">http://localhost:6400</span></a> to see our application running. We can stop our container
 by pressing <span 
@@ -2028,8 +2025,8 @@ practicals.
 </p>
    <div class="tcolorbox tcolorbox" id="tcolobox-8">    
 <div class="tcolorbox-title">
-<!--l. 583--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 583--><p class="noindent" >It is important for us to use the host of 0.0.0.0 when running our application. This is because we
+<!--l. 581--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 581--><p class="noindent" >It is important for us to use the host of 0.0.0.0 when running our application. This is because we
 are running our application inside a container and we need to expose the port to the host machine.
 If we were to use the default host of 127.0.0.1 we would not be able to access our application from
 outside the container.  </p> 
@@ -2037,42 +2034,42 @@ outside the container.  </p>
 </div>
    <div class="tcolorbox tcolorbox" id="tcolobox-9">    
 <div class="tcolorbox-title">
-<!--l. 589--><p class="indent" >   Warning</p></div> 
-<div class="tcolorbox-content"><!--l. 589--><p class="noindent" >You need to make sure that you are not running the webserver from the previous practical on port
+<!--l. 587--><p class="indent" >   Warning</p></div> 
+<div class="tcolorbox-content"><!--l. 587--><p class="noindent" >You need to make sure that you are not running the webserver from the previous practical on port
 6400. If you are then you will need to stop that webserver before running the Docker container. If
 you also have other containers running they can conflict with this container.  </p> 
 </div> 
 </div>
-<!--l. 591--><p class="noindent" >
+<!--l. 589--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.5    </span> <a 
  id="x1-240004.5"></a>Optimizing Our Container</h4>
-<!--l. 593--><p class="noindent" >We build this container image up from the Ubuntu base image. However, we rarely want to do it this way as their
+<!--l. 591--><p class="noindent" >We build this container image up from the Ubuntu base image. However, we rarely want to do it this way as their
 exists a huge range of base images for most languages and environments. Try to optimize your image by using
 <span 
 class="ectt-1200">python:3.10 </span>as your base image.
-</p><!--l. 597--><p class="noindent" >
+</p><!--l. 595--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
  id="x1-250005"></a>Docker Compose</h3>
-<!--l. 599--><p class="noindent" >Docker is a useful tool itself but in terms of local development, but it is not always as easy to work with as it
+<!--l. 597--><p class="noindent" >Docker is a useful tool itself but in terms of local development, but it is not always as easy to work with as it
 could be. Docker Compose allows us to run multiple containers together which can be extremely
 useful for managing complex projects that require numerous run parameters or manage multiple
 containers.
-</p><!--l. 603--><p class="indent" >   For this practical, we want to use a database closer to our production environment. We will be using a
+</p><!--l. 601--><p class="indent" >   For this practical, we want to use a database closer to our production environment. We will be using a
 Postgresql database which will eventually be a managed database hosted on AWS.
-</p><!--l. 606--><p class="noindent" >
+</p><!--l. 604--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">5.1    </span> <a 
  id="x1-260005.1"></a>Moving to a Postgresql Database</h4>
-<!--l. 608--><p class="noindent" >This week we have actually made a small change to our application so that it can receive the SQLAlchemy
+<!--l. 606--><p class="noindent" >This week we have actually made a small change to our application so that it can receive the SQLAlchemy
 database URI as an environment variable. This means that we can now use Docker Compose to run our
 application and database together. To do this we will create a new file called <span 
 class="ectt-1200">docker-compose.yml </span>and add the
 following content:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 612--><pre class="listings" id="listing-37"><span class="label"><a 
+<!--l. 610--><pre class="listings" id="listing-37"><span class="label"><a 
  id="x1-26001r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">version</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2177,7 +2174,7 @@ class="ectt-1200">:</span></span>
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">DATABASE_URI</span></span><span style="color:#000000"><span 
+class="ectt-1200">SQLALCHEMY_DATABASE_URI</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">postgresql</span></span><span style="color:#000000"><span 
 class="ectt-1200">://</span></span><span style="color:#000000"><span 
@@ -2214,10 +2211,10 @@ class="ectt-1200">database</span></span>
 <span class="label"><a 
  id="x1-26022r22"></a></span></pre>
    </div>
-<!--l. 636--><p class="indent" >   We can now run our application and database with the following command within the root directory.
+<!--l. 634--><p class="indent" >   We can now run our application and database with the following command within the root directory.
 </p>
    <div class="framedenv" id="shaded*-1">
-   <!--l. 638-->
+   <!--l. 636-->
                                                                                                     
                                                                                                     
 <pre class="lstlisting" id="listing-38"><span class="label"><a 
@@ -2229,7 +2226,7 @@ class="ectt-1200">compose</span></span><span style="color:#000000"> </span><span
 class="ectt-1200">up</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 640--><p class="indent" >   You should observe the output of this command and you can see two containers running. One is the database,
+<!--l. 638--><p class="indent" >   You should observe the output of this command and you can see two containers running. One is the database,
 <span 
 class="ectt-1200">database</span>, and the other is our application, <span 
 class="ectt-1200">app</span>. We can now navigate to <a 
@@ -2240,7 +2237,7 @@ application tried to connect to it. We can fix this by adding a delay to our app
 the following line to our Dockerfile:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 647--><pre class="listings" id="listing-39"><span class="label"><a 
+<!--l. 645--><pre class="listings" id="listing-39"><span class="label"><a 
  id="x1-26024r1"></a></span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
 class="ectt-1200">Adding</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
@@ -2309,12 +2306,12 @@ class="ectt-1200">]</span></span>
 <span class="label"><a 
  id="x1-26026r3"></a></span></pre>
    </div>
-<!--l. 652--><p class="indent" >   In the long run you would want your application to be able to retry connecting to the database if it fails but for
+<!--l. 650--><p class="indent" >   In the long run you would want your application to be able to retry connecting to the database if it fails but for
 now we will just add a delay. We can now rebuild our Docker image and run our application and database with the
 following commands:
 </p>
    <div class="framedenv" id="shaded*-1">
-   <!--l. 655-->
+   <!--l. 653-->
 <pre class="lstlisting" id="listing-40"><span class="label"><a 
  id="x1-26027r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2326,17 +2323,17 @@ class="ectt-1200">--</span></span><span style="color:#000000"><span
 class="ectt-1200">build</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 657--><p class="indent" >   You may have noticed that when we defined the todo application service above we did not specify a container.
+<!--l. 655--><p class="indent" >   You may have noticed that when we defined the todo application service above we did not specify a container.
 This is because Docker Compose can be instructed to use our Dockerfile to build at time so that we do not have to
 keep using the build command.
-</p><!--l. 675--><p class="noindent" >
+</p><!--l. 673--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">6    </span> <a 
  id="x1-270006"></a>Conclusion</h3>
-<!--l. 677--><p class="noindent" >Over the past couple of weeks we have built a full todo app API that is ready to be deployed to a remote
+<!--l. 675--><p class="noindent" >Over the past couple of weeks we have built a full todo app API that is ready to be deployed to a remote
 production environment. We started with a Flask API returning static responses and now we have a dynamic API
 that is running in a containerised environment with an external database.
-</p><!--l. 680--><p class="indent" >   We have cheated with our Docker deployment by using the flask development server. For a production
+</p><!--l. 678--><p class="indent" >   We have cheated with our Docker deployment by using the flask development server. For a production
 environment you will want to use a production webserver such as <span 
 class="ectt-1200">gunicorn </span>or <span 
 class="ectt-1200">uwsgi</span>. These web servers are
