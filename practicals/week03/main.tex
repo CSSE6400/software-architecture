@@ -7,9 +7,9 @@
 \usepackage{languages}
 
 \title{Docker and Docker Compose}
-\author{Brae Webb \& Evan Hughes}
+\author{Evan Hughes \& Brae Webb}
 
-\date{\week{3}}
+\date{\week[practical]{3}}
 \begin{document}
 
 \maketitle
@@ -18,176 +18,436 @@
   \begin{center}
     \includegraphics[scale=0.4]{images/docker}
   \end{center}
-  \caption{Docker containers by MidJourney with Prompt ""}
 \end{figure}
 
 \section{This Week}
 This week our goal is to:
 \begin{itemize}
-  \item Learn docker basics.
-  \item Dockerise our Todo application from last week.
-  \item Move to a postgresql database from the SQLite database we used last week.
-  \item Testing and Packaging our application on commit.
+  \item Gain hands on practice with Docker.
+  \item Containerise our Todo application.
+  \item Move to a PostgreSQL database from the SQLite database.
+  %\item Implement CI tests and deployment of our container on commit.
 \end{itemize}
 
 \pagebreak
-\section{Getting Started with Docker}
-
-In the lectures we have delved into the world of containers and how they can be used to create a consistent environment for our applications. Depending on the courses you have taken you may have been exposed to them as either a user or a consumer, for instance if you have submitted assessment to gradescope in CSSE1001 or CSSE2002 the submission system uses docker to run your code.\\
 
 \notice{
-This practical will assume you have not used docker before but we will be skipping over some aspects since its not needed for our purposes. Please see the lectures if you would like a better overview to containerisation.
+\section{Installing Docker}
+
+Before the practical class, please install Docker on your machine.
+Start the process of installing Docker while your tutor runs through the first part of the practical.
+
+To install Docker on your Mac or Windows machine you can follow the instructions on the docker website: \url{https://docs.docker.com/get-docker/}.
+If you are using a Linux machine you can install Docker using your package manager.
+For example on Ubuntu you can use the following command:
+
+\bash{sudo apt-get install docker.io}
+
+\info{
+If you are using a Linux machine you may need to add your user to the docker group so that you can run docker commands without sudo.
+While the docker website suggests using docker-desktop for Linux,
+this course recommends using the native docker installation.
+}
+
+\info{
+The GitHub Codespaces environment has Docker and Docker-Compose installed.
+}
+}
+
+\section{Getting Started with Docker}
+
+In the lectures we have delved into the world of containers and how they can be used to create a consistent environment for our applications.
+Depending on the courses you have taken you may have been exposed to them as either a user or a consumer,
+for instance if you have submitted assignments in CSSE1001 or CSSE2002 the autograding uses Docker to run and test your code.
+
+\notice{
+This practical will assume you have not used Docker before but we will be skipping over some aspects since its not needed for our purposes.
+Please watch the lecture for a foundational understanding of container technology and terminology.
 }
 
 \teacher{
-  Sections 2.1 and 2.2 are presentation based where you should be covering the fundementals of docker images and containers. Where we are using container to describe the implemented image running in an environment.
+Sections \ref{docker-images} and \ref{docker-containers} are for presentation.
 }
 
 \subsection{Docker Images}
+\label{docker-images}
 
-Images are the building block of the principals on containerisation. They are a self contained environment that can be run that contains the depenedencies and code for an application. A common way to build an image is to use a Dockerfile. Though Docker was not the first to make this concept, it is very popular and relativly easy to use.
+Docker images are the layers of files required to run containers.
+They are self contained environments that should contain the depenedencies and code for any application.
+A common way to build an image is to use a Dockerfile.
 
 \subsubsection{Dockerfile}
 
-The Dockerfile is a plain text file with its own markup language that is used to describe the image. It is a series of instructions that are run in order to build the image. The instructions are run in a layered fashion, each instruction is run on top of the previous instruction. This means that if you change a line in the Dockerfile you only need to rebuild the layers that have changed. This is a huge time saver when developing your application.
+The Dockerfile is a plain text file with its own syntax that is used to describe the instructions for creating an image.
+The series of instructions are run in order to create each layer of the image.
 
-A reference of all possible Dockerfile instructions can be found here: \url{https://docs.docker.com/engine/reference/builder/}. For the purposes of the course we are just gonna cover some of the basics and some common recipes.
+A reference of all possible Dockerfile instructions can be found here: \url{https://docs.docker.com/engine/reference/builder/}.
+For the purposes of the course we will cover the core instructions, namely;
+\texttt{FROM}, \texttt{RUN}, \texttt{COPY}, \texttt{ADD}, \texttt{WORKDIR}, \texttt{CMD}, and \texttt{ENTRYPOINT}.
 
+\paragraph{FROM}
+The FROM instruction should be the first instruction in your Dockerfile and specifies the base image for subsequent instructions.
+If you want to start with an empty image,
+use the \texttt{scratch} image.
+Otherwise, you likely want to start from an image that has a number of the common utilities pre-packaged.
 
-\begin{code}[language=docker,numbers=none]{}
-# syntax=docker/dockerfile:1
+\begin{code}[language=docker,numbers=none]{Dockerfile}
 FROM ubuntu:latest
 \end{code}
 
-When building a Dockerfile you need to start with a base image. This is the image that you will build on top of. In this case we are using the latest version of ubuntu. This ubutu is a very minimal image that is used intended to be used as a starting point and is itself an image.
+In this case we are using the latest version of ubuntu.
+This ubuntu is a very minimal image that is intended to be used as a starting point and is itself an image.
+Unless you are working in an obscure language,
+you will often want to start from an image that already has your language or framework installed.
+For example, you can start from the \texttt{nodejs} image,
+or the \texttt{python} image.
 
-\begin{code}[language=docker,numbers=none]{}
-  # syntax=docker/dockerfile:1
-  FROM ubuntu:latest
 
-  # Installing dependencies for running a python application
-  RUN apt-get update && apt-get install -y python3 python3-pip
+\paragraph{RUN}
+The RUN instruction will execute commands on top of the current layer and store the changes as a new layer.
+The layer will be used for the next step in the Dockerfile.
+
+\begin{code}[language=docker,numbers=none]{Dockerfile}
+FROM ubuntu:latest
+
+# Installing dependencies for running a python application
+RUN apt-get update && apt-get install -y python3 python3-pip
 \end{code}
 
-Now that we have a base image we can start to add our own dependencies. In this case we are installing python3 and pip. The RUN command is used to run a command in the container. Since we are using ubuntu we can use apt-get to install our dependencies and we are chaining the commands so that they are run as one block. You will notice that we are running \texttt{apt-get update} before we install our dependencies. This is because the base image probably has no package caches as that would take up unnesscary space. So we need to update the package cache before we can install anything.
+The RUN instruction allows us to execute commands when the container is built.
+The example above is installing python dependencies for a fake application.
+\info{
+When using the \texttt{apt} package manager on the ubuntu image,
+remember that the package indexes are removed to reduce the size of the base image.
 
-\todo{continue fleshing this out with copy, add, workdir, cmd, entrypoint}
+We've made a mistake in the above example resulting in our image size being larger than necessary, can you spot it?
+}
+
+\paragraph{COPY}
+The COPY instruction copies files or directories from <src> on the host machine where the image is being built to the filesystem of the container at the path <dest>.
+
+\begin{code}[language=docker,numbers=none]{Dockerfile}
+FROM ubuntu:latest
+
+# Installing dependencies for running a python application
+RUN apt-get update && apt-get install -y python3 python3-pip
+
+# Copying our application into the container
+COPY fan-club-runner /app
+\end{code}
+
+The COPY instruction is one of the simplier ways to put resources into the container.
+Be aware that when you COPY files into the container they will exist in a layer forever.
+The following example will still expose the \texttt{secrets.txt} file even though we removed it in another layer.
+
+\begin{code}[language=docker,numbers=none]{Dockerfile}
+FROM ubuntu:latest
+
+# Installing dependencies for running a python application
+RUN apt-get update && apt-get install -y python3 python3-pip
+
+# Copying our application into the container
+COPY fan-club-runner /app
+
+# Removing the secrets file
+RUN rm /app/secrets.txt
+\end{code}
+
+\paragraph{ADD}
+The ADD instruction copies files, directories, or remote file URLs from <src> to the filesystem of the image at the path <dest>.
+
+ADD can behave like COPY but it can also pull in files from remote locations and extract tars.
+This can be handy if your application requires external static files and you dont want to store them in your git repository.
+Though the ADD command is usually not recommended and is often replaced with curl or wget.
+
+\begin{code}[language=docker,numbers=none]{}
+ADD https://csse6400.uqcloud.net/slides/containers.pdf .
+\end{code}
+\begin{code}[language=docker,numbers=none]{}
+RUN curl https://csse6400.uqcloud.net/slides/containers.pdf -o containers.pdf
+\end{code}
+
+\paragraph{WORKDIR}
+The WORKDIR instruction sets the working directory for any subsequent RUN, CMD, ENTRYPOINT, COPY, or ADD instruction.
+If the WORKDIR does not exist, it will be created even if it is not used in any subsequent Dockerfile instruction.
+This instruction is a readability feature to help you reduce the amount of moving around within the container.
+
+\begin{code}[language=docker,numbers=none]{Dockerfile}
+FROM ubuntu:latest
+
+# Installing dependencies for running a python application
+RUN apt-get update && apt-get install -y python3 python3-pip
+
+# Setting the working directory
+WORKDIR /app
+
+# Copying our application into the container
+COPY fan-club-runner .
+\end{code}
+
+
+\paragraph{ENTRYPOINT}
+The ENTRYPOINT instruction allows you to configure what process is executed when a container is run.
+
+\begin{code}[language=docker,numbers=none]{Dockerfile}
+FROM ubuntu:latest
+
+# Installing dependencies for running a python application
+RUN apt-get update && apt-get install -y python3 python3-pip
+
+# Setting the working directory
+WORKDIR /app
+
+# Copying our application into the container
+COPY fan-club-runner .
+
+# Setting the default command
+ENTRYPOINT ["python3", "fan-club-runner.py"]
+\end{code}
+
+The ENTRYPOINT instruction is the executable that will be run when the container starts.
+The CMD instruction accompanises the ENTRYPOINT and is the default arguments that will be passed to the ENTRYPOINT.
+
+\begin{code}[language=shell,numbers=none]{}
+> docker build -t fan-club .
+> docker run --rm fan-clib
+\end{code}
+
+example output:
+
+\begin{code}[language=shell,numbers=none]{}
+Richard Thomas Fan Club!
+\end{code}
+
+\paragraph{CMD}
+CMD provides defaults for an executing container.
+
+\begin{code}[language=docker,numbers=none]{Dockerfile}
+FROM ubuntu:latest
+
+# Installing dependencies for running a python application
+RUN apt-get update && apt-get install -y python3 python3-pip
+
+# Setting the working directory
+WORKDIR /app
+
+# Copying our application into the container
+COPY fan-club-runner .
+
+# Setting the default command
+ENTRYPOINT ["python3", "fan-club-runner.py"]
+CMD ["--help"]
+\end{code}
+
+The CMD instruction sets default parameters for the ENTRYPOINT but is easily overriden when the container is run.
+The following example will override the default \texttt{-{}-help} argument and run the application with the \texttt{-{}-version} argument.
+
+\begin{code}[language=shell,numbers=none]{}
+> docker run --rm fan-club --version
+\end{code}
+
+\begin{code}[language=shell,numbers=none]{}
+  Fan Club Runner 1.0.0
+\end{code}
+
+\info{
+Occasionally you will see the CMD instruction used without the ENTRYPOINT instruction.
+
+This is only possible because the default ENTRYPOINT is \texttt{/bin/sh -c}.
+
+So \texttt{docker run --rm -it ubuntu /bin/bash} actually runs the process \texttt{/bin/sh -c /bin/bash}.
+}
+
+This concludes the Dockerfile instructions required for this practical,
+however, there are more that you may need to explore in the future.
+The full list of instructions can be found in the official documentation:
+
+\url{https://docs.docker.com/engine/reference/builder/}
 
 \subsubsection{Dockerfile Layers}
 
-In the previous sections we have been using the RUN, ADD and COPY to build up our image to run an example application. When the container is built each of these instructions is run on a layer of the image. This means that if you change a line in the Dockerfile you only need to rebuild the layers that have changed. This is a huge time saver when developing your application.
+In the previous sections we used the RUN, ADD, and COPY to build an image to run our example application.
+When the container is built, each of these instructions is run to create layer of the image.
+This means that if you change a line in the Dockerfile you only need to rebuild the layers that come after the altered line.
+This is a huge time saver when developing your Dockerfile.
 
-Lets have a look at an example of the layers that are created when we build our Dockerfile from the previous section.
+Let's take a look at the Dockerfile below.
+In this Dockerfile, our application now has Python dependencies that need to be installed.
 
-\begin{code}[language=docker,numbers=none]{}
-  # syntax=docker/dockerfile:1
-  FROM ubuntu:latest
+\begin{code}[language=docker,numbers=none]{Dockerfile}
+FROM ubuntu:latest
 
-  # Installing dependencies for running a python application
-  RUN apt-get update && apt-get install -y python3 python3-pip
+# Installing dependencies for running a python application
+RUN apt-get update && apt-get install -y python3 python3-pip
 
-  # Copying our application into the container
-  COPY . /app
+# Copying our application into the container
+COPY . /app
 
-  # Installing our application dependencies
-  RUN pip3 install -r /app/requirements.txt
+# Installing our application dependencies
+RUN pip3 install -r /app/requirements.txt
 
-  # Setting the working directory
-  WORKDIR /app
+# Setting the working directory
+WORKDIR /app
 
-  # Running our application
-  CMD ["python3", "src/app.py"]
+# Running our application
+CMD ["python3", "src/app.py"]
 \end{code}
 
-We see that we are copying in the entire application directory before we install our requirements. We can improve this so that we only copy in the requirements file and then install the requirements. This means that if we change our application code we don't need to reinstall the requirements.
+We are copying in the entire application directory before we install our requirements.
+We can improve this so that we only copy in the requirements file and then install the requirements.
+This means that if we change our application code we do not need to reinstall the requirements.
 
 \begin{code}[language=docker,numbers=none]{}
-  # syntax=docker/dockerfile:1
-  FROM ubuntu:latest
+FROM ubuntu:latest
 
-  # Installing dependencies for running a python application
-  RUN apt-get update && apt-get install -y python3 python3-pip
+# Installing dependencies for running a python application
+RUN apt-get update && apt-get install -y python3 python3-pip
 
-  # Copying our application into the container
-  COPY requirements.txt /app/requirements.txt
+# Copying our application into the container
+COPY requirements.txt /app/requirements.txt
 
-  # Installing our application dependencies
-  RUN pip3 install -r /app/requirements.txt
+# Installing our application dependencies
+RUN pip3 install -r /app/requirements.txt
 
-  # Copying our application into the container
-  COPY src/ /app
+# Copying our application into the container
+COPY src/ /app
 
-  # Setting the working directory
-  WORKDIR /app
+# Setting the working directory
+WORKDIR /app
 
-  # Running our application
-  CMD ["python3", "src/app.py"]
+# Running our application
+CMD ["python3", "src/app.py"]
 \end{code}
 
-For the containers we will be building this may not be a large issue, but once your project becomes larger and you have more dependencies it can become a large time saver.
+For the containers we will be building this may not be a large issue,
+but once your project becomes larger and you have more dependencies it can be a real time saver,
+so it is worth getting into the habit early.
 
 To see the layers that are created when you build your Dockerfile you can use the following command:
 
 \begin{code}[language=bash,numbers=none]{}
-  docker history <image name>
+docker history <image name>
 
-  # Example
-  docker history ubuntu:latest
-\end{code}
-
-
-\subsubsection{Image Registries}
-
-When we introduced the Dockerfile we glossed over the details of where \texttt{ubuntu:latest} is being sourced from. This image is coming from a registry. There are a few different registries that you can use. The default registry is one hosted by Docker themselves. This is the registry that is used when you don't specify a registry and is available at \url{https://hub.docker.com/}. There are also registries hosted by other companies such as Google and Amazon. These are available at \url{https://cloud.google.com/container-registry} and \url{https://aws.amazon.com/ecr/} respectively.
-
-As an example the image that we have been using is available at \url{https://hub.docker.com/_/ubuntu}. When browsing this page we can also see differnt tags that are available for this image, such as \texttt{latest} and \texttt{20.04}. These tags are used to specify different versions of the image so you can pin your image instead of using the \texttt{latest} tag which will always point to the latest version of the image. Note that not all images will have different tags or even a \texttt{latest} tag.
-
-\begin{figure}[H]
-  \includegraphics[width=\textwidth]{images/dockerhub}
-  \caption{Ubuntu image on Docker Hub}
-\end{figure}
-
-\subsection{Docker Containers}
-
-\todo{continue fleshing this out}
-
-\subsubsection{Docker Networking}
-
-\todo{continue fleshing this out}
-
-\subsubsection{Docker Volumes}
-
-\todo{continue fleshing this out}
-
-\subsection{Installing Docker}
-
-To install docker on your Mac or Windows machine you can follow the instructions on the docker website: \url{https://docs.docker.com/get-docker/}. If you are using a Linux machine you can install docker using your package manager. For example on Ubuntu you can use the following command:
-
-\begin{code}[language=bash,numbers=none]{}
-  sudo apt-get install docker.io
+# Example
+docker history ubuntu:latest
 \end{code}
 
 \info{
-  If you are using a Linux machine you may need to add your user to the docker group so that you can run docker commands without sudo. While the docker website suggests using docker-desktop for Linux, the course highly recommends using the native docker installation.
+Note how the Ubuntu image cheats and copies the whole file structure in one layer rather than running commands to build it incrementally.
+
+This is a common tactic in core images that the developers expect others to build on top of.
+One reason being the 127 layer limit of Docker.
+
+For an example of a container that has left their whole thought process in the layers they produce,
+try running the Doom image.
+
+\bash{docker run -it --rm -p 224:6901 -e VNC_PW=password kasmweb/doom:1.12.0}
+
+You can then go to \url{http://localhost:224} and connect to the VNC server with the username \texttt{kasm\_user} password \texttt{password}.
+
+\bash{docker history kasmweb/doom:1.12.0}
 }
 
+\subsubsection{Image Registries}
+
+When we introduced the Dockerfile we glossed over the details of from where \texttt{ubuntu:latest} is coming.
+This image comes from a registry.
+There are a few different registries that you can use.
+The default registry is hosted by Docker,
+this is the registry that is used when you do not specify a registry and is available at \url{https://hub.docker.com/}.
+
+There are also registries hosted by other companies such as Google and Amazon.
+These are available at \url{https://cloud.google.com/container-registry} and \url{https://aws.amazon.com/ecr/} respectively.
+
+The Ubuntu image that we have been using is available at \url{https://hub.docker.com/_/ubuntu}.
+When browsing this page we can also see different tags that are available for this image,
+such as \texttt{latest} and \texttt{20.04}.
+
+These tags are used to specify different versions of the image so you can pin your image instead of using the \texttt{latest} tag,
+which will always point to the latest version of the image.
+Note that not all images will have different tags or even a \texttt{latest} tag.
+
+\begin{figure}[H]
+    \centering
+  \includegraphics[width=0.6\textwidth]{images/dockerhub}
+  \caption{Ubuntu image on DockerHub}
+\end{figure}
+
+\subsection{Docker Containers}
+\label{docker-containers}
+
+Docker containers are the runtime instantiation of a Docker image.
+They are the process that is running inside the filesystem environment that has been created as an image.
+
+Once you have a suitable Docker image,
+you can start and run a Docker container by using the \texttt{docker run} command.
 
 \subsection{Running a Docker Container}
 
-To verify that docker is installed correctly you can run the following command:
+The below shows how to run the \texttt{hello-world} Docker image from DockerHub.
 
 \begin{code}[language=bash,numbers=none]{}
-  docker run hello-world
-
-  # Example output
-  ...
-
-  Hello from Docker!
-  This message shows that your installation appears to be working correctly.
+> docker run hello-world
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
 \end{code}
 
+It is worth nothing that if you do not use the \texttt{-{}-rm} flag when using Docker run,
+the container will still exist after it has finished running.
+You can view the running containers with:
+\bash{docker ps}
 
-\section{Dockerising our Todo Application}
+You can view the running and stopped containers with:
+\bash{docker ps -a}
+
+We can modify our original command so that the container is not kept around after it terminates as show below:
+\bash{docker run --rm hello-world}
+
+Another commonly useful set of arguments is \texttt{-i} and \texttt{-t} which combined allow you to interact with the running container process using your terminal.
+If we want to enter a Ubuntu environment,
+then we would use the combined flags, \texttt{-it} to do so.
+\bash{docker run --rm -it ubuntu}
+
+Next we will look at allowing the outside world into our isolated environment.
+Remember that containers live in an isolated networking space and filesystem,
+however we often want to access files from our container or talk to processes running on the network inside the container.
+
+\subsubsection{Docker Networking}
+
+To allow our Docker containers to communicate via a network we can use the \texttt{-p} flag to specify ports we wish to publish.
+For example, if we are running an application in our container on port 6400,
+we can make it accessible outside of the container with:
+\bash{docker run -p 6400:6400 fan-club}
+
+Note that we've repeated the port.
+The first occurence of the port is the binding on the host machine,
+so from the host we can go to localhost:6400 to access it.
+The second occurence is the port being listened to within the container.
+This means that we can use different ports on the host.
+If we want to go to port 80 to access our service,
+we can do so without changing the port inside of the container with:
+\bash{docker run -p 80:6400 fan-club}
+
+Docker networking is much more complicated than just this but it is a starting point so that we can start using containers that talk to the outside world.
+
+\subsubsection{Docker Volumes}
+
+The next tool to escape from a container is to use Docker volumes.
+Docker volumes allow a way for us to share the same folder between the host machine and the container.
+This is particularly useful for development of an application where the code we want to run is updated often.
+It is also useful if we are running an application which we would like to be persistent, like a database.
+
+In our fan club example,
+we are storing our application within the \texttt{/app} directory of the container.
+If we want this to live update with the contents of our application on the host (assuming we run this command from the applications directory), we can do so with:
+\bash{docker run -v $(pwd):/app fan-club}
+
+This command mounts our current working directory (\texttt{\$(pwd)}) to the \texttt{/app} directory inside the container.
+This allows us to update our application and have the change reflected inside the container.
+
+Again, Docker volumes are a much more complex beast but host mounting is all we require for this practical.
+
+\section{Containerising our Todo Application}
 
 \teacher{
   For this section let the students work through the practical on their own. The content above should be enough to guide them through the process with the provided instructions.
@@ -197,78 +457,77 @@ To verify that docker is installed correctly you can run the following command:
 Navigate to the GitHub Classroom link for this practical provided by your tutor in Slack.
 As with last week, this will create a new repository for you in the course organisation.
 You can now clone this repository to your local machine or work directly in the browser with GitHub codespaces.
-This repository will be populated with our solution to last weeks practical exercise.
+This repository will be populated with our solution to last week's practical exercise.
 You may modify this solution or replace it with your own.
 
 \subsection{Creating a Dockerfile}
 
-Now that we have covered the basics of Docker we can Dockerise our Todo App to prepare it for deployment. Inside our practical folder we will create a new file called \texttt{Dockerfile}. To start us off we will use the following Dockerfile:
+Now that we have covered the basics of Docker we can Dockerise our Todo App to prepare it for deployment.
+Inside our practical folder we will create a new file called \texttt{Dockerfile}.
+To start, we will use the following Dockerfile:
 
-\begin{code}[language=docker,numbers=none]{}
-  # syntax=docker/dockerfile:1
-  FROM ubuntu:latest
+\begin{code}[language=docker,numbers=none]{Dockerfile}
+FROM ubuntu:latest
 
-  # Installing dependencies for running a python application
-  RUN apt-get update && apt-get install -y python3 python3-pip
+# Installing dependencies for running a python application
+RUN apt-get update && apt-get install -y python3 python3-pip postgresql-client libpq-dev
 \end{code}
 
-The above image is what your local environments may have been like when you started the course. To follow the same setup as we have had in the practicals lets install pipenv. We can do this by adding the following line to our Dockerfile:
+The above image is what your local environment may have been like when you started the course.
+To follow the same setup as we have had in the practicals let's install pipenv.
+We can do this by adding the following line to our Dockerfile:
 
 \begin{code}[language=docker,numbers=none]{}
-  # Install pipenv
-  RUN pip3 install -y pipenv
+# Install pipenv
+RUN pip3 install pipenv
 \end{code}
 
-Lets now change our working directory to \texttt{/app} and copy our \texttt{Pipfile} and \texttt{Pipfile.lock} into the container. We can then install our dependencies using pipenv. We can do this by adding the following lines to our Dockerfile:
+Let's now change our working directory to \texttt{/app} and copy our \texttt{Pipfile} and \texttt{Pipfile.lock} into the container.
+We can then install our dependencies using pipenv.
 
 \begin{code}[language=docker,numbers=none]{}
-  # Setting the working directory
-  WORKDIR /app
+# Setting the working directory
+WORKDIR /app
 
-  # Install pipenv dependencies
-  COPY Pipfile Pipfile.lock /app/
-  RUN pipenv install --system --deploy
+# Install pipenv dependencies
+COPY Pipfile Pipfile.lock ./
+RUN pipenv install --system --deploy
 \end{code}
 
-Now that we have installed our dependencies we can copy our application into the container. We can do this by adding the following line to our Dockerfile:
+Note that we are installing dependencies in a layer separate to our application.
+This allows us to quickly rebuild the image if we change anything other than the Pipfile or Pipfile.lock.
+
+Now that we have installed our dependencies we can copy our application into the container.
 
 \begin{code}[language=docker,numbers=none]{}
-  # Copying our application into the container
-  COPY todo/ /app
-
+# Copying our application into the container
+COPY todo todo
 \end{code}
 
 Finally we can run our application by adding the following line to our Dockerfile:
 
 \begin{code}[language=docker,numbers=none]{}
-  # Running our application
-  CMD ["python3", "flask", "--app", "todo", "run", "--host", "0.0.0.0", "--port", "6400"]
+# Running our application
+CMD ["flask", "--app", "todo", "run", "--host", "0.0.0.0", "--port", "6400"]
 \end{code}
 
 We should now have a complete Dockerfile, as shown below:
 
 \begin{code}[language=docker,numbers=none]{}
-  # syntax=docker/dockerfile:1
   FROM ubuntu:latest
-
   # Installing dependencies for running a python application
-  RUN apt-get update && apt-get install -y python3 python3-pip
-
+  RUN apt-get update && apt-get install -y python3 python3-pip postgresql-client libpq-dev
   # Install pipenv
-  RUN pip3 install -y pipenv
-
+  RUN pip3 install pipenv
   # Setting the working directory
   WORKDIR /app
-
   # Install pipenv dependencies
-  COPY Pipfile Pipfile.lock /app/
+  COPY Pipfile Pipfile.lock ./
   RUN pipenv install --system --deploy
-
   # Copying our application into the container
-  COPY todo/ /app
-  
+  COPY todo todo
   # Running our application
-  CMD ["python3", "flask", "--app", "todo", "run", "--host", "0.0.0.0", "--port", "6400"]
+  CMD ["flask", "--app", "todo", "run", "--host", "0.0.0.0", "--port", "6400"]
 \end{code}
 
 \subsection{Building our Docker Image}
@@ -276,17 +535,14 @@ We should now have a complete Dockerfile, as shown below:
 Now that we have created our Dockerfile we can build our Docker image. To do this we will use the following command:
 
 \begin{code}[language=bash,numbers=none]{}
-  docker build -t todo .
-
-  # Example output
-  ...
-  Successfully tagged todo:latest
+> docker build -t todo .
+Successfully tagged todo:latest
 \end{code}
 
 We can then inspect our layers with the following command:
 
 \begin{code}[language=bash,numbers=none]{}
-  docker image history todo
+> docker image history todo
 \end{code}
 
 
@@ -295,32 +551,46 @@ We can then inspect our layers with the following command:
 Now that we have built our Docker image we can run our Docker container. To do this we will use the following command:
 
 \begin{code}[language=bash,numbers=none]{}
-  docker run -p 6400:6400 todo
-
-  # Example output
-  ...
-  * Running on ...
+> docker run -it --rm -p 6400:6400 todo
+* Running on ...
 \end{code}
 
-We can now navigate to \url{http://localhost:6400} to see our application running. We can stop our container by pressing \texttt{Ctrl+C}. This should show the todo app that we have been working with for the past couple of practicals.
+We can now navigate to \url{http://localhost:6400} to see our application running.
+We can stop our container by pressing \texttt{Ctrl+C}.
+This should show the todo app that we have been working with for the past couple of practicals.
 
 \info{
-  It is important for us to use the host of 0.0.0.0 when running our application. This is because we are running our application inside a container and we need to expose the port to the host machine. If we were to use the default host of 127.0.0.1 we would not be able to access our application from outside the container.
+It is important for us to use the host of 0.0.0.0 when running our application.
+This is because we are running our application inside a container and we need to expose the port to the host machine.
+If we were to use the default host of 127.0.0.1 we would not be able to access our application from outside the container.
 }
 
 \warning{
-  You do need to make sure that you were not running the webserver from the previous practical on port 6400. If you were you will need to stop that webserver before running the docker container. If you also have other containers running they can conflict with this container.
+You need to make sure that you are not running the webserver from the previous practical on port 6400.
+If you are then you will need to stop that webserver before running the Docker container.
+If you also have other containers running they can conflict with this container.
 }
 
-\subsection{Docker Compose}
+\subsection{Optimizing Our Container}
 
-Docker is a useful tool itself but in terms of local development, Docker Compose is a much more useful tool. Docker Compose allows us to run multiple containers together which can be extremely useful if your developing multiple projects or have multiple components that need to be put together. For instance for a story close to home, maybe you are working on INFS2200 with you database schema in one container and you can be running your DECO3801 projects database in another container. 
+We build this container image up from the Ubuntu base image.
+However, we rarely want to do it this way as their exists a huge range of base images for most languages and environments.
+Try to optimize your image by using \texttt{python:3.10} as your base image.
 
-For us, we are going to be using a database closer to our production environment. We will be using a Postgresql database which will eventually be a managed database hosted option from AWS.
+\section{Docker Compose}
+
+Docker is a useful tool itself but in terms of local development,
+but it is not always as easy to work with as it could be.
+Docker Compose allows us to run multiple containers together which can be extremely useful for managing complex projects that require numerous run parameters or manage multiple containers.
+
+For this practical, we want to use a database closer to our production environment.
+We will be using a Postgresql database which will eventually be a managed database hosted on AWS.
 
 \subsection{Moving to a Postgresql Database}
 
-This week we have actually made a small change to our application so that it can receive the SQLAlchemy database URI as an environment variable. This means that we can now use Docker Compose to run our application and database together. To do this we will create a new file called \texttt{docker-compose.yml} and add the following content:
+This week we have actually made a small change to our application so that it can receive the SQLAlchemy database URI as an environment variable.
+This means that we can now use Docker Compose to run our application and database together.
+To do this we will create a new file called \texttt{docker-compose.yml} and add the following content:
 
 \begin{code}[numbers=none]{}
   version: "3.9"
@@ -334,38 +604,41 @@ This week we have actually made a small change to our application so that it can
         POSTGRES_USER: administrator
         POSTGRES_DB: todo
       volumes:
-        - ./data:/var/lib/postgresql/data
+        - ./data/db:/var/lib/postgresql/data
     app:
       build: .
       restart: always
       environment:
-        DATABASE_URI: postgresql://administrator:verySecretPassword@database:5432/todo
+        SQLALCHEMY_DATABASE_URI: postgresql://administrator:verySecretPassword@database:5432/todo
       ports:
         - "6400:6400"
       depends_on:
         - database
 \end{code}
 
-We can now run our application and database with the following command:
+We can now run our application and database with the following command within the root directory.
 
-\begin{code}[language=bash,numbers=none]{}
-  docker-compose up
-\end{code}
+\bash{docker-compose up}
 
-You should observe the output of this command and you can see two processes running. One is the database and the other is our application. We can now navigate to \url{http://localhost:6400} to see our application running. In reality though our database probably did not have enough time to start up before our application tried to connect to it. We can fix this by adding a delay to our application startup. To do this we will add the following line to our Dockerfile:
+You should observe the output of this command and you can see two containers running.
+One is the database, \texttt{database}, and the other is our application, \texttt{app}.
+We can now navigate to \url{http://localhost:6400} to see our application running.
+In reality though our database probably did not have enough time to start up before our application tried to connect to it.
+We can fix this by adding a delay to our application startup.
+To do this we will change the CMD instruction to the following line in our Dockerfile:
 
 \begin{code}[language=docker,numbers=none]{}
-  # Adding a delay to our application startup
-  CMD ["sleep", "10", "&&", "python3", "flask", "--app", "todo", "run", "--host", "0.0.0.0", "--port", "6400"]
+# Adding a delay to our application startup
+CMD ["bash", "-c", "sleep 10 && flask --app todo run --host 0.0.0.0 --port 6400"]
 \end{code}
 
-In the long run you would want your application to be able to retry connecting to the database if it fails but for now we will just add a delay. We can now rebuild our Docker image and run our application and database with the following commands:
+In the long run you would want your application to be able to retry connecting to the database if it fails but for now we will just add a delay.
+We can now rebuild our Docker image and run our application and database with the following commands:
 
-\begin{code}[language=bash,numbers=none]{}
-  docker-compose up --build
-\end{code}
+\bash{docker-compose up --build}
 
-You may have noticed that when we defined the todo application service above we didnt specify a container. This is because Docker Compose can be instructed to use our Dockerfile to build at time so that we dont have to keep using the build command.
+You may have noticed that when we defined the todo application service above we did not specify a container.
+This is because Docker Compose can be instructed to use our Dockerfile to build at time so that we do not have to keep using the build command.
 
 % \section{Packaging our Application on Commit}
 
@@ -382,7 +655,40 @@ You may have noticed that when we defined the todo application service above we 
 
 % \subsection{Packaging on commit}
 
-\bibliographystyle{ieeetr}
-\bibliography{books,ours}
+\section{Conclusion}
+
+Over the past couple of weeks we have built a full todo app API that is ready to be deployed to a remote production environment.
+We started with a Flask API returning static responses and now we have a dynamic API that is running in a containerised environment with an external database.
+
+We have cheated with our Docker deployment by using the flask development server.
+For a production environment you will want to use a production webserver such as \texttt{gunicorn} or \texttt{uwsgi}.
+These web servers are designed to handle multiple requests at the same time and are much more efficient than the Flask development server.
+We recommend you have a look at how to prepare a Flask application for production as it may help you in your future projects if you choose to use Flask.
+
+\section{Extra}
+
+\subsection{Python Based Dockerfile}
+
+Earlier we mentioned that you can use language specific base images for your applications. Below is an example Dockerfile that uses the python 3.10 base image.
+
+\begin{code}[language=docker,numbers=none]{}
+FROM python:3.10
+# Install pipenv
+RUN pip3 install pipenv
+# Setting the working directory
+WORKDIR /app
+# Install pipenv dependencies
+COPY Pipfile Pipfile.lock ./
+RUN pipenv install --system --deploy
+# Copying our application into the container
+COPY todo todo
+# Running our application
+CMD ["flask", "--app", "todo", "run", "--host", "0.0.0.0", "--port", "6400"]
+\end{code}
+
+You will notice that we did not have to install python3 and pip and the postgresql depenedencies.
+
+%\bibliographystyle{ieeetr}
+%\bibliography{books,ours,references}
 
 \end{document}
