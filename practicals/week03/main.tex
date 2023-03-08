@@ -665,6 +665,29 @@ For a production environment you will want to use a production webserver such as
 These web servers are designed to handle multiple requests at the same time and are much more efficient than the Flask development server.
 We recommend you have a look at how to prepare a Flask application for production as it may help you in your future projects if you choose to use Flask.
 
+\section{Extra}
+
+\subsection{Python Based Dockerfile}
+
+Earlier we mentioned that you can use language specific base images for your applications. Below is an example Dockerfile that uses the python 3.10 base image.
+
+\begin{code}[language=docker,numbers=none]{}
+FROM python:3.10
+# Install pipenv
+RUN pip3 install pipenv
+# Setting the working directory
+WORKDIR /app
+# Install pipenv dependencies
+COPY Pipfile Pipfile.lock ./
+RUN pipenv install --system --deploy
+# Copying our application into the container
+COPY todo todo
+# Running our application
+CMD ["flask", "--app", "todo", "run", "--host", "0.0.0.0", "--port", "6400"]
+\end{code}
+
+You will notice that we did not have to install python3 and pip and the postgresql depenedencies.
+
 %\bibliographystyle{ieeetr}
 %\bibliography{books,ours,references}
 
