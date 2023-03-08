@@ -1,4 +1,4 @@
-Last Updated on 2023/03/07      
+Last Updated on 2023/03/08     
 
 <?xml version="1.0" encoding="iso-8859-1" ?> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
@@ -2290,6 +2290,135 @@ class="ectt-1200">uwsgi</span>. These web servers are
 designed to handle multiple requests at the same time and are much more efficient than the Flask development
 server. We recommend you have a look at how to prepare a Flask application for production as it may help you in
 your future projects if you choose to use Flask.
+</p><!--l. 668--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">7    </span> <a 
+ id="x1-280007"></a>Extra</h3>
+<!--l. 670--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">7.1    </span> <a 
+ id="x1-290007.1"></a>Python Based Dockerfile</h4>
+<!--l. 672--><p class="noindent" >Earlier we mentioned that you can use language specific base images for your applications. Below is an example
+Dockerfile that uses the python 3.10 base image.
+</p>
+   <div class="framedenv" id="code-1">
+<!--l. 674--><pre class="listings" id="listing-41"><span class="label"><a 
+ id="x1-29001r1"></a></span><span style="color:#006699"><span 
+class="ectt-1200">FROM</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">python</span></span><span style="color:#000000"><span 
+class="ectt-1200">:3.10</span></span> 
+<span class="label"><a 
+ id="x1-29002r2"></a></span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Install</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">pipenv</span></span> 
+<span class="label"><a 
+ id="x1-29003r3"></a></span><span style="color:#006699"><span 
+class="ectt-1200">RUN</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">pip3</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">install</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">pipenv</span></span> 
+<span class="label"><a 
+ id="x1-29004r4"></a></span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Setting</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">the</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">working</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">directory</span></span> 
+<span class="label"><a 
+ id="x1-29005r5"></a></span><span style="color:#006699"><span 
+class="ectt-1200">WORKDIR</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span> 
+<span class="label"><a 
+ id="x1-29006r6"></a></span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Install</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">pipenv</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">dependencies</span></span> 
+<span class="label"><a 
+ id="x1-29007r7"></a></span><span style="color:#006699"><span 
+class="ectt-1200">COPY</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Pipfile</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Pipfile</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">lock</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">./</span></span> 
+<span class="label"><a 
+ id="x1-29008r8"></a></span><span style="color:#006699"><span 
+class="ectt-1200">RUN</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">pipenv</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">install</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">--</span></span><span style="color:#000000"><span 
+class="ectt-1200">system</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">--</span></span><span style="color:#000000"><span 
+class="ectt-1200">deploy</span></span> 
+<span class="label"><a 
+ id="x1-29009r9"></a></span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Copying</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">our</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">application</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">into</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">the</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">container</span></span> 
+<span class="label"><a 
+ id="x1-29010r10"></a></span><span style="color:#006699"><span 
+class="ectt-1200">COPY</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">todo</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">todo</span></span> 
+<span class="label"><a 
+ id="x1-29011r11"></a></span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Running</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">our</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">application</span></span> 
+<span class="label"><a 
+ id="x1-29012r12"></a></span><span style="color:#006699"><span 
+class="ectt-1200">CMD</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">flask</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">--</span></span><span style="color:#669900"><span 
+class="ectt-1200">app</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todo</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">run</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">--</span></span><span style="color:#669900"><span 
+class="ectt-1200">host</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">0.0.0.0</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">--</span></span><span style="color:#669900"><span 
+class="ectt-1200">port</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">6400</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span>
+ 
+<span class="label"><a 
+ id="x1-29013r13"></a></span></pre>
+                                                                                                    
+                                                                                                    
+   </div>
+<!--l. 689--><p class="indent" >   You will notice that we did not have to install python3 and pip and the postgresql depenedencies.
 </p>
     
 </body></html> 
