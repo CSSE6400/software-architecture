@@ -15,8 +15,8 @@ providing better availability and some level of scalability.
 
 Many medium-sized bespoke systems\footnote{\emph{Bespoke systems} are custom designed and built for a single organisation.}
 are built using a service-based architecture.
-For example, an on-line store might be partitioned into services such as ProductBrowsing,
-ProductPurchasing, ProductFulfilment, InventoryManagement, and CustomerAccountManagement.
+For example, an on-line store might be partitioned into services such as Product Browsing,
+Product Purchasing, Product Fulfilment, Inventory Management, and Customer Account Management.
 Each of these could be independent distributed services that use a shared database.
 
 \vspace{2mm}
@@ -26,10 +26,12 @@ Each of these could be independent distributed services that use a shared databa
 \end{definition}
 
 \begin{figure}[h!]
+    \vspace{-5pt}
     \begin{adjustwidth}{-10mm}{-10mm}
         \centering
         \includegraphics[trim=197 197 197 198,clip,width=0.97\paperwidth]{diagrams/general-service-based-arch.png}
     \end{adjustwidth}
+    \vspace{-5pt}
     \caption{General structure of a service-based architecture.}
     \label{fig:service-based-arch}
 \end{figure}
@@ -138,7 +140,7 @@ Figure \ref{fig:db-logical-partitioning} is an example of shared persistent obje
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=197 197 197 197,clip,width=0.75\textwidth]{diagrams/db-logical-partitioning.png}
+    \includegraphics[trim=197 197 197 197,clip,width=0.78\textwidth]{diagrams/db-logical-partitioning.png}
     \caption{Database logical partitioning example.}
     \label{fig:db-logical-partitioning}
 \end{figure}
@@ -180,9 +182,9 @@ This extends the idea of logical partitioning your database, as described in sec
 Figure \ref{fig:separate-dbs} shows a few options of how this can be implemented.
 
 \begin{figure}[h!]
-    \begin{adjustwidth}{-5mm}{-5mm}
+    \begin{adjustwidth}{-8mm}{-8mm}
         \centering
-        \includegraphics[trim=39 42 18 48,clip,width=0.92\paperwidth]{diagrams/separate-dbs.png}
+        \includegraphics[trim=197 197 197 197,clip,width=0.95\paperwidth]{diagrams/separate-dbs.png}
     \end{adjustwidth}
     \caption{Separate databases example.}
     \label{fig:separate-dbs}
@@ -190,7 +192,7 @@ Figure \ref{fig:separate-dbs} shows a few options of how this can be implemented
 
 In figure \ref{fig:separate-dbs}, there is a shared database that contains the entity data that is shared across services.
 Service 1 and 2 are deployed on separate servers but share a single database server that hosts different tables for each service.
-Service 3 has communicates with its own database server that hosts its tables.
+Service 3 communicates with its own database server that hosts its tables.
 Service 4 uses a database that is running on the same server as the service.
 
 Each of these approaches have their own advantages and disadvantages.
@@ -202,7 +204,7 @@ may provide enough performance for the system.
 A separate database server for some or all services provides greater flexibility for scaling,
 if database performance is likely to become a bottleneck for the service.
 Running an independent database on the same server as the service provides easier communication with the database
-and may suit cases where an independent database is useful but it is not large enough to warrant to run on its own server.
+and may suit cases where an independent database is useful but it is not large enough to warrant running on its own server.
 
 \subsection{Separate User Interfaces}
 
@@ -213,15 +215,17 @@ Figure \ref{fig:separate-uis} shows some options of how this can be implemented.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=40 42 19 45,clip,width=0.9\textwidth]{diagrams/separate-uis.png}
+    \includegraphics[trim=197 197 197 197,clip,width=\textwidth]{diagrams/separate-uis.png}
     \caption{Separate user interfaces example.}
     \label{fig:separate-uis}
 \end{figure}
 
-In figure \ref{fig:separate-uis}, there is one user interface that interacts with two services,
-like the single interface in the general structure shown in figure \ref{fig:service-based-arch}.
-There are then two interfaces that interact with service 3.
-A benefit of the service API is that it allows multiple interfaces to be implemented to work with the backend services.
+In figure \ref{fig:separate-uis}, the mobile and web user interfaces interact with two services.
+They both use the same API interfaces to use those services.
+This is like the single user interface in the general structure shown in figure~\ref{fig:service-based-arch}.
+The admin user interface interacts with the admin service.
+This example demonstrates a service API that provides services for a specialised user domain (i.e. administrators).
+It also shows that service APIs can be used to allow multiple user interfaces to work with the backend services.
 
 \subsection{API Layer}
 
@@ -232,7 +236,7 @@ while hiding details of the services.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=39 37 21 42,clip,width=0.85\textwidth]{diagrams/api-layer.png}
+    \includegraphics[trim=197 197 197 197,clip,width=0.85\textwidth]{diagrams/api-layer.png}
     \caption{API layer separating the user interface from services.}
     \label{fig:api-layer}
 \end{figure}
@@ -273,7 +277,9 @@ This results in the clients needing to know the services, before they can discov
 Another problem was poor interface design, that caused dependencies on some implementation details of the services.
 
 Microservices were designed to deliver the promised benefits of SOA without some of the implementation issues.
-In particular, microservices deliver much smaller elements of functionality, reducing the possibility of tight coupling between services.
+In particular, well designed microservices break a system up into independent contexts that have strictly defined boundaries.
+This reduces the likelihood of tight coupling between services,
+as each microservice can have its own independent model of its perspective of the problem domain.
 There are challenges in designing and delivering microservices to achieve the benefits.
 These will be explored later in the course.
 

@@ -35,77 +35,36 @@ workspace "Service-Based Architecture" "Structures of service-based architectura
         }
         
         separateDBs = softwareSystem "Separate Databases Example" "Example of having separate databases for each service." {
-            globalDB = container "Shared DBMS" {
-                sharedEntitiesSchema = component "Shared Entities Schema"
-            }
-            serv1 = container "Service 1" {
-                sharedEntities1 = component "Shared Entities"
-                s1Entities = component "Service 1 Entities"
-            }
-            serv2 = container "Service 2" {
-                sharedEntities2 = component "Shared Entities"
-                s2Entities = component "Service 2 Entities"
-            }
-            serv3 = container "Service 3" {
-                sharedEntities3 = component "Shared Entities"
-                s3Entities = component "Service 3 Entities"
-            }
-            serv4 = container "Service 4" {
-                sharedEntities4 = component "Shared Entities"
-                s4Entities = component "Service 4 Entities"
-            }
-            db1 = container "DBMS 1" {
-                s1EntitiesSchema = component "Service 1 Entities Schema"
-                s2EntitiesSchema = component "Service 2 Entities Schema"
-            }
-            db2 = container "DBMS 2" {
-                s3EntitiesSchema = component "Service 3 Entities Schema"
-            }
-            db3 = container "DBMS 3" {
-                s4EntitiesSchema = component "Service 4 Entities Schema"
-            }
+            sharedEntitiesSchema = container "Shared Entities Schema" "" "" "shared"
+            sharedEntities = container "Shared Entities" "Persistent entities that are shared between services." "" "shared"
+            s1Entities = container "Service 1 Entities" "Entities that are unique to Service 1." "" "service1"
+            s2Entities = container "Service 2 Entities" "Entities that are unique to Service 2." "" "service2"
+            s3Entities = container "Service 3 Entities" "Entities that are unique to Service 3." "" "service3"
+            s4Entities = container "Service 4 Entities" "Entities that are unique to Service 4." "" "service4"
+            s1EntitiesSchema = container "Service 1 Entities Schema" "" "" "service1"
+            s2EntitiesSchema = container "Service 2 Entities Schema" "" "" "service2"
+            s3EntitiesSchema = container "Service 3 Entities Schema" "" "" "service3"
+            s4EntitiesSchema = container "Service 4 Entities Schema" "" "" "service4"
         }
 
         separateUIs = softwareSystem "Separate User Interfaces" "Example of having separate user interfaces using the APIs." {
-            admin = container "Admin Interface" "Delivers the user interface for admin functionality." "" "ui" {
-                adminUI = component "Admin User Interface" "" "" "ui"
-            }
-            web = container "Web Interface" "Delivers a web interface for users." "" "ui" {
-                webUI = component "Web  User Interface" "" "" "ui"
-            }
-            mobile = container "Mobile Interface" "Delivers a mobile interface for users." "" "ui" {
-                mobileUI = component "Mobile User Interface" "" "" "ui"
-            }
-            adminService = container "Admin Service" "" "" "service3" {
-                adminFacade = component "Admin API Façade" "" "" "facade"
-            }
-            service1UI = container "Service 1" "" "" "service1" {
-                facadeUI1 = component "API Façade 1" "" "" "facade"
-            }
-            service2UI = container "Service 2" "" "" "service2" {
-                facadeUI2 = component "API Façade 2" "" "" "facade"
-            }
+            adminUI = container "Admin User Interface" "Delivers the user interface for admin functionality." "" "ui"
+            webUI = container "Web  User Interface" "Delivers a web interface for users." "" "ui"
+            mobileUI = container "Mobile User Interface" "Delivers a mobile interface for users." "" "ui,mobile"
+            adminFacade = container "Admin API Façade" "" "" "facade"
+            facadeUI1 = container "API Façade 1" "" "" "facade"
+            facadeUI2 = container "API Façade 2" "" "" "facade"
         }
 
         apiLayers = softwareSystem "API Layer Example" "Example of an API layer to hide system's internal structure." {
-            externalUI = container "User Interface" "" "" "ui" {
-                exUiComp = component "User Interface Component" "" "" "ui"
-            }
-            apiLayer = container "API Layer" "Delivers a web interface for users." "" "ui" {
-                apiFacade1 = component "API Façade 1" "" "" "facade"
-                apiFacade2 = component "API Façade 2" "" "" "facade"
-                apiFacade3 = component "API Façade 3" "" "" "facade"
-                routing = component "Routing"
-            }
-            apilServ1 = container "Service 1" "" "" "service1" {
-                s1Facade = component "Service API Façade 1" "" "" "facade"
-            }
-            apilServ2 = container "Service 2" "" "" "service2" {
-                s2Facade = component "Service API Façade 2" "" "" "facade"
-            }
-            apilServ3 = container "Service 3" "" "" "service3" {
-                s3Facade = component "Service API Façade 3" "" "" "facade"
-            }
+            externalUI = container "User Interface" "" "" "ui"
+            apiFacade1 = container "API Façade 1" "" "" "apiLayer"
+            apiFacade2 = container "API Façade 2" "" "" "apiLayer"
+            apiFacade3 = container "API Façade 3" "" "" "apiLayer"
+            routing = container "Routing" "" "" "apiLayer"
+            s1Facade = container "Service API Façade 1" "" "" "facade"
+            s2Facade = container "Service API Façade 2" "" "" "facade"
+            s3Facade = container "Service API Façade 3" "" "" "facade"
         }
 
         # Basic Service-Based Relationships
@@ -137,10 +96,7 @@ workspace "Service-Based Architecture" "Structures of service-based architectura
         invoicing -> invoicingSchema
 
         # Separate DBs Relationships
-        sharedEntities1 -> sharedEntitiesSchema
-        sharedEntities2 -> sharedEntitiesSchema
-        sharedEntities3 -> sharedEntitiesSchema
-        sharedEntities4 -> sharedEntitiesSchema
+        sharedEntities -> sharedEntitiesSchema
         s1Entities -> s1EntitiesSchema
         s2Entities -> s2EntitiesSchema
         s3Entities -> s3EntitiesSchema
@@ -154,15 +110,15 @@ workspace "Service-Based Architecture" "Structures of service-based architectura
         mobileUI -> facadeUI2 "Service 2 API"
 
         # API Layer Relationships
-        exUiComp -> apiFacade1
-        exUiComp -> apiFacade2
-        exUiComp -> apiFacade3
+        externalUI -> apiFacade1 "API1"
+        externalUI -> apiFacade2 "API2"
+        externalUI -> apiFacade3 "API3"
         apiFacade1 -> routing
         apiFacade2 -> routing
         apiFacade3 -> routing
-        routing -> s1Facade
-        routing -> s2Facade
-        routing -> s3Facade
+        routing -> s1Facade "Service 1 API"
+        routing -> s2Facade "Service 2 API"
+        routing -> s3Facade "Service 3 API"
 
         deploymentEnvironment "Basic Service-Based Structure" {
             deploymentNode "User Interface" {
@@ -219,6 +175,94 @@ workspace "Service-Based Architecture" "Structures of service-based architectura
                 }
             }
         }
+
+        deploymentEnvironment "Separate Databases" {
+            deploymentNode "Server 1" {
+                deploymentNode "Service 1" {
+                    shared1mInstance = containerInstance sharedEntities
+                    s1EntitiesInstance = containerInstance s1Entities
+                }
+            }
+            deploymentNode "Server 2" {
+                deploymentNode "Service 2" {
+                    shared1nInstance = containerInstance sharedEntities
+                    s2EntitiesInstance = containerInstance s2Entities
+                }
+            }
+            deploymentNode "Server 3" {
+                deploymentNode "Service 3" {
+                    shared1oInstance = containerInstance sharedEntities
+                    s3EntitiesInstance = containerInstance s3Entities
+                }
+            }
+            deploymentNode "Server 4" {
+                deploymentNode "Service 4" {
+                    shared1pInstance = containerInstance sharedEntities
+                    s4EntitiesInstance = containerInstance s4Entities
+                }
+                deploymentNode "DBMS 3" {
+                    s4EntitiesSchemaInstance = containerInstance s4EntitiesSchema
+                }
+            }
+            deploymentNode "Shared Database Server" {
+                deploymentNode "Shared DBMS" {
+                    sharedEntitiesSchemaInstance = containerInstance sharedEntitiesSchema
+                }
+            }
+            deploymentNode "Database Server 1" {
+                deploymentNode "DBMS 1" {
+                    s1EntitiesSchemaInstance = containerInstance s1EntitiesSchema
+                    s2EntitiesSchemaInstance = containerInstance s2EntitiesSchema
+                }
+            }
+            deploymentNode "Database Server 2" {
+                deploymentNode "DBMS 2" {
+                    s3EntitiesSchemaInstance = containerInstance s3EntitiesSchema
+                }
+            }
+        }
+
+        deploymentEnvironment "Separate User Interfaces" {
+            deploymentNode "Admin UI Platform" {
+                adminUIInstance = containerInstance adminUI
+            }
+            deploymentNode "Web Server" {
+                webUIInstance = containerInstance webUI
+            }
+            deploymentNode "Mobile Device" {
+                mobileUIInstance = containerInstance mobileUI
+            }
+            deploymentNode "Admin Service" {
+                adminFacadeInstance = containerInstance adminFacade
+            }
+            deploymentNode "Service 1" {
+                facadeUI1Instance = containerInstance facadeUI1
+            }
+            deploymentNode "Service 2" {
+                facadeUI2Instance = containerInstance facadeUI2
+            }
+        }
+
+        deploymentEnvironment "API Layer" {
+            deploymentNode "UI Platform" {
+                externalUIInstance = containerInstance externalUI
+            }
+            deploymentNode "API Layer" {
+                apiFacade1Instance = containerInstance apiFacade1
+                apiFacade2Instance = containerInstance apiFacade2
+                apiFacade3Instance = containerInstance apiFacade3
+                routingInstance = containerInstance routing
+            }
+            deploymentNode "Service 1" {
+                s1FacadeInstance = containerInstance s1Facade
+            }
+            deploymentNode "Service 2" {
+                s2FacadeInstance = containerInstance s2Facade
+            }
+            deploymentNode "Service 3" {
+                s3FacadeInstance = containerInstance s3Facade
+            }
+        }
     }
 
     views {
@@ -242,47 +286,17 @@ workspace "Service-Based Architecture" "Structures of service-based architectura
 #            autoLayout tb
         }
 
-        component serv1 "sep_db_service1_component" {
-            include *
-            autoLayout tb
-        }
-
-        component serv2 "sep_db_service2_component" {
-            include *
-            autoLayout tb
-        }
-
-        component serv3 "sep_db_service3_component" {
-            include *
-            autoLayout tb
-        }
-
-        component serv4 "sep_db_service4_component" {
-            include *
-            autoLayout tb
-        }
-
-        component globalDB "sep_db_global_db_component" {
+        deployment * "Separate Databases" "sep_dbs_deploy" {
             include *
 #            autoLayout tb
         }
 
-        container separateDBs "sep_dbs_context" {
+        deployment * "Separate User Interfaces" "sep_uis_deploy" {
             include *
 #            autoLayout tb
         }
 
-        container separateUIs "sep_uis_context" {
-            include *
-#            autoLayout tb
-        }
-
-        container apiLayers "api_layer_context" {
-            include *
-#            autoLayout tb
-        }
-
-        component apiLayer "api_layer_component" {
+        deployment * "API Layer" "api_layer_deploy" {
             include *
 #            autoLayout tb
         }
@@ -315,14 +329,23 @@ workspace "Service-Based Architecture" "Structures of service-based architectura
             element service3 {
                 background #deecfa
             }
+            element service4 {
+                background #f7f7eb
+            }
             element shared {
                 background #eee8fa
             }
             element invoicing {
                 background #edf5f0
             }
+            element apiLayer {
+                background #fcf0e6
+            }
             element ui {
                 background #fadee0
+            }
+            element mobile {
+                shape MobileDevicePortrait
             }
         }
     }   
