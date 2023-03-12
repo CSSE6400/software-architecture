@@ -10,9 +10,15 @@
 
 \maketitle
 
-\section{Before Class}
-It's preferable if you already have \link{terraform installed}{https://learn.hashicorp.com/tutorials/terraform/install-cli}.
-Please also have one of IntelliJ IDEA, PyCharm, or VSCode with the terraform plugin installed.
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[scale=0.4]{images/hextriscloud}
+  \end{center}
+\end{figure}
+
+% \section{Before Class}
+% It's preferable if you already have \link{terraform installed}{https://learn.hashicorp.com/tutorials/terraform/install-cli}.
+% Please also have one of IntelliJ IDEA, PyCharm, or VSCode with the terraform plugin installed.
 
 \section{This Week}
 This week our goal is to get acquainted with AWS Academy.
@@ -23,6 +29,7 @@ Specifically, this week you need to:
     \begin{enumerate}
         \item AWS Academy Cloud Foundations [10906] course;
         \item AWS Academy Learner Lab - Foundation Services [10909] course; and
+        \item \todo{add missing course}
     \end{enumerate}
     \item Navigate the AWS Academy interface.
     \item Enter the AWS Console from an AWS Academy lab.
@@ -38,9 +45,11 @@ Specifically, this week you need to:
     \item Create a Terraform module for deploying arbitrary single server websites.
 \end{itemize}
 
-\info{
-    This week's practical has a lot of content so don't feel pressured to complete the tasks and instead it might be better to focus on the tutors walkthrough. Next week we will be deploying our todo application which will recover this content in more depth and you will have the entire practical to complete the task.
-}
+\todo{the above sounds weird}
+
+% \info{
+%     This week's practical has a lot of content so don't feel pressured to complete the tasks and instead it might be better to focus on the tutors walkthrough. Next week we will be deploying our todo application which will recover this content in more depth and you will have the entire practical to complete the task.
+% }
 
 \section{AWS Academy}
 AWS Academy is an educational platform to support teaching AWS services.
@@ -61,7 +70,7 @@ In this course, we will be using it in two ways:
 
         \includegraphics{images/email-invite}
 
-    \item Go to \url{https://www.awsacademy.com/LMS_Login} to login.
+    \item Go to \url{https://www.awsacademy.com/vforcesite/LMS_Login} to login.
     \begin{enumerate}
         \item Press \textbf{Student Login}.
         \item Use the email address that received the email invitation.
@@ -148,7 +157,7 @@ An AMI is the template (cookie cutter) which provides instructions on how an ins
 Amazon offers a range of built-in AMIs. There are also community AMIs or you can create your own.
 As we just want a simple server today, we will use one of the built-in AMIs.
 
-Every AMI has a unique AMI code, something that looks like \texttt{ami-0a8b4cd432b1c3063}.
+Every AMI has a unique AMI code, something that looks like \texttt{ami-005f9685cb30f234b}.
 We will use this AMI today%
 \footnote{Check the requirements for your chosen website, if your website requires a specific operating system, look for it as a community AMI.
 Ask for help if you aren't sure.}
@@ -264,17 +273,15 @@ Now if you navigate to the \textbf{http} address of the public IP address (e.g. 
 \teacher{Make sure they delete their instances.}
 
 \section{Using Terraform in AWS Learner Labs}
-Following the steps from the week one practical, start a learner lab in AWS Academy.
-For this practical, you do not need to create any resources in the AWS Console.
-The console can be used to verify that Terraform has correctly provisioned resources.
+We will now redeploy our Hextris application but use Infrastructure As Code (IaC) to do so. You will need to keep your lab running for the next steps.
 
 \begin{enumerate}
-\item Once the learner lab has started, click on `AWS Details' to display information about the lab.
+\item Click on `AWS Details' to display information about the lab.
 
 \includegraphics[width=0.7\textwidth]{images/aws-details}
 
 \item Click on the first `Show' button next to `AWS CLI' which will display a text block starting with \texttt{[default]}.
-\item Create a directory for this week's practical.
+\item Create a directory for part b of this practical.
 \item Within that directory create a \texttt{credentials} file and copy the contents of the text block into the file.
 \textbf{Do not share this file contents --- do not commit it}.
 \item Create a \texttt{main.tf} file in the same directory with the following contents:
@@ -283,7 +290,7 @@ terraform {
     required_providers {
         aws = {
             source  = "hashicorp/aws"
-            version = "~> 3.0"
+            version = "~> 4.0"
         }
     }
 }
@@ -295,7 +302,7 @@ provider "aws" {
 \end{code}
 
 The \texttt{terraform} block specifies the required external dependencies, here we need to use the AWS provider.
-The \texttt{provider} clock configures the AWS provider, instructing it which region to use and how to authenticate (using the credentials file we created).
+The \texttt{provider} block configures the AWS provider, instructing it which region to use and how to authenticate (using the credentials file we created).
 
 \item We need to initialise terraform which will fetch the required dependencies. This is done with the \texttt{terraform init} command.
 \bash{terraform init}
@@ -311,9 +318,6 @@ Note that this does not ensure our credentials are correctly configured as Terra
 \end{enumerate}
 
 \section{Deploying Hextris}
-If you followed the default instructions in the week one practical, you would have manually deployed the hextris game.
-Now we'll try to deploy hextris using terraform.
-
 First, we will need to create an EC2 instance resource.
 The AWS provider calls this resource an \link{\texttt{aws\_instance}}{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance}.
 Get familiar with the documentation page.
@@ -324,9 +328,9 @@ We configured it to use a specific Amazon Machine Instance (AMI) and chose the \
 Refer back to the week one practical sheet for a refresher.
 Add the following basic resource to \texttt{main.tf}:
 
-\begin{code}[language=terraform]{main.tf}
+\begin{code}[language=terraform,numbers=none]{main.tf}
 resource "aws_instance" "hextris-server" {
-    ami           = "ami-0a8b4cd432b1c3063"
+    ami           = "ami-005f9685cb30f234b"
     instance_type = "t2.micro"
     
     tags = {
@@ -350,7 +354,7 @@ Terraform will perform the following actions:
 
   # aws_instance.hextris-server will be created
   + resource "aws_instance" "hextris-server" {
-      + ami                                  = "ami-0a8b4cd432b1c3063"
+      + ami                                  = "ami-005f9685cb30f234b"
       (omitted)
       + instance_type                        = "t2.micro"
       (omitted)
@@ -388,7 +392,7 @@ Now we have got a server, we should try to configure it to contain hextris.
 We will use the \texttt{user\_data} field which configures commands to run when launching the instance.
 First we need a script to provision the server, if we combine all our commands from the last practical, we will produce this script:
 
-\begin{code}[language=bash]{deploy.sh}
+\begin{code}[language=bash,numbers=none]{deploy.sh}
 #!/bin/bash
 yum install -y httpd
 systemctl enable httpd

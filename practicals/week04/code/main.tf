@@ -13,7 +13,7 @@ provider "aws" {
 }
 
 resource "aws_instance" "hextris-server" {
-  ami           = "ami-0a8b4cd432b1c3063"
+  ami           = "ami-005f9685cb30f234b"
   instance_type = "t2.micro"
   user_data = file("${path.module}/deploy.sh")
   security_groups = [aws_security_group.hextris-server.name]
