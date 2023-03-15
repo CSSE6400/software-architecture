@@ -294,7 +294,7 @@ You will need to keep your lab running for the next steps
 \textbf{Do not share this file contents --- do not commit it}.
 This file is added to the \texttt{.gitignore} of your repository by default.
 \item Create a \texttt{main.tf} file in the same directory with the following contents:
-\begin{code}[language=terraform]{main.tf}
+\begin{code}[language=terraform,numbers=none]{main.tf}
 terraform {
     required_providers {
         aws = {
@@ -356,7 +356,7 @@ To create the server, invoke
 
 You should be prompted with something similar to the output below.
 
-\begin{code}[]{}
+\begin{code}[numbers=none]{}
 Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
   + create
 
@@ -384,7 +384,7 @@ Do you want to perform these actions?
 
 If the plan looks sensible enter \texttt{yes} to enact the changes.
 
-\begin{code}[]{}
+\begin{code}[numbers=none]{}
   Enter a value: yes
 
 aws_instance.hextris-server: Creating...
@@ -421,7 +421,7 @@ Now we can add the following field to our Terraform resource.
 It uses the Terraform \texttt{file} function to load the contents of a file named \texttt{serve-hextris.sh} relative to the Terraform directory.
 The contents of that file is passed to the \texttt{user\_data} field.
 
-\begin{code}[language=terraform]{}
+\begin{code}[language=terraform,numbers=none]{}
 user_data = file("./serve-hextris.sh")
 \end{code}
 
@@ -443,7 +443,7 @@ We can specify certain attributes as `output' attributes.
 Output attributes are printed to the terminal when the module is invoked directly
 but as we will see later, they can also be used by other Terraform configuration files.
 
-\begin{code}[language=terraform]{main.tf}
+\begin{code}[language=terraform,numbers=none]{main.tf}
 output "hextris-url" {
   value = aws_instance.hextris-server.public_ip
 }
@@ -457,7 +457,7 @@ followed by the name of the resource (\texttt{hextris-server}).
 If you plan or apply the changes, it should tell you the public IP address of the instance resource.
 \bash{terraform plan}
 
-\begin{code}[]{}
+\begin{code}[numbers=none]{}
 aws_instance.hextris-server: Refreshing state... [id=i-043a61ff86aa272e0]
 
 Changes to Outputs:
@@ -488,7 +488,7 @@ In Terraform the whole state must be configured so we specify two
 but we will try to recreate the original AWS Console exactly.}
 Additionally, we will create egress for all outgoing traffic.
 
-\begin{code}[language=terraform]{}
+\begin{code}[language=terraform,numbers=none]{}
 resource "aws_security_group" "hextris-server" {
   name = "hextris-server"
   description = "Hextris HTTP and SSH access"
@@ -529,7 +529,7 @@ Next, we will attach the security group to the EC2 instance.
 Return to the \texttt{aws\_instance.hextrix-server} resource
 and include the following line:
 
-\begin{code}[language=terraform]{}
+\begin{code}[language=terraform,numbers=none]{}
 security_groups = [aws_security_group.hextris-server.name]
 \end{code}
 
