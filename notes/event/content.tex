@@ -36,6 +36,7 @@ That may lead to the event handler generating a processing event to move to the 
 The processing event is sent to the central broker and is picked up by another event handler.
 This continues until the business process is completed.
 
+\filbreak
 An auction system, as shown in figure \ref{fig:auction-architecture}, could be implemented as an event-driven architecture.
 \begin{itemize}[nosep]
     \item When a customer bids on an item, they initiate a bid \emph{event}.
@@ -145,7 +146,7 @@ The tradeoff is reducing asynchronous communication traffic with unnecessary eve
 
 \subsection{Scalability}
 
-As was described in section \ref{sec:intro}, the broker topology is optimised for performance.
+As was mentioned in section \ref{sec:intro}, the broker topology is optimised for performance.
 Each event handler is a separate container that can be deployed independently of other handlers.
 A load balancer and an automated scaling mechanism ensures that each event handler can scale to manage its load.
 
@@ -296,8 +297,8 @@ Rather, the event handler usually sends an asynchronous message to the \emph{Eve
 When the \emph{Event Mediator} receives a completion message from an event handler,
 the mediator determines what is the next step in the process and sends a processing event to the appropriate channel to continue the logic.
 
-The event mediator allows the system to implement more sophisticated logic to implement the business process.
-Based on the result received from an event handler when it finishes processing an event,
+The event mediator allows the system to implement more sophisticated logic to deliver the business process.
+Based on the result received from an event handler, when it finishes processing an event,
 the mediator can decide which processing event to send next.
 This allows conditional or iterative logic to be implemented in the business process.
 Unlike the broker topology, which only has a sequential flow through the business logic based on event handlers sending new events when they finish processing.
@@ -355,7 +356,8 @@ It is usually more efficient in developer time and effort to apply different str
 Describing and verifying the process for a simple event using BPEL or a BPM execution engine
 may cost more developer effort than implementing the logic programmatically.
 To minimise coupling, the client still only sends initiating events to a single event queue.
-An event mediator retrieves the events from the event queue and classifies them, forwarding the events to the appropriate type of mediator.
+An event mediator retrieves the events from the event queue and classifies them,
+adding the events to a queue for the appropriate type of mediator.
 
 
 \section{Broker vs. Mediator Topologies}\label{sec:broker-vs-mediator}
@@ -376,14 +378,14 @@ An event mediator coordinates the implementation of the business process by send
 This allows a mediator to implement complex logic.
 This can include maintaining state for the process and performing error handling.
 In the auction example, once a bidder wins an auction they have to pay for the item.
-\emph{Pay for item} would be the initiating event to being the process of paying for the item.
+\emph{Pay for item} would be the initiating event to begin the process of paying for the item.
 \emph{Notification sent} and \emph{order fulfilled} would be other events in the payment process.
 If the payment failed, the event mediator could store the state of the process
 and once payment was successfully processed it could restart the process.
 
 A conceptual difference between the broker and mediator topologies is that the broker topology is a pure form of event handling.
 Events represent things that have happened.
-Once action has occurred, the event is published and event handlers react to it.
+Once an action has occurred, the event is published and event handlers react to it.
 In the auction system, events in a broker topology would be \emph{bid placed},
 \emph{new high bid}, \emph{payment started}, \emph{payment accepted}, \dots.
 
@@ -395,7 +397,7 @@ In the auction system, events in a mediator topology would be \emph{place bid},
 Consequently, in the broker topology, because events represent actions that have occurred, some events can be ignored.
 In the mediator topology, because events are commands to perform the next step in the business process, they must be executed.
 
-\vspace{4mm}\noindent
+\bigskip\noindent
 \textbf{Broker Advantages}
 
 \begin{itemize}
