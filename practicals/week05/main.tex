@@ -565,6 +565,132 @@ output "url" {
 
 Congrats you have choosen to go down the ECS path which mimics the same environment that you have via Docker Compose but as a service on AWS. This path is new for the course this year so please let your tutors know any particular issues you have.
 
+To start off we need to get some information from our current AWS environment so that we can use it latter. Add the below to fetch the IAM role known as LabRole which is a super user in the Lab environments which can be everything you can do through the UI. We will also be fetching the default VPC and the private subnets within that VPC cause we need to setup some networking for our ECS cluster.
+
+\begin{code}[language=terraform,numbers=none,escapechar=!]{}
+  data "aws_iam_role" "lab" {
+    name = "LabRole"
+  }
+
+  data "aws_vpc" "default" {
+    default = true
+  }
+
+  data "aws_subnets" "private" {
+    filter {
+      name   = "vpc-id"
+      values = [data.aws_vpc.default.id]
+    }
+  }
+\end{code}
+
+The way in terraform that we can get external information into the environment is by using data sources. These are just like resources but they are not created or destroyed see the below to see the syntactual differences.
+
+\begin{code}[language=terraform,numbers=none,escapechar=!]{}
+!\colorbox{yellow}{data}! "aws_iam_role" "lab" {
+  ...
+}
+
+!\colorbox{yellow}{resource}! "aws_db_instance" "database" {
+  ...
+}
+\end{code}
+
+\begin{code}[language=terraform,numbers=none]{main.tf}
+  resource "aws_ecs_task_definition" "todo" {
+    family                   = "todo"
+    network_mode             = "awsvpc"
+    requires_compatibilities = ["FARGATE"]
+    cpu                      = 1024
+    memory                   = 2048
+    execution_role_arn       = data.aws_iam_role.lab.arn
+  
+    container_definitions = <<DEFINITION
+  [
+    {
+      "image": "${local.image}",
+      "cpu": 1024,
+      "memory": 2048,
+      "name": "todo",
+      "networkMode": "awsvpc",
+      "portMappings": [
+        {
+          "containerPort": 6400,
+          "hostPort": 6400
+        }
+      ],
+      "environment": [
+        {
+          "name": "SQLALCHEMY_DATABASE_URI",
+          "value": "postgresql://${local.database_username}:${local.database_password}@${aws_db_instance.database.address}:${aws_db_instance.database.port}/${aws_db_instance.database.db_name}"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/taskoverflow/todo",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs",
+          "awslogs-create-group": "true"
+        }
+      }
+    }
+  ]
+  DEFINITION
+  }
+\end{code}
+
+
+\begin{code}[language=terraform,numbers=none]{main.tf}
+  resource "aws_ecs_cluster" "taskoverflow" {
+    name = "taskoverflow"
+  }
+\end{code}
+
+\begin{code}[language=terraform,numbers=none]{main.tf}
+  resource "aws_ecs_service" "taskoverflow" {
+    name            = "taskoverflow"
+    cluster         = aws_ecs_cluster.taskoverflow.id
+    task_definition = aws_ecs_task_definition.todo.arn
+    desired_count   = 1
+    launch_type     = "FARGATE"
+  
+    network_configuration {
+      subnets             = data.aws_subnets.private.ids
+      security_groups     = [aws_security_group.todo.id]
+      assign_public_ip    = true
+    }
+  }
+\end{code}
+
+\begin{code}[language=terraform,numbers=none]{main.tf}
+  resource "aws_security_group" "todo" {
+    name = "todo"
+    description = "TaskOverflow Security Group"
+  
+    ingress {
+      from_port = 6400
+      to_port = 6400
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  
+    ingress {
+      from_port = 22
+      to_port = 22
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  
+    egress {
+      from_port = 0
+      to_port = 0
+      protocol = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
+\end{code}
+
 \subsubsection{Finished Terraform}
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
