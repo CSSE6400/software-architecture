@@ -6,7 +6,7 @@
 \usepackage{float}
 
 \title{Deploying with Terraform}
-\author{Brae Webb}
+\author{Evan Hughes \& Brae Webb}
 
 \date{\week{3}}
 \begin{document}
@@ -214,7 +214,7 @@ Now would be a good time to browse the documentation for the RDS database in Ter
 \url{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_instance}.
 Using our manual configuration, we can come up with a resource with the appropriate parameters as below:
 
-\begin{code}[language=terraform]{main.tf}
+\begin{code}[language=terraform,numbers=none]{main.tf}
 locals {
   password = "foobarbaz" # this is bad
 }
@@ -222,13 +222,13 @@ locals {
 resource "aws_db_instance" "todoapp-database" {
   allocated_storage      = 20
   max_allocated_storage  = 1000
-  engine                 = "postgresql"
+  engine                 = "postgres"
   engine_version         = "14"
-  instance_class         = "db.t2.micro"
-  name                   = "todo"
+  instance_class         = "db.t4g.micro"
+  db_name                = "todo"
   username               = "todo"
   password               = local.password
-  parameter_group_name   = "default.postgresql14"
+  parameter_group_name   = "default.postgres14"
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.todo-database.id]
   publicly_accessible    = true
@@ -241,9 +241,9 @@ resource "aws_db_instance" "todoapp-database" {
 
 \noindent Remember to create an appropriate security group as we did through the user interface.
 
-\begin{code}[language=terraform]{main.tf}
+\begin{code}[language=terraform,numbers=none]{main.tf}
 resource "aws_security_group" "todo-database" {
-  name        = "todo-database"
+  name        = "database"
   description = "Allow inbound Postgresql traffic"
 
   ingress {
@@ -267,6 +267,8 @@ resource "aws_security_group" "todo-database" {
 }
 \end{code}
 
+\todo{Connect to the database and explore around.}
+
 \section{Container on AWS}
 
 As we mentioned in the Infrastructure as Code notes \cite{iac-notes},
@@ -281,14 +283,165 @@ All of the differnt ways that we can deploy our application we have already deci
 
 To start off we are gonna use what we had above to create a database and the default terraform. Edit your files so that they match whats provided below:
 
+\begin{code}[language=terraform,numbers=none]{main.tf}
+  terraform {
+    required_providers {
+        aws = {
+            source  = "hashicorp/aws"
+            version = "~> 4.0"
+        }
+    }
+}
 
+provider "aws" {
+    region = "us-east-1"
+    shared_credentials_files = ["./credentials"]
+    default_tags {
+        tags = {
+            Course       = "CSSE6400"
+            Name         = "TaskOverflow"
+            Automation   = "Terraform"
+        }
+    }
+}
+
+locals {
+    image             = "ghcr.io/csse6400/taskoverflow:latest"
+    database_username = "administrator"
+    database_password = "VerySecurePasswordByYourBoiEvan"
+}
+
+resource "aws_db_instance" "database" {
+  allocated_storage      = 20
+  max_allocated_storage  = 1000
+  engine                 = "postgres"
+  engine_version         = "14"
+  instance_class         = "db.t4g.micro"
+  db_name                = "todo"
+  username               = local.database_username
+  password               = local.database_password
+  parameter_group_name   = "default.postgres14"
+  skip_final_snapshot    = true
+  vpc_security_group_ids = [aws_security_group.database.id]
+  publicly_accessible    = true
+}
+
+resource "aws_security_group" "database" {
+  name        = "todo-database"
+  description = "Allow inbound Postgres traffic"
+
+  ingress {
+    from_port        = 5432
+    to_port          = 5432
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+}
+\end{code}
+
+The above sets up a RDS instances of postgres and a security group to allow access to it. We have also added a local variable to store the password for the database. Local variables in terraform can come through two ways, they can be in a variables block which can be overriden or they can be in a locals block which can be used to store values that are used in multiple places.
+
+Now we can run terraform init and terraform apply to create our database. Once this is done we can move on to the next step. For the next step you must choose a path to follow, either EC2 or ECS, only choose one path for the practical, if you have trouble with one path you can always switch to the other. When switching you may want to destroy the resources you have created so far before starting the new path.
+
+We would like to recommend that you start with the ECS path as it is the more modern way of deploying containers and is the path that we will be suggesting for the future but all tasks are also doable using EC2.
 
 \subsection{[Path A] EC2}
 
-Congrats you have chosen to go down the EC2 path which builds on what we experienced in the previouse practicals.
+\aside{
+  This is not the recommended path but is provided for those who would like to use EC2 instead of ECS. This is also the path that was used in the first run of the course (2022).
+}
 
+Congrats you have chosen to go down the EC2 path which builds on what we experienced in the previouse practicals. To deploy our application we first need to get the EC2 instance running and install docker on the instance. We can do this by using the following terraform:
+
+\begin{code}[language=terraform,numbers=none]{main.tf}
+  resource "aws_instance" "todo" {
+    ami           = "ami-005f9685cb30f234b" // Amazon Linux 2
+    instance_type = "t2.micro"
+    key_name      = "vockey" // allows us to SSH into the instance using the preconfigured key
+    
+    user_data_replace_on_change = true // If we change user_data this will force the box to be recreated
+    user_data                   = <<-EOT
+  #!/bin/bash
+  yum update -y
+    EOT
+  
+    security_groups = [aws_security_group.todo.name] // Firewall for the instance
+  }
+\end{code}
+
+Compared to the last time we used EC2 instances we have moved the \texttt{user\_data} from a file to being defined inline and we have made sure to provide the \texttt{key\_name} encase we want to ssh into the deployed instance.
+
+If we ran terraform apply now our instance wouldnt do anything interesting and we havnt defined our security group yet. For the \texttt{user\_data} we need to install docker and run the container that we have already built. We can do this by changing our \texttt{user\_data}:
+
+\begin{code}[language=terraform,numbers=none]{main.tf}
+  user_data                   = <<-EOT
+  #!/bin/bash
+  yum update -y
+  yum install -y docker
+  service docker start
+  systemctl enable docker
+  usermod -a -G docker ec2-user 
+  docker run --restart always -e SQLALCHEMY_DATABASE_URI=postgresql://${local.database_username}:${local.database_password}@${aws_db_instance.database.address}:${aws_db_instance.database.port}/${aws_db_instance.database.db_name} -p 6400:6400 ${local.image}
+  EOT
+\end{code}
+
+The first lines install docker and start the docker service and allow the ec2-user to be able to run docker commands. The last line is where the magic is happening but running the container by the docker cli. To get a refresher about the docker cli please see the lectures and the docker website. 
+
+\aside{
+  The \texttt{--restart always} flag tells docker to restart the container if it crashes or is stopped. This is useful for our application as it may take a while for the database to be provisioned and we dont want to have to manually restart the container once the database is ready.
+}
+
+Now that our instance is ready to go we just need to make sure that its accessible from the internet. We can do this by creating a security group that allows traffic on port 6400 and attaching it to our instance.
+
+\begin{code}[language=terraform,numbers=none]{main.tf}
+  resource "aws_security_group" "todo" {
+    name = "todo"
+    description = "TaskOverflow Security Group"
+  
+    ingress {
+      from_port = 6400
+      to_port = 6400
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  
+    ingress {
+      from_port = 22
+      to_port = 22
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  
+    egress {
+      from_port = 0
+      to_port = 0
+      protocol = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
+\end{code}
+
+Now we can run terraform init and terraform apply to deploy our entire application. Once this is done we can visit the public IP of our instance on port 6400 to see our application running.
+
+\begin{code}[language=terraform,numbers=none]{}
+  output "url" {
+    value = "http://${aws_instance.todo.public_ip}:6400/"
+  }
+\end{code}
+
+You should be presented with a very lightweight todo based application called TaskOverflow.
 
 \subsubsection{Finished Terraform}
+
+The below is the full terraform we built in this path.
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
   terraform {
@@ -405,6 +558,10 @@ output "url" {
 
 
 \subsection{[Path B] ECS}
+
+\aside{
+  This is the recommended path for the course and is the path that we will be suggesting for the future.
+}
 
 Congrats you have choosen to go down the ECS path which mimics the same environment that you have via Docker Compose but as a service on AWS. This path is new for the course this year so please let your tutors know any particular issues you have.
 
