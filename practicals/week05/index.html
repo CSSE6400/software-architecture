@@ -2896,13 +2896,1053 @@ class="ectt-1200">}</span></span>
 <!--l. 566--><p class="noindent" >Congrats you have choosen to go down the ECS path which mimics the same environment that you have via
 Docker Compose but as a service on AWS. This path is new for the course this year so please let your tutors know
 any particular issues you have.
-</p><!--l. 568--><p class="noindent" >
+</p><!--l. 568--><p class="indent" >   To start off we need to get some information from our current AWS environment so that we can
+use it latter. Add the below to fetch the IAM role known as LabRole which is a super user in the Lab
+environments which can be everything you can do through the UI. We will also be fetching the default
+VPC and the private subnets within that VPC cause we need to setup some networking for our ECS
+cluster.
+</p>
+   <div class="framedenv" id="code-1">
+<!--l. 570--><pre class="listings" id="listing-12"><span class="label"><a 
+ id="x1-10001r1"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">data</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_iam_role</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">lab</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10002r2"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">LabRole</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-10003r3"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-10004r4"></a></span> 
+<span class="label"><a 
+ id="x1-10005r5"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">data</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_vpc</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">default</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10006r6"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">default</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">true</span></span> 
+<span class="label"><a 
+ id="x1-10007r7"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-10008r8"></a></span> 
+<span class="label"><a 
+ id="x1-10009r9"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">data</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_subnets</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">private</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10010r10"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">filter</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10011r11"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">vpc</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">id</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-10012r12"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">values</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#006699"><span 
+class="ectt-1200">data</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">aws_vpc</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">default</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">id</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-10013r13"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-10014r14"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-10015r15"></a></span></pre>
+   </div>
+<!--l. 587--><p class="indent" >   The way in terraform that we can get external information into the environment is by using data sources.
+These are just like resources but they are not created or destroyed see the below to see the syntactual
+differences.
+</p>
+   <div class="framedenv" id="code-1">
+<!--l. 589--><pre class="listings" id="listing-13"><span class="label"><a 
+ id="x1-10016r1"></a></span><span 
+class="colorbox" id="colorbox1"><span 
+class="ectt-1200">data</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_iam_role</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">lab</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10017r2"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">...</span></span> 
+<span class="label"><a 
+ id="x1-10018r3"></a></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-10019r4"></a></span> 
+<span class="label"><a 
+ id="x1-10020r5"></a></span><span 
+class="colorbox" id="colorbox2"><span 
+class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_db_instance</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">database</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10021r6"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">...</span></span> 
+<span class="label"><a 
+ id="x1-10022r7"></a></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-10023r8"></a></span></pre>
+                                                                                                    
+                                                                                                    
+   </div>
+<!--l. 599--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 599--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 599--><pre class="listings" id="listing-14"><span class="label"><a 
+ id="x1-10024r1"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_ecs_task_definition</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todo</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10025r2"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">family</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todo</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-10026r3"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">network_mode</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">awsvpc</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-10027r4"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">requires_compatibilities</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">FARGATE</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-10028r5"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">cpu</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">1024</span></span> 
+<span class="label"><a 
+ id="x1-10029r6"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">memory</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">2048</span></span> 
+<span class="label"><a 
+ id="x1-10030r7"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">execution_role_arn</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">data</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">aws_iam_role</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">lab</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">arn</span></span> 
+<span class="label"><a 
+ id="x1-10031r8"></a></span> 
+<span class="label"><a 
+ id="x1-10032r9"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">container_definitions</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">&#x003C;&#x003C;</span></span><span style="color:#000000"><span 
+class="ectt-1200">DEFINITION</span></span> 
+<span class="label"><a 
+ id="x1-10033r10"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span> 
+<span class="label"><a 
+ id="x1-10034r11"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10035r12"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">image</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">$</span></span><span style="color:#669900"><span 
+class="ectt-1200">{</span></span><span style="color:#669900"><span 
+class="ectt-1200">local</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">image</span></span><span style="color:#669900"><span 
+class="ectt-1200">}</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span> 
+<span class="label"><a 
+ id="x1-10036r13"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">cpu</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">1024,</span></span> 
+<span class="label"><a 
+ id="x1-10037r14"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">memory</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">2048,</span></span> 
+<span class="label"><a 
+ id="x1-10038r15"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">name</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todo</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span> 
+<span class="label"><a 
+ id="x1-10039r16"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">networkMode</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">awsvpc</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span> 
+<span class="label"><a 
+ id="x1-10040r17"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">portMappings</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span> 
+<span class="label"><a 
+ id="x1-10041r18"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10042r19"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">containerPort</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">6400,</span></span> 
+<span class="label"><a 
+ id="x1-10043r20"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">hostPort</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">6400</span></span> 
+<span class="label"><a 
+ id="x1-10044r21"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-10045r22"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">],</span></span> 
+<span class="label"><a 
+ id="x1-10046r23"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">environment</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span> 
+<span class="label"><a 
+ id="x1-10047r24"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10048r25"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">name</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">SQLALCHEMY_DATABASE_URI</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span> 
+<span class="label"><a 
+ id="x1-10049r26"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">value</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">postgresql</span></span><span style="color:#669900"><span 
+class="ectt-1200">://</span></span><span style="color:#669900"><span 
+class="ectt-1200">$</span></span><span style="color:#669900"><span 
+class="ectt-1200">{</span></span><span style="color:#669900"><span 
+class="ectt-1200">local</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">database_username</span></span><span style="color:#669900"><span 
+class="ectt-1200">}:</span></span><span style="color:#669900"><span 
+class="ectt-1200">$</span></span><span style="color:#669900"><span 
+class="ectt-1200">{</span></span><span style="color:#669900"><span 
+class="ectt-1200">local</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">database_password</span></span><span style="color:#669900"><span 
+class="ectt-1200">}</span></span><span style="color:#669900"><span 
+class="ectt-1200">@$</span></span><span style="color:#669900"><span 
+class="ectt-1200">{</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_db_instance</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">database</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">address</span></span><span style="color:#669900"><span 
+class="ectt-1200">}:</span></span><span style="color:#669900"><span 
+class="ectt-1200">$</span></span><span style="color:#669900"><span 
+class="ectt-1200">{</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_db_instance</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">database</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">port</span></span><span style="color:#669900"><span 
+class="ectt-1200">}/</span></span><span style="color:#669900"><span 
+class="ectt-1200">$</span></span><span style="color:#669900"><span 
+class="ectt-1200">{</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_db_instance</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">database</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">db_name</span></span><span style="color:#669900"><span 
+class="ectt-1200">}</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-10050r27"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-10051r28"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">],</span></span> 
+<span class="label"><a 
+ id="x1-10052r29"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">logConfiguration</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10053r30"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">logDriver</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">awslogs</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span> 
+<span class="label"><a 
+ id="x1-10054r31"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">options</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10055r32"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">awslogs</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">group</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">todo</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span> 
+<span class="label"><a 
+ id="x1-10056r33"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">awslogs</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">region</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">us</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">east</span></span><span style="color:#669900"><span 
+class="ectt-1200">-1</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span> 
+<span class="label"><a 
+ id="x1-10057r34"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">awslogs</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">stream</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">prefix</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">ecs</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span> 
+<span class="label"><a 
+ id="x1-10058r35"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">awslogs</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">create</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">group</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">true</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-10059r36"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-10060r37"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-10061r38"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-10062r39"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-10063r40"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">DEFINITION</span></span> 
+<span class="label"><a 
+ id="x1-10064r41"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-10065r42"></a></span></pre>
+   </div>
+<!--l. 644--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 644--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 644--><pre class="listings" id="listing-15"><span class="label"><a 
+ id="x1-10066r1"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_ecs_cluster</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10067r2"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-10068r3"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-10069r4"></a></span></pre>
+   </div>
+<!--l. 650--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 650--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 650--><pre class="listings" id="listing-16"><span class="label"><a 
+ id="x1-10070r1"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_ecs_service</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10071r2"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-10072r3"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">cluster</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">aws_ecs_cluster</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">id</span></span> 
+<span class="label"><a 
+ id="x1-10073r4"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">task_definition</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">aws_ecs_task_definition</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">todo</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">arn</span></span> 
+<span class="label"><a 
+ id="x1-10074r5"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">desired_count</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">1</span></span> 
+<span class="label"><a 
+ id="x1-10075r6"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">launch_type</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">FARGATE</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-10076r7"></a></span> 
+<span class="label"><a 
+ id="x1-10077r8"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">network_configuration</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10078r9"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">subnets</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">data</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">aws_subnets</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">private</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">ids</span></span> 
+<span class="label"><a 
+ id="x1-10079r10"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">security_groups</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#000000"><span 
+class="ectt-1200">aws_security_group</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">todo</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">id</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-10080r11"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">assign_public_ip</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">true</span></span> 
+<span class="label"><a 
+ id="x1-10081r12"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-10082r13"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-10083r14"></a></span></pre>
+   </div>
+<!--l. 666--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 666--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 666--><pre class="listings" id="listing-17"><span class="label"><a 
+ id="x1-10084r1"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_security_group</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todo</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10085r2"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">todo</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-10086r3"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">description</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">TaskOverflow</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">Security</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">Group</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-10087r4"></a></span> 
+<span class="label"><a 
+ id="x1-10088r5"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">ingress</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10089r6"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">from_port</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">6400</span></span> 
+<span class="label"><a 
+ id="x1-10090r7"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">to_port</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">6400</span></span> 
+<span class="label"><a 
+ id="x1-10091r8"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">protocol</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">tcp</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-10092r9"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">cidr_blocks</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">0.0.0.0/0</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-10093r10"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-10094r11"></a></span> 
+<span class="label"><a 
+ id="x1-10095r12"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">ingress</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10096r13"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">from_port</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">22</span></span> 
+<span class="label"><a 
+ id="x1-10097r14"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">to_port</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">22</span></span> 
+<span class="label"><a 
+ id="x1-10098r15"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">protocol</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">tcp</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-10099r16"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">cidr_blocks</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">0.0.0.0/0</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-10100r17"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-10101r18"></a></span> 
+<span class="label"><a 
+ id="x1-10102r19"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">egress</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-10103r20"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">from_port</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">0</span></span> 
+<span class="label"><a 
+ id="x1-10104r21"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">to_port</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">0</span></span> 
+<span class="label"><a 
+ id="x1-10105r22"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">protocol</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">-1</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-10106r23"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">cidr_blocks</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">0.0.0.0/0</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-10107r24"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-10108r25"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-10109r26"></a></span></pre>
+   </div>
+<!--l. 694--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">6.3.1    </span> <a 
  id="x1-110006.3.1"></a>Finished Terraform</h5>
-<!--l. 570--><p class="noindent" ></p><div class="framedenv" id="code-1">
-<!--l. 570--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 570--><pre class="listings" id="listing-12"><span class="label"><a 
+<!--l. 696--><p class="noindent" ></p><div class="framedenv" id="code-1">
+<!--l. 696--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 696--><pre class="listings" id="listing-18"><span class="label"><a 
  id="x1-11001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">terraform</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -4250,14 +5290,12 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-11163r163"></a></span></pre>
    </div>
-<!--l. 735--><p class="noindent" >
+<!--l. 861--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">6.4    </span> <a 
  id="x1-120006.4"></a>[Path C] EKS / K8S</h4>
-<!--l. 737--><p class="noindent" >This path is not available in the course yet but we recommend that if you liked the course to have a look at
+<!--l. 863--><p class="noindent" >This path is not available in the course yet but we recommend that if you liked the course to have a look at
 Kubernetes as it is widly used in industry.
-                                                                                                    
-                                                                                                    
 </p><!--l. 1--><p class="noindent" >
 </p>
    <h3 class="likesectionHead"><a 
