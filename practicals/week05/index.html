@@ -1,4 +1,4 @@
-Last Updated on 2023/03/19      
+Last Updated on 2023/03/20      
 
 <?xml version="1.0" encoding="iso-8859-1" ?> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
@@ -1433,12 +1433,25 @@ EC2.
 ECS. This is also the path that was used in the first run of the course (2022).  </p> 
 </div> 
 </div>
-<!--l. 362--><p class="noindent" >Congrats you have chosen to go down the EC2 path which builds on what we experienced in the previouse
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 363--><p class="noindent" ><img 
+src="diagrams/ec2deployment.png" alt="PIC"  
+width="525" height="525"  />
+                                                                                                    
+                                                                                                    
+</p>
+   </div><hr class="endfigure" />
+<!--l. 366--><p class="indent" >   Congrats you have chosen to go down the EC2 path which builds on what we experienced in the previouse
 practicals. To deploy our application we first need to get the EC2 instance running and install docker on the
 instance. We can do this by using the following terraform:
-</p><!--l. 364--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 364--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 364--><pre class="listings" id="listing-7"><span class="label"><a 
+</p><!--l. 368--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 368--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 368--><pre class="listings" id="listing-7"><span class="label"><a 
  id="x1-8001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
@@ -1581,19 +1594,19 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-8014r14"></a></span></pre>
    </div>
-<!--l. 380--><p class="indent" >   Compared to the last time we used EC2 instances we have moved the <span 
+<!--l. 384--><p class="indent" >   Compared to the last time we used EC2 instances we have moved the <span 
 class="ectt-1200">user_data </span>from a file to being defined
 inline and we have made sure to provide the <span 
 class="ectt-1200">key_name </span>encase we want to ssh into the deployed
 instance.
-</p><!--l. 382--><p class="indent" >   If we ran terraform apply now our instance wouldnt do anything interesting and we havnt defined our security
+</p><!--l. 386--><p class="indent" >   If we ran terraform apply now our instance wouldnt do anything interesting and we havnt defined our security
 group yet. For the <span 
 class="ectt-1200">user_data </span>we need to install docker and run the container that we have already built. We can
 do this by changing our <span 
 class="ectt-1200">user_data</span>:
-</p><!--l. 384--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 384--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 384--><pre class="listings" id="listing-8"><span class="label"><a 
+</p><!--l. 388--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 388--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 388--><pre class="listings" id="listing-8"><span class="label"><a 
  id="x1-8015r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">user_data</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1714,25 +1727,25 @@ class="ectt-1200">EOT</span></span>
 <span class="label"><a 
  id="x1-8024r10"></a></span></pre>
    </div>
-<!--l. 396--><p class="indent" >   The first lines install docker and start the docker service and allow the ec2-user to be able to run docker
+<!--l. 400--><p class="indent" >   The first lines install docker and start the docker service and allow the ec2-user to be able to run docker
 commands. The last line is where the magic is happening but running the container by the docker cli. To get a
 refresher about the docker cli please see the lectures and the docker website.
 </p>
    <div class="tcolorbox tcolorbox" id="tcolobox-5">    
 <div class="tcolorbox-title">
-<!--l. 400--><p class="indent" >   Aside</p></div> 
-<div class="tcolorbox-content"><!--l. 400--><p class="noindent" >The <span 
+<!--l. 404--><p class="indent" >   Aside</p></div> 
+<div class="tcolorbox-content"><!--l. 404--><p class="noindent" >The <span 
 class="ectt-1200">&#8211;restart always </span>flag tells docker to restart the container if it crashes or is stopped. This is
 useful for our application as it may take a while for the database to be provisioned and we dont want
 to have to manually restart the container once the database is ready.  </p> 
 </div> 
 </div>
-<!--l. 402--><p class="indent" >   Now that our instance is ready to go we just need to make sure that its accessible from the internet.
+<!--l. 406--><p class="indent" >   Now that our instance is ready to go we just need to make sure that its accessible from the internet.
 We can do this by creating a security group that allows traffic on port 6400 and attaching it to our
 instance.
-</p><!--l. 404--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 404--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 404--><pre class="listings" id="listing-9"><span class="label"><a 
+</p><!--l. 408--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 408--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 408--><pre class="listings" id="listing-9"><span class="label"><a 
  id="x1-8025r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
@@ -1943,14 +1956,12 @@ class="ectt-1200">}</span></span>
  
 <span class="label"><a 
  id="x1-8050r26"></a></span></pre>
-                                                                                                    
-                                                                                                    
    </div>
-<!--l. 432--><p class="indent" >   Now we can run terraform init and terraform apply to deploy our entire application. Once this is done we can
+<!--l. 436--><p class="indent" >   Now we can run terraform init and terraform apply to deploy our entire application. Once this is done we can
 visit the public IP of our instance on port 6400 to see our application running.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 434--><pre class="listings" id="listing-10"><span class="label"><a 
+<!--l. 438--><pre class="listings" id="listing-10"><span class="label"><a 
  id="x1-8051r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">output</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
@@ -1985,15 +1996,14 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-8054r4"></a></span></pre>
    </div>
-<!--l. 440--><p class="indent" >   You should be presented with a very lightweight todo based application called TaskOverflow.
-</p><!--l. 442--><p class="noindent" >
+<!--l. 444--><p class="indent" >   You should be presented with a very lightweight todo based application called TaskOverflow.
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">6.2.1    </span> <a 
  id="x1-90006.2.1"></a>Finished Terraform</h5>
-<!--l. 444--><p class="noindent" >The below is the full terraform we built in this path.
-</p><!--l. 446--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 446--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 446--><pre class="listings" id="listing-11"><span class="label"><a 
+<!--l. 448--><p class="noindent" >The below is the full terraform we built in this path.
+</p><!--l. 450--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 450--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 450--><pre class="listings" id="listing-11"><span class="label"><a 
  id="x1-9001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">terraform</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2882,28 +2892,43 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-9111r111"></a></span></pre>
    </div>
-<!--l. 560--><p class="noindent" >
+                                                                                                    
+                                                                                                    
+<!--l. 564--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">6.3    </span> <a 
  id="x1-100006.3"></a>[Path B] ECS</h4>
    <div class="tcolorbox tcolorbox" id="tcolobox-6">    
 <div class="tcolorbox-title">
-<!--l. 564--><p class="indent" >   Aside</p></div> 
-<div class="tcolorbox-content"><!--l. 564--><p class="noindent" >This is the recommended path for the course and is the path that we will be suggesting for the future.
+<!--l. 568--><p class="indent" >   Aside</p></div> 
+<div class="tcolorbox-content"><!--l. 568--><p class="noindent" >This is the recommended path for the course and is the path that we will be suggesting for the future.
 </p> 
 </div> 
 </div>
-<!--l. 566--><p class="noindent" >Congrats you have choosen to go down the ECS path which mimics the same environment that you have via
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 571--><p class="noindent" ><img 
+src="diagrams/ecsdeployment.png" alt="PIC"  
+width="525" height="525"  />
+                                                                                                    
+                                                                                                    
+</p>
+   </div><hr class="endfigure" />
+<!--l. 574--><p class="indent" >   Congrats you have choosen to go down the ECS path which mimics the same environment that you have via
 Docker Compose but as a service on AWS. This path is new for the course this year so please let your tutors know
 any particular issues you have.
-</p><!--l. 568--><p class="indent" >   To start off we need to get some information from our current AWS environment so that we can
+</p><!--l. 576--><p class="indent" >   To start off we need to get some information from our current AWS environment so that we can
 use it latter. Add the below to fetch the IAM role known as LabRole which is a super user in the Lab
 environments which can be everything you can do through the UI. We will also be fetching the default
 VPC and the private subnets within that VPC cause we need to setup some networking for our ECS
 cluster.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 570--><pre class="listings" id="listing-12"><span class="label"><a 
+<!--l. 578--><pre class="listings" id="listing-12"><span class="label"><a 
  id="x1-10001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">data</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
@@ -3017,12 +3042,12 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-10015r15"></a></span></pre>
    </div>
-<!--l. 587--><p class="indent" >   The way in terraform that we can get external information into the environment is by using data sources.
+<!--l. 595--><p class="indent" >   The way in terraform that we can get external information into the environment is by using data sources.
 These are just like resources but they are not created or destroyed see the below to see the syntactual
 differences.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 589--><pre class="listings" id="listing-13"><span class="label"><a 
+<!--l. 597--><pre class="listings" id="listing-13"><span class="label"><a 
  id="x1-10016r1"></a></span><span 
 class="colorbox" id="colorbox1"><span 
 class="ectt-1200">data</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
@@ -3063,12 +3088,10 @@ class="ectt-1200">}</span></span>
  
 <span class="label"><a 
  id="x1-10023r8"></a></span></pre>
-                                                                                                    
-                                                                                                    
    </div>
-<!--l. 599--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 599--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 599--><pre class="listings" id="listing-14"><span class="label"><a 
+<!--l. 607--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 607--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 607--><pre class="listings" id="listing-14"><span class="label"><a 
  id="x1-10024r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
@@ -3564,9 +3587,9 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-10065r42"></a></span></pre>
    </div>
-<!--l. 644--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 644--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 644--><pre class="listings" id="listing-15"><span class="label"><a 
+<!--l. 652--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 652--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 652--><pre class="listings" id="listing-15"><span class="label"><a 
  id="x1-10066r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
@@ -3595,9 +3618,9 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-10069r4"></a></span></pre>
    </div>
-<!--l. 650--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 650--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 650--><pre class="listings" id="listing-16"><span class="label"><a 
+<!--l. 658--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 658--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 658--><pre class="listings" id="listing-16"><span class="label"><a 
  id="x1-10070r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
@@ -3722,9 +3745,9 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-10083r14"></a></span></pre>
    </div>
-<!--l. 666--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 666--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 666--><pre class="listings" id="listing-17"><span class="label"><a 
+<!--l. 674--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 674--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 674--><pre class="listings" id="listing-17"><span class="label"><a 
  id="x1-10084r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
@@ -3936,13 +3959,11 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-10109r26"></a></span></pre>
    </div>
-<!--l. 694--><p class="noindent" >
-</p>
    <h5 class="subsubsectionHead"><span class="titlemark">6.3.1    </span> <a 
  id="x1-110006.3.1"></a>Finished Terraform</h5>
-<!--l. 696--><p class="noindent" ></p><div class="framedenv" id="code-1">
-<!--l. 696--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 696--><pre class="listings" id="listing-18"><span class="label"><a 
+<!--l. 704--><p class="noindent" ></p><div class="framedenv" id="code-1">
+<!--l. 704--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 704--><pre class="listings" id="listing-18"><span class="label"><a 
  id="x1-11001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">terraform</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -5290,11 +5311,13 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-11163r163"></a></span></pre>
    </div>
-<!--l. 861--><p class="noindent" >
+                                                                                                    
+                                                                                                    
+<!--l. 869--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">6.4    </span> <a 
  id="x1-120006.4"></a>[Path C] EKS / K8S</h4>
-<!--l. 863--><p class="noindent" >This path is not available in the course yet but we recommend that if you liked the course to have a look at
+<!--l. 871--><p class="noindent" >This path is not available in the course yet but we recommend that if you liked the course to have a look at
 Kubernetes as it is widly used in industry.
 </p><!--l. 1--><p class="noindent" >
 </p>
