@@ -41,11 +41,14 @@
                     ContainerDb(database, "Todo Database", "Stores the todo items for TaskOverflow.")
                 }
             }
-            EC2(ec2gp, "Amazon EC2", "Amazon Linux 2 | t2.micro | Public IP") {
-                Container(todo, "Todo", "Flask/Python", "Web application for TaskOverflow including static resources.")
+
+            ElasticContainerService(ecs, "Amazon ECS", "TaskOverflow Cluster") {
+                ElasticContainerServiceService(taskoverflow-service, "TaskOverflow Service", "Desired count: 1 | Task definition: taskoverflow:latest") {
+                    Fargate(todo-compute, "Fargate", "1 vCPU | 2GB RAM") {
+                        ElasticContainerServiceTask(todo, "Todo", "Flask/Python | 1 vCPU | 2GB RAM", "Web application for TaskOverflow including static resources.")
+                    }
+                }
             }
-            ' ElasticLoadBalancingApplicationLoadBalancer(alb, "Application Load Balancer", "")
-            ' Route53(route53, "Route 53", "")
         }
    }
 
