@@ -1,0 +1,55 @@
+@startuml ec2deployment
+    title TaskOverflow on EC2 (Deployment Diagram)
+
+    left to right direction
+
+    !include <C4/C4_Container>
+    !include <C4/C4_Context>
+    !include <C4/C4_Deployment>
+
+    !define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v14.0/dist
+    !include AWSPuml/AWSCommon.puml
+    !include AWSPuml/AWSC4Integration.puml
+    !include AWSPuml/Groups/all.puml
+    !include AWSPuml/NetworkingContentDelivery/all.puml
+    !include AWSPuml/Database/all.puml
+    !include AWSPuml/Compute/all.puml
+    !include AWSPuml/Containers/all.puml
+
+    skinparam PackageTitleAlignment Center
+    UpdateElementStyle(Container, $bgColor="#FFFFFF", $borderColor="#d3d3d3", $fontColor="#000000")
+    skinparam rectangle {
+        roundCorner 25
+    }
+    skinparam rectangle<<RDS>> { 
+        BorderColor AWS_COLOR_BLUE 
+    }
+    skinparam rectangle<<AuroraPostgreSQLInstance>> {
+        BorderColor AWS_COLOR_BLUE
+    }
+    skinparam rectangle<<ElasticLoadBalancingApplicationLoadBalancer>> {
+        BorderColor AWS_COLOR_PURPLE
+    }
+    skinparam rectangle<<Route53>> {
+        BorderColor AWS_COLOR_PURPLE
+    }
+
+    AWSCloudGroup(aws, "Amazon Web Services") {
+        RegionGroup(useast1, "us-east-1") {
+            RDS(rds, "Amazon RDS", "Postgres 14 | db.t4g.micro | Public IP") {
+                AuroraPostgreSQLInstance(postgresql-grouper, "PostgreSQL - TaskOverflow", "") {
+                    ContainerDb(database, "Todo Database", "Stores the todo items for TaskOverflow.")
+                }
+            }
+            EC2(ec2gp, "Amazon EC2", "Amazon Linux 2 | t2.micro | Public IP") {
+                Container(todo, "Todo", "Flask/Python", "Web application for TaskOverflow including static resources.")
+            }
+            ' ElasticLoadBalancingApplicationLoadBalancer(alb, "Application Load Balancer", "")
+            ' Route53(route53, "Route 53", "")
+        }
+   }
+
+   Rel_D(todo, database, "Connects to", "TCP/5432")
+
+   SHOW_LEGEND(true)
+@enduml
