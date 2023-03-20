@@ -43,7 +43,7 @@ for folder in ${REPO_ROOT}/practicals/*; do
             mkdir -p "${HTML_DIR}"
             cp ./main.html "${HTML_DIR}/index.html"
             cp ./main.css ./*.svg ./*.png "${HTML_DIR}"
-            cp -r ./images ./diagrams "${HTML_DIR}"
+            cp -r ./images ./diagrams ./public "${HTML_DIR}"
         fi
         popd
     fi
