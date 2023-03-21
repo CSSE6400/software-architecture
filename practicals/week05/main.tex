@@ -8,41 +8,41 @@
 \title{Deploying with Terraform}
 \author{Evan Hughes \& Brae Webb}
 
-\date{\week{3}}
+\date{\week{5}}
 \begin{document}
 
 \maketitle
 
 \section{Before Class}
-Ensure you've had practice using the AWS Academy learner lab.
-It's preferable if you already have \link{terraform installed}{https://learn.hashicorp.com/tutorials/terraform/install-cli}.
-Please also have one of IntelliJ IDEA, PyCharm, or VSCode with the terraform plugin installed.
+Ensure you have had practice using the AWS Academy Learner Lab.
+It is preferable if you already have \link{Terraform installed}{https://learn.hashicorp.com/tutorials/terraform/install-cli}.
+Please also have one of IntelliJ IDEA, PyCharm, or VSCode with the Terraform plugin installed.
 
 \section{This Week}
 This week we are going to deploy TaskOverflow our Todo Application to AWS using a hosted database and a single server website.
 
 Specifically, this week you need to:
 \begin{itemize}
-    \item Authenticate Terraform to use the AWS learner lab.
+    \item Authenticate Terraform to use the AWS Learner Lab.
     \item Configure an RDS database.
     \item [Path A] Configure a single server and deploy the container.
-    \item [Path B] Configure a ECS cluster and deploy the container.
+    \item [Path B] Configure an ECS cluster and deploy the container.
 \end{itemize}
 
 \section{Using Terraform in AWS Learner Labs}
-Following the steps from the week four practical, start a learner lab in AWS Academy.
+Following the steps from the week four practical, start a Learner Lab in AWS Academy.
 For this practical, you do not need to create any resources in the AWS Console.
 The console can be used to verify that Terraform has correctly provisioned resources.
 
 \begin{enumerate}
-\item Once the learner lab has started, click on `AWS Details' to display information about the lab.
+\item Once the Learner Lab has started, click on `AWS Details' to display information about the lab.
 
 \includegraphics[width=0.7\textwidth]{images/aws-details}
 
 \item Click on the first `Show' button next to `AWS CLI' which will display a text block starting with \texttt{[default]}.
 \item Create a directory for this week's practical.
 \item Within that directory create a \texttt{credentials} file and copy the contents of the text block into the file.
-\textbf{Do not share this file contents --- do not commit it}.
+\textbf{Do \underline{not} share this file contents --- do \underline{not} commit it}.
 \item Create a \texttt{main.tf} file in the same directory with the following contents:
 \begin{code}[language=terraform]{main.tf}
 terraform {
@@ -63,7 +63,7 @@ provider "aws" {
 The \texttt{terraform} block specifies the required external dependencies, here we need to use the AWS provider.
 The \texttt{provider} block configures the AWS provider, instructing it which region to use and how to authenticate (using the credentials file we created).
 
-\item We need to initialise terraform which will fetch the required dependencies. This is done with the \texttt{terraform init} command.
+\item We need to initialise Terraform which will fetch the required dependencies. This is done with the \texttt{terraform init} command.
 \bash{terraform init}
 
 This command will create a \texttt{.terraform} directory which stores providers and a provider lock file, \texttt{.terraform.lock.hcl}.
@@ -79,7 +79,7 @@ Note that this does not ensure our credentials are correctly configured as Terra
 \section{Deploying a Database in AWS}
 
 \info{
-  This section manually deploys a Postgresql RDS instance, which is not the courses end goals but is a good way to get started with AWS. Latter this practical we will use terraform to create the database, so this section is optional and is better to be observed rather than actioned.
+This section manually deploys a Postgresql RDS instance, which is not the course's end goal but is a good way to get started with AWS. Later in this practical we will use Terraform to create the database, so this section is optional and is better to be observed rather than actioned.
 }
 
 \teacher{
@@ -97,7 +97,7 @@ This is the last time we will heavily use the AWS user interface in the practica
   Give students time to start the labs, could take up to 10 minutes.
 }
 
-To get started let's jump into the lab environment and have a look at AWS RDS which is an AWS managed database service. To get to the RDS service either search it or browse Services -> Database -> RDS as shown below.
+To get started let us jump into the lab environment and have a look at AWS RDS which is an AWS managed database service. To get to the RDS service either search it or browse Services -> Database -> RDS as shown below.
 
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{images/aws_1}
@@ -111,7 +111,7 @@ Head to ``DB Instances (0/40)''.
 \includegraphics[width=\textwidth]{images/aws_2}
 \end{figure}
 
-This page should appear familar as it's very similar to the AWS EC2 instance page.
+This page should appear familiar as it is very similar to the AWS EC2 instance page.
 Let us create a new database by hitting the ``Create Database'' button.
 
 \begin{figure}[H]
@@ -129,7 +129,7 @@ Let us create a new database by hitting the ``Create Database'' button.
 }
 
 We will be creating a standard database so select standard and Postgresql.
-We will use version 14 which is a fairly recent release.
+We will use version 14, which is a fairly recent release.
 
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{images/db1}
@@ -153,7 +153,7 @@ Now we need to name our database and create credentials to connect via. Here is 
   \includegraphics[width=\textwidth]{images/db3}
 \end{figure}
 
-For exploring the process select t2.micro, which should be adaquite for our needs.
+For exploring the process select t2.micro, which should be adequate for our needs.
 
 \teacher{
   May want to mention that burstable is not recommended for consistantly used databases.
@@ -170,7 +170,7 @@ For storage we will leave all the default options.
   \includegraphics[width=\textwidth]{images/db5}
 \end{figure}
 
-In connectivity we need to make sure our instance is publicly available. Usually you don't want to expose your databases publicly and, would instead, have a web server sitting in-front. For our learning purposes though we are gonna expose it directly just like we did with our EC2 instances early in the course.
+In connectivity we need to make sure our instance is publicly available. Usually you do not want to expose your databases publicly and, would instead, have a web server sitting in-front. For our learning purposes though we are going to expose it directly just like we did with our EC2 instances early in the course.
 
 When selecting public access as yes we have to create a new Security Group,
 give this Security Group a sensible name.
@@ -179,7 +179,7 @@ give this Security Group a sensible name.
   \includegraphics[width=\textwidth]{images/db6}
 \end{figure}
 
-We will leave the authentication as password based but we need to expand the ``Additional configuration''. Fill in the ``Initial Database Name'' section to be ``todo'', this is similar to what we had in the Docker Composes environment variable.
+We will leave the authentication as password based but we need to expand the ``Additional configuration''. Fill in the ``Initial Database Name'' section to be ``todo'', this is similar to what we had in the Docker Compose's environment variable.
 
 \teacher{
 The other options here are to do with the parameters used to start the database,
@@ -196,13 +196,13 @@ Now we can click create which will take some time.
   \includegraphics[width=\textwidth]{images/db8}
 \end{figure}
 
-Depending on your database it may take 10 to 30minutes to create, the larger and more complicated the setup the longer it usually takes. The database will also do a initial backup when its created.
+Depending on your database it may take 10 to 30 minutes to create, the larger and more complicated the set-up, the longer it usually takes. The database will also do a initial backup when it is created.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/aws_4}
 \end{figure}
 
-When the database has finished being created you can select it to view the configuration and details. In this menu we also see the endpoint address which we will need to copy into our docker compose file.
+When the database has finished being created you can select it to view the configuration and details. In this menu we also see the endpoint address which we will need to copy into our Docker Compose file.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/aws_5}
@@ -275,13 +275,13 @@ As we mentioned in the Infrastructure as Code notes \cite{iac-notes},
 in this course we will use Docker to configure machines and Terraform to configure infrastructure.
 AWS has the ability to deploy Docker containers using a service known as Elastic Container Service (ECS). We will cover ECS and deploying maunally via EC2 so you can use the method you feel most confortable with.
 
-For this practical we have made available a docker container running the todo application which you can use to deploy to AWS. This container is available on Github under the CSSE6400 organisation \url{https://ghcr.io/csse6400/taskoverflow:latest}. This container is very similar to what you have been building in the practicals but contains a simple UI and some extra features for the future practicals.
+For this practical we have made available a Docker container running the todo application which you can use to deploy to AWS. This container is available on Github under the CSSE6400 organisation \url{https://ghcr.io/csse6400/taskoverflow:latest}. This container is very similar to what you have been building in the practicals but contains a simple UI and some extra features for the future practicals.
 
 \subsection{Setup}
 
-All of the differnt ways that we can deploy our application we have already decided that we are gonna offload the database to AWS. This means that we can move all the "state" of our application away from our containerised environment.
+Of all the different ways that we can deploy our application we have already decided that we are going to offload the database to AWS. This means that we can move all the "state" of our application away from our containerised environment.
 
-To start off we are gonna use what we had above to create a database and the default terraform. Edit your files so that they match whats provided below:
+To start off we are going to use what we had above to create a database and the default Terraform. Edit your files so that they match what is provided below:
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
   terraform {
@@ -347,11 +347,11 @@ resource "aws_security_group" "database" {
 }
 \end{code}
 
-The above sets up a RDS instances of postgres and a security group to allow access to it. We have also added a local variable to store the password for the database. Local variables in terraform can come through two ways, they can be in a variables block which can be overriden or they can be in a locals block which can be used to store values that are used in multiple places.
+The above sets up a RDS instance of Postgres and a security group to allow access to it. We have also added a local variable to store the password for the database. Local variables in Terraform can come through two ways, they can be in a variables block which can be overridden or they can be in a locals block which can be used to store values that are used in multiple places.
 
-Now we can run terraform init and terraform apply to create our database. Once this is done we can move on to the next step. For the next step you must choose a path to follow, either EC2 or ECS, only choose one path for the practical, if you have trouble with one path you can always switch to the other. When switching you may want to destroy the resources you have created so far before starting the new path.
+Now we can run \texttt{terraform init} and \texttt{terraform apply} to create our database. Once this is done we can move on to the next step. For the next step you must choose a path to follow, either EC2 or ECS, only choose one path for the practical, if you have trouble with one path you can always switch to the other. When switching you should destroy the resources you have created so far before starting the new path.
 
-We would like to recommend that you start with the ECS path as it is the more modern way of deploying containers and is the path that we will be suggesting for the future but all tasks are also doable using EC2.
+We recommend that you start with the ECS path as it is the more modern way of deploying containers and is the path that we will be suggesting for the future but all tasks are also doable using EC2.
 
 \subsection{[Path A] EC2}
 
@@ -363,7 +363,7 @@ We would like to recommend that you start with the ECS path as it is the more mo
   \includegraphics[width=\textwidth]{diagrams/ec2deployment}
 \end{figure}
 
-Congrats you have chosen to go down the EC2 path which builds on what we experienced in the previouse practicals. To deploy our application we first need to get the EC2 instance running and install docker on the instance. We can do this by using the following terraform:
+Congrats you have chosen to go down the EC2 path which builds on what we experienced in the previous practicals. To deploy our application we first need to get the EC2 instance running and install Docker on the instance. We can do this by using the following Terraform code:
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
   resource "aws_instance" "todo" {
@@ -381,9 +381,9 @@ Congrats you have chosen to go down the EC2 path which builds on what we experie
   }
 \end{code}
 
-Compared to the last time we used EC2 instances we have moved the \texttt{user\_data} from a file to being defined inline and we have made sure to provide the \texttt{key\_name} encase we want to ssh into the deployed instance.
+Compared to the last time we used EC2 instances we have moved the \texttt{user\_data} from a file to being defined in-line and we have made sure to provide the \texttt{key\_name} in case we want to ssh into the deployed instance.
 
-If we ran terraform apply now our instance wouldnt do anything interesting and we havnt defined our security group yet. For the \texttt{user\_data} we need to install docker and run the container that we have already built. We can do this by changing our \texttt{user\_data}:
+If we ran \texttt{terraform apply} now, our instance would not do anything interesting and we have not defined our security group yet. For the \texttt{user\_data} we need to install Docker and run the container that we have already built. We can do this by changing our \texttt{user\_data}:
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
   user_data                   = <<-EOT
@@ -397,13 +397,13 @@ If we ran terraform apply now our instance wouldnt do anything interesting and w
   EOT
 \end{code}
 
-The first lines install docker and start the docker service and allow the ec2-user to be able to run docker commands. The last line is where the magic is happening but running the container by the docker cli. To get a refresher about the docker cli please see the lectures and the docker website. 
+The first lines install Docker and start the Docker service and allow the ec2-user to be able to run Docker commands. The last line is where the magic happens by running the container via the Docker cli. To get a refresher about the Docker cli please see the Containers lecture \cite{container-slides} and the \link{Docker documentation}{https://docs.docker.com/}. 
 
 \aside{
-  The \texttt{--restart always} flag tells docker to restart the container if it crashes or is stopped. This is useful for our application as it may take a while for the database to be provisioned and we dont want to have to manually restart the container once the database is ready.
+  The \texttt{--restart always} flag tells docker to restart the container if it crashes or is stopped. This is useful for our application as it may take a while for the database to be provisioned and we do not want to have to manually restart the container once the database is ready.
 }
 
-Now that our instance is ready to go we just need to make sure that its accessible from the internet. We can do this by creating a security group that allows traffic on port 6400 and attaching it to our instance.
+Now that our instance is ready to go we just need to make sure that it is accessible from the internet. We can do this by creating a security group that allows traffic on port 6400 and attaching it to our instance.
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
   resource "aws_security_group" "todo" {
@@ -433,7 +433,7 @@ Now that our instance is ready to go we just need to make sure that its accessib
   }
 \end{code}
 
-Now we can run terraform init and terraform apply to deploy our entire application. Once this is done we can visit the public IP of our instance on port 6400 to see our application running.
+Now we can run \texttt{terraform init} and \texttt{terraform apply} to deploy our entire application. Once this is done we can visit the public IP of our instance on port 6400 to see our application running.
 
 \begin{code}[language=terraform,numbers=none]{}
   output "url" {
@@ -441,7 +441,7 @@ Now we can run terraform init and terraform apply to deploy our entire applicati
   }
 \end{code}
 
-You should be presented with a very lightweight todo based application called TaskOverflow.
+You should be presented with a very lightweight todo application called TaskOverflow.
 
 \subsubsection{Finished Terraform}
 
@@ -571,9 +571,9 @@ output "url" {
   \includegraphics[width=\textwidth]{diagrams/ecsdeployment}
 \end{figure}
 
-Congrats you have choosen to go down the ECS path which mimics the same environment that you have via Docker Compose but as a service on AWS. This path is new for the course this year so please let your tutors know any particular issues you have.
+Congrats you have choosen to go down the ECS path which mimics the same environment that you have via Docker Compose but as a service on AWS. This path is new for the course this year so please let your tutors know of any issues you have.
 
-To start off we need to get some information from our current AWS environment so that we can use it latter. Add the below to fetch the IAM role known as LabRole which is a super user in the Lab environments which can be everything you can do through the UI. We will also be fetching the default VPC and the private subnets within that VPC cause we need to setup some networking for our ECS cluster.
+To start off we need to get some information from our current AWS environment so that we can use it later. Add the below to fetch the IAM role known as LabRole which is a super user in the Lab environments which can do everything you can do through the UI. We will also be fetching the default VPC and the private subnets within that VPC because we need to set-up some networking for our ECS cluster.
 
 \begin{code}[language=terraform,numbers=none,escapechar=!]{}
   data "aws_iam_role" "lab" {
@@ -592,7 +592,7 @@ To start off we need to get some information from our current AWS environment so
   }
 \end{code}
 
-The way in terraform that we can get external information into the environment is by using data sources. These are just like resources but they are not created or destroyed see the below to see the syntactual differences.
+The way in Terraform that we can get external information into the environment is by using data sources. These are just like resources but they are not created or destroyed see the below to see the syntactual differences.
 
 \begin{code}[language=terraform,numbers=none,escapechar=!]{}
 !\colorbox{yellow}{data}! "aws_iam_role" "lab" {
@@ -868,7 +868,7 @@ resource "aws_security_group" "todo" {
 
 \subsection{[Path C] EKS / K8S}
 
-This path is not available in the course yet but we recommend that if you liked the course to have  a look at Kubernetes as it is widly used in industry.
+This path is not described in the course yet, but we recommend that if you liked the course to have a look at \link{Kubernetes}{https://kubernetes.io/} as it is widely used in industry.
 
 \bibliographystyle{ieeetr}
 \bibliography{books,ours}
