@@ -5,46 +5,57 @@
 \usepackage{languages}
 \usepackage{float}
 
-\title{Deploying with Terraform}
+\title{Database \& Container Deployment}
 \author{Evan Hughes \& Brae Webb}
 
-\date{\week{3}}
+\date{\week[practical]{5}}
 \begin{document}
 
 \maketitle
 
-\section{Before Class}
-Ensure you've had practice using the AWS Academy learner lab.
-It's preferable if you already have \link{terraform installed}{https://learn.hashicorp.com/tutorials/terraform/install-cli}.
-Please also have one of IntelliJ IDEA, PyCharm, or VSCode with the terraform plugin installed.
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[scale=0.4]{images/cloud-whale}
+  \end{center}
+\end{figure}
 
 \section{This Week}
-This week we are going to deploy TaskOverflow our Todo Application to AWS using a hosted database and a single server website.
+This week we are going to deploy our todo application,
+now called TaskOverflow,
+on AWS infrastructure using a hosted database and a single server website.
 
 Specifically, this week you need to:
 \begin{itemize}
-    \item Authenticate Terraform to use the AWS learner lab.
-    \item Configure an RDS database.
-    \item [Path A] Configure a single server and deploy the container.
-    \item [Path B] Configure a ECS cluster and deploy the container.
+    \item Deploy an AWS Relational Database Service (RDS) using Terraform.
+    \item Deploy the TaskOverflow container on AWS infrastructure using either:
+    \begin{description}
+    \item [Path A] An EC2 instance running the container.
+    \item [Path B] An ECS cluster with the container.
+    \end{description}
 \end{itemize}
 
-\section{Using Terraform in AWS Learner Labs}
-Following the steps from the week four practical, start a learner lab in AWS Academy.
-For this practical, you do not need to create any resources in the AWS Console.
+\section{Terraform in AWS Learner Labs}
+Following the steps from the week four practical,
+start a learner lab in AWS Academy.
+For this practical,
+you do not need to create any resources using the AWS Console.
 The console can be used to verify that Terraform has correctly provisioned resources.
 
 \begin{enumerate}
-\item Once the learner lab has started, click on `AWS Details' to display information about the lab.
+\item Using the GitHub Classroom link for this practical provided by your tutor in Slack,
+    create a repository to work within.
+\item Clone the repository or open an environment in GitHub CodeSpaces%
+\footnote{If you are using CodeSpaces, you will need to reinstall Terraform using the same steps as last week.}
+\item Start the learner lab then, once the lab has started,
+    click on `AWS Details' to display information about the lab.
 
 \includegraphics[width=0.7\textwidth]{images/aws-details}
 
 \item Click on the first `Show' button next to `AWS CLI' which will display a text block starting with \texttt{[default]}.
-\item Create a directory for this week's practical.
-\item Within that directory create a \texttt{credentials} file and copy the contents of the text block into the file.
+\item Within your repository create a \texttt{credentials} file and copy the contents of the text block into the file.
 \textbf{Do not share this file contents --- do not commit it}.
-\item Create a \texttt{main.tf} file in the same directory with the following contents:
-\begin{code}[language=terraform]{main.tf}
+\item Create a \texttt{main.tf} file in the your repository with the following contents:
+\begin{code}[language=terraform,numbers=none]{main.tf}
 terraform {
     required_providers {
         aws = {
@@ -60,10 +71,8 @@ provider "aws" {
 }
 \end{code}
 
-The \texttt{terraform} block specifies the required external dependencies, here we need to use the AWS provider.
-The \texttt{provider} block configures the AWS provider, instructing it which region to use and how to authenticate (using the credentials file we created).
-
-\item We need to initialise terraform which will fetch the required dependencies. This is done with the \texttt{terraform init} command.
+\item We need to initialise terraform which will fetch the required dependencies.
+    This is done with the \texttt{terraform init} command.
 \bash{terraform init}
 
 This command will create a \texttt{.terraform} directory which stores providers and a provider lock file, \texttt{.terraform.lock.hcl}.
@@ -78,34 +87,24 @@ Note that this does not ensure our credentials are correctly configured as Terra
 
 \section{Deploying a Database in AWS}
 
-\info{
-  This section manually deploys a Postgresql RDS instance, which is not the courses end goals but is a good way to get started with AWS. Latter this practical we will use terraform to create the database, so this section is optional and is better to be observed rather than actioned.
+\warning{
+This section manually deploys a PostgreSQL RDS instance,
+this is intended as a demonstration by your tutor.
+You should attempt to deploy your infrastructure using Terraform rather than manually.
 }
 
 \teacher{
-  Instruct the class to observe you making the database and not to follow along.
-}
-
-\begin{figure}[ht]
-\includegraphics[width=\textwidth]{diagrams/remotedb}
-\caption{Remote database deployment diagram}
-\end{figure}
-
-This is the last time we will heavily use the AWS user interface in the practicals. If you already feel confident in the AWS environment skip this section and move on to the next one.
-
-\teacher{
-  Give students time to start the labs, could take up to 10 minutes.
+Instruct the class to observe you making the database and not to follow along.
 }
 
 To get started let's jump into the lab environment and have a look at AWS RDS which is an AWS managed database service. To get to the RDS service either search it or browse Services -> Database -> RDS as shown below.
 
 \begin{figure}[H]
-\includegraphics[width=\textwidth]{images/aws_1}
+\includegraphics[width=0.8\textwidth]{images/aws_1}
 \end{figure}
 
-Now we are in the management page for all our database instances,
-for today we just want to get a small instance running to explore the service.
-Head to ``DB Instances (0/40)''.
+Now we are in the management interface for all our RDS instances.
+Head to ``DB Instances (0/40)'' or click ``Databases`` on the left panel.
 
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{images/aws_2}
@@ -119,20 +118,20 @@ Let us create a new database by hitting the ``Create Database'' button.
 \end{figure}
 
 \warning{
-  In the next section we cannot use the Easy Create method as it tries to create a IAM account which is not allowed in the labs.
-  Going forward we would typically do this using Terraform so we can easily avoid these restrictions.
+In the next section we cannot use the Easy Create option as it tries to create a IAM account which is disabled in Learner Labs.
 }
 
 \teacher{
-  Feel free to talk about the other offerings here, but make sure to flame Oracle and Microsoft SQL Server.
-  A good thing to point out is the Amazon Aurora which is the serverless version of RDS.
+Feel free to talk about the other offerings here, but make sure to flame Oracle and Microsoft SQL Server.
+A good thing to point out is the Amazon Aurora which is the serverless version of RDS.
 }
 
-We will be creating a standard database so select standard and Postgresql.
+We will be creating a standard database so select standard and PostgreSQL.
 We will use version 14 which is a fairly recent release.
 
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{images/db1}
+\todo{Update to use PostgreSQL.}
 \end{figure}
 
 For today we are going to use ``Free Tier'' but in the future,
@@ -147,17 +146,19 @@ Please peruse the available different options.
   \includegraphics[width=\textwidth]{images/db2}
 \end{figure}
 
-Now we need to name our database and create credentials to connect via. Here is where you can enter in credentials for the main account of the database.
+Now we need to name our database and create credentials to use when connecting from our application.
+Enter memorable credentials as these will be used later.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/db3}
 \end{figure}
 
-For exploring the process select t2.micro, which should be adaquite for our needs.
+For exploring the process select t2.micro,
+which should be adaquite for our needs.
 
 \teacher{
-  May want to mention that burstable is not recommended for consistantly used databases.
-  Usually DBs are memory focused and thus the standard or memory optimised are used.
+May want to mention that burstable is not recommended for consistantly used databases.
+Usually DBs are memory focused and thus the standard or memory optimised are used.
 }
 
 \begin{figure}[H]
@@ -179,7 +180,9 @@ give this Security Group a sensible name.
   \includegraphics[width=\textwidth]{images/db6}
 \end{figure}
 
-We will leave the authentication as password based but we need to expand the ``Additional configuration''. Fill in the ``Initial Database Name'' section to be ``todo'', this is similar to what we had in the Docker Composes environment variable.
+We will leave the authentication as password based but we need to expand the ``Additional configuration''.
+Fill in the ``Initial Database Name'' section to be ``todo'',
+this will automatically create the database that our todo application expects to connect to.
 
 \teacher{
 The other options here are to do with the parameters used to start the database,
@@ -196,13 +199,15 @@ Now we can click create which will take some time.
   \includegraphics[width=\textwidth]{images/db8}
 \end{figure}
 
-Depending on your database it may take 10 to 30minutes to create, the larger and more complicated the setup the longer it usually takes. The database will also do a initial backup when its created.
+It may take 10 to 30 minutes to create.
+The database will also do a initial backup when its created.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/aws_4}
 \end{figure}
 
-When the database has finished being created you can select it to view the configuration and details. In this menu we also see the endpoint address which we will need to copy into our docker compose file.
+When the database has finished being created you can select it to view the configuration and details.
+In this menu we also see the endpoint address which we will need to configure our TaskOverflow application to use.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/aws_5}
@@ -219,7 +224,7 @@ locals {
   password = "foobarbaz" # this is bad
 }
 
-resource "aws_db_instance" "todoapp-database" {
+resource "aws_db_instance" "taskoverflow-database" {
   allocated_storage      = 20
   max_allocated_storage  = 1000
   engine                 = "postgres"
@@ -230,7 +235,7 @@ resource "aws_db_instance" "todoapp-database" {
   password               = local.password
   parameter_group_name   = "default.postgres14"
   skip_final_snapshot    = true
-  vpc_security_group_ids = [aws_security_group.todo-database.id]
+  vpc_security_group_ids = [aws_security_group.taskoverflow-database.id]
   publicly_accessible    = true
 
   tags = {
@@ -239,10 +244,12 @@ resource "aws_db_instance" "todoapp-database" {
 }
 \end{code}
 
-\noindent Remember to create an appropriate security group as we did through the user interface.
+When we created the database using the AWS Console,
+we needed an appropriate security group so that we could access the database.
+We can create the security group using Terraform as well.
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
-resource "aws_security_group" "todo-database" {
+resource "aws_security_group" "taskoverflow-database" {
   name        = "database"
   description = "Allow inbound Postgresql traffic"
 
