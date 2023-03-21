@@ -353,7 +353,7 @@ resource "aws_instance" "taskoverflow_instance" {
 yum update -y
     EOT
   
-    security_groups = [aws_security_group.todo.name] # firewall for the instance
+    security_groups = [aws_security_group.taskoverflow_instance.name] # firewall for the instance
 
     tags = {
         Name = "taskoverflow_instance"
@@ -367,6 +367,11 @@ If we ran \texttt{terraform apply} now, our instance would not do anything inter
 We need the \texttt{user\_data} to install Docker and start our TaskOverflow image.
 For this, we will need to make the following adjustments to the \texttt{user\_data} field:
 
+\warning{
+The \texttt{<<-EOT} line cannot have a trailing space.
+Ensure that one has not been erroneously inserted.
+}
+
 \begin{code}[language=terraform,numbers=none]{main.tf}
   user_data = <<-EOT
 #!/bin/bash
@@ -375,9 +380,7 @@ yum install -y docker
 service docker start
 systemctl enable docker
 usermod -a -G docker ec2-user 
-docker run --restart always \
-    -e SQLALCHEMY_DATABASE_URI=postgresql://${local.database_username}:${local.database_password}@${aws_db_instance.taskoverflow_database.address}:${aws_db_instance.taskoverflow_database.port}/${aws_db_instance.taskoverflow_database.db_name} \
-    -p 6400:6400 ${local.image}
+docker run --restart always -e SQLALCHEMY_DATABASE_URI=postgresql://${local.database_username}:${local.database_password}@${aws_db_instance.taskoverflow_database.address}:${aws_db_instance.taskoverflow_database.port}/${aws_db_instance.taskoverflow_database.db_name} -p 6400:6400 ${local.image}
   EOT
 \end{code}
 
@@ -504,6 +507,11 @@ the environment variables,
 the port mappings, etc.
 This is similar to a server entry in Docker Compose.
 
+\warning{
+The \texttt{<<DEFINITION} line cannot have a trailing space.
+Ensure that one has not been erroneously inserted.
+}
+
 \begin{code}[language=terraform,numbers=none]{main.tf}
 resource "aws_ecs_task_definition" "taskoverflow" {
     family                   = "taskoverflow"
@@ -530,7 +538,7 @@ resource "aws_ecs_task_definition" "taskoverflow" {
       "environment": [
         {
           "name": "SQLALCHEMY_DATABASE_URI",
-          "value": "postgresql://${local.database_username}:${local.database_password}@${aws_db_instance.database.address}:${aws_db_instance.database.port}/${aws_db_instance.database.db_name}"
+          "value": "postgresql://${local.database_username}:${local.database_password}@${aws_db_instance.taskoverflow_database.address}:${aws_db_instance.taskoverflow_database.port}/${aws_db_instance.taskoverflow_database.db_name}"
         }
       ],
       "logConfiguration": {
@@ -617,6 +625,14 @@ resource "aws_security_group" "taskoverflow" {
 
 Finally, if we run the appropriate \texttt{terraform init} and \texttt{terraform apply} commands,
 it should provision an ECS cluster with a service that will then create one ECS container based on our task description.
+
+Note that we are doing something a bit weird in this deployment.
+Normally ECS expects multiple instances of containers,
+so it naturally expects a load balancer.
+This makes it difficult for us to discover the public IP of our single instance using Terraform.
+Instead, you will need to use the AWS Console to find the public IP address.
+
+This is an opportunity for you to explore the ECS interface and find the task, within the service, within the cluster that we have provisioned.
 
 \subsection{[Path C] EKS / K8S}
 
