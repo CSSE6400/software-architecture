@@ -224,25 +224,26 @@ Using our manual configuration, we can come up with a resource with the appropri
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
 locals {
-  password = "foobarbaz" # this is bad
+  database_username = "administrator"
+  database_password = "foobarbaz" # this is bad
 }
 
-resource "aws_db_instance" "taskoverflow-database" {
+resource "aws_db_instance" "taskoverflow_database" {
   allocated_storage      = 20
   max_allocated_storage  = 1000
   engine                 = "postgres"
   engine_version         = "14"
   instance_class         = "db.t4g.micro"
   db_name                = "todo"
-  username               = "todo"
-  password               = local.password
+  username               = local.database_username
+  password               = local.database_password
   parameter_group_name   = "default.postgres14"
   skip_final_snapshot    = true
-  vpc_security_group_ids = [aws_security_group.taskoverflow-database.id]
+  vpc_security_group_ids = [aws_security_group.taskoverflow_database.id]
   publicly_accessible    = true
 
   tags = {
-    Name = "todo-database"
+    Name = "taskoverflow_database"
   }
 }
 \end{code}
@@ -252,8 +253,8 @@ we needed an appropriate security group so that we could access the database.
 We can create the security group using Terraform as well.
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
-resource "aws_security_group" "taskoverflow-database" {
-  name        = "database"
+resource "aws_security_group" "taskoverflow_database" {
+  name        = "taskoverflow_database"
   description = "Allow inbound Postgresql traffic"
 
   ingress {
@@ -272,7 +273,7 @@ resource "aws_security_group" "taskoverflow-database" {
   }
 
   tags = {
-    Name = "todo-database"
+    Name = "taskoverflow_database"
   }
 }
 \end{code}
@@ -283,141 +284,118 @@ resource "aws_security_group" "taskoverflow-database" {
 
 As we mentioned in the Infrastructure as Code notes \cite{iac-notes},
 in this course we will use Docker to configure machines and Terraform to configure infrastructure.
-AWS has the ability to deploy Docker containers using a service known as Elastic Container Service (ECS). We will cover ECS and deploying maunally via EC2 so you can use the method you feel most confortable with.
+AWS has the ability to deploy Docker containers using a service known as Elastic Container Service (ECS).
+We will cover ECS and deploying maunally via EC2 so you can use the method you feel most comfortable with.
 
-For this practical we have made available a Docker container running the todo application which you can use to deploy to AWS. This container is available on Github under the CSSE6400 organisation \url{https://ghcr.io/csse6400/taskoverflow:latest}. This container is very similar to what you have been building in the practicals but contains a simple UI and some extra features for the future practicals.
+For this practical we have made available a Docker container running the TaskOverflow application which you can use for your AWS deployment.
+This container is available on GitHub under the CSSE6400 organisation:
+
+\url{https://ghcr.io/csse6400/taskoverflow:latest}
+
+This container is very similar to what you have been building in the practicals but contains a simple UI and some extra features for the future practicals.%
+\footnote{If you are interested, the source code is available on GitHub \url{https://github.com/csse6400/practical}}
 
 \subsection{Setup}
 
-Of all the different ways that we can deploy our application we have already decided that we are going to offload the database to AWS. This means that we can move all the "state" of our application away from our containerised environment.
+Of all the different ways that we can deploy our application, we have decided to offload the database to AWS RDS.
+This means that we can move all the "state" of our application away from our containerised environment.
 
-To start off we are going to use what we had above to create a database and the default Terraform. Edit your files so that they match what is provided below:
+To begin, we will reuse our Terraform from above for deploying the RDS database.
+Extend the existing local Terraform variables to include the address of the container, such that we have:
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
-  terraform {
-    required_providers {
-        aws = {
-            source  = "hashicorp/aws"
-            version = "~> 4.0"
-        }
-    }
-}
-
-provider "aws" {
-    region = "us-east-1"
-    shared_credentials_files = ["./credentials"]
-    default_tags {
-        tags = {
-            Course       = "CSSE6400"
-            Name         = "TaskOverflow"
-            Automation   = "Terraform"
-        }
-    }
-}
-
 locals {
     image             = "ghcr.io/csse6400/taskoverflow:latest"
     database_username = "administrator"
-    database_password = "VerySecurePasswordByYourBoiEvan"
-}
-
-resource "aws_db_instance" "database" {
-  allocated_storage      = 20
-  max_allocated_storage  = 1000
-  engine                 = "postgres"
-  engine_version         = "14"
-  instance_class         = "db.t4g.micro"
-  db_name                = "todo"
-  username               = local.database_username
-  password               = local.database_password
-  parameter_group_name   = "default.postgres14"
-  skip_final_snapshot    = true
-  vpc_security_group_ids = [aws_security_group.database.id]
-  publicly_accessible    = true
-}
-
-resource "aws_security_group" "database" {
-  name        = "todo-database"
-  description = "Allow inbound Postgres traffic"
-
-  ingress {
-    from_port        = 5432
-    to_port          = 5432
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
+    database_password = "foobarbaz" # this is bad
 }
 \end{code}
 
-The above sets up a RDS instance of Postgres and a security group to allow access to it. We have also added a local variable to store the password for the database. Local variables in Terraform can come through two ways, they can be in a variables block which can be overridden or they can be in a locals block which can be used to store values that are used in multiple places.
+This already sets up an RDS instance of Postgres and a security group to allow access to it.
+Now we can run \texttt{terraform init} and \texttt{terraform apply} to create our database.
 
-Now we can run \texttt{terraform init} and \texttt{terraform apply} to create our database. Once this is done we can move on to the next step. For the next step you must choose a path to follow, either EC2 or ECS, only choose one path for the practical, if you have trouble with one path you can always switch to the other. When switching you should destroy the resources you have created so far before starting the new path.
+We have also added a local variable for us to use later.
+Variables in Terraform can be populated via two mechanisms,
+they can be in a variables block which can be overridden,
+or they can be in a locals block which can be used to store values that are used in multiple places.
+
+For the next step you must choose a path to follow,
+either EC2 or ECS,
+if you have trouble with one path you can always switch to the other.
+When switching you should destroy the resources you have created before starting the new path.
 
 We recommend that you start with the ECS path as it is the more modern way of deploying containers and is the path that we will be suggesting for the future but all tasks are also doable using EC2.
 
 \subsection{[Path A] EC2}
 
 \aside{
-  This is not the recommended path but is provided for those who would like to use EC2 instead of ECS. This is also the path that was used in the first run of the course (2022).
+This is not the recommended path but is provided for those who would like to use EC2 instead of ECS.
+Please skip to Section \ref{pathb} for the ECS approach.
 }
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{diagrams/ec2deployment}
 \end{figure}
 
-Congrats you have chosen to go down the EC2 path which builds on what we experienced in the previous practicals. To deploy our application we first need to get the EC2 instance running and install Docker on the instance. We can do this by using the following Terraform code:
+Congratulations! You have chosen to go down the EC2 path which builds on what we experienced in the week 4 practical.
+To deploy our application we first need to get the EC2 instance running and install Docker on the instance.
+We can do this by using the following Terraform code:
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
-  resource "aws_instance" "todo" {
-    ami           = "ami-005f9685cb30f234b" // Amazon Linux 2
+resource "aws_instance" "taskoverflow_instance" {
+    ami           = "ami-005f9685cb30f234b" # Amazon Linux 2
     instance_type = "t2.micro"
-    key_name      = "vockey" // allows us to SSH into the instance using the preconfigured key
+    key_name      = "vockey" # allows SSH into the instance using the preconfigured key
     
-    user_data_replace_on_change = true // If we change user_data this will force the box to be recreated
+    user_data_replace_on_change = true # changing user_data will force recreate
     user_data                   = <<-EOT
-  #!/bin/bash
-  yum update -y
+#!/bin/bash
+yum update -y
     EOT
   
-    security_groups = [aws_security_group.todo.name] // Firewall for the instance
-  }
+    security_groups = [aws_security_group.todo.name] # firewall for the instance
+
+    tags = {
+        Name = "taskoverflow_instance"
+    }
+}
 \end{code}
 
-Compared to the last time we used EC2 instances we have moved the \texttt{user\_data} from a file to being defined in-line and we have made sure to provide the \texttt{key\_name} in case we want to ssh into the deployed instance.
+Compared to the last time we used EC2 instances we have moved the \texttt{user\_data} from a file to being defined in-line and we have made sure to provide the \texttt{key\_name} in case we want to SSH into the deployed instance.
 
-If we ran \texttt{terraform apply} now, our instance would not do anything interesting and we have not defined our security group yet. For the \texttt{user\_data} we need to install Docker and run the container that we have already built. We can do this by changing our \texttt{user\_data}:
+If we ran \texttt{terraform apply} now, our instance would not do anything interesting.
+We need the \texttt{user\_data} to install Docker and start our TaskOverflow image.
+For this, we will need to make the following adjustments to the \texttt{user\_data} field:
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
-  user_data                   = <<-EOT
-  #!/bin/bash
-  yum update -y
-  yum install -y docker
-  service docker start
-  systemctl enable docker
-  usermod -a -G docker ec2-user 
-  docker run --restart always -e SQLALCHEMY_DATABASE_URI=postgresql://${local.database_username}:${local.database_password}@${aws_db_instance.database.address}:${aws_db_instance.database.port}/${aws_db_instance.database.db_name} -p 6400:6400 ${local.image}
+  user_data = <<-EOT
+#!/bin/bash
+yum update -y
+yum install -y docker
+service docker start
+systemctl enable docker
+usermod -a -G docker ec2-user 
+docker run --restart always \
+    -e SQLALCHEMY_DATABASE_URI=postgresql://${local.database_username}:${local.database_password}@${aws_db_instance.taskoverflow_database.address}:${aws_db_instance.taskoverflow_database.port}/${aws_db_instance.taskoverflow_database.db_name} \
+    -p 6400:6400 ${local.image}
   EOT
 \end{code}
 
-The first lines install Docker and start the Docker service and allow the ec2-user to be able to run Docker commands. The last line is where the magic happens by running the container via the Docker cli. To get a refresher about the Docker cli please see the Containers lecture \cite{container-slides} and the \link{Docker documentation}{https://docs.docker.com/}. 
+The first lines install Docker and start the Docker service and allow the ec2-user to be able to run Docker commands.
+The last line is where the magic happens by running the container via the Docker CLI.
+To get a refresher about the Docker CLI please see the Containers lecture \cite{container-slides} and the \link{Docker documentation}{https://docs.docker.com/}. 
 
 \aside{
-  The \texttt{--restart always} flag tells docker to restart the container if it crashes or is stopped. This is useful for our application as it may take a while for the database to be provisioned and we do not want to have to manually restart the container once the database is ready.
+The \texttt{-{}-restart always} flag tells docker to restart the container if it crashes or is stopped.
+This is useful for our application as it may take a while for the database to be provisioned and we do not want to have to manually restart the container once the database is ready.
 }
 
-Now that our instance is ready to go we just need to make sure that it is accessible from the internet. We can do this by creating a security group that allows traffic on port 6400 and attaching it to our instance.
+Now that our instance is ready to go we just need to make sure that it is accessible from the internet.
+We can do this by creating a security group that allows traffic on port 6400 and attaching it to our instance.
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
-  resource "aws_security_group" "todo" {
-    name = "todo"
+resource "aws_security_group" "taskoverflow_instance" {
+    name = "taskoverflow_instance"
     description = "TaskOverflow Security Group"
   
     ingress {
@@ -440,138 +418,22 @@ Now that our instance is ready to go we just need to make sure that it is access
       protocol = "-1"
       cidr_blocks = ["0.0.0.0/0"]
     }
-  }
+}
 \end{code}
 
-Now we can run \texttt{terraform init} and \texttt{terraform apply} to deploy our entire application. Once this is done we can visit the public IP of our instance on port 6400 to see our application running.
+Now we can run \texttt{terraform init} and \texttt{terraform apply} to deploy our application.
+Once this is done we can visit the public IP of our instance on port 6400 to see our application running.
 
-\begin{code}[language=terraform,numbers=none]{}
-  output "url" {
-    value = "http://${aws_instance.todo.public_ip}:6400/"
-  }
+\begin{code}[language=terraform,numbers=none]{main.tf}
+output "url" {
+    value = "http://${aws_instance.taskoverflow_instance.public_ip}:6400/"
+}
 \end{code}
 
 You should be presented with a very lightweight todo application called TaskOverflow.
 
-\subsubsection{Finished Terraform}
-
-The below is the full terraform we built in this path.
-
-\begin{code}[language=terraform,numbers=none]{main.tf}
-  terraform {
-    required_providers {
-        aws = {
-            source  = "hashicorp/aws"
-            version = "~> 4.0"
-        }
-    }
-}
-
-provider "aws" {
-    region = "us-east-1"
-    shared_credentials_files = ["./credentials"]
-    default_tags {
-        tags = {
-            Course       = "CSSE6400"
-            Name         = "TaskOverflow"
-            Automation   = "Terraform"
-        }
-    }
-}
-
-locals {
-    image = "ghcr.io/csse6400/taskoverflow:latest"
-    database_username = "administrator"
-    database_password = "VerySecurePasswordByYourBoiEvan"
-}
-
-resource "aws_db_instance" "database" {
-  allocated_storage      = 20
-  max_allocated_storage  = 1000
-  engine                 = "postgres"
-  engine_version         = "14"
-  instance_class         = "db.t4g.micro"
-  db_name                = "todo"
-  username               = local.database_username
-  password               = local.database_password
-  parameter_group_name   = "default.postgres14"
-  skip_final_snapshot    = true
-  vpc_security_group_ids = [aws_security_group.database.id]
-  publicly_accessible    = true
-}
-
-resource "aws_security_group" "database" {
-  name        = "todo-database"
-  description = "Allow inbound Postgres traffic"
-
-  ingress {
-    from_port        = 5432
-    to_port          = 5432
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-}
-
-resource "aws_instance" "todo" {
-  ami           = "ami-005f9685cb30f234b"
-  instance_type = "t2.micro"
-  key_name      = "vockey"
-  
-  user_data_replace_on_change = true
-  user_data                   = <<-EOT
-#!/bin/bash
-yum update -y
-yum install -y docker
-service docker start
-systemctl enable docker
-usermod -a -G docker ec2-user 
-docker run --restart always -e SQLALCHEMY_DATABASE_URI=postgresql://${local.database_username}:${local.database_password}@${aws_db_instance.database.address}:${aws_db_instance.database.port}/${aws_db_instance.database.db_name} -p 6400:6400 ${local.image}
-  EOT
-
-  security_groups = [aws_security_group.todo.name]
-}
-
-resource "aws_security_group" "todo" {
-  name = "todo"
-  description = "TaskOverflow Security Group"
-
-  ingress {
-    from_port = 6400
-    to_port = 6400
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-output "url" {
-  value = "http://${aws_instance.todo.public_ip}:6400/"
-}
-\end{code}
-
-
 \subsection{[Path B] ECS}
+\label{pathb}
 
 \aside{
   This is the recommended path for the course and is the path that we will be suggesting for the future.
@@ -579,30 +441,37 @@ output "url" {
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{diagrams/ecsdeployment}
+  \todo{Can we get higher resolution?}
 \end{figure}
 
-Congrats you have choosen to go down the ECS path which mimics the same environment that you have via Docker Compose but as a service on AWS. This path is new for the course this year so please let your tutors know of any issues you have.
+Congratulations! You have choosen to go down the ECS path which mimics a similar environment as Docker Compose but as an AWS service.
+This path is new for the course this year so please let your tutors know of any issues you have.
 
-To start off we need to get some information from our current AWS environment so that we can use it later. Add the below to fetch the IAM role known as LabRole which is a super user in the Lab environments which can do everything you can do through the UI. We will also be fetching the default VPC and the private subnets within that VPC because we need to set-up some networking for our ECS cluster.
+To start off we need to get some information from our current AWS environment so that we can use it later.
+Add the below to fetch the IAM role known as LabRole which is a super user in the Learner Lab environments which can do everything you can do through the UI.
+We will also be fetching the default VPC and the private subnets within that VPC as they are required for the ECS network configuration.
 
-\begin{code}[language=terraform,numbers=none,escapechar=!]{}
-  data "aws_iam_role" "lab" {
+\begin{code}[language=terraform,numbers=none]{}
+data "aws_iam_role" "lab" {
     name = "LabRole"
-  }
+}
 
-  data "aws_vpc" "default" {
+data "aws_vpc" "default" {
     default = true
-  }
+}
 
-  data "aws_subnets" "private" {
+data "aws_subnets" "private" {
     filter {
-      name   = "vpc-id"
-      values = [data.aws_vpc.default.id]
+        name   = "vpc-id"
+        values = [data.aws_vpc.default.id]
     }
-  }
+}
 \end{code}
 
-The way in Terraform that we can get external information into the environment is by using data sources. These are just like resources but they are not created or destroyed see the below to see the syntactual differences.
+In Terraform, the way to retrieve external information is data sources.
+These are functionally like resources but they are not created or destroyed,
+instead they are populated with attributes from the current state.
+See the below for the minor syntactic difference.
 
 \begin{code}[language=terraform,numbers=none,escapechar=!]{}
 !\colorbox{yellow}{data}! "aws_iam_role" "lab" {
@@ -613,10 +482,32 @@ The way in Terraform that we can get external information into the environment i
   ...
 }
 \end{code}
+\end{lrbox}
+
+
+Now that we have access to the information required,
+we can create the ECS cluster to host our application.
+
+The first step is to create the ECS cluster
+which is just a logical grouping of any images.
+All that is required is a name for the new grouping.
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
-  resource "aws_ecs_task_definition" "todo" {
-    family                   = "todo"
+resource "aws_ecs_cluster" "taskoverflow" {
+    name = "taskoverflow"
+}
+\end{code}
+
+On it's own this cluster is not particularly useful.
+We need to create a task definition which is a description of the container that we want to run.
+This is where we will define the image that we want to run,
+the environment variables,
+the port mappings, etc.
+This is similar to a server entry in Docker Compose.
+
+\begin{code}[language=terraform,numbers=none]{main.tf}
+resource "aws_ecs_task_definition" "taskoverflow" {
+    family                   = "taskoverflow"
     network_mode             = "awsvpc"
     requires_compatibilities = ["FARGATE"]
     cpu                      = 1024
@@ -655,35 +546,51 @@ The way in Terraform that we can get external information into the environment i
     }
   ]
   DEFINITION
-  }
+}
 \end{code}
 
+\begin{description}
+    \item[family] A family is similar to the name of the task but it is a name that persists through multiple revisions of the task.
+    \item[network\_mode] This is the network mode that the container will run in, we want to run on regular AWS VPC infrastructure.
+    \item[requires\_compatibilities] This is the type of container that we want to run. This can be fargate, EC2, or external.
+    \item[cpu] The amount of CPU units that the container will be allocated. 1024 is equivalen to one vCPU.
+    \item[memory] The amount of memory that the container will be allocated, here we've chosen 2GB.
+    \item[execution\_role\_arn] The IAM role that the container will run as.
+        Importantly, we have re-used the lab role we previously retrieved.
+        This gives the instance full admin permission for our lab environment.
+    \item[container\_definitions] This is the definition of the container, it should look very familiar to Docker Compose.
+        The only additional feature here is the \texttt{logConfiguration}.
+        This configures our container to write logs to AWS CloudWatch so that we can see if anything has gone wrong.
+\end{description}
+
+Now we have a description of our container as a task.
+We need a service to run the container on.
+This is functionally similar to an auto-scaling group from the lecture.
+We specify how many instances of the described container we want and it will provision them.
+We also specify which ECS cluster and AWS subnets to run the containers within.
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
-  resource "aws_ecs_cluster" "taskoverflow" {
-    name = "taskoverflow"
-  }
-\end{code}
-
-\begin{code}[language=terraform,numbers=none]{main.tf}
-  resource "aws_ecs_service" "taskoverflow" {
+resource "aws_ecs_service" "taskoverflow" {
     name            = "taskoverflow"
     cluster         = aws_ecs_cluster.taskoverflow.id
-    task_definition = aws_ecs_task_definition.todo.arn
+    task_definition = aws_ecs_task_definition.taskoverflow.arn
     desired_count   = 1
     launch_type     = "FARGATE"
   
     network_configuration {
       subnets             = data.aws_subnets.private.ids
-      security_groups     = [aws_security_group.todo.id]
+      security_groups     = [aws_security_group.taskoverflow.id]
       assign_public_ip    = true
     }
-  }
+}
 \end{code}
 
+In the above we refer to a non-existent security group.
+As always, to be able to access our instances over the network we need to add a security group policy to enable it.
+
 \begin{code}[language=terraform,numbers=none]{main.tf}
-  resource "aws_security_group" "todo" {
-    name = "todo"
+resource "aws_security_group" "taskoverflow" {
+    name = "taskoverflow"
     description = "TaskOverflow Security Group"
   
     ingress {
@@ -706,179 +613,16 @@ The way in Terraform that we can get external information into the environment i
       protocol = "-1"
       cidr_blocks = ["0.0.0.0/0"]
     }
-  }
-\end{code}
-
-\subsubsection{Finished Terraform}
-
-\begin{code}[language=terraform,numbers=none]{main.tf}
-  terraform {
-    required_providers {
-        aws = {
-            source  = "hashicorp/aws"
-            version = "~> 4.0"
-        }
-    }
-}
-
-provider "aws" {
-    region = "us-east-1"
-    shared_credentials_files = ["./credentials"]
-    default_tags {
-        tags = {
-            Course       = "CSSE6400"
-            Name         = "TaskOverflow"
-            Automation   = "Terraform"
-        }
-    }
-}
-
-locals {
-    image = "ghcr.io/csse6400/taskoverflow:latest"
-    database_username = "administrator"
-    database_password = "VerySecurePasswordByYourBoiEvan"
-}
-
-resource "aws_db_instance" "database" {
-  allocated_storage      = 20
-  max_allocated_storage  = 1000
-  engine                 = "postgres"
-  engine_version         = "14"
-  instance_class         = "db.t4g.micro"
-  db_name                = "todo"
-  username               = local.database_username
-  password               = local.database_password
-  parameter_group_name   = "default.postgres14"
-  skip_final_snapshot    = true
-  vpc_security_group_ids = [aws_security_group.database.id]
-  publicly_accessible    = true
-}
-
-resource "aws_security_group" "database" {
-  name        = "todo-database"
-  description = "Allow inbound Postgres traffic"
-
-  ingress {
-    from_port        = 5432
-    to_port          = 5432
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-}
-
-data "aws_iam_role" "lab" {
-  name = "LabRole"
-}
-
-resource "aws_ecs_cluster" "taskoverflow" {
-  name = "taskoverflow"
-}
-
-resource "aws_ecs_task_definition" "todo" {
-  family                   = "todo"
-  network_mode             = "awsvpc"
-  requires_compatibilities = ["FARGATE"]
-  cpu                      = 1024
-  memory                   = 2048
-  execution_role_arn       = data.aws_iam_role.lab.arn
-
-  container_definitions = <<DEFINITION
-[
-  {
-    "image": "${local.image}",
-    "cpu": 1024,
-    "memory": 2048,
-    "name": "todo",
-    "networkMode": "awsvpc",
-    "portMappings": [
-      {
-        "containerPort": 6400,
-        "hostPort": 6400
-      }
-    ],
-    "environment": [
-      {
-        "name": "SQLALCHEMY_DATABASE_URI",
-        "value": "postgresql://${local.database_username}:${local.database_password}@${aws_db_instance.database.address}:${aws_db_instance.database.port}/${aws_db_instance.database.db_name}"
-      }
-    ],
-    "logConfiguration": {
-      "logDriver": "awslogs",
-      "options": {
-        "awslogs-group": "/taskoverflow/todo",
-        "awslogs-region": "us-east-1",
-        "awslogs-stream-prefix": "ecs",
-        "awslogs-create-group": "true"
-      }
-    }
-  }
-]
-DEFINITION
-}
-
-data "aws_vpc" "default" {
-    default = true
-}
-
-data "aws_subnets" "private" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
-  }
-}
-
-resource "aws_ecs_service" "taskoverflow" {
-  name            = "taskoverflow"
-  cluster         = aws_ecs_cluster.taskoverflow.id
-  task_definition = aws_ecs_task_definition.todo.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
-
-  network_configuration {
-    subnets             = data.aws_subnets.private.ids
-    security_groups     = [aws_security_group.todo.id]
-    assign_public_ip    = true
-  }
-}
-
-resource "aws_security_group" "todo" {
-  name = "todo"
-  description = "TaskOverflow Security Group"
-
-  ingress {
-    from_port = 6400
-    to_port = 6400
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
 \end{code}
+
+Finally, if we run the appropriate \texttt{terraform init} and \texttt{terraform apply} commands,
+it should provision an ECS cluster with a service that will then create one ECS container based on our task description.
 
 \subsection{[Path C] EKS / K8S}
 
-This path is not described in the course yet, but we recommend that if you liked the course to have a look at \link{Kubernetes}{https://kubernetes.io/} as it is widely used in industry.
+This path is not described in the course yet,
+but we recommend that if you liked the course to have a look at \link{Kubernetes}{https://kubernetes.io/} as it is widely used in industry.
 
 \bibliographystyle{ieeetr}
 \bibliography{books,ours}
