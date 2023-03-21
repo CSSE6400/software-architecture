@@ -1581,26 +1581,22 @@ class="ectt-1200">}</span></span>
                                                                                                     
 <!--l. 446--><p class="noindent" ><img 
 src="diagrams/ecsdeployment.png" alt="PIC"  
-width="525" height="525"  />  </p> <div class="tcolorbox tcolorbox" id="tcolobox-9">    
-<div class="tcolorbox-title">
-</div> 
-<div class="tcolorbox-content"><!--l. 447--><p class="noindent" >TODO: Can we get higher resolution? </p> 
-</div> 
-</div>
+width="525" height="525"  />
                                                                                                     
                                                                                                     
+</p>
    </div><hr class="endfigure" />
-<!--l. 450--><p class="indent" >   Congratulations! You have choosen to go down the ECS path which mimics a similar environment as Docker
+<!--l. 449--><p class="indent" >   Congratulations! You have choosen to go down the ECS path which mimics a similar environment as Docker
 Compose but as an AWS service. This path is new for the course this year so please let your tutors know of any
 issues you have.
-</p><!--l. 453--><p class="indent" >   To start off we need to get some information from our current AWS environment so that we
+</p><!--l. 452--><p class="indent" >   To start off we need to get some information from our current AWS environment so that we
 can use it later. Add the below to fetch the IAM role known as LabRole which is a super user in the
 Learner Lab environments which can do everything you can do through the UI. We will also be fetching
 the default VPC and the private subnets within that VPC as they are required for the ECS network
 configuration.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 457--><pre class="listings" id="listing-11"><span class="label"><a 
+<!--l. 456--><pre class="listings" id="listing-11"><span class="label"><a 
  id="x1-8001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">data</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -1712,12 +1708,12 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-8015r15"></a></span></pre>
    </div>
-<!--l. 474--><p class="indent" >   In Terraform, the way to retrieve external information is data sources. These are functionally like resources but
+<!--l. 473--><p class="indent" >   In Terraform, the way to retrieve external information is data sources. These are functionally like resources but
 they are not created or destroyed, instead they are populated with attributes from the current state. See the
 below for the minor syntactic difference.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 479--><pre class="listings" id="listing-12"><span class="label"><a 
+<!--l. 478--><pre class="listings" id="listing-12"><span class="label"><a 
  id="x1-8016r1"></a></span><span 
 class="colorbox" id="colorbox1"><span 
 class="ectt-1200">data</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
@@ -1759,13 +1755,13 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-8023r8"></a></span></pre>
    </div>
-<!--l. 490--><p class="indent" >   Now that we have access to the information required, we can create the ECS cluster to host our
+<!--l. 489--><p class="indent" >   Now that we have access to the information required, we can create the ECS cluster to host our
 application.
-</p><!--l. 493--><p class="indent" >   The first step is to create the ECS cluster which is just a logical grouping of any images. All that is required is a
+</p><!--l. 492--><p class="indent" >   The first step is to create the ECS cluster which is just a logical grouping of any images. All that is required is a
 name for the new grouping.
-</p><!--l. 497--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 497--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 497--><pre class="listings" id="listing-13"><span class="label"><a 
+</p><!--l. 496--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 496--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 496--><pre class="listings" id="listing-13"><span class="label"><a 
  id="x1-8024r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -1792,22 +1788,22 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-8027r4"></a></span></pre>
    </div>
-<!--l. 503--><p class="indent" >   On it&#8217;s own this cluster is not particularly useful. We need to create a task definition which is a
+<!--l. 502--><p class="indent" >   On it&#8217;s own this cluster is not particularly useful. We need to create a task definition which is a
 description of the container that we want to run. This is where we will define the image that we want to
 run, the environment variables, the port mappings, etc. This is similar to a server entry in Docker
 Compose.
 </p>
-   <div class="tcolorbox tcolorbox" id="tcolobox-10">    
+   <div class="tcolorbox tcolorbox" id="tcolobox-9">    
 <div class="tcolorbox-title">
-<!--l. 513--><p class="indent" >   Warning</p></div> 
-<div class="tcolorbox-content"><!--l. 513--><p class="noindent" >The  <span 
+<!--l. 512--><p class="indent" >   Warning</p></div> 
+<div class="tcolorbox-content"><!--l. 512--><p class="noindent" >The  <span 
 class="ectt-1200">«DEFINITION </span>line  cannot  have  a  trailing  space.  Ensure  that  one  has  not  been  erroneously
 inserted.  </p> 
 </div> 
 </div>
-<!--l. 515--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 515--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 515--><pre class="listings" id="listing-14"><span class="label"><a 
+<!--l. 514--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 514--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 514--><pre class="listings" id="listing-14"><span class="label"><a 
  id="x1-8028r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -2302,62 +2298,62 @@ class="ectt-1200">}</span></span>
  id="x1-8069r42"></a></span></pre>
    </div>
       <dl class="description"><dt class="description">
-      <!--l. 560--><p class="noindent" >
+      <!--l. 559--><p class="noindent" >
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">family</span> </p></dt><dd 
 class="description">
-      <!--l. 560--><p class="noindent" >A family is similar to the name of the task but it is a name that persists through multiple revisions of
+      <!--l. 559--><p class="noindent" >A family is similar to the name of the task but it is a name that persists through multiple revisions of
       the task.
                                                                                                     
                                                                                                     
       </p></dd><dt class="description">
-      <!--l. 561--><p class="noindent" >
+      <!--l. 560--><p class="noindent" >
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">network_mode</span> </p></dt><dd 
 class="description">
-      <!--l. 561--><p class="noindent" >This  is  the  network  mode  that  the  container  will  run  in,  we  want  to  run  on  regular  AWS  VPC
+      <!--l. 560--><p class="noindent" >This  is  the  network  mode  that  the  container  will  run  in,  we  want  to  run  on  regular  AWS  VPC
       infrastructure.
       </p></dd><dt class="description">
-      <!--l. 562--><p class="noindent" >
+      <!--l. 561--><p class="noindent" >
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">requires_compatibilities</span> </p></dt><dd 
 class="description">
-      <!--l. 562--><p class="noindent" >This is the type of container that we want to run. This can be fargate, EC2, or external.
+      <!--l. 561--><p class="noindent" >This is the type of container that we want to run. This can be fargate, EC2, or external.
       </p></dd><dt class="description">
-      <!--l. 563--><p class="noindent" >
+      <!--l. 562--><p class="noindent" >
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">cpu</span> </p></dt><dd 
 class="description">
-      <!--l. 563--><p class="noindent" >The amount of CPU units that the container will be allocated. 1024 is equivalen to one vCPU.
+      <!--l. 562--><p class="noindent" >The amount of CPU units that the container will be allocated. 1024 is equivalen to one vCPU.
       </p></dd><dt class="description">
-      <!--l. 564--><p class="noindent" >
+      <!--l. 563--><p class="noindent" >
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">memory</span> </p></dt><dd 
 class="description">
-      <!--l. 564--><p class="noindent" >The amount of memory that the container will be allocated, here we&#8217;ve chosen 2GB.
+      <!--l. 563--><p class="noindent" >The amount of memory that the container will be allocated, here we&#8217;ve chosen 2GB.
       </p></dd><dt class="description">
-      <!--l. 565--><p class="noindent" >
+      <!--l. 564--><p class="noindent" >
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">execution_role_arn</span> </p></dt><dd 
 class="description">
-      <!--l. 565--><p class="noindent" >The IAM role that the container will run as. Importantly, we have re-used the lab role we previously
+      <!--l. 564--><p class="noindent" >The IAM role that the container will run as. Importantly, we have re-used the lab role we previously
       retrieved. This gives the instance full admin permission for our lab environment.
       </p></dd><dt class="description">
-      <!--l. 568--><p class="noindent" >
+      <!--l. 567--><p class="noindent" >
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">container_definitions</span> </p></dt><dd 
 class="description">
-      <!--l. 568--><p class="noindent" >This  is  the  definition  of  the  container,  it  should  look  very  familiar  to  Docker  Compose.  The  only
+      <!--l. 567--><p class="noindent" >This  is  the  definition  of  the  container,  it  should  look  very  familiar  to  Docker  Compose.  The  only
       additional feature here is the <span 
 class="ectt-1200">logConfiguration</span>. This configures our container to write logs to AWS
       CloudWatch so that we can see if anything has gone wrong.</p></dd></dl>
-<!--l. 573--><p class="indent" >   Now we have a description of our container as a task. We need a service to run the container on. This is
+<!--l. 572--><p class="indent" >   Now we have a description of our container as a task. We need a service to run the container on. This is
 functionally similar to an auto-scaling group from the lecture. We specify how many instances of the described
 container we want and it will provision them. We also specify which ECS cluster and AWS subnets to run the
 containers within.
-</p><!--l. 579--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 579--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 579--><pre class="listings" id="listing-15"><span class="label"><a 
+</p><!--l. 578--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 578--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 578--><pre class="listings" id="listing-15"><span class="label"><a 
  id="x1-8070r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -2480,11 +2476,11 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-8083r14"></a></span></pre>
    </div>
-<!--l. 595--><p class="indent" >   In the above we refer to a non-existent security group. As always, to be able to access our instances over the
+<!--l. 594--><p class="indent" >   In the above we refer to a non-existent security group. As always, to be able to access our instances over the
 network we need to add a security group policy to enable it.
-</p><!--l. 598--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 598--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 598--><pre class="listings" id="listing-16"><span class="label"><a 
+</p><!--l. 597--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 597--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 597--><pre class="listings" id="listing-16"><span class="label"><a 
  id="x1-8084r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -2696,21 +2692,21 @@ class="ectt-1200">}</span></span>
                                                                                                     
                                                                                                     
    </div>
-<!--l. 626--><p class="indent" >   Finally, if we run the appropriate <span 
+<!--l. 625--><p class="indent" >   Finally, if we run the appropriate <span 
 class="ectt-1200">terraform init </span>and <span 
 class="ectt-1200">terraform apply </span>commands, it should
 provision an ECS cluster with a service that will then create one ECS container based on our task
 description.
-</p><!--l. 629--><p class="indent" >   Note that we are doing something a bit weird in this deployment. Normally ECS expects multiple instances of
+</p><!--l. 628--><p class="indent" >   Note that we are doing something a bit weird in this deployment. Normally ECS expects multiple instances of
 containers, so it naturally expects a load balancer. This makes it difficult for us to discover the public IP of our
 single instance using Terraform. Instead, you will need to use the AWS Console to find the public IP
 address.
-</p><!--l. 635--><p class="indent" >   This is an opportunity for you to explore the ECS interface and find the task, within the service, within the
+</p><!--l. 634--><p class="indent" >   This is an opportunity for you to explore the ECS interface and find the task, within the service, within the
 cluster that we have provisioned.
 </p>
    <h4 class="subsectionHead"><span class="titlemark">5.4    </span> <a 
  id="x1-90005.4"></a>[Path C] EKS / K8S</h4>
-<!--l. 639--><p class="noindent" >This path is not described in the course yet, but we recommend that if you liked the course to have a look at
+<!--l. 638--><p class="noindent" >This path is not described in the course yet, but we recommend that if you liked the course to have a look at
 <a 
 href="https://kubernetes.io/" >Kubernetes</a><span class="footnote-mark"><a 
 href="#fn4x0" id="fn4x0-bk"><sup class="textsuperscript">4</sup></a></span><a 
@@ -2754,7 +2750,7 @@ href="#fn3x0-bk" id="fn3x0"><sup class="textsuperscript">3</sup></a></span><a
 href="https://docs.docker.com/" class="url" ><span 
 class="ectt-1000">https://docs.docker.com/</span></a></p><a 
  id="x1-9002x5.4"></a>
-<!--l. 640--><p class="indent" >   <span class="footnote-mark"><a 
+<!--l. 639--><p class="indent" >   <span class="footnote-mark"><a 
 href="#fn4x0-bk" id="fn4x0"><sup class="textsuperscript">4</sup></a></span><a 
 href="https://kubernetes.io/" class="url" ><span 
 class="ectt-1000">https://kubernetes.io/</span></a></p>                                                                      </div>
