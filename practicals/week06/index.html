@@ -1,4 +1,4 @@
-Last Updated on 2023/03/25      
+Last Updated on 2023/03/26      
 
 <?xml version="1.0" encoding="iso-8859-1" ?> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
@@ -6,7 +6,7 @@ Last Updated on 2023/03/25
 <!--http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd-->  
 <html xmlns="http://www.w3.org/1999/xhtml"  
 > 
-<head> <title>Empty Practical</title> 
+<head> <title>Scaling Stateless Components</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> 
 <meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
 <meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
@@ -22,285 +22,340 @@ dl dd {text-align: left}</style>
    <div class="maketitle"><a 
  id="Q1-1-1"></a>
 _________________________________________________________________________________________________
-<h2 class="titleHead">Empty Practical</h2>                                                                              Software Architecture
-   <div class="date" >February 13, 2023</div>                                                                                                                     <div class="author" >Evan Hughes &amp; Brae
+<h2 class="titleHead">Scaling Stateless Components</h2>                                                  Software Architecture
+   <div class="date" >March 29, 2023</div>                                                                                                                         <div class="author" >Evan Hughes &amp; Brae
 Webb</div>
 ______________________________________________________________________________________________
    </div>
-   <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
- id="x1-10001"></a>This Week</h3>
-<!--l. 18--><p class="noindent" >This week our goal is to: </p>
-      <ul class="itemize1">
-      <li class="itemize">
-      <!--l. 20--><p class="noindent" >Deploy our TaskOverflow Application with a Load Balancer.
-      </p></li>
-      <li class="itemize">
-      <!--l. 21--><p class="noindent" >Deploy a Autoscaling architecture on EC2.
-      </p></li>
-      <li class="itemize">
-      <!--l. 22--><p class="noindent" >Deploy a Autoscaling architecture on ECS.</p></li></ul>
-<!--l. 25--><p class="noindent" >
-</p>
-   <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
- id="x1-20002"></a>Load Balancers</h3>
-   <div class="tcolorbox tcolorbox" id="tcolobox-1">    
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 27--><p class="noindent" >TODO: General overview of the topic </p> 
-</div> 
-</div>
-<!--l. 29--><p class="noindent" >
-</p>
-   <h4 class="subsectionHead"><span class="titlemark">2.1    </span> <a 
- id="x1-30002.1"></a>Routing Algorithms</h4>
-<!--l. 31--><p class="noindent" >
-      </p><dl class="description"><dt class="description">
-      <!--l. 32--><p class="noindent" >
-<span 
-class="Cabin-Bold-tlf-t1-x-x-120">Round Robin</span> </p></dt><dd 
-class="description">
-      <!--l. 32--><p class="noindent" >This method allocates to the next available server no matter who the last request was sent to. Even
-      though it may feel too simple it in practice works very effectively.
-                                                                                                    
-                                                                                                    
-      </p></dd><dt class="description">
-      <!--l. 33--><p class="noindent" >
-<span 
-class="Cabin-Bold-tlf-t1-x-x-120">Least Connections</span> </p></dt><dd 
-class="description">
-      <!--l. 33--><p class="noindent" >This method the load balancer keeps track of how many connections has been allocated to each
-      node. It then sends the next request to the node with the least connections.
-      </p></dd><dt class="description">
-      <!--l. 34--><p class="noindent" >
-<span 
-class="Cabin-Bold-tlf-t1-x-x-120">Weighted Least Connections</span> </p></dt><dd 
-class="description">
-      <!--l. 34--><p class="noindent" >Similar to Least Connections but has a weight associated with each node. This allows us to preference
-      certain nodes over others. An example of where this could be used is if we have a new node that we
-      have added which is less powerful than the other nodes and we want to give it less load.
-      </p></dd><dt class="description">
-      <!--l. 35--><p class="noindent" >
-<span 
-class="Cabin-Bold-tlf-t1-x-x-120">Consistent Hashing</span> </p></dt><dd 
-class="description">
-      <!--l. 35--><p class="noindent" >In some cases we may want a user to continously be routed to a specific node. This is useful for
-      multiple transactions that need to be done in a consistent order or if the data is stored/cached on
-      the node. This can be done by hashing the information in the request payload or headers and then
-      rout the request to the node that looks after that hash group.
-      </p></dd><dt class="description">
-      <!--l. 36--><p class="noindent" >
-<span 
-class="Cabin-Bold-tlf-t1-x-x-120">Others...</span> </p></dt><dd 
-class="description">
-      <!--l. 36--><p class="noindent" >Many more algorithms exist wether generic or bespoke for an application.</p></dd></dl>
-<!--l. 39--><p class="noindent" >
-</p>
-   <h4 class="subsectionHead"><span class="titlemark">2.2    </span> <a 
- id="x1-40002.2"></a>Health Checks</h4>
-<!--l. 41--><p class="noindent" >An important aspect of load balancing is to ensure that the nodes that we route to are actually able to service the
-request. A strong health check can save or break your service depending on how you plan it, consider the two
-following examples which have happened within ITS:<br 
-class="newline" />
-</p><!--l. 43--><p class="indent" >   <span 
-class="Cabin-Bold-tlf-t1-x-x-120">Example 1: </span>At the start of my career (Evan Hughes) I setup a multi-node Directory Server at UQ under
-the hostname of ldap.uq.edu.au, which is effectively a NoSQL database implementing the LDAP
-protocol, widely used for authentication services. This service is one that underpins UQ Authenticate
-which provides Single Sign-On for UQ. The service is setup with a load balancer that checks that port
-389 is open and available to the load balancer. This works for some time but an outage accurs in
-the data-center such that the disk of the OS running the service has dissapeared but the service
-is still running in memory. Even though upstream systems of the LDAP service have switched to
-the healthy data center they still talk to the dead nodes of LDAP due to the health check being too
-weak.<br 
-class="newline" />
-</p>
-   <div class="tcolorbox tcolorbox" id="tcolobox-2">    
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 45--><p class="noindent" >TODO: C4 Diagram of the architecture </p> 
-</div> 
-</div>
-                                                                                                    
-                                                                                                    
-<!--l. 47--><p class="indent" >   <span 
-class="Cabin-Bold-tlf-t1-x-x-120">Example 2: </span>During the rollout of a new prompt for UQ Authenticate which required users to go to My.UQ to
-provide verified contact details the Blackboard (learn.uq.edu.au) service went completly offline. The
-health check for Blackboard at the time actually did a full authentication as a test user to ensure
-everything was functioning as expected. Once this user was enrolled into the new campaign the
-health checks started going offline and within a matter of minutes the entire pool of nodes were
-shutdown. This health check was too wide and was not specific enough to the service that it was
-checking.<br 
-class="newline" />
-</p>
-   <div class="tcolorbox tcolorbox" id="tcolobox-3">    
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 49--><p class="noindent" >TODO: C4 diagram of the architecture </p> 
-</div> 
-</div>
-<!--l. 51--><p class="indent" >   A lot of services will provide a health check endpoint or a metrics endpoint which can help the engineer setup
-a proper level of health check. We want a health check that is specific enough for the service that it is checking but
-not so specific that it is too brittle. For the TaskOverflow application that we have been building so far, a
-reasonable health check would be that the health endpoint ensures the database is available and that the
-application is able to connect to it.
-</p><!--l. 53--><p class="noindent" >
-</p>
-   <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
- id="x1-50003"></a>Load Balancers in AWS</h3>
-<!--l. 55--><p class="noindent" >Not all load balancers are alike, some usecases can require inspection into the packets being transmitted to make
-the correct choice of where it should go. In AWS we have two types of load balancers that we are going to
-cover.
-</p><!--l. 57--><p class="indent" >
-      </p><dl class="description"><dt class="description">
-      <!--l. 58--><p class="noindent" >
-<span 
-class="Cabin-Bold-tlf-t1-x-x-120">Application Load Balancer</span> </p></dt><dd 
-class="description">
-      <!--l. 58--><p class="noindent" >This is a layer 7 load balancer that can route based on the content of the request. This is useful for
-      services that are using HTTP, HTTPS or any other supported protocol.
-      </p></dd><dt class="description">
-      <!--l. 59--><p class="noindent" >
-<span 
-class="Cabin-Bold-tlf-t1-x-x-120">Network Load Balancer</span> </p></dt><dd 
-class="description">
-      <!--l. 59--><p class="noindent" >This is a layer 4 load balancer that can route based on the source and destination IP addresses and
-      ports. This is useful for services that are using TCP or UDP.</p></dd></dl>
-<!--l. 62--><p class="indent" >   The design of the load balancer is described in the diagram below with three destinct components.
-</p><!--l. 64--><p class="indent" >
-      </p><dl class="description"><dt class="description">
-      <!--l. 65--><p class="noindent" >
-<span 
-class="Cabin-Bold-tlf-t1-x-x-120">Listeners</span> </p></dt><dd 
-class="description">
-      <!--l. 65--><p class="noindent" >Listeners are the doors on the load balancer that allow traffic to enter. Each listener has a port and
-      a protocol associated with it. For example we can have a listener with a port of 80 and a protocol of
-      HTTP.
-                                                                                                    
-                                                                                                    
-      </p></dd><dt class="description">
-      <!--l. 66--><p class="noindent" >
-<span 
-class="Cabin-Bold-tlf-t1-x-x-120">Target Groups</span> </p></dt><dd 
-class="description">
-      <!--l. 66--><p class="noindent" >Target groups are the groups of nodes that the load balancer can route to. Each target group also has
-      a protocol and a port associated with it. This allows us to switch ports on the way through the load
-      balancer if the targets are using a different port to what we wish to expose.
-      </p></dd><dt class="description">
-      <!--l. 67--><p class="noindent" >
-<span 
-class="Cabin-Bold-tlf-t1-x-x-120">Load Balancer</span> </p></dt><dd 
-class="description">
-      <!--l. 67--><p class="noindent" >The load balancer is the actual load balancer that routes the traffic to the target groups based on
-      rules that we setup. The load balancer has a DNS name that we can use to route traffic to it. The load
-      balancer also has a security group that we can use to control what traffic can enter the load balancer.</p></dd></dl>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 71--><p class="noindent" ><img 
+<div class="center" 
+>
+<!--l. 18--><p class="noindent" >
+</p><!--l. 19--><p class="noindent" ><img 
+src="images/scaling-out.png" alt="PIC"  
+width="28" height="28"  /></p></div>
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+   <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
+ id="x1-10001"></a>This Week</h3>
+<!--l. 24--><p class="noindent" >Our goal is to scale out the stateless component of our TaskOverflow application across multiple compute
+instances. Specifically we will need to: </p>
+      <ul class="itemize1">
+      <li class="itemize">
+      <!--l. 27--><p class="noindent" >Route traffic to our deployed TaskOverflow application with a load balancer.
+      </p></li>
+      <li class="itemize">
+      <!--l. 28--><p class="noindent" >Scale out TaskOverflow instances with autoscaling.
+      </p></li>
+      <li class="itemize">
+      <!--l. 29--><p class="noindent" >Check the status of our instances with a healthcheck.
+      </p></li>
+      <li class="itemize">
+      <!--l. 30--><p class="noindent" >Dynamically scale our application based on load.</p></li></ul>
+<!--l. 33--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
+ id="x1-20002"></a>Load Balancers</h3>
+<!--l. 35--><p class="noindent" >Load balancing distributes a load over a set of resources. For example, balacing network traffic across several
+servers. Load balancing is crucial to the scalability of modern systems, as often, one physical device can not
+process the large amount network traffic for (e.g.) a large website.
+</p><!--l. 39--><p class="indent" >   A service which load balances, is called a <span 
+class="Cabin-Bold-tlf-t1-x-x-120">Load Balancer</span>.
+</p><!--l. 42--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">2.1    </span> <a 
+ id="x1-30002.1"></a>Routing Algorithms</h4>
+<!--l. 44--><p class="noindent" >A load balancer can implement many techinques to select which resource to route incoming requests toward,
+these techniques are the load balancer&#8217;s routing algorithm.
+</p><!--l. 46--><p class="indent" >   Below lists several common routing techniques. There are many other generic and bespoke routing algorithms
+that are not listed.
+</p><!--l. 49--><p class="indent" >
+      </p><dl class="description"><dt class="description">
+      <!--l. 50--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">Round Robin</span> </p></dt><dd 
+class="description">
+      <!--l. 50--><p class="noindent" >allocates requests to the next available server regardless of where the last request was sent. It is
+      simple, and in practice, works effectively.
+                                                                                                    
+                                                                                                    
+      </p></dd><dt class="description">
+      <!--l. 52--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">Least Connections</span> </p></dt><dd 
+class="description">
+      <!--l. 52--><p class="noindent" >sends  the  next  request  to  the  node  with  the  fewest  current  connections.  The  load  balancer  is
+      responsible for tracking how many connections exist to each node.
+      </p></dd><dt class="description">
+      <!--l. 54--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">Weighted Least Connections</span> </p></dt><dd 
+class="description">
+      <!--l. 54--><p class="noindent" >sends the next request to the node with the least weighted connections. This is similar to the above
+      least connections method, however, each node has an associated weight. This allows certain nodes
+      to be preferred over others. This is useful if we have an inequal distribution of compute power. We
+      would want to give smaller nodes a reduced load in comparison to other more powerful nodes.
+      </p></dd><dt class="description">
+      <!--l. 58--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">Consistent Hashing</span> </p></dt><dd 
+class="description">
+      <!--l. 58--><p class="noindent" >In some cases we may want a user to consistently be routed to a specific node. This is useful for
+      multiple transactions that need to be done in a consistent order or if the data is stored/cached on
+      the node. This can be done by hashing the information in the request payload or headers and then
+      routing the request to the node that handles hashes in the range of the computed hash.</p></dd></dl>
+<!--l. 63--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">2.2    </span> <a 
+ id="x1-40002.2"></a>Health Checks</h4>
+<!--l. 65--><p class="noindent" >When load balancing, it is important to ensure that the nodes we route requests to are able to service the request.
+A good health check can save or break your service. Consider the two following examples from UQ&#8217;s Information
+Technology Services (ITS):
+</p>
+<!--l. 69--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-5000"></a><span 
+class="Cabin-Bold-tlf-t1-x-x-120">Example 1</span></span>
+   Early in my career, I, Evan Hughes, setup a multi-node Directory Server at UQ under the hostname of
+<span 
+class="ectt-1200">ldap.uq.edu.au</span>. This server was a NoSQL database which implemented the LDAP protocol and supported <span 
+class="ectt-1200">UQ</span>
+<span 
+class="ectt-1200">Authenticate</span>, UQ&#8217;s Single Sign-On service.
+</p><!--l. 73--><p class="indent" >   The service had a load balancer which checked that <span 
+class="ectt-1200">port 389 </span>is open and reachable. This worked well most of
+the time. However, the health check was too weak. When:
+      </p><ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x1-5002x1">
+      <!--l. 77--><p class="noindent" >A data-center outage occured; and
+      </p></li>
+<li 
+  class="enumerate" id="x1-5004x2">
+      <!--l. 78--><p class="noindent" >The operating system running the service disappeared; but
+                                                                                                    
+                                                                                                    
+      </p></li>
+<li 
+  class="enumerate" id="x1-5006x3">
+      <!--l. 79--><p class="noindent" >The service was still running in memory.</p></li></ol>
+<!--l. 82--><p class="indent" >   The health check passed, but in reality, the service was talking to dead nodes, causing upstream services to
+have intermitent failures.
+</p>
+   <div class="tcolorbox tcolorbox" id="tcolobox-1">    
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 84--><p class="noindent" >TODO: C4 Diagram of the architecture </p> 
+</div> 
+</div>
+<!--l. 86--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-6000"></a><span 
+class="Cabin-Bold-tlf-t1-x-x-120">Example 2</span></span>
+   During the rollout of a new prompt for UQ Authenticate which required users to go to my.UQ to provide
+verified contact details - the Blackboard (learn.uq.edu.au) service went completly offline. The health check for
+Blackboard at the time completed a full authentication as a test user to ensure everything was functioning as
+expected. Once this user was enrolled into the new rollout, the health checks started reporting failures and within
+a matter of minutes the entire pool of nodes were shutdown. This health check was too broad and was not
+isolated enough to the service that it was checking.
+</p>
+   <div class="tcolorbox tcolorbox" id="tcolobox-2">    
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 92--><p class="noindent" >TODO: C4 diagram of the architecture </p> 
+</div> 
+</div>
+<!--l. 94--><p class="indent" >   A lot of services will provide a health check endpoint or a metrics endpoint which can help the engineer setup
+a proper level of health check. We want a health check that is specific enough for the service that it is checking but
+not so specific that it is too brittle. For the TaskOverflow application that we have been building so far, a
+reasonable health check would be that the health endpoint ensures the database is available and that the
+application is able to connect to it.
+</p><!--l. 99--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
+ id="x1-70003"></a>Load Balancers in AWS</h3>
+<!--l. 101--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">3.1    </span> <a 
+ id="x1-80003.1"></a>Types of AWS Load Balancers</h4>
+<!--l. 102--><p class="noindent" >Not all load balancers are the same. Some load balancers inspect the transmitted packets to correctly route the
+packet. We will cover two load balancer types AWS provides:
+</p><!--l. 106--><p class="indent" >
+      </p><dl class="description"><dt class="description">
+      <!--l. 107--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">Application Load Balancer</span> </p></dt><dd 
+class="description">
+      <!--l. 107--><p class="noindent" >is an OSI layer 7<span class="footnote-mark"><a 
+href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
+ id="x1-8001f1"></a>
+      load balancer which routes traffic based on the request&#8217;s content. This is useful for services using
+      HTTP, HTTPS, or any other supported protocol.
+                                                                                                    
+                                                                                                    
+      </p></dd><dt class="description">
+      <!--l. 111--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">Network Load Balancer</span> </p></dt><dd 
+class="description">
+      <!--l. 111--><p class="noindent" >is an OSI layer 4<span class="footnote-mark"><a 
+href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
+ id="x1-8003f2"></a>
+      load balancer which routes traffic based on the source and destination IP addresses and ports. This
+      is useful for services that are using TCP or UDP.</p></dd></dl>
+<!--l. 117--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">3.2    </span> <a 
+ id="x1-90003.2"></a>AWS Load Balancer Design</h4>
+<!--l. 119--><p class="noindent" >An AWS Elastic Load Balancer has three distinct components.
+</p><!--l. 121--><p class="indent" >
+      </p><dl class="description"><dt class="description">
+      <!--l. 122--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">Listeners</span> </p></dt><dd 
+class="description">
+      <!--l. 122--><p class="noindent" >allows traffic to enter the Elastic Load Balancer. Each listener has a port (e.g. <span 
+class="ectt-1200">port 80</span>) and a protocol
+      (e.g. <span 
+class="ectt-1200">HTTP</span>) associated with it.
+      </p></dd><dt class="description">
+      <!--l. 124--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">Target Groups</span> </p></dt><dd 
+class="description">
+      <!--l. 124--><p class="noindent" >are groups of nodes which the load balancer can route to. Each target group has a protocol and a
+      port associated with it, allowing us (the programmer) to switch ports on the way through the load
+      balancer. This is useful if the targets are using a different port to the ports we want to expose.
+      </p></dd><dt class="description">
+      <!--l. 127--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">Load Balancer</span> </p></dt><dd 
+class="description">
+      <!--l. 127--><p class="noindent" >is the actual load balancer that routes the traffic to the target groups based on rules that we setup.
+      The load balancer has a DNS name that we can use to route traffic to it. The load balancer also has
+      a security group that we can use to control what traffic can enter the load balancer.</p></dd></dl>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 133--><p class="noindent" ><img 
 src="diagrams/loadbalancers.png" alt="PIC"  
 width="525" height="525"  />
                                                                                                     
                                                                                                     
 </p>
    </div><hr class="endfigure" />
+   <h4 class="subsectionHead"><span class="titlemark">3.3    </span> <a 
+ id="x1-100003.3"></a>Autoscaling in AWS</h4>
+<!--l. 137--><p class="noindent" >Instead of creating the maxiumum amount of services we predict we will need, we can automatically scale the
+number of nodes we need to minimise resources. When the load is low, we operate with minimal nodes. When
+the load is high, we increase the number of nodes available to cope.
+</p><!--l. 142--><p class="indent" >   To compute the resources needed, AWS relies on triggers from CloudWatch and scaling policies. Some
+premade triggers are based around a node&#8217;s;
+</p>
+      <ul class="itemize1">
+      <li class="itemize">
+      <!--l. 146--><p class="noindent" >CPU usage,
+      </p></li>
+      <li class="itemize">
+      <!--l. 147--><p class="noindent" >memory usage, or
+      </p></li>
+      <li class="itemize">
+      <!--l. 148--><p class="noindent" >network usage.</p></li></ul>
+<!--l. 151--><p class="indent" >   We create custom triggers based on our application&#8217;s metrics.
+</p><!--l. 153--><p class="noindent" >
+</p>
    <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
- id="x1-60004"></a>Autoscaling in AWS</h3>
-<!--l. 76--><p class="noindent" >As load balancers are able to distribute load we need to be able to have nodes that can service the load. Instead of
-having to create the maxiumum amount of services we predict will need we can utilise autoscaling to minimise
-resources when load is low and scale up when load is high. For compute resources in AWS this is
-mostly down around triggers from CloudWatch and scaling policies. Some of the premade triggers are
-based around the CPU usage of the node, the memory usage of the node and the network usage of
-the node. We can also create custom triggers based on the metrics that we are collecting from our
-application.
-</p><!--l. 78--><p class="noindent" >
+ id="x1-110004"></a>Load Balancing TaskOverflow</h3>
+<!--l. 155--><p class="noindent" >
 </p>
-   <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
- id="x1-70005"></a>Load Balancing TaskOverflow</h3>
-<!--l. 80--><p class="noindent" >
-</p>
-   <h4 class="subsectionHead"><span class="titlemark">5.1    </span> <a 
- id="x1-80005.1"></a>[Path A] EC2</h4>
+   <h4 class="subsectionHead"><span class="titlemark">4.1    </span> <a 
+ id="x1-120004.1"></a>[Path A] EC2</h4>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 83--><p class="noindent" ><img 
+<!--l. 158--><p class="noindent" ><img 
 src="diagrams/ec2deployment.png" alt="PIC"  
 width="525" height="525"  />
                                                                                                     
                                                                                                     
 </p>
    </div><hr class="endfigure" />
+   <div class="tcolorbox tcolorbox" id="tcolobox-3">    
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 161--><p class="noindent" >TODO: Move to EC2Template </p> 
+</div> 
+</div>
    <div class="tcolorbox tcolorbox" id="tcolobox-4">    
 <div class="tcolorbox-title">
    </div> 
-<div class="tcolorbox-content"><!--l. 86--><p class="noindent" >TODO: Move to EC2Template </p> 
+<div class="tcolorbox-content"><!--l. 163--><p class="noindent" >TODO: AutoScaling group </p> 
 </div> 
 </div>
    <div class="tcolorbox tcolorbox" id="tcolobox-5">    
 <div class="tcolorbox-title">
    </div> 
-<div class="tcolorbox-content"><!--l. 88--><p class="noindent" >TODO: AutoScaling group </p> 
+<div class="tcolorbox-content"><!--l. 165--><p class="noindent" >TODO: target group </p> 
 </div> 
 </div>
    <div class="tcolorbox tcolorbox" id="tcolobox-6">    
 <div class="tcolorbox-title">
    </div> 
-<div class="tcolorbox-content"><!--l. 90--><p class="noindent" >TODO: target group </p> 
+<div class="tcolorbox-content"><!--l. 167--><p class="noindent" >TODO: autoscaling + target </p> 
 </div> 
 </div>
    <div class="tcolorbox tcolorbox" id="tcolobox-7">    
 <div class="tcolorbox-title">
    </div> 
-<div class="tcolorbox-content"><!--l. 92--><p class="noindent" >TODO: autoscaling + target </p> 
+<div class="tcolorbox-content"><!--l. 169--><p class="noindent" >TODO: load balancer </p> 
 </div> 
 </div>
    <div class="tcolorbox tcolorbox" id="tcolobox-8">    
 <div class="tcolorbox-title">
    </div> 
-<div class="tcolorbox-content"><!--l. 94--><p class="noindent" >TODO: load balancer </p> 
+<div class="tcolorbox-content"><!--l. 171--><p class="noindent" >TODO: listener </p> 
 </div> 
 </div>
    <div class="tcolorbox tcolorbox" id="tcolobox-9">    
 <div class="tcolorbox-title">
    </div> 
-<div class="tcolorbox-content"><!--l. 96--><p class="noindent" >TODO: listener </p> 
+<div class="tcolorbox-content"><!--l. 173--><p class="noindent" >TODO: Applying autoscaling rules </p> 
 </div> 
 </div>
+   <h4 class="subsectionHead"><span class="titlemark">4.2    </span> <a 
+ id="x1-130004.2"></a>[Path B] ECS</h4>
    <div class="tcolorbox tcolorbox" id="tcolobox-10">    
 <div class="tcolorbox-title">
    </div> 
-<div class="tcolorbox-content"><!--l. 98--><p class="noindent" >TODO: Applying autoscaling rules </p> 
+<div class="tcolorbox-content"><!--l. 177--><p class="noindent" >TODO: load balancer </p> 
 </div> 
 </div>
-   <h4 class="subsectionHead"><span class="titlemark">5.2    </span> <a 
- id="x1-90005.2"></a>[Path B] ECS</h4>
    <div class="tcolorbox tcolorbox" id="tcolobox-11">    
 <div class="tcolorbox-title">
    </div> 
-<div class="tcolorbox-content"><!--l. 102--><p class="noindent" >TODO: load balancer </p> 
+<div class="tcolorbox-content"><!--l. 179--><p class="noindent" >TODO: adding to ecs </p> 
 </div> 
 </div>
    <div class="tcolorbox tcolorbox" id="tcolobox-12">    
 <div class="tcolorbox-title">
    </div> 
-<div class="tcolorbox-content"><!--l. 104--><p class="noindent" >TODO: adding to ecs </p> 
+<div class="tcolorbox-content"><!--l. 181--><p class="noindent" >TODO: listener </p> 
 </div> 
 </div>
    <div class="tcolorbox tcolorbox" id="tcolobox-13">    
 <div class="tcolorbox-title">
    </div> 
-<div class="tcolorbox-content"><!--l. 106--><p class="noindent" >TODO: listener </p> 
-</div> 
-</div>
-   <div class="tcolorbox tcolorbox" id="tcolobox-14">    
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 108--><p class="noindent" >TODO: Applying autoscaling rules </p> 
+<div class="tcolorbox-content"><!--l. 183--><p class="noindent" >TODO: Applying autoscaling rules </p> 
 </div> 
 </div>
    <hr class="figure" /><div class="figure" 
@@ -309,22 +364,31 @@ width="525" height="525"  />
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 111--><p class="noindent" ><img 
+<!--l. 186--><p class="noindent" ><img 
 src="diagrams/ecsdeployment.png" alt="PIC"  
 width="525" height="525"  />
                                                                                                     
                                                                                                     
 </p>
    </div><hr class="endfigure" />
-   <h4 class="subsectionHead"><span class="titlemark">5.3    </span> <a 
- id="x1-100005.3"></a>Producing Load with K6</h4>
+   <h4 class="subsectionHead"><span class="titlemark">4.3    </span> <a 
+ id="x1-140004.3"></a>Producing Load with K6</h4>
 <!--l. 1--><p class="noindent" >
 </p>
    <h3 class="likesectionHead"><a 
- id="x1-11000"></a>References</h3>
+ id="x1-15000"></a>References</h3>
 <!--l. 1--><p class="noindent" >
 </p>
-    
+   <div class="footnotes"><a 
+ id="x1-8002x3.1"></a>
+<!--l. 108--><p class="noindent" ><span class="footnote-mark"><a 
+href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span><span 
+class="Cabin-Regular-tlf-t1-">OSI layer 7: Application, in this case HTTP/HTTPS/etc</span></p><a 
+ id="x1-8004x3.1"></a>
+<!--l. 112--><p class="noindent" ><span class="footnote-mark"><a 
+href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span><span 
+class="Cabin-Regular-tlf-t1-">OSI layer 4: Transport, in this case TCP/UDP</span></p>                                                                                                                                                </div>
+ 
 </body></html> 
 
                                                                                                     
