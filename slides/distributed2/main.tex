@@ -10,7 +10,7 @@
 % \usepackage{pgfpages}
 % \setbeameroption{show notes on second screen}
 
-\title{Distributed Computing II}
+\title{Distributed Systems II}
 \subtitle{Software Architecture}
 \author{Brae Webb}
 \date{\week{6}}
@@ -27,6 +27,22 @@
 \begin{document}
 
 \maketitle
+
+\point[Distributed Systems Series]{
+    \begin{description}
+        \item[Distributed I] \highlight{Reliability} and \highlight{scalability} of \highlight{stateless} systems.
+        \item[Distributed II] \highlight{Complexities} of \highlight{stateful} systems.
+        \item[Distributed III] \highlight{Hard problems} in distributed systems.
+    \end{description}
+}
+
+\point[Distributed Systems Series]{
+    \begin{description}
+        \item[Distributed I] {\color{gray}Reliability and scalability of stateless systems.}
+        \item[Distributed II] \highlight{Complexities} of \highlight{stateful} systems.
+    \item[Distributed III] {\color{gray}Hard problems in distributed systems.}
+    \end{description}
+}
 
 \point[Previously in CSSE6400\dots]{
 \begin{center}
@@ -89,9 +105,9 @@
 
 \questionanswer{What are the advantages of \highlight{replication}?}{
     \begin{itemize}[<+(1)->]
-        \item Scale out our database to cope with \highlight{load}.
-        \item Provide \highlight{fault tolerance} from a single database instance failure.
-        \item Locate databases \highlight{closer to end-users}.
+        \item \highlight{Scale} out our to cope with higher loads.
+        \item Provide \highlight{fault tolerance} from a single instance failure.
+        \item Locate instances \highlight{closer to end-users}.
     \end{itemize}
 }
 
@@ -387,9 +403,22 @@
 \definecolor{eq2}{RGB}{227, 116, 137}
 
 \point[Quorum Consistency]{
+\only<1>{
 \begin{equation*}
 \textcolor{eq1}{w} + \textcolor{eq2}{r} > \textcolor{focus}{n}
 \end{equation*}
+}
+\only<2>{
+\begin{equation*}
+\textcolor{eq1}{2} + \textcolor{eq2}{2} > \textcolor{focus}{3}
+\end{equation*}
+}
+\only<3>{
+\begin{equation*}
+\textcolor{eq1}{1} + \textcolor{eq2}{3} > \textcolor{focus}{3}
+\end{equation*}
+}
+
 \Large
 \begin{description}
     \item[$\textcolor{focus}{n}$] total replicas
@@ -403,7 +432,7 @@
 \begin{frame}
 \begin{center}
     \begin{tikzpicture}
-        \node[anchor=south west,inner sep=0] at (0,0) {\includegraphics[width=0.8\textwidth]{diagrams/LeaderlessQuorum}};
+        \node[anchor=south west,inner sep=0] at (0,0.5) {\includegraphics[width=0.8\textwidth]{diagrams/LeaderlessQuorum}};
         \draw[eq1,ultra thick,rounded corners] (0,0) rectangle (5.5,8.2);
         \draw[eq2,ultra thick,rounded corners] (0,4.5) rectangle (11.5,8.2);
         \draw[focus,ultra thick,rounded corners] (-0.1,-0.1) rectangle (11.6,8.3);
@@ -535,44 +564,44 @@
     \end{itemize}
 }
 
-\point{Distributed state creates a lot of \highlight{complexity}}
+%\point{Distributed state creates a lot of \highlight{complexity}}
 
-\note{And when programmers have complexity, they create bugs}
+%\note{And when programmers have complexity, they create bugs}
 
-\point[When programmers are faced with complexity]{
-    They create \highlight{abstractions}
-}
+%\point[When programmers are faced with complexity]{
+%    They create \highlight{abstractions}
+%}
 
-\point[One key database abstraction]{Transactions}
+%\point[One key database abstraction]{Transactions}
 
-\note{Introduced by IBM System R in 1975}
+%\note{Introduced by IBM System R in 1975}
 
-\definition{Transaction}{A group of operations performed as if they were one.}
+%\definition{Transaction}{A group of operations performed as if they were one.}
 
-\note{What does as if it were one mean?}
+%\note{What does as if it were one mean?}
 
-\begin{frame}{ACID}
-    \Huge
-\begin{description}
-    \item[A] tomic
-    \item[C] onsistent
-    \item[I] solated
-    \item[D] urable
-\end{description}
-\end{frame}
+%\begin{frame}{ACID}
+%    \Huge
+%\begin{description}
+%    \item[A] tomic
+%    \item[C] onsistent
+%    \item[I] solated
+%    \item[D] urable
+%\end{description}
+%\end{frame}
 
-\point[The pushback]{
-    NoSQL and microservice architectures pushed back against transactions.
-}
+%\point[The pushback]{
+%    NoSQL and microservice architectures pushed back against transactions.
+%}
 
-\note[itemize]{
-    \item Transactions were used fairly universally for a long time.
-    \item Push back occurred when people decided they weren't scalable.
-}
+%\note[itemize]{
+%    \item Transactions were used fairly universally for a long time.
+%    \item Push back occurred when people decided they weren't scalable.
+%}
 
-\point[For more on transactions]{
-    \centering \youtubevideo{images/transactions}{https://www.youtube.com/watch?v=5ZjhNTM8XU8}
-}
+%\point[For more on transactions]{
+%    \centering \youtubevideo{images/transactions}{https://www.youtube.com/watch?v=5ZjhNTM8XU8}
+%}
 
 \point[Summary]{
     \begin{itemize}[<+->]
@@ -587,11 +616,11 @@
             \item Consistent method to pick nodes for data
             \item Avoiding skewing
         \end{itemize}
-        \item Transactions
-        \begin{itemize}
-            \item ACID properties
-            \item Pushback causing headaches
-        \end{itemize}
+        %\item Transactions
+        %\begin{itemize}
+        %    \item ACID properties
+        %    \item Pushback causing headaches
+        %\end{itemize}
     \end{itemize}
 }
 
