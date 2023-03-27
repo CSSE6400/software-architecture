@@ -1,0 +1,40 @@
+@startuml lb4
+title Building a AWS Load Balancer
+
+top to bottom direction
+
+skinparam dpi 300
+skinparam shadowing false
+skinparam monochrome false
+skinparam componentStyle uml2
+skinparam packageStyle rectangle
+skinparam packageTitleAlignment left
+
+Person user
+
+package "AWS" {
+    frame "Elastic Load Balancing" {
+        [Listener] as listener
+        [Application Load Balancer] as alb
+        [Target Group] as tg
+    }
+
+    frame "Auto Scaling Group" {
+        [Auto Scaling Group] as asg
+        [EC2 Instances] as ec2
+
+        asg -> ec2 : launches instances
+    }
+}
+
+listener -[hidden]d- alb
+alb -[hidden]d- tg
+
+asg -[hidden]d- ec2
+
+user -> listener: sends traffic to port & protocol
+listener -[bold,#red]> alb : forwards traffic
+alb -> tg : forwards traffic
+tg -> ec2 : sends traffic to instances
+
+@enduml
