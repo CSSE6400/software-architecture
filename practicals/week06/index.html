@@ -273,32 +273,54 @@ premade triggers are based around a node&#8217;s;
 </p>
    <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
  id="x1-110004"></a>Load Balancing TaskOverflow</h3>
-<!--l. 155--><p class="noindent" >
+<!--l. 155--><p class="noindent" >This week we are going to explore load balancing the TaskOverflow service that we have been working with. The
+aim is to have a service that when given a lot of requesters will be able to scale out the webservice nodes to
+handle it. This wont be a full solution to the scaling issue as our database is still a single node, but it will be a good
+start. Other methods could also be employed to help deal with the load like caching but we will leave that for
+another day.
+</p><!--l. 157--><p class="indent" >   Start with the github repository provided in class and install terraform as it will be required this week. You will
+also need to start your learner lab and copy the credentials into a credentials file into the root of the respository. In
+the respository you will also see two differnt folders, one is the starter for the EC2 path and the other is the starter
+for the ECS path. Once you have chosen which path you want to take, copy the contents of the folder into the
+root of the repository.
+</p><!--l. 159--><p class="indent" >   As per last week, we encourage that you take <span 
+class="ectt-1200">Path B </span>first and then pruse the <span 
+class="ectt-1200">Path A </span>if you have time. This
+week <span 
+class="ectt-1200">Path A </span>does show an alternative method to autoscaling.
+</p><!--l. 161--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.1    </span> <a 
  id="x1-120004.1"></a>[Path A] EC2</h4>
+                                                                                                    
+                                                                                                    
+<!--l. 163--><p class="noindent" >Congratulations! You have chosen to go down the EC2 path, this week we need to create a AutoScaling
+Group and a Load Balancer to handle the scaling of our service. Our goal is the deployment diagram
+below.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 158--><p class="noindent" ><img 
+<!--l. 166--><p class="noindent" ><img 
 src="diagrams/ec2deployment.png" alt="PIC"  
 width="525" height="525"  />
                                                                                                     
                                                                                                     
 </p>
    </div><hr class="endfigure" />
-   <div class="tcolorbox tcolorbox" id="tcolobox-3">    
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 161--><p class="noindent" >TODO: Move to EC2Template </p> 
-</div> 
-</div>
-<!--l. 165--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 165--><p class="indent" >   <span 
-class="ectt-1200">» cat ec2.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 165--><pre class="listings" id="listing-1"><span class="label"><a 
+<!--l. 169--><p class="indent" >   To get started we need to modify how we create our EC2 instances, instead of manually creating them we are
+going to have to teach AWS how to deploy them for us. We can do this by converting our EC2 instance into a
+Launch Template. Our launch template is going to look very similar to the instance we had last week, instead
+a few variables have changed including that our user_data must be stored as a base64 encoded
+string. Some of these changes have been highlighted below, also copy this code into a file called
+<span 
+class="ectt-1200">ec2.tf</span>.
+</p><!--l. 172--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 172--><p class="indent" >   <span 
+class="ectt-1200">» cat ec2.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 172--><pre class="listings" id="listing-1"><span class="label"><a 
  id="x1-12001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -673,28 +695,29 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12047r47"></a></span></pre>
    </div>
-   <div class="tcolorbox tcolorbox" id="tcolobox-4"> 
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 214--><p class="noindent" >TODO: AutoScaling group </p> 
-</div> 
-</div>
+<!--l. 221--><p class="indent" >   Now that we have a template and a security group, we can create the AutoScaling Group. This block defines
+the limits of how many instances we want to have and the template we want it to use. Copy this code into a file
+called <span 
+class="ectt-1200">autoscaling.tf</span>.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 217--><p class="noindent" ><img 
+<div class="center" 
+>
+<!--l. 224--><p class="noindent" >
+</p><!--l. 225--><p class="noindent" ><img 
 src="diagrams/lb1.png" alt="PIC"  
-width="525" height="525"  />
+width="14" height="14"  /></p></div>
                                                                                                     
                                                                                                     
-</p>
    </div><hr class="endfigure" />
-<!--l. 220--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 220--><p class="indent" >   <span 
-class="ectt-1200">» cat autoscaling.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 220--><pre class="listings" id="listing-2"><span class="label"><a 
+<!--l. 229--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 229--><p class="indent" >   <span 
+class="ectt-1200">» cat autoscaling.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 229--><pre class="listings" id="listing-2"><span class="label"><a 
  id="x1-12048r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -784,28 +807,31 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12060r13"></a></span></pre>
    </div>
-   <div class="tcolorbox tcolorbox" id="tcolobox-5"> 
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 235--><p class="noindent" >TODO: target group </p> 
-</div> 
-</div>
+<!--l. 244--><p class="indent" >   If we deployed this now we would see that we get one initial instance created for us due to the
+desired and min_size. Now that we have instances we have the ability for traffic to be routed to them.
+Lets create a target_group which will be on the internal facing side of our load balancer. This is the
+side that lets traffic leave the load balancer and hit the instances. Copy this code into a file called
+<span 
+class="ectt-1200">lb.tf</span>.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 238--><p class="noindent" ><img 
+<div class="center" 
+>
+<!--l. 247--><p class="noindent" >
+</p><!--l. 248--><p class="noindent" ><img 
 src="diagrams/lb2.png" alt="PIC"  
-width="525" height="525"  />
+width="14" height="14"  /></p></div>
                                                                                                     
                                                                                                     
-</p>
    </div><hr class="endfigure" />
-<!--l. 241--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 241--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 241--><pre class="listings" id="listing-3"><span class="label"><a 
+<!--l. 252--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 252--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 252--><pre class="listings" id="listing-3"><span class="label"><a 
  id="x1-12061r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -854,15 +880,12 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12067r7"></a></span></pre>
    </div>
-   <div class="tcolorbox tcolorbox" id="tcolobox-6"> 
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 250--><p class="noindent" >TODO: autoscaling + target </p> 
-</div> 
-</div>
-<!--l. 252--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 252--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 252--><pre class="listings" id="listing-4"><span class="label"><a 
+<!--l. 261--><p class="indent" >   When the target_group is created we need to attach it to the autoscaling group. This is done by via the code
+below, copy this into <span 
+class="ectt-1200">lb.tf</span>.
+</p><!--l. 263--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 263--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 263--><pre class="listings" id="listing-4"><span class="label"><a 
  id="x1-12068r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -899,28 +922,29 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12072r5"></a></span></pre>
    </div>
-   <div class="tcolorbox tcolorbox" id="tcolobox-7"> 
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 259--><p class="noindent" >TODO: load balancer </p> 
-</div> 
-</div>
+<!--l. 270--><p class="indent" >   With a target_group made we now need to attach that to a load balancer, copy this code into <span 
+class="ectt-1200">lb.tf</span>. You will
+notice that there is also a security group attached to the load balancer, this is the firewall that sits on the front of
+the load balancer and allows traffic to enter the load balancer.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 262--><p class="noindent" ><img 
+<div class="center" 
+>
+<!--l. 273--><p class="noindent" >
+</p><!--l. 274--><p class="noindent" ><img 
 src="diagrams/lb3.png" alt="PIC"  
-width="525" height="525"  />
+width="14" height="14"  /></p></div>
                                                                                                     
                                                                                                     
-</p>
    </div><hr class="endfigure" />
-<!--l. 265--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 265--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 265--><pre class="listings" id="listing-5"><span class="label"><a 
+<!--l. 278--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 278--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 278--><pre class="listings" id="listing-5"><span class="label"><a 
  id="x1-12073r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -1114,28 +1138,28 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12099r27"></a></span></pre>
    </div>
-   <div class="tcolorbox tcolorbox" id="tcolobox-8"> 
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 294--><p class="noindent" >TODO: listener </p> 
-</div> 
-</div>
+<!--l. 307--><p class="indent" >   Now we are on the external side of the load balancer we need to create a listener which actually creates the
+rules for how traffic is routed to the instances. Copy this code into <span 
+class="ectt-1200">lb.tf</span>.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 297--><p class="noindent" ><img 
+<div class="center" 
+>
+<!--l. 310--><p class="noindent" >
+</p><!--l. 311--><p class="noindent" ><img 
 src="diagrams/lb4.png" alt="PIC"  
-width="525" height="525"  />
+width="14" height="14"  /></p></div>
                                                                                                     
                                                                                                     
-</p>
    </div><hr class="endfigure" />
-<!--l. 300--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 300--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 300--><pre class="listings" id="listing-6"><span class="label"><a 
+<!--l. 315--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 315--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 315--><pre class="listings" id="listing-6"><span class="label"><a 
  id="x1-12100r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -1211,15 +1235,19 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12110r11"></a></span></pre>
    </div>
-   <div class="tcolorbox tcolorbox" id="tcolobox-9"> 
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 313--><p class="noindent" >TODO: Applying autoscaling rules </p> 
-</div> 
-</div>
-<!--l. 315--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 315--><p class="indent" >   <span 
-class="ectt-1200">» cat autoscaling.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 315--><pre class="listings" id="listing-7"><span class="label"><a 
+<!--l. 328--><p class="indent" >   Deploying this we now have achieved the architecture as requested with a dynamically scaling
+group of EC2s with a Application Load Balancer sitting infront which is listening on port 80 instead of
+6400.
+</p><!--l. 330--><p class="indent" >   To make our autoscaling group actually be dynamically scaling we need to give it some rules about when to
+scale up and when to scale down. The policies below is what does this function for us, they listen to the average
+CPU usage of the group of instances and if it is above 25 percent it will scale up by 1 instance and if it is below 10
+percent it will scale down by 1 instance. We apply a cooldown period cause we dont want to act too aggressivly
+to changes in CPU usage as instances will take time to start and handle load. Copy this code into
+<span 
+class="ectt-1200">autoscaling.tf</span>.
+</p><!--l. 332--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 332--><p class="indent" >   <span 
+class="ectt-1200">» cat autoscaling.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 332--><pre class="listings" id="listing-7"><span class="label"><a 
  id="x1-12111r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -1585,43 +1613,53 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12160r50"></a></span></pre>
    </div>
+<!--l. 384--><p class="indent" >   Head to the next section to see how we can send load to the load balancer to cause our service to have to
+scale up.
+</p>
    <h4 class="subsectionHead"><span class="titlemark">4.2    </span> <a 
  id="x1-130004.2"></a>[Path B] ECS</h4>
+<!--l. 387--><p class="noindent" >Congratulations! You have chosen to go down the ECS path, this week we need create a Application Scaling Policy
+for our ECS service and a Load Balancer to handle the routing of our service. Our goal is the deployment diagram
+below.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 369--><p class="noindent" ><img 
+<!--l. 390--><p class="noindent" ><img 
 src="diagrams/ecsdeployment.png" alt="PIC"  
 width="525" height="525"  />
                                                                                                     
                                                                                                     
 </p>
    </div><hr class="endfigure" />
-   <div class="tcolorbox tcolorbox" id="tcolobox-10">    
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 372--><p class="noindent" >TODO: target group </p> 
-</div> 
-</div>
+<!--l. 393--><p class="indent" >   Last week when we setup the ECS service we noticed that we couldnt get a endpoint cause the instance would
+only be provisioned after our terraform had run. This is because it is already a dynamic service and it wants a
+load balancer to service its traffic. To get started we need to create a target group which is on the
+internal side of the load balancer and defines where traffic can be routed to. Copy this code into
+<span 
+class="ectt-1200">lb.tf</span>.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 375--><p class="noindent" ><img 
+<div class="center" 
+>
+<!--l. 396--><p class="noindent" >
+</p><!--l. 397--><p class="noindent" ><img 
 src="diagrams/lb2fargate.png" alt="PIC"  
-width="525" height="525"  />
+width="14" height="14"  /></p></div>
                                                                                                     
                                                                                                     
-</p>
    </div><hr class="endfigure" />
-<!--l. 378--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 378--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 378--><pre class="listings" id="listing-8"><span class="label"><a 
+<!--l. 401--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 401--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 401--><pre class="listings" id="listing-8"><span class="label"><a 
  id="x1-13001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -1756,15 +1794,12 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-13018r18"></a></span></pre>
    </div>
-   <div class="tcolorbox tcolorbox" id="tcolobox-11"> 
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 398--><p class="noindent" >TODO: adding to ecs </p> 
-</div> 
-</div>
-<!--l. 400--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 400--><p class="indent" >   <span 
-class="ectt-1200">» cat ecs.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 400--><pre class="listings" id="listing-9"><span class="label"><a 
+<!--l. 421--><p class="indent" >   Now that we have the target group we can add it to the ECS service. Copy this code into <span 
+class="ectt-1200">ecs.tf </span>inside the
+service block.
+</p><!--l. 423--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 423--><p class="indent" >   <span 
+class="ectt-1200">» cat ecs.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 423--><pre class="listings" id="listing-9"><span class="label"><a 
  id="x1-13019r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">load_balancer</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1807,28 +1842,29 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-13024r6"></a></span></pre>
    </div>
-   <div class="tcolorbox tcolorbox" id="tcolobox-12"> 
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 408--><p class="noindent" >TODO: load balancer </p> 
-</div> 
-</div>
+<!--l. 431--><p class="indent" >   With the internal side of the load balancer done we can create it and a firewall for the external side. This
+firewall allows us to restrict what traffic will be allowed to flow through the load balancer. Copy this code into
+<span 
+class="ectt-1200">lb.tf</span>.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 411--><p class="noindent" ><img 
+<div class="center" 
+>
+<!--l. 434--><p class="noindent" >
+</p><!--l. 435--><p class="noindent" ><img 
 src="diagrams/lb3fargate.png" alt="PIC"  
-width="525" height="525"  />
+width="14" height="14"  /></p></div>
                                                                                                     
                                                                                                     
-</p>
    </div><hr class="endfigure" />
-<!--l. 414--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 414--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 414--><pre class="listings" id="listing-10"><span class="label"><a 
+<!--l. 439--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 439--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 439--><pre class="listings" id="listing-10"><span class="label"><a 
  id="x1-13025r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -2022,28 +2058,28 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-13051r27"></a></span></pre>
    </div>
-   <div class="tcolorbox tcolorbox" id="tcolobox-13"> 
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 443--><p class="noindent" >TODO: listener </p> 
-</div> 
-</div>
+<!--l. 468--><p class="indent" >   Now over to the external side of the load balancer we need to create a listener which is the entry point for the
+load balancer. Copy this code into <span 
+class="ectt-1200">lb.tf</span>.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 446--><p class="noindent" ><img 
+<div class="center" 
+>
+<!--l. 471--><p class="noindent" >
+</p><!--l. 472--><p class="noindent" ><img 
 src="diagrams/lb4fargate.png" alt="PIC"  
-width="525" height="525"  />
+width="14" height="14"  /></p></div>
                                                                                                     
                                                                                                     
-</p>
    </div><hr class="endfigure" />
-<!--l. 449--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 449--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 449--><pre class="listings" id="listing-11"><span class="label"><a 
+<!--l. 476--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 476--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 476--><pre class="listings" id="listing-11"><span class="label"><a 
  id="x1-13052r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -2119,15 +2155,13 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-13062r11"></a></span></pre>
    </div>
-   <div class="tcolorbox tcolorbox" id="tcolobox-14"> 
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 462--><p class="noindent" >TODO: Applying autoscaling rules </p> 
-</div> 
-</div>
-<!--l. 464--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 464--><p class="indent" >   <span 
-class="ectt-1200">» cat autoscaling.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 464--><pre class="listings" id="listing-12"><span class="label"><a 
+<!--l. 489--><p class="indent" >   If we deployed now we would have completed the deployment diagram above. However we want to add
+some autoscaling to our service so that it can scale up and down based on the load. Copy this code into
+<span 
+class="ectt-1200">autoscaling.tf</span>.
+</p><!--l. 491--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 491--><p class="indent" >   <span 
+class="ectt-1200">» cat autoscaling.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 491--><pre class="listings" id="listing-12"><span class="label"><a 
  id="x1-13063r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -2300,11 +2334,25 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-13087r25"></a></span></pre>
    </div>
+<!--l. 518--><p class="indent" >   This auto scaling policy looks at the average CPU utilization of the service and scales up if it is above 20% and
+scales down if it is below 20%. This is a very simple policy but it is a good starting point. We can now deploy our
+service and see it scale up and down. Continue onto the next section to see how to send our service some
+load.
+</p>
    <h4 class="subsectionHead"><span class="titlemark">4.3    </span> <a 
  id="x1-140004.3"></a>Producing Load with K6</h4>
-<!--l. 493--><p class="noindent" ></p><div class="framedenv" id="code-1">
-<!--l. 493--><p class="indent" >   <span 
-class="ectt-1200">» cat k6.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 493--><pre class="listings" id="listing-13"><span class="label"><a 
+<!--l. 522--><p class="noindent" >We have a service but us visiting it in our web browser is not gonna trigger enough load for our policies to trigger.
+To do this we are gonna employ the help of a tool called K6 which is a recent addition to the load testing tools. To
+install K6 visit <a 
+href="https://k6.io/docs/get-started/installation/" class="url" ><span 
+class="ectt-1200">https://k6.io/docs/get-started/installation/</span></a>, this can be installed in the code spaces
+environment or locally.
+</p><!--l. 524--><p class="indent" >   We have provided an example K6 file which is a javascript script that creates 1000 to 5000 users to call the
+list endpoint of our service. Copy this code into a file called <span 
+class="ectt-1200">k6.js</span>.
+</p><!--l. 526--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 526--><p class="indent" >   <span 
+class="ectt-1200">» cat k6.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 526--><pre class="listings" id="listing-13"><span class="label"><a 
  id="x1-14001r1"></a></span><span style="color:#404040"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">http</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2405,13 +2453,7 @@ class="tctt-1200">'</span></span><span style="color:#669900"><span
 class="ectt-1200">http</span></span><span style="color:#669900"><span 
 class="ectt-1200">://</span></span><span 
 class="colorbox" id="colorbox1"><span 
-class="ectt-1200">«Your</span>
-<span 
-class="ectt-1200">LoadBalancer</span>
-<span 
-class="ectt-1200">URL</span>
-<span 
-class="ectt-1200">Here»</span></span><span style="color:#669900"><span 
+class="ectt-1200">your-loadBalancer-url-here</span></span><span style="color:#669900"><span 
 class="ectt-1200">/</span></span><span style="color:#669900"><span 
 class="ectt-1200">api</span></span><span style="color:#669900"><span 
 class="ectt-1200">/</span></span><span style="color:#669900"><span 
@@ -2459,10 +2501,47 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-14016r16"></a></span></pre>
    </div>
+<!--l. 544--><p class="indent" >   we can then run this file using the following command.
+</p>
+   <div class="framedenv" id="code-1">
+<!--l. 546--><pre class="listings" id="listing-14"><span class="label"><a 
+ id="x1-14017r1"></a></span><span style="color:#000000"><span 
+class="ectt-1200">&#x003E;&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">k6</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">run</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">k6</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">js</span></span>
+ 
+<span class="label"><a 
+ id="x1-14018r2"></a></span></pre>
+   </div>
+<!--l. 550--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">4.3.1    </span> <a 
+ id="x1-150004.3.1"></a>EC2 Auto Scaling</h5>
+   <div class="tcolorbox tcolorbox" id="tcolobox-3">    
+<div class="tcolorbox-title">
+   </div> 
+<div class="tcolorbox-content"><!--l. 552--><p class="noindent" >TODO: Show where in AWS they can see the scaling events for ECS </p> 
+</div> 
+</div>
+<!--l. 554--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">4.3.2    </span> <a 
+ id="x1-160004.3.2"></a>ECS Auto Scaling</h5>
+   <div class="tcolorbox tcolorbox" id="tcolobox-4">    
+<div class="tcolorbox-title">
+                                                                                                    
+                                                                                                    
+   </div> 
+<div class="tcolorbox-content"><!--l. 556--><p class="noindent" >TODO: Show where in AWS they can see the scaling events for ECS </p> 
+</div> 
+</div>
 <!--l. 1--><p class="noindent" >
 </p>
    <h3 class="likesectionHead"><a 
- id="x1-15000"></a>References</h3>
+ id="x1-17000"></a>References</h3>
 <!--l. 1--><p class="noindent" >
 </p>
    <div class="footnotes"><a 
