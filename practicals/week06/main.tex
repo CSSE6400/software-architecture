@@ -160,33 +160,353 @@ We create custom triggers based on our application's metrics.
 
 \todo{Move to EC2Template}
 
+
+
+\begin{code}[language=terraform,numbers=none]{ec2.tf}
+resource "aws_launch_template" "todo" {
+  name = "todo-launch-template"
+  image_id = "ami-005f9685cb30f234b"
+  instance_type = "t2.micro"
+  key_name = "vockey"
+
+  user_data = base64encode(<<-EOT
+    #!/bin/bash
+    yum update -y
+    yum install -y docker
+    service docker start
+    systemctl enable docker
+    usermod -a -G docker ec2-user 
+    docker run --restart always -e SQLALCHEMY_DATABASE_URI=postgresql://${local.database_username}:${local.database_password}@${aws_db_instance.database.address}:5432/todo -p 6400:6400 ${local.image}
+EOT
+  )
+
+  vpc_security_group_ids = [aws_security_group.todo.id]
+}
+
+
+resource "aws_security_group" "todo" {
+  name = "todo"
+  description = "TaskOverflow Security Group"
+
+  ingress {
+    from_port = 6400
+    to_port = 6400
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+\end{code}
+
 \todo{AutoScaling group}
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{diagrams/lb1}
+\end{figure}
+
+\begin{code}[language=terraform,numbers=none]{autoscaling.tf}
+resource "aws_autoscaling_group" "todo" {
+  name = "todo"
+  availability_zones = ["us-east-1a"]
+  desired_capacity   = 1
+  max_size           = 4
+  min_size           = 1
+  
+  launch_template {
+    id      = aws_launch_template.todo.id
+    version = "$Latest"
+  }
+}
+\end{code}
 
 \todo{target group}
 
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{diagrams/lb2}
+\end{figure}
+
+\begin{code}[language=terraform,numbers=none]{lb.tf}
+resource "aws_lb_target_group" "todo" {
+  name     = "todo"
+  port     = 6400
+  protocol = "HTTP"
+  vpc_id   = aws_security_group.todo.vpc_id
+}
+\end{code}
+
 \todo{autoscaling + target}
 
+\begin{code}[language=terraform,numbers=none]{lb.tf}
+resource "aws_autoscaling_attachment" "todo" {
+  autoscaling_group_name = aws_autoscaling_group.todo.id
+  alb_target_group_arn   = aws_lb_target_group.todo.arn
+}
+\end{code}
+
 \todo{load balancer}
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{diagrams/lb3}
+\end{figure}
+
+\begin{code}[language=terraform,numbers=none]{lb.tf}
+resource "aws_lb" "taskoverflow" {
+  name               = "taskoverflow"
+  internal           = false
+  load_balancer_type = "application"
+  subnets            = data.aws_subnets.private.ids
+  security_groups    = [aws_security_group.taskoverflow.id]
+}
+
+resource "aws_security_group" "taskoverflow" {
+  name = "taskoverflow"
+  description = "TaskOverflow Security Group"
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+\end{code}
 
 \todo{listener}
 
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{diagrams/lb4}
+\end{figure}
+
+\begin{code}[language=terraform,numbers=none]{lb.tf}
+resource "aws_lb_listener" "taskoverflow" {
+  load_balancer_arn = aws_lb.taskoverflow.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.todo.arn
+  }
+}
+\end{code}
+
 \todo{Applying autoscaling rules}
 
+\begin{code}[language=terraform,numbers=none]{autoscaling.tf}
+resource "aws_autoscaling_policy" "todo_scale_down" {
+  name                   = "todo_scale_down"
+  autoscaling_group_name = aws_autoscaling_group.todo.name
+  adjustment_type        = "ChangeInCapacity"
+  scaling_adjustment     = -1
+  cooldown               = 120
+}
+
+resource "aws_cloudwatch_metric_alarm" "todo_scale_down" {
+  alarm_description   = "Monitors CPU utilization for Todo"
+  alarm_actions       = [aws_autoscaling_policy.todo_scale_down.arn]
+  alarm_name          = "todo_scale_down"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  namespace           = "AWS/EC2"
+  metric_name         = "CPUUtilization"
+  threshold           = "10"
+  evaluation_periods  = "2"
+  period              = "120"
+  statistic           = "Average"
+
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.todo.name
+  }
+}
+
+resource "aws_autoscaling_policy" "todo_scale_up" {
+  name                   = "todo_scale_up"
+  autoscaling_group_name = aws_autoscaling_group.todo.name
+  adjustment_type        = "ChangeInCapacity"
+  scaling_adjustment     = 1
+  cooldown               = 120
+}
+
+resource "aws_cloudwatch_metric_alarm" "todo_scale_up" {
+  alarm_description   = "Monitors CPU utilization for Todo"
+  alarm_actions       = [aws_autoscaling_policy.todo_scale_up.arn]
+  alarm_name          = "todo_scale_up"
+  comparison_operator = "GreaterThanThreshold"
+  namespace           = "AWS/EC2"
+  metric_name         = "CPUUtilization"
+  threshold           = "20"
+  evaluation_periods  = "2"
+  period              = "120"
+  statistic           = "Average"
+
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.todo.name
+  }
+}
+\end{code}
 \subsection{[Path B] ECS}
-
-\todo{load balancer}
-
-\todo{adding to ecs}
-
-\todo{listener}
-
-\todo{Applying autoscaling rules}
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{diagrams/ecsdeployment}
 \end{figure}
 
+\todo{target group}
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{diagrams/lb2fargate.png}
+\end{figure}
+
+\begin{code}[language=terraform,numbers=none]{lb.tf}
+resource "aws_lb_target_group" "todo" {
+  name     = "todo"
+  port     = 6400
+  protocol = "HTTP"
+  vpc_id   = aws_security_group.todo.vpc_id
+  target_type = "ip"
+
+  health_check {
+    path = "/api/v1/health"
+    port = "6400"
+    protocol = "HTTP"
+    healthy_threshold = 2
+    unhealthy_threshold = 2
+    timeout = 5
+    interval = 10
+  }
+}
+\end{code}
+
+\todo{adding to ecs}
+
+\begin{code}[language=terraform,numbers=none]{ecs.tf}
+  load_balancer {
+    target_group_arn = aws_lb_target_group.todo.arn
+    container_name   = "todo"
+    container_port   = 6400
+  }
+\end{code}
+
+\todo{load balancer}
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{diagrams/lb3fargate}
+\end{figure}
+
+\begin{code}[language=terraform,numbers=none]{lb.tf}
+resource "aws_lb" "taskoverflow" {
+  name               = "taskoverflow"
+  internal           = false
+  load_balancer_type = "application"
+  subnets            = data.aws_subnets.private.ids
+  security_groups    = [aws_security_group.taskoverflow.id]
+}
+
+resource "aws_security_group" "taskoverflow" {
+  name = "taskoverflow"
+  description = "TaskOverflow Security Group"
+
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+\end{code}
+
+\todo{listener}
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{diagrams/lb4fargate}
+\end{figure}
+
+\begin{code}[language=terraform,numbers=none]{lb.tf}
+resource "aws_lb_listener" "todo" {
+  load_balancer_arn = aws_lb.taskoverflow.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.todo.arn
+  }
+}
+\end{code}
+
+\todo{Applying autoscaling rules}
+
+\begin{code}[language=terraform,numbers=none]{autoscaling.tf}
+resource "aws_appautoscaling_target" "todo" {
+  max_capacity = 4
+  min_capacity = 1
+  resource_id = "service/taskoverflow/taskoverflow"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace = "ecs"
+}
+
+
+resource "aws_appautoscaling_policy" "todo-cpu" {
+  name = "todo-cpu"
+  policy_type = "TargetTrackingScaling"
+  resource_id = aws_appautoscaling_target.todo.resource_id
+  scalable_dimension = aws_appautoscaling_target.todo.scalable_dimension
+  service_namespace = aws_appautoscaling_target.todo.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+
+    target_value = 20
+  }
+}
+\end{code}
+
 \subsection{Producing Load with K6}
+
+\begin{code}[language=javascript,numbers=none,escapechar=!]{k6.js}
+import http from 'k6/http';
+import { sleep, check } from 'k6';
+
+export const options = {
+  stages: [
+    { target: 1000, duration: '1m' },
+    { target: 5000, duration: '10m' },
+  ],
+};
+
+export default function () {
+  const res = http.get('http://!\colorbox{yellow}{<<Your LoadBalancer URL Here>>}!/api/v1/todos');
+  check(res, { 'status was 200': (r) => r.status == 200 });
+  sleep(1);
+}
+\end{code}
 
 
 \bibliographystyle{ieeetr}
