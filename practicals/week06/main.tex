@@ -169,14 +169,13 @@ Congratulations! You have chosen to go down the EC2 path, this week we need to c
 To get started we need to modify how we create our EC2 instances, instead of manually creating them we are going to have to teach AWS how to deploy them for us. We can do this by converting our EC2 instance into a Launch Template. Our launch template is going to look very similar to the instance we had last week, instead a few variables have changed including that our user\_data must be stored as a base64 encoded string. Some of these changes have been highlighted below, also copy this code into a file called \texttt{ec2.tf}.
 
 
-\begin{code}[language=terraform,numbers=none]{ec2.tf}
+\begin{code}[language=terraform,numbers=none,escapechar=|,keepspaces=true]{ec2.tf}
 resource "aws_launch_template" "todo" {
-  name = "todo-launch-template"
-  image_id = "ami-005f9685cb30f234b"
+  name          = "todo-launch-template"
+  |\colorbox{yellow}{image\_id}|     = "ami-005f9685cb30f234b"
   instance_type = "t2.micro"
-  key_name = "vockey"
-
-  user_data = base64encode(<<-EOT
+  key_name      = "vockey"
+  user_data     = |\colorbox{yellow}{base64encode}|(<<-EOT
     #!/bin/bash
     yum update -y
     yum install -y docker
@@ -192,27 +191,27 @@ EOT
 
 
 resource "aws_security_group" "todo" {
-  name = "todo"
-  description = "TaskOverflow Security Group"
+  name          = "todo"
+  description   = "TaskOverflow Security Group"
 
   ingress {
-    from_port = 6400
-    to_port = 6400
-    protocol = "tcp"
+    from_port   = 6400
+    to_port     = 6400
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
@@ -226,9 +225,9 @@ Now that we have a template and a security group, we can create the AutoScaling 
   \end{center}
 \end{figure}
 
-\begin{code}[language=terraform,numbers=none]{autoscaling.tf}
+\begin{code}[language=terraform,numbers=none,keepspaces=true]{autoscaling.tf}
 resource "aws_autoscaling_group" "todo" {
-  name = "todo"
+  name               = "todo"
   availability_zones = ["us-east-1a"]
   desired_capacity   = 1
   max_size           = 4
@@ -249,7 +248,7 @@ If we deployed this now we would see that we get one initial instance created fo
   \end{center}
 \end{figure}
 
-\begin{code}[language=terraform,numbers=none]{lb.tf}
+\begin{code}[language=terraform,numbers=none,keepspaces=true]{lb.tf}
 resource "aws_lb_target_group" "todo" {
   name     = "todo"
   port     = 6400
@@ -260,7 +259,7 @@ resource "aws_lb_target_group" "todo" {
 
 When the target\_group is created we need to attach it to the autoscaling group. This is done by via the code below, copy this into \texttt{lb.tf}.
 
-\begin{code}[language=terraform,numbers=none]{lb.tf}
+\begin{code}[language=terraform,numbers=none,keepspaces=true]{lb.tf}
 resource "aws_autoscaling_attachment" "todo" {
   autoscaling_group_name = aws_autoscaling_group.todo.id
   alb_target_group_arn   = aws_lb_target_group.todo.arn
@@ -275,7 +274,7 @@ With a target\_group made we now need to attach that to a load balancer, copy th
   \end{center}
 \end{figure}
 
-\begin{code}[language=terraform,numbers=none]{lb.tf}
+\begin{code}[language=terraform,numbers=none,keepspaces=true]{lb.tf}
 resource "aws_lb" "taskoverflow" {
   name               = "taskoverflow"
   internal           = false
@@ -285,20 +284,20 @@ resource "aws_lb" "taskoverflow" {
 }
 
 resource "aws_security_group" "taskoverflow" {
-  name = "taskoverflow"
-  description = "TaskOverflow Security Group"
+  name          = "taskoverflow"
+  description   = "TaskOverflow Security Group"
 
   ingress {
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
@@ -312,7 +311,7 @@ Now we are on the external side of the load balancer we need to create a listene
   \end{center}
 \end{figure}
 
-\begin{code}[language=terraform,numbers=none]{lb.tf}
+\begin{code}[language=terraform,numbers=none,keepspaces=true]{lb.tf}
 resource "aws_lb_listener" "taskoverflow" {
   load_balancer_arn = aws_lb.taskoverflow.arn
   port              = "80"
@@ -329,7 +328,7 @@ Deploying this we now have achieved the architecture as requested with a dynamic
 
 To make our autoscaling group actually be dynamically scaling we need to give it some rules about when to scale up and when to scale down. The policies below is what does this function for us, they listen to the average CPU usage of the group of instances and if it is above 25 percent it will scale up by 1 instance and if it is below 10 percent it will scale down by 1 instance. We apply a cooldown period cause we dont want to act too aggressivly to changes in CPU usage as instances will take time to start and handle load. Copy this code into \texttt{autoscaling.tf}.
 
-\begin{code}[language=terraform,numbers=none]{autoscaling.tf}
+\begin{code}[language=terraform,numbers=none,keepspaces=true]{autoscaling.tf}
 resource "aws_autoscaling_policy" "todo_scale_down" {
   name                   = "todo_scale_down"
   autoscaling_group_name = aws_autoscaling_group.todo.name
@@ -350,7 +349,7 @@ resource "aws_cloudwatch_metric_alarm" "todo_scale_down" {
   period              = "120"
   statistic           = "Average"
 
-  dimensions = {
+  dimensions          = {
     AutoScalingGroupName = aws_autoscaling_group.todo.name
   }
 }
@@ -375,7 +374,7 @@ resource "aws_cloudwatch_metric_alarm" "todo_scale_up" {
   period              = "120"
   statistic           = "Average"
 
-  dimensions = {
+  dimensions          = {
     AutoScalingGroupName = aws_autoscaling_group.todo.name
   }
 }
@@ -398,29 +397,29 @@ Last week when we setup the ECS service we noticed that we couldnt get a endpoin
   \end{center}
 \end{figure}
 
-\begin{code}[language=terraform,numbers=none]{lb.tf}
+\begin{code}[language=terraform,numbers=none,keepspaces=true]{lb.tf}
 resource "aws_lb_target_group" "todo" {
-  name     = "todo"
-  port     = 6400
-  protocol = "HTTP"
-  vpc_id   = aws_security_group.todo.vpc_id
-  target_type = "ip"
+  name          = "todo"
+  port          = 6400
+  protocol      = "HTTP"
+  vpc_id        = aws_security_group.todo.vpc_id
+  target_type   = "ip"
 
   health_check {
-    path = "/api/v1/health"
-    port = "6400"
-    protocol = "HTTP"
-    healthy_threshold = 2
+    path                = "/api/v1/health"
+    port                = "6400"
+    protocol            = "HTTP"
+    healthy_threshold   = 2
     unhealthy_threshold = 2
-    timeout = 5
-    interval = 10
+    timeout             = 5
+    interval            = 10
   }
 }
 \end{code}
 
 Now that we have the target group we can add it to the ECS service. Copy this code into \texttt{ecs.tf} inside the service block.
 
-\begin{code}[language=terraform,numbers=none]{ecs.tf}
+\begin{code}[language=terraform,numbers=none,keepspaces=true]{ecs.tf}
   load_balancer {
     target_group_arn = aws_lb_target_group.todo.arn
     container_name   = "todo"
@@ -436,7 +435,7 @@ With the internal side of the load balancer done we can create it and a firewall
   \end{center}
 \end{figure}
 
-\begin{code}[language=terraform,numbers=none]{lb.tf}
+\begin{code}[language=terraform,numbers=none,keepspaces=true]{lb.tf}
 resource "aws_lb" "taskoverflow" {
   name               = "taskoverflow"
   internal           = false
@@ -446,21 +445,21 @@ resource "aws_lb" "taskoverflow" {
 }
 
 resource "aws_security_group" "taskoverflow" {
-  name = "taskoverflow"
+  name        = "taskoverflow"
   description = "TaskOverflow Security Group"
 
   ingress {
-    from_port = 80
-    to_port = 80
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port     = 80
+    to_port       = 80
+    protocol      = "tcp"
+    cidr_blocks   = ["0.0.0.0/0"]
   }
 
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port     = 0
+    to_port       = 0
+    protocol      = "-1"
+    cidr_blocks   = ["0.0.0.0/0"]
   }
 }
 \end{code}
@@ -473,44 +472,44 @@ Now over to the external side of the load balancer we need to create a listener 
   \end{center}
 \end{figure}
 
-\begin{code}[language=terraform,numbers=none]{lb.tf}
+\begin{code}[language=terraform,numbers=none,keepspaces=true]{lb.tf}
 resource "aws_lb_listener" "todo" {
-  load_balancer_arn = aws_lb.taskoverflow.arn
-  port              = "80"
-  protocol          = "HTTP"
+  load_balancer_arn   = aws_lb.taskoverflow.arn
+  port                = "80"
+  protocol            = "HTTP"
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.todo.arn
+    type              = "forward"
+    target_group_arn  = aws_lb_target_group.todo.arn
   }
 }
 \end{code}
 
 If we deployed now we would have completed the deployment diagram above. However we want to add some autoscaling to our service so that it can scale up and down based on the load. Copy this code into \texttt{autoscaling.tf}.
 
-\begin{code}[language=terraform,numbers=none]{autoscaling.tf}
+\begin{code}[language=terraform,numbers=none,keepspaces=true]{autoscaling.tf}
 resource "aws_appautoscaling_target" "todo" {
-  max_capacity = 4
-  min_capacity = 1
-  resource_id = "service/taskoverflow/taskoverflow"
-  scalable_dimension = "ecs:service:DesiredCount"
-  service_namespace = "ecs"
+  max_capacity        = 4
+  min_capacity        = 1
+  resource_id         = "service/taskoverflow/taskoverflow"
+  scalable_dimension  = "ecs:service:DesiredCount"
+  service_namespace   = "ecs"
 }
 
 
 resource "aws_appautoscaling_policy" "todo-cpu" {
-  name = "todo-cpu"
-  policy_type = "TargetTrackingScaling"
-  resource_id = aws_appautoscaling_target.todo.resource_id
-  scalable_dimension = aws_appautoscaling_target.todo.scalable_dimension
-  service_namespace = aws_appautoscaling_target.todo.service_namespace
+  name                = "todo-cpu"
+  policy_type         = "TargetTrackingScaling"
+  resource_id         = aws_appautoscaling_target.todo.resource_id
+  scalable_dimension  = aws_appautoscaling_target.todo.scalable_dimension
+  service_namespace   = aws_appautoscaling_target.todo.service_namespace
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
-      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+      predefined_metric_type  = "ECSServiceAverageCPUUtilization"
     }
 
-    target_value = 20
+    target_value              = 20
   }
 }
 \end{code}
@@ -543,17 +542,85 @@ export default function () {
 
 we can then run this file using the following command.
 
-\begin{code}[language=bash,numbers=none]{}
+\begin{code}[language=bash,numbers=none,keepspaces=true]{}
 >> k6 run k6.js
+\end{code}
+
+\begin{code}[language=bash,numbers=none,keepspaces=true]{}
+execution: local
+  script: load.js
+  output: -
+
+scenarios: (100.00%) 1 scenario, 5000 max VUs, 11m30s max duration (incl. graceful stop):
+        * default: Up to 5000 looping VUs for 11m0s over 2 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+
+running (00m05.4s), 0091/5000 VUs, 140 complete and 0 interrupted iterations
+default   [--------------------------------------] 0091/5000 VUs  00m05.4s/11m00.0s
+
 \end{code}
 
 \subsubsection{EC2 Auto Scaling}
 
-\todo{Show where in AWS they can see the scaling events for ECS}
+\todo{Show where in AWS they can see the scaling events for EC2}
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[scale=0.5]{images/ec2_1}
+  \end{center}
+\end{figure}
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=\textwidth]{images/ec2_3}
+  \end{center}
+\end{figure}
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=\textwidth]{images/ec2_4}
+  \end{center}
+\end{figure}
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=\textwidth]{images/ec2_5}
+  \end{center}
+\end{figure}
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=\textwidth]{images/ec2_6}
+  \end{center}
+\end{figure}
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=\textwidth]{images/ec2_7}
+  \end{center}
+\end{figure}
 
 \subsubsection{ECS Auto Scaling}
 
 \todo{Show where in AWS they can see the scaling events for ECS}
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=\textwidth]{images/ecs1}
+  \end{center}
+\end{figure}
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=\textwidth]{images/ecs2}
+  \end{center}
+\end{figure}
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=\textwidth]{images/ecs3}
+  \end{center}
+\end{figure}
 
 \bibliographystyle{ieeetr}
 \bibliography{books,ours}
