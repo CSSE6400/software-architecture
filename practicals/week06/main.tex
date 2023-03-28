@@ -75,13 +75,11 @@ This worked well most of the time.
 However, the health check was too weak. When:
 \begin{enumerate} 
     \item A data-center outage occured; and
-    \item The operating system running the service disappeared; but 
+    \item The storage running the service disappeared; but 
     \item The service was still running in memory.
 \end{enumerate}
 
 The health check passed, but in reality, the service was talking to dead nodes, causing upstream services to have intermitent failures. 
-
-\todo{C4 Diagram of the architecture}
 
 \paragraph{Example 2} During the rollout of a new prompt for UQ Authenticate which required users to go to my.UQ to provide verified contact details - the Blackboard (learn.uq.edu.au) service went completly offline.
 The health check for Blackboard at the time completed a full authentication as a test user to ensure everything was functioning as expected.
@@ -89,7 +87,6 @@ Once this user was enrolled into the new rollout,
 the health checks started reporting failures and within a matter of minutes the entire pool of nodes were shutdown.
 This health check was too broad and was not isolated enough to the service that it was checking.
 
-\todo{C4 diagram of the architecture}
 
 A lot of services will provide a health check endpoint or a metrics endpoint which can help the engineer setup a proper level of health check.
 We want a health check that is specific enough for the service that it is checking but not so specific that it is too brittle.
@@ -562,7 +559,7 @@ default   [--------------------------------------] 0091/5000 VUs  00m05.4s/11m00
 
 \subsubsection{EC2 Auto Scaling}
 
-\todo{Show where in AWS they can see the scaling events for EC2}
+With all the pieces together we can now see if our efforts have paid off. While the above K6 is running lets heave over to the EC2 console and see what actions our autoscaling policy has taken. In the EC2 console scroll down the left hand menu and select \texttt{Auto Scaling Groups}.
 
 \begin{figure}[H]
   \begin{center}
@@ -570,11 +567,15 @@ default   [--------------------------------------] 0091/5000 VUs  00m05.4s/11m00
   \end{center}
 \end{figure}
 
+You will be presented with our todo group which states the current instances and the desired, minimum and maximum. Select the name of the group.
+
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=\textwidth]{images/ec2_3}
   \end{center}
 \end{figure}
+
+In this panel we are presented with much of the same info but what we want is the \texttt{Automatic scaling} tab.
 
 \begin{figure}[H]
   \begin{center}
@@ -582,17 +583,23 @@ default   [--------------------------------------] 0091/5000 VUs  00m05.4s/11m00
   \end{center}
 \end{figure}
 
+In this tab we have our two policies being displayed and we can see the config of both.
+
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=\textwidth]{images/ec2_5}
   \end{center}
 \end{figure}
 
+In the activity tab we can see the actions performed by our policies, wether it be a scale up or a scale down.
+
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=\textwidth]{images/ec2_6}
   \end{center}
 \end{figure}
+
+If we also head over to CloudWatch alarms we can also see the alarms that are the triggers for our policies.
 
 \begin{figure}[H]
   \begin{center}
@@ -602,7 +609,7 @@ default   [--------------------------------------] 0091/5000 VUs  00m05.4s/11m00
 
 \subsubsection{ECS Auto Scaling}
 
-\todo{Show where in AWS they can see the scaling events for ECS}
+With all the pieces together we can now see if our efforts have paid off. While the above k6 is running lets go to the ECS console and see if we can see any scaling events. Navigate to ECS -> Clusters -> taskoverflow -> Services -> taskoverflow -> Configuration and tasks.
 
 \begin{figure}[H]
   \begin{center}
@@ -610,11 +617,15 @@ default   [--------------------------------------] 0091/5000 VUs  00m05.4s/11m00
   \end{center}
 \end{figure}
 
+In this panel we can see our Auto Scaling configuration which lists the desired, minimum and maximum number of tasks. The policies are listed further down and we can view the alarm which is a graphical representation of the CPU utilization vs the target value.
+
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=\textwidth]{images/ecs2}
   \end{center}
 \end{figure}
+
+In the Cloudwatch Alarm panel you will notice that we have two differnt alarms, this is for the scaling up and down of the service. Selecting the alarm you can view the status where an "in alert" alarm is when the auto scaling configuration needs to action increasing/decreasing the number of instances.
 
 \begin{figure}[H]
   \begin{center}
