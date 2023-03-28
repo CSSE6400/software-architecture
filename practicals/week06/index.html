@@ -1,4 +1,4 @@
-Last Updated on 2023/03/27      
+Last Updated on 2023/03/28      
 
 <?xml version="1.0" encoding="iso-8859-1" ?> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
@@ -137,7 +137,7 @@ the time. However, the health check was too weak. When:
       </p></li>
 <li 
   class="enumerate" id="x1-5004x2">
-      <!--l. 78--><p class="noindent" >The operating system running the service disappeared; but
+      <!--l. 78--><p class="noindent" >The storage running the service disappeared; but
                                                                                                     
                                                                                                     
       </p></li>
@@ -147,13 +147,7 @@ the time. However, the health check was too weak. When:
 <!--l. 82--><p class="indent" >   The health check passed, but in reality, the service was talking to dead nodes, causing upstream services to
 have intermitent failures.
 </p>
-   <div class="tcolorbox tcolorbox" id="tcolobox-1">    
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 84--><p class="noindent" >TODO: C4 Diagram of the architecture </p> 
-</div> 
-</div>
-<!--l. 86--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 84--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-6000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Example 2</span></span>
    During the rollout of a new prompt for UQ Authenticate which required users to go to my.UQ to provide
@@ -162,80 +156,73 @@ Blackboard at the time completed a full authentication as a test user to ensure 
 expected. Once this user was enrolled into the new rollout, the health checks started reporting failures and within
 a matter of minutes the entire pool of nodes were shutdown. This health check was too broad and was not
 isolated enough to the service that it was checking.
-</p>
-   <div class="tcolorbox tcolorbox" id="tcolobox-2">    
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 92--><p class="noindent" >TODO: C4 diagram of the architecture </p> 
-</div> 
-</div>
-<!--l. 94--><p class="indent" >   A lot of services will provide a health check endpoint or a metrics endpoint which can help the engineer setup
+</p><!--l. 91--><p class="indent" >   A lot of services will provide a health check endpoint or a metrics endpoint which can help the engineer setup
 a proper level of health check. We want a health check that is specific enough for the service that it is checking but
 not so specific that it is too brittle. For the TaskOverflow application that we have been building so far, a
 reasonable health check would be that the health endpoint ensures the database is available and that the
 application is able to connect to it.
-</p><!--l. 99--><p class="noindent" >
+</p><!--l. 96--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
  id="x1-70003"></a>Load Balancers in AWS</h3>
-<!--l. 101--><p class="noindent" >
+<!--l. 98--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.1    </span> <a 
  id="x1-80003.1"></a>Types of AWS Load Balancers</h4>
-<!--l. 102--><p class="noindent" >Not all load balancers are the same. Some load balancers inspect the transmitted packets to correctly route the
+<!--l. 99--><p class="noindent" >Not all load balancers are the same. Some load balancers inspect the transmitted packets to correctly route the
 packet. We will cover two load balancer types AWS provides:
-</p><!--l. 106--><p class="indent" >
+</p><!--l. 103--><p class="indent" >
       </p><dl class="description"><dt class="description">
-      <!--l. 107--><p class="noindent" >
+      <!--l. 104--><p class="noindent" >
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Application Load Balancer</span> </p></dt><dd 
 class="description">
-      <!--l. 107--><p class="noindent" >is an OSI layer 7<span class="footnote-mark"><a 
+      <!--l. 104--><p class="noindent" >is an OSI layer 7<span class="footnote-mark"><a 
 href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
  id="x1-8001f1"></a>
       load balancer which routes traffic based on the request&#8217;s content. This is useful for services using
       HTTP, HTTPS, or any other supported protocol.
-                                                                                                    
-                                                                                                    
       </p></dd><dt class="description">
-      <!--l. 111--><p class="noindent" >
+      <!--l. 108--><p class="noindent" >
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Network Load Balancer</span> </p></dt><dd 
 class="description">
-      <!--l. 111--><p class="noindent" >is an OSI layer 4<span class="footnote-mark"><a 
+      <!--l. 108--><p class="noindent" >is an OSI layer 4<span class="footnote-mark"><a 
 href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
  id="x1-8003f2"></a>
       load balancer which routes traffic based on the source and destination IP addresses and ports. This
       is useful for services that are using TCP or UDP.</p></dd></dl>
-<!--l. 117--><p class="noindent" >
+                                                                                                    
+                                                                                                    
+<!--l. 114--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.2    </span> <a 
  id="x1-90003.2"></a>AWS Load Balancer Design</h4>
-<!--l. 119--><p class="noindent" >An AWS Elastic Load Balancer has three distinct components.
-</p><!--l. 121--><p class="indent" >
+<!--l. 116--><p class="noindent" >An AWS Elastic Load Balancer has three distinct components.
+</p><!--l. 118--><p class="indent" >
       </p><dl class="description"><dt class="description">
-      <!--l. 122--><p class="noindent" >
+      <!--l. 119--><p class="noindent" >
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Listeners</span> </p></dt><dd 
 class="description">
-      <!--l. 122--><p class="noindent" >allows traffic to enter the Elastic Load Balancer. Each listener has a port (e.g. <span 
+      <!--l. 119--><p class="noindent" >allows traffic to enter the Elastic Load Balancer. Each listener has a port (e.g. <span 
 class="ectt-1200">port 80</span>) and a protocol
       (e.g. <span 
 class="ectt-1200">HTTP</span>) associated with it.
       </p></dd><dt class="description">
-      <!--l. 124--><p class="noindent" >
+      <!--l. 121--><p class="noindent" >
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Target Groups</span> </p></dt><dd 
 class="description">
-      <!--l. 124--><p class="noindent" >are groups of nodes which the load balancer can route to. Each target group has a protocol and a
+      <!--l. 121--><p class="noindent" >are groups of nodes which the load balancer can route to. Each target group has a protocol and a
       port associated with it, allowing us (the programmer) to switch ports on the way through the load
       balancer. This is useful if the targets are using a different port to the ports we want to expose.
       </p></dd><dt class="description">
-      <!--l. 127--><p class="noindent" >
+      <!--l. 124--><p class="noindent" >
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Load Balancer</span> </p></dt><dd 
 class="description">
-      <!--l. 127--><p class="noindent" >is the actual load balancer that routes the traffic to the target groups based on rules that we setup.
+      <!--l. 124--><p class="noindent" >is the actual load balancer that routes the traffic to the target groups based on rules that we setup.
       The load balancer has a DNS name that we can use to route traffic to it. The load balancer also has
       a security group that we can use to control what traffic can enter the load balancer.</p></dd></dl>
    <hr class="figure" /><div class="figure" 
@@ -244,7 +231,7 @@ class="description">
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 133--><p class="noindent" ><img 
+<!--l. 130--><p class="noindent" ><img 
 src="diagrams/loadbalancers.png" alt="PIC"  
 width="525" height="525"  />
                                                                                                     
@@ -253,48 +240,48 @@ width="525" height="525"  />
    </div><hr class="endfigure" />
    <h4 class="subsectionHead"><span class="titlemark">3.3    </span> <a 
  id="x1-100003.3"></a>Autoscaling in AWS</h4>
-<!--l. 137--><p class="noindent" >Instead of creating the maxiumum amount of services we predict we will need, we can automatically scale the
+<!--l. 134--><p class="noindent" >Instead of creating the maxiumum amount of services we predict we will need, we can automatically scale the
 number of nodes we need to minimise resources. When the load is low, we operate with minimal nodes. When
 the load is high, we increase the number of nodes available to cope.
-</p><!--l. 142--><p class="indent" >   To compute the resources needed, AWS relies on triggers from CloudWatch and scaling policies. Some
+</p><!--l. 139--><p class="indent" >   To compute the resources needed, AWS relies on triggers from CloudWatch and scaling policies. Some
 premade triggers are based around a node&#8217;s;
 </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 146--><p class="noindent" >CPU usage,
+      <!--l. 143--><p class="noindent" >CPU usage,
       </p></li>
       <li class="itemize">
-      <!--l. 147--><p class="noindent" >memory usage, or
+      <!--l. 144--><p class="noindent" >memory usage, or
       </p></li>
       <li class="itemize">
-      <!--l. 148--><p class="noindent" >network usage.</p></li></ul>
-<!--l. 151--><p class="indent" >   We create custom triggers based on our application&#8217;s metrics.
-</p><!--l. 153--><p class="noindent" >
+      <!--l. 145--><p class="noindent" >network usage.</p></li></ul>
+<!--l. 148--><p class="indent" >   We create custom triggers based on our application&#8217;s metrics.
+</p><!--l. 150--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
  id="x1-110004"></a>Load Balancing TaskOverflow</h3>
-<!--l. 155--><p class="noindent" >This week we are going to explore load balancing the TaskOverflow service that we have been working with. The
+<!--l. 152--><p class="noindent" >This week we are going to explore load balancing the TaskOverflow service that we have been working with. The
 aim is to have a service that when given a lot of requesters will be able to scale out the webservice nodes to
 handle it. This wont be a full solution to the scaling issue as our database is still a single node, but it will be a good
 start. Other methods could also be employed to help deal with the load like caching but we will leave that for
 another day.
-</p><!--l. 157--><p class="indent" >   Start with the github repository provided in class and install terraform as it will be required this week. You will
+</p><!--l. 154--><p class="indent" >   Start with the github repository provided in class and install terraform as it will be required this week. You will
 also need to start your learner lab and copy the credentials into a credentials file into the root of the respository. In
 the respository you will also see two differnt folders, one is the starter for the EC2 path and the other is the starter
 for the ECS path. Once you have chosen which path you want to take, copy the contents of the folder into the
 root of the repository.
-</p><!--l. 159--><p class="indent" >   As per last week, we encourage that you take <span 
+</p><!--l. 156--><p class="indent" >   As per last week, we encourage that you take <span 
 class="ectt-1200">Path B </span>first and then pruse the <span 
 class="ectt-1200">Path A </span>if you have time. This
 week <span 
 class="ectt-1200">Path A </span>does show an alternative method to autoscaling.
-</p><!--l. 161--><p class="noindent" >
+</p><!--l. 158--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.1    </span> <a 
  id="x1-120004.1"></a>[Path A] EC2</h4>
                                                                                                     
                                                                                                     
-<!--l. 163--><p class="noindent" >Congratulations! You have chosen to go down the EC2 path, this week we need to create a AutoScaling
+<!--l. 160--><p class="noindent" >Congratulations! You have chosen to go down the EC2 path, this week we need to create a AutoScaling
 Group and a Load Balancer to handle the scaling of our service. Our goal is the deployment diagram
 below.
 </p>
@@ -304,23 +291,23 @@ below.
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 166--><p class="noindent" ><img 
+<!--l. 163--><p class="noindent" ><img 
 src="diagrams/ec2deployment.png" alt="PIC"  
 width="525" height="525"  />
                                                                                                     
                                                                                                     
 </p>
    </div><hr class="endfigure" />
-<!--l. 169--><p class="indent" >   To get started we need to modify how we create our EC2 instances, instead of manually creating them we are
+<!--l. 166--><p class="indent" >   To get started we need to modify how we create our EC2 instances, instead of manually creating them we are
 going to have to teach AWS how to deploy them for us. We can do this by converting our EC2 instance into a
 Launch Template. Our launch template is going to look very similar to the instance we had last week, instead
 a few variables have changed including that our user_data must be stored as a base64 encoded
 string. Some of these changes have been highlighted below, also copy this code into a file called
 <span 
 class="ectt-1200">ec2.tf</span>.
-</p><!--l. 172--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 172--><p class="indent" >   <span 
-class="ectt-1200">» cat ec2.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 172--><pre class="listings" id="listing-1"><span class="label"><a 
+</p><!--l. 169--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 169--><p class="indent" >   <span 
+class="ectt-1200">» cat ec2.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 169--><pre class="listings" id="listing-1"><span class="label"><a 
  id="x1-12001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -623,7 +610,7 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12046r46"></a></span></pre>
    </div>
-<!--l. 220--><p class="indent" >   Now that we have a template and a security group, we can create the AutoScaling Group. This block defines
+<!--l. 217--><p class="indent" >   Now that we have a template and a security group, we can create the AutoScaling Group. This block defines
 the limits of how many instances we want to have and the template we want it to use. Copy this code into a file
 called <span 
 class="ectt-1200">autoscaling.tf</span>.
@@ -636,16 +623,16 @@ class="ectt-1200">autoscaling.tf</span>.
                                                                                                     
 <div class="center" 
 >
-<!--l. 223--><p class="noindent" >
-</p><!--l. 224--><p class="noindent" ><img 
+<!--l. 220--><p class="noindent" >
+</p><!--l. 221--><p class="noindent" ><img 
 src="diagrams/lb1.png" alt="PIC"  
 width="14" height="14"  /></p></div>
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
-<!--l. 228--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 228--><p class="indent" >   <span 
-class="ectt-1200">» cat autoscaling.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 228--><pre class="listings" id="listing-2"><span class="label"><a 
+<!--l. 225--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 225--><p class="indent" >   <span 
+class="ectt-1200">» cat autoscaling.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 225--><pre class="listings" id="listing-2"><span class="label"><a 
  id="x1-12047r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -722,7 +709,7 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12059r13"></a></span></pre>
    </div>
-<!--l. 243--><p class="indent" >   If we deployed this now we would see that we get one initial instance created for us due to the
+<!--l. 240--><p class="indent" >   If we deployed this now we would see that we get one initial instance created for us due to the
 desired and min_size. Now that we have instances we have the ability for traffic to be routed to them.
 Lets create a target_group which will be on the internal facing side of our load balancer. This is the
 side that lets traffic leave the load balancer and hit the instances. Copy this code into a file called
@@ -737,16 +724,16 @@ class="ectt-1200">lb.tf</span>.
                                                                                                     
 <div class="center" 
 >
-<!--l. 246--><p class="noindent" >
-</p><!--l. 247--><p class="noindent" ><img 
+<!--l. 243--><p class="noindent" >
+</p><!--l. 244--><p class="noindent" ><img 
 src="diagrams/lb2.png" alt="PIC"  
 width="14" height="14"  /></p></div>
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
-<!--l. 251--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 251--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 251--><pre class="listings" id="listing-3"><span class="label"><a 
+<!--l. 248--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 248--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 248--><pre class="listings" id="listing-3"><span class="label"><a 
  id="x1-12060r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -791,12 +778,12 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12066r7"></a></span></pre>
    </div>
-<!--l. 260--><p class="indent" >   When the target_group is created we need to attach it to the autoscaling group. This is done by via the code
+<!--l. 257--><p class="indent" >   When the target_group is created we need to attach it to the autoscaling group. This is done by via the code
 below, copy this into <span 
 class="ectt-1200">lb.tf</span>.
-</p><!--l. 262--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 262--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 262--><pre class="listings" id="listing-4"><span class="label"><a 
+</p><!--l. 259--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 259--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 259--><pre class="listings" id="listing-4"><span class="label"><a 
  id="x1-12067r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -831,7 +818,7 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12071r5"></a></span></pre>
    </div>
-<!--l. 269--><p class="indent" >   With a target_group made we now need to attach that to a load balancer, copy this code into <span 
+<!--l. 266--><p class="indent" >   With a target_group made we now need to attach that to a load balancer, copy this code into <span 
 class="ectt-1200">lb.tf</span>. You will
 notice that there is also a security group attached to the load balancer, this is the firewall that sits on the front of
 the load balancer and allows traffic to enter the load balancer.
@@ -844,16 +831,16 @@ the load balancer and allows traffic to enter the load balancer.
                                                                                                     
 <div class="center" 
 >
-<!--l. 272--><p class="noindent" >
-</p><!--l. 273--><p class="noindent" ><img 
+<!--l. 269--><p class="noindent" >
+</p><!--l. 270--><p class="noindent" ><img 
 src="diagrams/lb3.png" alt="PIC"  
 width="14" height="14"  /></p></div>
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
-<!--l. 277--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 277--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 277--><pre class="listings" id="listing-5"><span class="label"><a 
+<!--l. 274--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 274--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 274--><pre class="listings" id="listing-5"><span class="label"><a 
  id="x1-12072r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -1012,7 +999,7 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12098r27"></a></span></pre>
    </div>
-<!--l. 306--><p class="indent" >   Now we are on the external side of the load balancer we need to create a listener which actually creates the
+<!--l. 303--><p class="indent" >   Now we are on the external side of the load balancer we need to create a listener which actually creates the
 rules for how traffic is routed to the instances. Copy this code into <span 
 class="ectt-1200">lb.tf</span>.
 </p>
@@ -1024,16 +1011,16 @@ class="ectt-1200">lb.tf</span>.
                                                                                                     
 <div class="center" 
 >
-<!--l. 309--><p class="noindent" >
-</p><!--l. 310--><p class="noindent" ><img 
+<!--l. 306--><p class="noindent" >
+</p><!--l. 307--><p class="noindent" ><img 
 src="diagrams/lb4.png" alt="PIC"  
 width="14" height="14"  /></p></div>
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
-<!--l. 314--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 314--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 314--><pre class="listings" id="listing-6"><span class="label"><a 
+<!--l. 311--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 311--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 311--><pre class="listings" id="listing-6"><span class="label"><a 
  id="x1-12099r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -1098,19 +1085,19 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12109r11"></a></span></pre>
    </div>
-<!--l. 327--><p class="indent" >   Deploying this we now have achieved the architecture as requested with a dynamically scaling
+<!--l. 324--><p class="indent" >   Deploying this we now have achieved the architecture as requested with a dynamically scaling
 group of EC2s with a Application Load Balancer sitting infront which is listening on port 80 instead of
 6400.
-</p><!--l. 329--><p class="indent" >   To make our autoscaling group actually be dynamically scaling we need to give it some rules about when to
+</p><!--l. 326--><p class="indent" >   To make our autoscaling group actually be dynamically scaling we need to give it some rules about when to
 scale up and when to scale down. The policies below is what does this function for us, they listen to the average
 CPU usage of the group of instances and if it is above 25 percent it will scale up by 1 instance and if it is below 10
 percent it will scale down by 1 instance. We apply a cooldown period cause we dont want to act too aggressivly
 to changes in CPU usage as instances will take time to start and handle load. Copy this code into
 <span 
 class="ectt-1200">autoscaling.tf</span>.
-</p><!--l. 331--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 331--><p class="indent" >   <span 
-class="ectt-1200">» cat autoscaling.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 331--><pre class="listings" id="listing-7"><span class="label"><a 
+</p><!--l. 328--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 328--><p class="indent" >   <span 
+class="ectt-1200">» cat autoscaling.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 328--><pre class="listings" id="listing-7"><span class="label"><a 
  id="x1-12110r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -1436,12 +1423,12 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12159r50"></a></span></pre>
    </div>
-<!--l. 383--><p class="indent" >   Head to the next section to see how we can send load to the load balancer to cause our service to have to
+<!--l. 380--><p class="indent" >   Head to the next section to see how we can send load to the load balancer to cause our service to have to
 scale up.
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.2    </span> <a 
  id="x1-130004.2"></a>[Path B] ECS</h4>
-<!--l. 386--><p class="noindent" >Congratulations! You have chosen to go down the ECS path, this week we need create a Application Scaling Policy
+<!--l. 383--><p class="noindent" >Congratulations! You have chosen to go down the ECS path, this week we need create a Application Scaling Policy
 for our ECS service and a Load Balancer to handle the routing of our service. Our goal is the deployment diagram
 below.
 </p>
@@ -1451,14 +1438,14 @@ below.
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 389--><p class="noindent" ><img 
+<!--l. 386--><p class="noindent" ><img 
 src="diagrams/ecsdeployment.png" alt="PIC"  
 width="525" height="525"  />
                                                                                                     
                                                                                                     
 </p>
    </div><hr class="endfigure" />
-<!--l. 392--><p class="indent" >   Last week when we setup the ECS service we noticed that we couldnt get a endpoint cause the instance would
+<!--l. 389--><p class="indent" >   Last week when we setup the ECS service we noticed that we couldnt get a endpoint cause the instance would
 only be provisioned after our terraform had run. This is because it is already a dynamic service and it wants a
 load balancer to service its traffic. To get started we need to create a target group which is on the
 internal side of the load balancer and defines where traffic can be routed to. Copy this code into
@@ -1473,16 +1460,16 @@ class="ectt-1200">lb.tf</span>.
                                                                                                     
 <div class="center" 
 >
-<!--l. 395--><p class="noindent" >
-</p><!--l. 396--><p class="noindent" ><img 
+<!--l. 392--><p class="noindent" >
+</p><!--l. 393--><p class="noindent" ><img 
 src="diagrams/lb2fargate.png" alt="PIC"  
 width="14" height="14"  /></p></div>
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
-<!--l. 400--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 400--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 400--><pre class="listings" id="listing-8"><span class="label"><a 
+<!--l. 397--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 397--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 397--><pre class="listings" id="listing-8"><span class="label"><a 
  id="x1-13001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -1589,12 +1576,12 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-13018r18"></a></span></pre>
    </div>
-<!--l. 420--><p class="indent" >   Now that we have the target group we can add it to the ECS service. Copy this code into <span 
+<!--l. 417--><p class="indent" >   Now that we have the target group we can add it to the ECS service. Copy this code into <span 
 class="ectt-1200">ecs.tf </span>inside the
 service block.
-</p><!--l. 422--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 422--><p class="indent" >   <span 
-class="ectt-1200">» cat ecs.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 422--><pre class="listings" id="listing-9"><span class="label"><a 
+</p><!--l. 419--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 419--><p class="indent" >   <span 
+class="ectt-1200">» cat ecs.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 419--><pre class="listings" id="listing-9"><span class="label"><a 
  id="x1-13019r1"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">load_balancer</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
@@ -1626,7 +1613,7 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-13024r6"></a></span></pre>
    </div>
-<!--l. 430--><p class="indent" >   With the internal side of the load balancer done we can create it and a firewall for the external side. This
+<!--l. 427--><p class="indent" >   With the internal side of the load balancer done we can create it and a firewall for the external side. This
 firewall allows us to restrict what traffic will be allowed to flow through the load balancer. Copy this code into
 <span 
 class="ectt-1200">lb.tf</span>.
@@ -1639,16 +1626,16 @@ class="ectt-1200">lb.tf</span>.
                                                                                                     
 <div class="center" 
 >
-<!--l. 433--><p class="noindent" >
-</p><!--l. 434--><p class="noindent" ><img 
+<!--l. 430--><p class="noindent" >
+</p><!--l. 431--><p class="noindent" ><img 
 src="diagrams/lb3fargate.png" alt="PIC"  
 width="14" height="14"  /></p></div>
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
-<!--l. 438--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 438--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 438--><pre class="listings" id="listing-10"><span class="label"><a 
+<!--l. 435--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 435--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 435--><pre class="listings" id="listing-10"><span class="label"><a 
  id="x1-13025r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -1807,7 +1794,7 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-13051r27"></a></span></pre>
    </div>
-<!--l. 467--><p class="indent" >   Now over to the external side of the load balancer we need to create a listener which is the entry point for the
+<!--l. 464--><p class="indent" >   Now over to the external side of the load balancer we need to create a listener which is the entry point for the
 load balancer. Copy this code into <span 
 class="ectt-1200">lb.tf</span>.
 </p>
@@ -1819,16 +1806,16 @@ class="ectt-1200">lb.tf</span>.
                                                                                                     
 <div class="center" 
 >
-<!--l. 470--><p class="noindent" >
-</p><!--l. 471--><p class="noindent" ><img 
+<!--l. 467--><p class="noindent" >
+</p><!--l. 468--><p class="noindent" ><img 
 src="diagrams/lb4fargate.png" alt="PIC"  
 width="14" height="14"  /></p></div>
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
-<!--l. 475--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 475--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 475--><pre class="listings" id="listing-11"><span class="label"><a 
+<!--l. 472--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 472--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 472--><pre class="listings" id="listing-11"><span class="label"><a 
  id="x1-13052r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -1893,13 +1880,13 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-13062r11"></a></span></pre>
    </div>
-<!--l. 488--><p class="indent" >   If we deployed now we would have completed the deployment diagram above. However we want to add
+<!--l. 485--><p class="indent" >   If we deployed now we would have completed the deployment diagram above. However we want to add
 some autoscaling to our service so that it can scale up and down based on the load. Copy this code into
 <span 
 class="ectt-1200">autoscaling.tf</span>.
-</p><!--l. 490--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 490--><p class="indent" >   <span 
-class="ectt-1200">» cat autoscaling.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 490--><pre class="listings" id="listing-12"><span class="label"><a 
+</p><!--l. 487--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 487--><p class="indent" >   <span 
+class="ectt-1200">» cat autoscaling.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 487--><pre class="listings" id="listing-12"><span class="label"><a 
  id="x1-13063r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -2047,25 +2034,25 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-13087r25"></a></span></pre>
    </div>
-<!--l. 517--><p class="indent" >   This auto scaling policy looks at the average CPU utilization of the service and scales up if it is above 20% and
+<!--l. 514--><p class="indent" >   This auto scaling policy looks at the average CPU utilization of the service and scales up if it is above 20% and
 scales down if it is below 20%. This is a very simple policy but it is a good starting point. We can now deploy our
 service and see it scale up and down. Continue onto the next section to see how to send our service some
 load.
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.3    </span> <a 
  id="x1-140004.3"></a>Producing Load with K6</h4>
-<!--l. 521--><p class="noindent" >We have a service but us visiting it in our web browser is not gonna trigger enough load for our policies to trigger.
+<!--l. 518--><p class="noindent" >We have a service but us visiting it in our web browser is not gonna trigger enough load for our policies to trigger.
 To do this we are gonna employ the help of a tool called K6 which is a recent addition to the load testing tools. To
 install K6 visit <a 
 href="https://k6.io/docs/get-started/installation/" class="url" ><span 
 class="ectt-1200">https://k6.io/docs/get-started/installation/</span></a>, this can be installed in the code spaces
 environment or locally.
-</p><!--l. 523--><p class="indent" >   We have provided an example K6 file which is a javascript script that creates 1000 to 5000 users to call the
+</p><!--l. 520--><p class="indent" >   We have provided an example K6 file which is a javascript script that creates 1000 to 5000 users to call the
 list endpoint of our service. Copy this code into a file called <span 
 class="ectt-1200">k6.js</span>.
-</p><!--l. 525--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 525--><p class="indent" >   <span 
-class="ectt-1200">» cat k6.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 525--><pre class="listings" id="listing-13"><span class="label"><a 
+</p><!--l. 522--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 522--><p class="indent" >   <span 
+class="ectt-1200">» cat k6.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 522--><pre class="listings" id="listing-13"><span class="label"><a 
  id="x1-14001r1"></a></span><span style="color:#404040"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">http</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2214,10 +2201,10 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-14016r16"></a></span></pre>
    </div>
-<!--l. 543--><p class="indent" >   we can then run this file using the following command.
+<!--l. 540--><p class="indent" >   we can then run this file using the following command.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 545--><pre class="listings" id="listing-14"><span class="label"><a 
+<!--l. 542--><pre class="listings" id="listing-14"><span class="label"><a 
  id="x1-14017r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">k6</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2230,7 +2217,7 @@ class="ectt-1200">js</span></span>
  id="x1-14018r2"></a></span></pre>
    </div>
    <div class="framedenv" id="code-1">
-<!--l. 549--><pre class="listings" id="listing-15"><span class="label"><a 
+<!--l. 546--><pre class="listings" id="listing-15"><span class="label"><a 
  id="x1-14019r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">execution</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
@@ -2339,16 +2326,15 @@ class="ectt-1200">s</span></span>
 <span class="label"><a 
  id="x1-14031r13"></a></span></pre>
    </div>
-<!--l. 563--><p class="noindent" >
+<!--l. 560--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">4.3.1    </span> <a 
  id="x1-150004.3.1"></a>EC2 Auto Scaling</h5>
-   <div class="tcolorbox tcolorbox" id="tcolobox-3">    
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 565--><p class="noindent" >TODO: Show where in AWS they can see the scaling events for EC2 </p> 
-</div> 
-</div>
+<!--l. 562--><p class="noindent" >With all the pieces together we can now see if our efforts have paid off. While the above K6 is running lets heave
+over to the EC2 console and see what actions our autoscaling policy has taken. In the EC2 console scroll down the
+left hand menu and select <span 
+class="ectt-1200">Auto Scaling Groups</span>.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
@@ -2357,13 +2343,16 @@ class="ectt-1200">s</span></span>
                                                                                                     
 <div class="center" 
 >
-<!--l. 568--><p class="noindent" >
-</p><!--l. 569--><p class="noindent" ><img 
+<!--l. 565--><p class="noindent" >
+</p><!--l. 566--><p class="noindent" ><img 
 src="images/ec2_1.png" alt="PIC"  
 width="36" height="36"  /></p></div>
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
+<!--l. 570--><p class="indent" >   You will be presented with our todo group which states the current instances and the desired, minimum and
+maximum. Select the name of the group.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
@@ -2372,13 +2361,17 @@ width="36" height="36"  /></p></div>
                                                                                                     
 <div class="center" 
 >
-<!--l. 574--><p class="noindent" >
-</p><!--l. 575--><p class="noindent" ><img 
+<!--l. 573--><p class="noindent" >
+</p><!--l. 574--><p class="noindent" ><img 
 src="images/ec2_3.png" alt="PIC"  
 width="525" height="525"  /></p></div>
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
+<!--l. 578--><p class="indent" >   In this panel we are presented with much of the same info but what we want is the <span 
+class="ectt-1200">Automatic scaling</span>
+tab.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
@@ -2387,13 +2380,15 @@ width="525" height="525"  /></p></div>
                                                                                                     
 <div class="center" 
 >
-<!--l. 580--><p class="noindent" >
-</p><!--l. 581--><p class="noindent" ><img 
+<!--l. 581--><p class="noindent" >
+</p><!--l. 582--><p class="noindent" ><img 
 src="images/ec2_4.png" alt="PIC"  
 width="525" height="525"  /></p></div>
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
+<!--l. 586--><p class="indent" >   In this tab we have our two policies being displayed and we can see the config of both.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
@@ -2402,13 +2397,16 @@ width="525" height="525"  /></p></div>
                                                                                                     
 <div class="center" 
 >
-<!--l. 586--><p class="noindent" >
-</p><!--l. 587--><p class="noindent" ><img 
+<!--l. 589--><p class="noindent" >
+</p><!--l. 590--><p class="noindent" ><img 
 src="images/ec2_5.png" alt="PIC"  
 width="525" height="525"  /></p></div>
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
+<!--l. 594--><p class="indent" >   In the activity tab we can see the actions performed by our policies, wether it be a scale up or a scale
+down.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
@@ -2417,13 +2415,16 @@ width="525" height="525"  /></p></div>
                                                                                                     
 <div class="center" 
 >
-<!--l. 592--><p class="noindent" >
-</p><!--l. 593--><p class="noindent" ><img 
+<!--l. 597--><p class="noindent" >
+</p><!--l. 598--><p class="noindent" ><img 
 src="images/ec2_6.png" alt="PIC"  
 width="525" height="525"  /></p></div>
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
+<!--l. 602--><p class="indent" >   If we also head over to CloudWatch alarms we can also see the alarms that are the triggers for our
+policies.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
@@ -2432,8 +2433,8 @@ width="525" height="525"  /></p></div>
                                                                                                     
 <div class="center" 
 >
-<!--l. 598--><p class="noindent" >
-</p><!--l. 599--><p class="noindent" ><img 
+<!--l. 605--><p class="noindent" >
+</p><!--l. 606--><p class="noindent" ><img 
 src="images/ec2_7.png" alt="PIC"  
 width="525" height="525"  /></p></div>
                                                                                                     
@@ -2441,12 +2442,10 @@ width="525" height="525"  /></p></div>
    </div><hr class="endfigure" />
    <h5 class="subsubsectionHead"><span class="titlemark">4.3.2    </span> <a 
  id="x1-160004.3.2"></a>ECS Auto Scaling</h5>
-   <div class="tcolorbox tcolorbox" id="tcolobox-4">    
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 605--><p class="noindent" >TODO: Show where in AWS they can see the scaling events for ECS </p> 
-</div> 
-</div>
+<!--l. 612--><p class="noindent" >With all the pieces together we can now see if our efforts have paid off. While the above k6 is running lets go to
+the ECS console and see if we can see any scaling events. Navigate to ECS -&#x003E; Clusters -&#x003E; taskoverflow -&#x003E; Services
+-&#x003E; taskoverflow -&#x003E; Configuration and tasks.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
@@ -2455,13 +2454,17 @@ width="525" height="525"  /></p></div>
                                                                                                     
 <div class="center" 
 >
-<!--l. 608--><p class="noindent" >
-</p><!--l. 609--><p class="noindent" ><img 
+<!--l. 615--><p class="noindent" >
+</p><!--l. 616--><p class="noindent" ><img 
 src="images/ecs1.png" alt="PIC"  
 width="525" height="525"  /></p></div>
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
+<!--l. 620--><p class="indent" >   In this panel we can see our Auto Scaling configuration which lists the desired, minimum and maximum
+number of tasks. The policies are listed further down and we can view the alarm which is a graphical
+representation of the CPU utilization vs the target value.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
@@ -2470,13 +2473,18 @@ width="525" height="525"  /></p></div>
                                                                                                     
 <div class="center" 
 >
-<!--l. 614--><p class="noindent" >
-</p><!--l. 615--><p class="noindent" ><img 
+<!--l. 623--><p class="noindent" >
+</p><!--l. 624--><p class="noindent" ><img 
 src="images/ecs2.png" alt="PIC"  
 width="525" height="525"  /></p></div>
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
+<!--l. 628--><p class="indent" >   In the Cloudwatch Alarm panel you will notice that we have two differnt alarms, this is for the
+scaling up and down of the service. Selecting the alarm you can view the status where an "in alert"
+alarm is when the auto scaling configuration needs to action increasing/decreasing the number of
+instances.
+</p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
@@ -2485,8 +2493,8 @@ width="525" height="525"  /></p></div>
                                                                                                     
 <div class="center" 
 >
-<!--l. 620--><p class="noindent" >
-</p><!--l. 621--><p class="noindent" ><img 
+<!--l. 631--><p class="noindent" >
+</p><!--l. 632--><p class="noindent" ><img 
 src="images/ecs3.png" alt="PIC"  
 width="525" height="525"  /></p></div>
                                                                                                     
@@ -2498,11 +2506,11 @@ width="525" height="525"  /></p></div>
 </p>
    <div class="footnotes"><a 
  id="x1-8002x3.1"></a>
-<!--l. 108--><p class="noindent" ><span class="footnote-mark"><a 
+<!--l. 105--><p class="noindent" ><span class="footnote-mark"><a 
 href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span><span 
 class="Cabin-Regular-tlf-t1-">OSI layer 7: Application, in this case HTTP/HTTPS/etc</span></p><a 
  id="x1-8004x3.1"></a>
-<!--l. 112--><p class="noindent" ><span class="footnote-mark"><a 
+<!--l. 109--><p class="noindent" ><span class="footnote-mark"><a 
 href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span><span 
 class="Cabin-Regular-tlf-t1-">OSI layer 4: Transport, in this case TCP/UDP</span></p>                                                                                                                                                </div>
  
