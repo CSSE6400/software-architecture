@@ -24,10 +24,10 @@
 Our goal is to scale out the stateless component of our TaskOverflow application across multiple compute instances.
 Specifically we will need to:
 \begin{itemize}
-    \item Route traffic to our deployed TaskOverflow application with a load balancer.
-    \item Scale out TaskOverflow instances with autoscaling.
-    \item Check the status of our instances with a healthcheck.
-    \item Dynamically scale our application based on load.
+    \item Route traffic to our deployed TaskOverflow application with a \textsl{load balancer}.
+    \item Scale out TaskOverflow instances with \textsl{autoscaling}.
+    \item Check the status of our instances with a \textsl{healthcheck}.
+    \item \textsl{Dynamically scale} our application based on load.
 \end{itemize}
 
 \section{Load Balancers}
@@ -152,28 +152,47 @@ We create custom triggers based on our application's metrics.
 
 \section{Load Balancing TaskOverflow}
 
-This week we are going to explore load balancing the TaskOverflow service that we have been working with. The aim is to have a service that when given a lot of requests will be able to scale out the webservice nodes to handle it. This will not be a full solution to the scaling issue as our database is still a single node, but it will be a good start. Other methods could also be employed to help deal with the load like caching but we will leave that for another day.
+This week we are going to explore load balancing the TaskOverflow service that we have been working with.
+The aim is to have a service that, when given a lot of requests,
+will be able to scale out the web server instances to handle it.
+This will not be a full solution to the scaling issue as our database is still a single node,
+but it will be a good start.%
+\footnote{We will not explore scaling persistent data in the practicals.
+If you wish to try in your assignment,
+please see some of the concepts presented in the Distributed Systems II lecture \cite{distributed2-slides}.}
+Other methods could also be employed to help deal with the load like caching but we will leave that for another day.
 
-Start with the github repository provided in class and install Terraform as it will be required this week. You will also need to start your learner lab and copy the credentials into a credentials file into the root of the repository. In the repository you will also see two different folders, one is the starter for the EC2 path and the other is the starter for the ECS path. Once you have chosen which path you wish to take, copy the contents of the folder into the root of the repository.
+\paragraph{Getting Started}
+\begin{enumerate}
+    \item Using the GitHub Classroom link for this practical provided by your tutor in Slack,
+create a repository to work within.
+    \item Install Terraform if not already installed, as it will be required again this week.
+    \item Start your learner lab and copy the AWS Learner Lab credentials into a credentials file in the root of the repository.
+    \item In the repository you will have a \texttt{given} folder with two subfolders.
+        \texttt{ec2} is the starter Terraform code for the EC2 path from last week.
+        \texttt{ecs} is the starter Terraform code for the ECS path from last week.
+    \item Copy the contents of the folder into the root of the repository based on the path you wish to take.
+\end{enumerate}
 
 As per last week, we encourage that you take \texttt{Path B} first and then peruse \texttt{Path A}, if you have time.
-This week \texttt{Path A} shows an alternative method to autoscaling.
+This week, \texttt{Path A} offers an alternative method to autoscaling.
 
 \subsection{[Path A] EC2}
 
-Congratulations! You have chosen to go down the EC2 path. This week we need to create an AutoScaling Group and a Load Balancer to handle the scaling of our service. Our goal is to implement the deployment diagram below.
+Congratulations! You have chosen to go down the EC2 path.
+This week we need to create an AutoScaling Group and a Load Balancer to handle the scaling of our service.
+Our goal is to implement the deployment diagram below.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{diagrams/ec2deployment}
 \end{figure}
 
 To get started, we need to modify how we create our EC2 instances.
-Instead of manually creating them we are going to have to tell AWS how to deploy them for us.
+Instead of manually deploying an instance we are going to tell AWS how to deploy instances for us.
 We can do this by converting our EC2 instance into a Launch Template.
 Our launch template is going to look very similar to the instance we had last week, with a few variables changing.
 This includes that \texttt{user\_data} must be stored as a base64 encoded string.
-Some of these changes have been highlighted below. Copy this code into a file called \texttt{ec2.tf}.
-
+Some of these changes have been highlighted below.
 
 \begin{code}[language=terraform,numbers=none,escapechar=|,keepspaces=true]{ec2.tf}
 resource "aws_launch_template" "todo" {
@@ -223,9 +242,9 @@ resource "aws_security_group" "todo" {
 }
 \end{code}
 
-Now that we have a template and a security group, we can create the AutoScaling Group.
-This block defines the limits of how many instances we want to have and the template we want it to use.
-Copy this code into a file called \texttt{autoscaling.tf}.
+Now that we have an instance template and a security group, we can create the AutoScaling Group.
+The AutoScaling group is given the instance template and uses it to create groups of instances.
+The group defines the desired capacity and the limits of how many instances we want.
 
 \begin{figure}[H]
   \begin{center}
@@ -248,11 +267,11 @@ resource "aws_autoscaling_group" "todo" {
 }
 \end{code}
 
-If we deployed this now, we would get one initial instance created for us, due to the \texttt{desired\_capacity} and \texttt{min\_size} values.
+If we deployed this now, we would get one initial instance created for us,
+based on the \texttt{desired\_capacity} and \texttt{min\_size} values.
 Now that we have instances we have the ability for traffic to be routed to them.
 Let's create a target group which will be on the internal facing side of our load balancer.
-This is the side that lets traffic leave the load balancer and hit the instances.
-Copy this code into a file called \texttt{lb.tf}.
+This is the side that lets traffic from the load balancer hit the instances.
 
 \begin{figure}[H]
   \begin{center}
@@ -269,8 +288,7 @@ resource "aws_lb_target_group" "todo" {
 }
 \end{code}
 
-When the target\_group is created, we need to attach it to the autoscaling group.
-This is done by via the code below. Copy this into \texttt{lb.tf}.
+We also need to link the \texttt{target\_group} to the autoscaling group.
 
 \begin{code}[language=terraform,numbers=none,keepspaces=true]{lb.tf}
 resource "aws_autoscaling_attachment" "todo" {
@@ -279,7 +297,7 @@ resource "aws_autoscaling_attachment" "todo" {
 }
 \end{code}
 
-With a target\_group created, we now need to attach it to a load balancer, copy this code into \texttt{lb.tf}.
+We now need to create a load balancer and route traffic to our target group.
 You will notice that there is also a security group attached to the load balancer.
 This is the firewall that sits on the front of the load balancer and allows traffic to enter the load balancer.
 
@@ -318,9 +336,8 @@ resource "aws_security_group" "taskoverflow" {
 }
 \end{code}
 
-Now we are on the external side of the load balancer.
-We need to create a listener which actually creates the rules for how traffic is routed to the instances.
-Copy this code into \texttt{lb.tf}.
+The load balancer now needs a way to accept incoming traffic.
+We need a listener which creates the rules for how traffic is routed to the instances.
 
 \begin{figure}[H]
   \begin{center}
@@ -341,15 +358,17 @@ resource "aws_lb_listener" "taskoverflow" {
 }
 \end{code}
 
-Deploying this, we now have achieved the architecture as requested with a dynamically scaling group of EC2s with an Application Load Balancer sitting in front which is listening on port 80 instead of 6400.
+Now we are able to deploy our infrastructure.
+\bash{terraform apply}
+We have created the architecture as requested with a dynamically scaling group of EC2s and an Application Load Balancer in front which is listens on port 80 and routes to port 6400 of the instances.
 
-To make our autoscaling group perform dynamic scaling, we need to give it some rules about when to scale up and when to scale down.
-The policies below are what does this function for us. They listen to the average CPU usage of the group of instances.
+To make our autoscaling group perform dynamic scaling,
+we need to create some rules for when to scale up and when to scale down.
+The policies below track the average CPU usage of the group of instances.
 If the usage is above 20 percent it will scale up by 1 instance,
 and if it is below 10 percent it will scale down by 1 instance.
-We apply a cooldown period so that we do not act too aggressivly to changes in CPU usage,
+We also apply a cooldown period so that we do not act too aggressivly to changes in CPU usage,
 as instances will take time to start and handle load.
-Copy this code into \texttt{autoscaling.tf}.
 
 \begin{code}[language=terraform,numbers=none,keepspaces=true]{autoscaling.tf}
 resource "aws_autoscaling_policy" "todo_scale_down" {
@@ -403,7 +422,7 @@ resource "aws_cloudwatch_metric_alarm" "todo_scale_up" {
 }
 \end{code}
 
-Head to section \ref{k6} to see how we can send multiple requests to our service so that the load balancer has to scale up.
+Head to Section \ref{k6} to see how we can send multiple requests to our service so that the load balancer has to scale up.
 
 \subsection{[Path B] ECS}
 
@@ -416,7 +435,9 @@ Our goal is to implement the deployment diagram below.
   \includegraphics[width=\textwidth]{diagrams/ecsdeployment}
 \end{figure}
 
-Last week, when we setup the ECS service, we noticed that we could not get an endpoint because the instance would only be provisioned after our Terraform code had run. This is because it is already a dynamic service and it wants a load balancer to service its traffic. To get started we need to create a target group which is on the internal side of the load balancer and defines where traffic can be routed to. Copy this code into \texttt{lb.tf}.
+Last week, when we setup the ECS service, we noticed that we could not get an endpoint because the instance would only be provisioned after our Terraform code had run.
+This is because ECS is already a dynamic scaling service and it expects a load balancer to route its traffic.
+To get started we need to create a target group which defines where traffic can be routed to.
 
 \begin{figure}[H]
   \begin{center}
@@ -444,7 +465,9 @@ resource "aws_lb_target_group" "todo" {
 }
 \end{code}
 
-Now that we have the target group we can add it to the ECS service. Copy this code into \texttt{ecs.tf} inside the service block.
+Load balancing is core to how ECS works and so the \texttt{aws\_ecs\_service} resource that we used last week accepts a \texttt{load\_balancer} block.
+To associate the target group with our ECS service,
+modify the given \texttt{aws\_ecs\_service.taskoverflow} resource to include a \texttt{load\_balancer} block.
 
 \begin{code}[language=terraform,numbers=none,keepspaces=true]{ecs.tf}
   load_balancer {
@@ -455,8 +478,7 @@ Now that we have the target group we can add it to the ECS service. Copy this co
 \end{code}
 
 With the internal side of the load balancer done, we can create it and a firewall for the external side.
-This firewall allows us to restrict what traffic will be allowed to flow through the load balancer.
-Copy this code into \texttt{lb.tf}.
+This firewall allows us to restrict what traffic will be allowed to reach the load balancer.
 
 \begin{figure}[H]
   \begin{center}
@@ -495,7 +517,6 @@ resource "aws_security_group" "taskoverflow" {
 
 Now over to the external side of the load balancer.
 We need to create a listener which is the entry point for the load balancer.
-Copy this code into \texttt{lb.tf}.
 
 \begin{figure}[H]
   \begin{center}
@@ -518,7 +539,6 @@ resource "aws_lb_listener" "todo" {
 
 If we deployed now, we would have implemented the deployment diagram above.
 However, we want to add autoscaling to our service so that it can scale up and down based on the load.
-Copy this code into \texttt{autoscaling.tf}.
 
 \begin{code}[language=terraform,numbers=none,keepspaces=true]{autoscaling.tf}
 resource "aws_appautoscaling_target" "todo" {
@@ -550,19 +570,19 @@ resource "aws_appautoscaling_policy" "todo-cpu" {
 This auto scaling policy looks at the average CPU utilization of the service and scales up if it is above 20\% and scales down if it is below 20\%.
 This is a very simple policy but it is a good starting point.
 We can now deploy our service and see it scale up and down.
-Continue onto the next section to see how to send multiple requests to our service to generate a heavy load.
 
-\subsection{Producing Load with K6}\label{k6}
+Continue onto the next section to see how to send multiple requests to our service to generate traffic to trigger scaling.
 
-We have a service but us visiting it in our web browser is not going to be enough load for our policies to trigger.
-To do this we will employ the help of a tool called K6,
+\subsection{Producing Load with k6}\label{k6}
+
+We have a service but us visiting it in our web browser is not going to be enough load for our scaling policies to trigger.
+To do this we will employ the help of a tool called k6,
 which is a relatively new load testing tool.
-To install K6 visit \url{https://k6.io/docs/get-started/installation/}.
+To install k6 visit \url{https://k6.io/docs/get-started/installation/}.
 It can be installed in the code spaces environment or locally.
 
-We have provided an example K6 file, which is JavaScript code that creates
+We have provided an example k6 file, which is JavaScript code that creates
 1000 to 5000 users to call the list endpoint of our service.
-Copy this code into a file called \texttt{k6.js}.
 
 \begin{code}[language=javascript,numbers=none,escapechar=!]{k6.js}
 import http from 'k6/http';
@@ -584,9 +604,7 @@ export default function () {
 
 We can then run this file using the following command.
 
-\begin{code}[language=bash,numbers=none,keepspaces=true]{}
->> k6 run k6.js
-\end{code}
+\bash{k6 run k6.js}
 
 \begin{code}[language=bash,numbers=none,keepspaces=true]{}
 execution: local
@@ -605,7 +623,7 @@ default   [--------------------------------------] 0091/5000 VUs  00m05.4s/11m00
 \subsubsection{EC2 Auto Scaling}
 
 With all the pieces together we can now see if our efforts have paid off.
-While the above K6 code is running, let's check the EC2 console and see what actions our autoscaling policy has taken.
+While the above k6 code is running, let's check the EC2 console and see what actions our autoscaling policy has taken.
 In the EC2 console scroll down the left hand menu and select \texttt{Auto Scaling Groups}.
 
 \begin{figure}[H]
@@ -685,7 +703,17 @@ Selecting the alarm you can view the status where an "in alert" alarm is when th
   \end{center}
 \end{figure}
 
-%\bibliographystyle{ieeetr}
-%\bibliography{books,ours}
+
+\section{Conclusion}
+You have now deployed an scalable stateless service.
+If you would like to experiment with generating different load for the service,
+please read through the k6 documentation at \url{https://k6.io/docs/}.
+
+In the cloud assignment,
+we will use \texttt{k6} to test various scenarios as described in the task sheet and evaluate how your service performs.
+It will be beneficial to be familiar with how this type of testing works.
+
+\bibliographystyle{ieeetr}
+\bibliography{books,ours}
 
 \end{document}
