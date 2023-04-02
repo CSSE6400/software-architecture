@@ -7,54 +7,50 @@
 \usepackage{languages}
 
 \title{Events \& Worker Queues}
-\author{Brae Webb}
+\author{Evan Hughes \& Brae Webb}
 
-\date{\week{6}}
+\date{\week[practical]{7}}
 \begin{document}
 
 \maketitle
 
 \begin{figure}[ht]
-  \href{https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/ch11.html}{
-    \includegraphics[width=\textwidth]{images/streams}
-  }
-\caption{A map of stream processing \cite{data-intensive}.}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/event-driven}
 \end{figure}
 
 \section{This Week}
-This week our goal is to:
+Our goal is to:
 \begin{itemize}
-  \item run an application that processes events asynchronously using SQS.
+    \item Explore events and worker queues in the context of AWS.
+    \item Deploy our own TaskOverflow container on AWS Elastic Container Registry (ECS).
+    \item Develop an event-based architecture to generate a calendar from tasks in TaskOverflow.
 \end{itemize}
 
 \section{Event Processing}
 
-As we saw in the Event-Driven Architecture notes \cite{events-notes},
+As we saw in Event-Driven Architectures \cite{events-notes},
 event processing enable us to build highly scalable and extensible systems.
-In this weeks practical we will get our hands dirty with event processing using AWS SQS.
-SQS gives us a service which can act as an event broker.
+In this practical we will get our hands dirty with event processing using AWS SQS.
+AWS SQS is a service which acts as an event broker.
 
 \subsection{Technologies}
 
-We should first discuss a few of our technology options for services which can be used in an Event-Driven Architecture.
-
-% \info{
-%   Below we only discuss external stream technologies but it is common to have streams within an application where concurrency is needed. 
-%   Instead of dealing with concurrency using locking based methods like in CSSE2310, we can use streams to send data to the consumers that need to handle single writer usecases.
-% }
+There are other technologies that can be useful in developing an event-based architecture.
+The following is a non-exhaustive list of services native to AWS.
 
 \subsubsection{AWS SQS}
 
 AWS provides the Simple Queue Service, SQS,
 which offers a simple and fully managed message queue service.
-There are two flavours of SQS to be aware of;
-the standard message queue, and the FIFO message queue.
-Standard message queues allow for greater scalability by providing higher through-put.
+There are two flavours of SQS to be aware of.
+\begin{description}
+    \item[Standard message queues] allow for greater scalability by providing higher through-put.
 However, standard message queues in SQS are not exactly queues,
 messages are not first in first out,
 they are best-effort ordered.
-The second flavour, FIFO message queues,
-guarantees that messages are First in First Out.
+    \item[FIFO message queues] guarantees that messages are First in First Out.
+\end{description}
 
 \subsubsection{AWS SNS}
 \begin{quote}{AWS}
@@ -339,27 +335,144 @@ Again as before try experimenting with differnt publisher / subscriber configura
   \textbf{Please remember to terraform destroy to delete your resources}
 }
 
+\section{Hosting TaskOverflow Images}
+
+When we last deployed a container on AWS,
+we used an existing hosted image.
+Now, we will be developing our own image so we will need a mechanism to host the image.
+For this, we will being using a AWS ECR, Docker, and Terraform.
+AWS ECR is the Elastic Container Registry,
+it is a container registry like DockerHub or GitHub.
+We can use it to host our images,
+using the process below:
+
+\begin{enumerate}
+    \item Use Terraform to create an ECR repository for our image.
+    \item Use Terraform to build our Docker image.
+    \item Use Terraform to push our Docker image.
+\end{enumerate}
+
+\info{
+This is a non-standard way process.
+As you may have seen in the DevOps tutorial,
+we would ordinarily like our code commits to trigger a CI/CD pipeline which builds appropriate images and pushes from there.
+You can still use GitHub actions to build and push your container to the GitHub container registry and authenticate when you pull the image.
+
+However, using ECR simplifies the process,
+despite the oddities introduced by having a non-persistent ECR repository.
+}
+
+First we will setup our initial Terraform configuration.
+Note that now we introduce a new required provider.
+This provider is for Docker.
+
+\begin{code}[language=terraform,numbers=none]{main.tf}
+terraform {
+   required_providers {
+      aws = {
+         source = "hashicorp/aws"
+         version = "~> 4.0"
+      }
+      docker = {
+         source  = "kreuzwerker/docker"
+         version = "3.0.2"
+      }
+   }
+}
+
+provider "aws" {
+   region = "us-east-1"
+   shared_credentials_files = ["./credentials"]
+}
+\end{code}
+
+As with our AWS provider,
+when we initially configure the provider,
+we want to authenticate so that we can later push to our registry using the Docker provider.
+We will use the \texttt{aws\_ecr\_authorization\_token} data block to get appropriate ECR credentials for Docker.
+
+\begin{code}[language=terraform,numbers=none]{main.tf}
+data "aws_ecr_authorization_token" "ecr_token" {}
+
+provider "docker" {
+  registry_auth {
+    address  = data.aws_ecr_authorization_token.ecr_token.proxy_endpoint
+    username = data.aws_ecr_authorization_token.ecr_token.user_name
+    password = data.aws_ecr_authorization_token.ecr_token.password
+  }
+}
+\end{code}
+
+We need to use Terraform to create an ECR repository to push to.
+
+\begin{code}[language=terraform,numbers=none]{main.tf}
+resource "aws_ecr_repository" "taskoverflow" {
+  name = "taskoverflow"
+}
+\end{code}
+
+The URL for containers in the ECR following the format below:
+
+\url{{ACCOUNT_ID}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME}}
+
+Remember to push to a container registry,
+we need a local container whose tag matches the remote URL.
+We could then create and push the contianer locally with:
+
+\begin{code}[language=bash,numbers=none]{}
+docker build -t {ACCOUNT_ID}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME} .
+docker push {ACCOUNT_ID}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME} 
+\end{code}
+
+However, it would be easier if we could build and push this container from within Terraform.
+We can use the Docker provider for this.
+
+\begin{code}[language=terraform,numbers=none]{image.tf}
+resource "docker_image" "taskoverflow" {
+  name         = "${aws_ecr_repository.taskoverflow.repository_url}:latest"
+  build {
+    context = "."
+  }
+}
+
+resource "docker_registry_image" "taskoverflow" {
+  name          = docker_image.taskoverflow.name
+}
+\end{code}
+
+Notice that we are able to utilize the output of the ECR repository as the URL which resolves to the correct URL for the image.
+
 \section{Worker Queues}
 
-One good usecase of queues is for distributing work over many machines to scale to demand. In this exercise we encourage you to have a look at these widly used libraries to see how you could integrate them into a distributed system.
+One good use case for queues is for distributing work to scale to demand.
+In this exercise we encourage you to have a look at these widly used libraries to see how you could integrate them into a distributed system.
 
 \begin{itemize}
   \item Python: \href{https://docs.celeryq.dev/en/stable/}{Celery}
   \item Java: \href{https://www.rabbitmq.com/tutorials/tutorial-one-java.html}{RabbitMQ}
 \end{itemize}
 
-The two above libraries are integrated into many of the popular application frameworks aswell. Today we will be using the python library Celery to create a simple worker queue for our Todo App.
+The two above libraries are integrated into many popular application frameworks.
+Today we will be using the Python library Celery to create a simple worker queue for TaskOverflow.
 
 \subsection{Celery}
 
-Celery is a python library which allows you to create a worker queue. It is very popular and is used in many large scale applications. It is also very easy to use and has a lot of documentation.
+Celery is a Python library which allows you to create a worker queue.
+It is popular and used in many large scale applications.
+It is also relatively easy to use and has comprehensive documentation.
 
 
-\subsection{Todo App}
+\subsection{TaskOverflow}
 
-Our Todo App will use celery to distribute the work of generating a calendar view of the todo items. This will be done by a worker which will be started on a seperate instance. The webserver will then send the worker a message to generate the calendar view. The worker will then generate the calendar view and send it back to the webserver. The webserver will then display the calendar view to the user.
+TaskOverflow will use celery to distribute the work of generating a calendar view of tasks,
+as this could be a time-intensive task.
+This will be done by a worker which will run in a separate container.
+The TaskOverflow server will place job requests on the Celery queue.
+The worker will pick-up jobs and generate the calendar view.
+The webserver can then display the calendar view to the user.
 
-This allows us to queue a job when the user makes changes and asynchronously generate the calendar view. This means that the user will not have to wait for the calendar view to be generated and the webserver will be able to handle other requests.
+Calendar generation occurs asynchronously with this architecture.
+The user will not have to wait for the calendar view to be generated and the webserver can handle other requests.
 
 \todo{Add diagram}
 \todo{Add worker cli startup option}
