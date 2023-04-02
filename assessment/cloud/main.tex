@@ -3,82 +3,89 @@
 \usepackage{CJKutf8}
 \usepackage{languages}
 
-\title{Scalable Text-to-Speech}
+% RUBRIC
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{xltabular}
+\usepackage{pdflscape}
+\usepackage{enumitem}
+
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+% RUBRIC
+
+\title{TikHub}
 \author{Brae Webb}
-\date{Semester 1, 2022}
+\date{Semester 1, 2023}
 
 \begin{document}
 \maketitle
 
 \section*{Summary}
 In this assignment, you will demonstrate your ability to \textsl{design},
-\textsl{implement}, and \textsl{deploy} a web application that can process a high load,
+\textsl{implement}, and \textsl{deploy} a web API that can process a high load,
 i.e. a scalable application.
-You will be asked to deploy a tool that accepts text input and generates synthesized speech output.
+You will be asked to deploy an API for booking concert tickets,
+generating printed tickets, and generating seating plans.
 Specially you need to support:
 \begin{itemize}
-    \item Uploading and generating speech for text input of varying sizes.
+    \item Purchasing of tickets via API requests.
+    \item Generation of printed tickets and seating plans for existing tickets.
     \item Access via a specified REST API for use by front-end interfaces.
     \item Remaining responsive to the user while generating speech.
 \end{itemize}
 
-Your service will be deployed to AWS and will undergo automated correctness and load-testing to ensure it meets the required scalability.
+Your service will be deployed to AWS and will undergo automated correctness and load-testing to ensure it meets the requirements.
 
 \section{Introduction}
-Text-to-speech software supports accessibility,
-enables smart-home devices,
-and even breaks down language barriers.
-Unfortunately, text-to-speech is computationally intensive.
-While the technology has made great advances over the past few decades,
-many open-source implementations are still inefficient.
+Recent controversy has brought attention to the monopoly held by certain ticketing companies.
+In hopes of a eventual collapse of the current monopoly,
+we aim to develop, TikHub,
+an online concert ticket booking system.
 
 \paragraph{Task}
 For this assignment,
-the University of Queensland is looking to convert all course content into speech.
-This will support visually impaired students in their studies.
-All course content from slack messages and blackboard announcements to textbooks must be converted to speech.
-You will be responsible for designing and implementing a service to generate synthesized speech for use across the entire university.
+you are working for TikHub,
+a new competitor in the online ticket booking space.
+TikHub uses a microservice based architecture to implement their new platform.
+The CEO saw that you took Software Architecture on your resume and has assigned you to design and implement the ticket service,
+as this service must be scalable to cope with a large influx of bookings.
 
 \paragraph{Requirements}
-As you might imagine,
-blackboard announcements occur frequently and should be translated in almost real time.
-While textbooks are set ahead of semester and may take several days to process.
-The university will experience peaks of usage.
-At the start of semester,
-instructors set many textbooks which need to be processed.
-The university will also experience usage lows over the summer holiday period when few translations will be required.
-The university is not willing to pay for the resources required during usage peaks all year round.
-Your implementation must be able to scale dynamically based on the current amount of jobs to be processed.
-
-% \section{Features}
-
+As you may be aware,
+ticket booking platforms have intense peaks of traffic.
+At the scale that TikHub hopes to operate,
+it would be inappropriate to run the servers required to meet demand at all times.
+Thus, our service must be elastic --- able to scale up to meet demand and able to scale down to preserve costs.
 
 \section{Interface}
-Your service will be utilised by almost every system in the university.
-Every university service must support text-to-speech on the first Monday of semester two.
-An interface specification has already been developed and distributed to existing service owners,
-who are working hard to deliver support for their services.
+As you are operating in a microservice context,
+other service providers have been given an API specification for your service.
+They have been developing their services based on this specification so you must match it exactly.
 
-You must implement this interface exactly as described.
 The interface specification is available to all service owners online:
-\url{https://csse6400.uqcloud.net/assessment/chatterbox}
+\url{https://csse6400.uqcloud.net/assessment/tikhub}
 
 \section{Implementation}
-To ensure that your service is able to faithfully generate voice clips that our tests will expect,
-there are some restrictions on how your service can be implemented.
+The tool to generate appropriately styled printed tickets and seating plans has already been developed by the companies UX team.
+Your investors have taken a liking to the designs generated by this tool.
+Unfortunately, the tool developer has quit and the tool can run quite slowly,
+so you will have to work around this bottleneck in the design and development of your system (you are not allowed to reimplement or modify this tool).
 
-Your service must utilise the chatterbox command line tool provided for this assignment.
-This tool is available on pypi and may be installed using pip: \url{https://pypi.org/project/uq-chatterbox/}
+Your service must utilise the tikgen command line tool provided for this assignment.
+\todo{Deploy binaries}
+%This tool is available on pypi and may be installed using pip: \url{https://pypi.org/project/uq-chatterbox/}
 
 \section{Submission}
 Your solution must committed to the GitHub repository specified in Section \ref{sec:github}.
-Committing to this repository will be disabled after \textbf{16:00 (AEST) on 6 May 2022} and the contents of the repository at this time will be taken as your submission.
+Committing to this repository will be disabled after \textbf{16:00 (AEST) on 12 May 2022} and the contents of the repository at this time will be taken as your submission.
 The repository \textbf{must} contain everything required to successfully deploy your application.
 You must include all of the following in the repository:
 \begin{itemize}
   \item Your implementation of the service API, including the source code and a mechanism to build the service.%
-  \footnote{If you are using external libraries, ensure that you pin the version to avoid external changes breaking your application.}
-  \item Terraform code that can provision your service from a fresh AWS learner lab environment.
+  \footnote{If you are using external libraries, ensure that you pin the versions to avoid external changes breaking your application.}
+  \item Terraform code that can provision your service from a fresh AWS Learner Lab environment.
+  \item A \texttt{deploy.sh} script that can use your Terraform code to deploy your application.
+    This script can perform other tasks as required.
 \end{itemize}
 
 When deploying your application to mark,
@@ -94,21 +101,25 @@ You may re-create the process yourself.
   \item We will run automated functionality and load-testing on the URL provided in the \texttt{api.txt} file.
 \end{enumerate}
 
-\textbf{Important Note: AWS will deactivate your account if more than 15 EC2 instances are running. Ensure you do not exceed a total of 15 EC2 instances running at once.}
+\textbf{Important Note: 
+Ensure your service does not exceed the resource limits of AWS Learner Labs.
+For example, AWS will deactivate your account if more than 15 EC2 instances are running.}
 
 \subsection{GitHub Repository}\label{sec:github}
 You will be provisioned with a private repo on GitHub for this assignment, via GitHub Classroom.
-You must click on the link below and associate your GitHub username with your UQ student id in the Classroom.
+You must click on the link below and associate your GitHub username with your UQ student ID in the Classroom.
 
 \url{https://classroom.github.com/a/tGJ8UEBh}\\
-Associating your GitHub username with another student's id,
-or getting someone else to associate their GitHub username with your student id, is \link{academic misconduct}
+Associating your GitHub username with another student's ID,
+or getting someone else to associate their GitHub username with your student ID, is \link{academic misconduct}
 {https://my.uq.edu.au/information-and-services/manage-my-program/student-integrity-and-conduct/academic-integrity-and-student-conduct}.
 
-If for some reason you have accidently associated your GitHub username with the wrong student id,
-contact the course coordinator as soon as possible.
+If for some reason you have accidently associated your GitHub username with the wrong student ID,
+contact the course staff as soon as possible.
 
 \subsection{Tips}
+
+\todo{Populate all repositories with a default terraform that outputs a value}
 
 \paragraph{Outputting an API URL}
 Your Terraform code should produce a URL from where your API can be accessed.
@@ -121,6 +132,8 @@ resource "local_file" "url" {
     filename = "./api.txt"
 }
 \end{code}
+
+\todo{Populate all repositories with a default deploy.sh}
 
 \paragraph{Terraform apply in deploy script}
 Your \texttt{deploy.sh} script must deploy without user interaction.
@@ -146,6 +159,9 @@ we recommend that you reset your lab prior to final submission.
 Note that resetting the lab can take a considerable amount of time,
 in the order of hours, you should do this at least 4 to 6 hours before the submission deadline.
 Please do not wait to the last minute.
+
+
+\todo{Can we use AWS ECR to make this easier?}
 
 \paragraph{Deploying with Docker}
 In this course,
@@ -181,43 +197,43 @@ When we run your \texttt{deploy.sh} script,
 our environment will contain a \texttt{TF\_VAR\_github\_pat} with access to pull from your container registry.
 
 
-\paragraph{Unique S3 buckets}
-You may find it helpful to use S3 buckets for this assignment.
-It is important to be aware that the name of an S3 bucket has to be \textsl{globally} unique.
-To avoid any deployment conflicts,
-we recommend that you use the \texttt{random\_string} Terraform resource.
-This allows you to generate a random string which can be appended to the S3 bucket name.
+%\paragraph{Unique S3 buckets}
+%You may find it helpful to use S3 buckets for this assignment.
+%It is important to be aware that the name of an S3 bucket has to be \textsl{globally} unique.
+%To avoid any deployment conflicts,
+%we recommend that you use the \texttt{random\_string} Terraform resource.
+%This allows you to generate a random string which can be appended to the S3 bucket name.
 
-\begin{code}[language=terraform]{}
-resource "random_string" "bucket-name" {
-    length    = 16
-    special   = false
-    upper     = false
-}
+%\begin{code}[language=terraform]{}
+%resource "random_string" "bucket-name" {
+%    length    = 16
+%    special   = false
+%    upper     = false
+%}
 
-resource "aws_s3_bucket" "bucket" {
-    bucket = "my-bucket-${random_string.bucket-name.result}"
-}
-\end{code}
+%resource "aws_s3_bucket" "bucket" {
+%    bucket = "my-bucket-${random_string.bucket-name.result}"
+%}
+%\end{code}
 
-\paragraph{S3 pre-signed URLs}
-If you are using AWS S3 to store audio recordings,
-ensure that you consider the security aspects of storing these recordings.
-You do not want to make your S3 bucket publicly accessible.
-A good middle-ground is to use \link{pre-signed URLs}{https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html} which allow you to generate temporary URLs that have read access to an object in an S3 bucket, e.g.
+%\paragraph{S3 pre-signed URLs}
+%If you are using AWS S3,
+%ensure that you consider the security aspects of storing your files.
+%You do not want to make your S3 bucket publicly accessible.
+%A good middle-ground is to use \link{pre-signed URLs}{https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html} which allow you to generate temporary URLs that have read access to an object in an S3 bucket, e.g.
 
-\begin{code}[language=python]{}
-import boto3
-url = boto3.client('s3').generate_presigned_url(
-  ClientMethod='get_object', 
-  Params={'Bucket': BUCKET_NAME, 'Key': OBJECT_KEY},
-  ExpiresIn=3600
-)
-\end{code}
+%\begin{code}[language=python]{}
+%import boto3
+%url = boto3.client('s3').generate_presigned_url(
+%  ClientMethod='get_object', 
+%  Params={'Bucket': BUCKET_NAME, 'Key': OBJECT_KEY},
+%  ExpiresIn=3600
+%)
+%\end{code}
 
 \paragraph{Authenticating AWS resources from EC2}
 You may find it helpful to access other AWS resources,
-such as S3 from an EC2 instance.
+such as SQS from an EC2 instance.
 AWS offers \link{libraries to handle this communication}%
 {https://aws.amazon.com/tools/},
 however you will need to authenticate to access the resources.
@@ -227,24 +243,16 @@ You can give the EC2 instance the built-in IAM instance profile,
 {https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance\#iam_instance_profile}.
 This profile will provide your EC2 instance with access to all AWS resources on the account.
 
-\paragraph{EC2 Instance Size}
-The chatterbox command line tool and dependencies are quite large.
-You may find that the default 8GB size of an EC2 instance is insufficient.
-You can use \link{the \texttt{block\_device\_mappings} field}%
-{https://github.com/CSSE6400/terraform/blob/740edeb8eacb8b80f5d85a729fd3914b4d2a5b0f/template/main.tf\#L31} of \texttt{aws\_instance}
-to create a volume with larger storage space.
-
-\paragraph{URL Validity}
-The URL returned from the API to access the audio file
-only needs to be valid for four hours after initial generation.
-You may assume the URL will not be used after that period.
-This may be helpful if you are using signed URLs.
+%\paragraph{URL Validity}
+%The URL returned from the API to access the printed ticket or seating plan
+%only needs to be valid for four hours after initial generation.
+%You may assume the URL will not be used after that period.
+%This may be helpful if you are using signed URLs.
 
 \subsection{Fine Print}
 You can reproduce our process for deploying your application using our \link{Docker image}{https://ghcr.io/CSSE6400/csse6400-cloud-testing}:
 \codefile[language=docker]{Dockerfile}{deployment/Dockerfile}
 
-\noindent
 Our steps for deploying your infrastructure using this container are as follows.
 \texttt{\$REPO} is the name of your repository,
 \texttt{\$CREDENTIALS} is the path where we will store our AWS credentials,
@@ -266,7 +274,7 @@ This has been tested on MacOSX and Linux but might require WSL2 on Windows.
 \section{Criteria}
 Your assignment submission will be assessed on its ability to support the specified use cases.
 Testing is divided into functionality testing and quality testing.
-Functionality testing is to ensure that your backend software and API meet the MVP requirements by satisfying the API specification without excessive load.
+Functionality testing is to ensure that your backend software and API meet the MVP requirements by satisfying the API specification without any excessive load.
 Quality testing is based upon several likely use case scenarios.
 The scenarios create different scaling requirements.
 
@@ -275,30 +283,82 @@ i.e. if some functionality is implemented you can receive marks for that functio
 or if your service can handle 80\% of the load during quality testing you will receive marks for that.
 
 \subsection{Functionality}
-You will be awarded some credit for correct implementation of the API specification without being able to cope with excessive load.
+You will be awarded 40\% of the total marks for a correct implementation of the API specification without being able to cope with excessive load.
 A suite of automated API tests will assess the correctness of the implementation, via a sequence of API calls.
 Some tests from this suite will be made available before the assignment due date.
 
 \subsection{Quality Scenarios}\label{sec:scenarios}
+The remaining 60\% of the marks will be derived from how your service handles various scenarios.
+These scenarios will require you to consider how your application performs under load.
+
+\todo{Quality scenarios}
+
+\subsection{Marking}
+Functionality accounts for 40\% of the marks for the assignment.
+This is split as 25\% for correct implementation of the provided API,
+and 15\% for correct implementation generation of printed tickets and seating plans.
+The simple queries in the API are worth much less of the mark compared to the API operations that require dealing with persistent data.
+
+%Backend processing is the synchronous and asynchronous conversion of text to speech.
+%Synchronous processing is worth 12\% and asynchronous processing is worth 8\%.
+All functionality marks are based solely on correct implementation of the functionality,
+as assessed by the automated functionality tests.
+
+Scaling your application to deliver the quality scenarios accounts for the other 60\% of the marks.
+The scenarios described in section \ref{sec:scenarios} provide guidance as to the type of scalability issues your system is expected to handle.
+They are not literal descriptions of the exact loads that will be used.
+Tests related to scenarios that involve more complex behaviour will have higher weight than other tests.
+
+The scenarios will also evaluate whether your service is being wasteful in resource usage.
+The amount of resources deployed in your AWS account will be monitored to ensure that your service implements a scaling up and scaling down procedure.
+
+Scaling will be assessed via automated tests.
+A small subset of these will be released shortly before the due date.
+These tests may consume a significant portion of your AWS credit.
+You are advised to be prudent in how many times you execute these tests.
+
+You will be given advanced warning of when your submission will be tested.
+The idea is that it will give you a window of opportunity to confirm that your system is running correctly in your account,
+before we run the automated tests.
+This will also give you the opportunity to resolve any production errors that occur during testing.
+For this reason,
+you should ensure that your service has appropriate observability so that you can identify issues and respond accordingly.
+
+Please refer to the marking criteria at the end of this document.
+
+
+\section{Academic Integrity}
+As this is a higher-level course, you are expected to be familiar with the importance of academic integrity in general, and the details of UQ's rules.
+If you need a reminder, review the \link{Academic Integrity Modules}
+{https://web.library.uq.edu.au/library-services/it/learnuq-blackboard-help/academic-integrity-modules}.
+Submissions will be checked to ensure that the work submitted is not plagiarised.
+
+This is an individual assignment.
+You may not discuss details of approaches to solve the problem with other students in the course.
+All code that you submit must be your own work.
+You may not directly copy code that you have found online to solve parts of the assignment.
+If you find ideas from online sources (e.g. Stack Overflow), you must \link{cite and reference}{https://web.library.uq.edu.au/node/4221/2} these sources.
+Use the \link{IEEE referencing style}{https://libraryguides.vu.edu.au/ieeereferencing/gettingstarted} for citations and references.
+Citations should be included in a comment at the location where the idea is used in your code.
+All references for citations must be included in a file called \texttt{refs.txt}.
+This file should be in the root directory of your project.
+
+Uncited or unreferenced material will be treated as not being your own work.
+Significant amounts of cited material from other sources will be considered to be of no academic merit.
+
+
+\bibliographystyle{ieeetr}
+\bibliography{ours}
+
+\input{criteria}
+
+\end{document}
 
 \paragraph{Semester break}
 Your application will see decreased usage during the semester break.
 Minimal students and staff may periodically query pre-generated speech when revising content.
 During this period we might see traffic of not more than 20 parallel users,
 querying read-only endpoints.
-
-% \begin{code}[language=javascript]{}
-% stages: [
-%   { duration: '1m', target: 10 },
-%   { duration: '1m', target: 20 },
-%   { duration: '1m', target: 0 },
-% ]
-% endpoints: [
-%   get("/health"),
-%   get("/text"),
-%   get("/text/{id}")
-% ]
-% \end{code}
 
 \paragraph{Exam revision}
 During the 20 minutes prior to an exam of a larger course, such as CSSE1001,
@@ -338,56 +398,4 @@ About 20 courses uploading 2,500 characters of material.
 At the same time, many coordinators like to send our announcements on Monday mornings summarizing the weeks content.
 These announcements are typically around 80 characters long and sent out by 75 or so coordinators.
 
-\subsection{Marking}
-Functionality accounts for 50\% of the marks for the assignment.
-This is split as 30\% for correct implementation of the provided API,
-and 20\% for correct implementation of the backend processing.
-The simple queries in the API are worth much less of the mark compared to the API operations that require dealing with persistent data.
-Note that the API marks are for \emph{implementing} the API, \emph{separate} to the backend functionality.
-This means that an API operation that behaves correctly based on the specification will achieve full marks,
-even if the backend processing is not working correctly.
 
-Backend processing is the synchronous and asynchronous conversion of text to speech.
-Synchronous processing is worth 12\% and asynchronous processing is worth 8\%.
-All functionality marks are based solely on correct implementation of the functionality, as assessed by the automated functionality tests.
-
-Scaling your application to deliver the quality scenarios accounts for the other 50\% of the marks.
-The scenarios described in section \ref{sec:scenarios} provide guidance as to the type of scalability issues your system is expected to handle.
-They are not literal descriptions of the exact loads that will be used.
-Tests related to scenarios that involve more complex behaviour will have higher weight than other tests.
-
-Scaling will be assessed via automated tests.
-A small subset of these will be released shortly before the due date.
-These tests may consume a significant portion of your AWS credit.
-You are advised to be prudent in how many times you execute these tests.
-
-We are expecting that AWS will provide you with substantial credit for use in this assignment, and potentially your project.
-If that turns out to be correct, you will be given advanced warning of when your submission will be tested.
-The idea is that it will give you a window of opportunity to confirm that your system is running correctly in your account,
-before we run the automated tests.
-If the expected AWS credit is not available, we will test your submission in our staff account.
-
-
-\section{Academic Integrity}
-As this is a higher-level course, you are expected to be familiar with the importance of academic integrity in general, and the details of UQ's rules.
-If you need a reminder, review the \link{Academic Integrity Modules}
-{https://web.library.uq.edu.au/library-services/it/learnuq-blackboard-help/academic-integrity-modules}.
-Submissions will be checked to ensure that the work submitted is not plagiarised.
-
-This is an individual assignment.
-You may not discuss details of approaches to solve the problem with other students in the course.
-All code that you submit must be your own work.
-You may not directly copy code that you have found online to solve parts of the assignment.
-If you find ideas from online sources (e.g. Stack Overflow), you must \link{cite and reference}{https://web.library.uq.edu.au/node/4221/2} these sources.
-Use the \link{IEEE referencing style}{https://libraryguides.vu.edu.au/ieeereferencing/gettingstarted} for citations and references.
-Citations should be included in a comment at the location where the idea is used in your code.
-All references for citations must be included in a file called \texttt{refs.txt}.
-This file should be in the root directory of your project.
-
-Uncited or unreferenced material will be treated as not being your own work.
-Significant amounts of cited material from other sources will be considered to be of no academic merit.
-
-\bibliographystyle{ieeetr}
-\bibliography{ours}
-
-\end{document}
