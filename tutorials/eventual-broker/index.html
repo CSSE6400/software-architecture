@@ -1,0 +1,149 @@
+Last Updated on 2023/04/02     
+
+<?xml version="1.0" encoding="iso-8859-1" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+<!--http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd-->  
+<html xmlns="http://www.w3.org/1999/xhtml"  
+> 
+<head> <title>Eventual Broker</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
+<!-- fn-in,html,htex4ht,xhtml --> 
+<meta name="src" content="main.tex" /> 
+<link rel="stylesheet" type="text/css" href="main.css" /> 
+<link rel="stylesheet" href="https://latex.now.sh/style.css"> 
+<link rel="stylesheet" href="/notes.css"> 
+<style>body {max-width: 100ch;} 
+dl dd {text-align: left}</style> 
+</head><body 
+>
+   <div class="maketitle"><a 
+ id="Q1-1-1"></a>
+_________________________________________________________________________________________________
+<h2 class="titleHead">Eventual Broker</h2>                                                                              Software Architecture
+   <div class="date" >April 6, 2023</div>                                                                                                                                                           <div class="author" >Brae
+Webb</div>
+______________________________________________________________________________________________
+   </div>
+   <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
+ id="x1-10001"></a>Brief</h3>
+<!--l. 23--><p class="noindent" >Now that we are over halfway through software architecutre, we should have sufficient knowledge to
+start making a profit. Instead of applying for positions as a software architect, we&#8217;ve decided to use
+our knowledge to design Eventual Broker, a financial trading system that monitors market data and
+triggers trades based on certain conditions, such as price movements, news events, or other market
+data.
+</p><!--l. 31--><p class="indent" >   Eventual Broker aims to be a highly reliable and scalable system capable of processing a large volume of
+market data and trades in real-time. You want to design a system that is extensible, as you are able to
+consume more data sources, you want your core trading logic to be able to process the new data
+stream.
+</p><!--l. 36--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
+ id="x1-20002"></a>Requirements</h3>
+<!--l. 39--><p class="noindent" >
+      </p><dl class="enumerate-enumitem"><dt class="enumerate-enumitem">
+   1. </dt><dd 
+class="enumerate-enumitem">The system should be able to receive market data from multiple sources in real-time.
+      </dd><dt class="enumerate-enumitem">
+   2. </dt><dd 
+class="enumerate-enumitem">The system should be able to process the market data and trigger trades based on certain conditions,
+      as specified by a trading logic unit(s).
+      </dd><dt class="enumerate-enumitem">
+   3. </dt><dd 
+class="enumerate-enumitem">The system should cope with large volumes of data and trades.
+      </dd><dt class="enumerate-enumitem">
+   4. </dt><dd 
+class="enumerate-enumitem">The system should be scalable to handle an increasing number and variety of data sources.
+      </dd><dt class="enumerate-enumitem">
+   5. </dt><dd 
+class="enumerate-enumitem">The system should be observable to appropriately monitor trading and the performance of historical
+      trades.</dd></dl>
+                                                                                                    
+                                                                                                    
+<!--l. 46--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
+ id="x1-30003"></a>Outline</h3>
+<!--l. 48--><p class="noindent" >
+</p>
+   <h4 class="likesubsectionHead"><a 
+ id="x1-4000"></a>Introduction (5 minutes)</h4>
+<!--l. 49--><p class="noindent" >Introduction to the brief, what is does our input data stream look like, what are the requirements, where to
+start.
+</p><!--l. 54--><p class="noindent" >
+</p>
+   <h4 class="likesubsectionHead"><a 
+ id="x1-5000"></a>Planning (10 minutes)</h4>
+<!--l. 55--><p class="noindent" >In small groups, attempt to enumerate potential sources of input data. Of course, we will need feeds of informing
+us of changing in stock values. What other sources of data might be relevant to give you an edge? Discuss your
+existing <span 
+class="Cabin-Italic-tlf-t1-x-x-120">domain knowledge </span>with your peers. What types of financial instruments will you trade (e.g. stocks, bonds,
+options, futures, etc.)?
+</p><!--l. 63--><p class="noindent" >
+</p>
+   <h4 class="likesubsectionHead"><a 
+ id="x1-6000"></a>Design (25 minutes)</h4>
+<!--l. 65--><p class="noindent" >In your group, design the components that your system requires. Each component should have a brief description
+of the functionality that it provides the system. You will also need to design the flow of information through your
+system. This flow of information results in trades being performed.
+</p><!--l. 71--><p class="indent" >   Your final design can include more sources of information than originally planned. Make sure that you are
+considering risk management strategies and observability. How are the systems decisions being reported? How
+are the results of these decisions evaluated?
+</p><!--l. 76--><p class="noindent" >
+</p>
+   <h4 class="likesubsectionHead"><a 
+ id="x1-7000"></a>Presentation (10 minutes)</h4>
+<!--l. 78--><p class="noindent" >In the remaining time, each group should present their proposed design. This is an opportunity for discussion
+amoungst the class to point out limitations of the proposed system designs.
+</p><!--l. 82--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
+ id="x1-80004"></a>Design Challenges</h3>
+                                                                                                    
+                                                                                                    
+<!--l. 84--><p class="noindent" >
+</p>
+   <h4 class="likesubsectionHead"><a 
+ id="x1-9000"></a>Challenge 1: Duplicate Data</h4>
+<!--l. 85--><p class="noindent" >The market data from different sources may overlap, leading to duplicate data being processed by the
+system. For example if you are monitoring the stock price of Apple, you may receive data from multiple
+sources, each of which may have a different delay. How would you modify your design to prevent
+this?
+</p><!--l. 92--><p class="noindent" >
+</p>
+   <h4 class="likesubsectionHead"><a 
+ id="x1-10000"></a>Challenge 2: Regulation Compliance</h4>
+<!--l. 93--><p class="noindent" >How can you design the system to comply with financial regulations, such as those related to insider trading,
+market manipulation, or other requirements? Can you use auditing, logging, or other techniques to track and
+monitor trading activities?
+</p><!--l. 97--><p class="noindent" >
+</p>
+   <h4 class="likesubsectionHead"><a 
+ id="x1-11000"></a>Challenge 3: Trading Manipulation</h4>
+<!--l. 98--><p class="noindent" >Now that our system is not performing market manipulation, we need to consider preventing others from
+manipulating our trading system <span class="cite">[<a 
+href="#Xbot-manipulation">1</a>]</span>. For example, if you are monitoring social networking sites, how could you
+prevent one user or a few users manipulating positive tweets of a company to trigger buying their
+shares?
+</p><!--l. 1--><p class="noindent" >
+</p>
+   <h3 class="likesectionHead"><a 
+ id="x1-12000"></a>References</h3>
+<!--l. 1--><p class="noindent" >
+   </p><div class="thebibliography">
+   <p class="bibitem" ><span class="biblabel">
+ [1]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xbot-manipulation"></a>C.&#x00A0;Yagemann, S.&#x00A0;P. Chung, E.&#x00A0;Uzun, S.&#x00A0;Ragam, B.&#x00A0;Saltaformaggio, and W.&#x00A0;Lee, &#8220;On the feasibility
+   of automating stock market manipulation,&#8221; in <span 
+class="Cabin-Italic-tlf-t1-x-x-120">Annual Computer Security Applications Conference</span>, ACSAC
+   &#8217;20, (New York, NY, USA), p.&#x00A0;277&#8211;290, Association for Computing Machinery, 2020.
+</p>
+   </div>
+    
+</body></html> 
+
+                                                                                                    
+
+
