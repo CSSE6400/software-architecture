@@ -79,7 +79,7 @@ you can easily migrate to AWS without having to rewrite code.
 \raggedleft -- AWS
 \end{oldquote}
 
-\aside{Not available in the lab environments}
+\aside{Not available in the lab environments.}
 
 \subsubsection{AWS MSK ( Managed Streaming for Apache Kafka )}
 \begin{oldquote}
@@ -94,7 +94,7 @@ You can use Amazon MSK to create clusters that use any of the Apache Kafka versi
 \raggedleft -- AWS
 \end{oldquote}
 
-\aside{Not available in the lab environments}
+\aside{Not available in the lab environments.}
 
 \subsubsection{Redis}
 \begin{oldquote}
@@ -121,32 +121,18 @@ Furthermore, ElastiCache also offers support for Memcached, another popular open
 \raggedleft -- AWS
 \end{oldquote}
 
-\aside{Not available in the lab environments}
+\aside{Not available in the lab environments.}
 
 \section{Talking to the Simple Queue Service (SQS)}
 
-\warning{
-    For terminal examples in this section,
-    lines that begin with a \$ indicate a line which you should type while the other lines are example output that you should expect.
-    Not all of the output is captured in the examples to save on space.  
+\info{
+    This section is intended to be demonstrated by your practical tutor.
+    You may work through it on your own if you wish.
 }
 
-Today we will be creating and experimenting with the two queue flavours of AWS SQS.
+We will demonstrate working with the two queue flavours of AWS SQS.
 A standard queue, named \texttt{csse6400\_prac} and a FIFO queue, named \texttt{csse6400\_prac.fifo}.
 The Terraform code below can be used to create these two queues.
-
-\info{
-  If you have forgotten how to get started you will need to run the following commands in a local terminal.
-
-  \bash{
-    terraform init^^J
-    ...^^J
-    $ terraform plan^^J
-    ...^^J
-    $ terraform apply^^J
-    ...
-  }
-}
 
 \teacher{
   In the below terraform it is pretty simple and relies a lot on defaults.
@@ -210,15 +196,10 @@ we can browse the queue configurations and metrics.
 
 \subsection{Queue Command-line Interface}
 
-We have provided a small docker container for you to use with your queues to see the differnce between the implementations.
+We have provided a small docker container to demonstrate the differnce between the implementations.
 First we must retrieve our AWS credentials and setup our environment.
 
-With our learner lab grab the AWS credentials but instead of creating a credentials file we will be using environment variables.
-Make a folder for the practi.
-
-\begin{code}[language=shell, numbers=none]{}
-$ mkdir queues && cd queues
-\end{code}
+Grab the AWS credentials from the Learner Lab but instead of creating a credentials file we will be using environment variables.
 
 Now we need to create an environment file for our docker container to read so that it can access AWS. Create a ``.env'' file in the current directory and edit the contents so that it looks similar to the below: The AWS keys will be from the credentials shown in your lab environment.
 
@@ -230,7 +211,7 @@ AWS_SESSION_TOKEN=...
 \end{code}
 
 \begin{code}[numbers=none,keepspaces=true]{}
-$ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "test" --client-name "Client 1"
+> docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "test" --client-name "Client 1"
 
 
   __________
@@ -248,24 +229,11 @@ $ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "test" 
 Unable to find a Queue by this name test
 \end{code}
 
-If your program shows the above then your ready to head to the next section :).
-  
-
-% \begin{code}[language=shell, numbers=none]{}
-% docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "hello" --sender
-% \end{code}
-
-% \begin{code}[language=shell, numbers=none]{}
-%   docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "hello" --sender
-% \end{code}
-  
-
-
 
 \subsection{SQS Standard}
 
-As we have stated above the ``Standard'' offering of SQS does not guarantee order or ``only once delivery''. 
-Assuming our terraform was created sucessfully we are going to create one publisher and one subscriber.
+The ``standard'' offering of SQS does not guarantee order or ``only once delivery''. 
+We will create a message publisher and a message subscriber.
 
 \info{
   For the rest of this practical you will require multiple terminals. Make sure these are all in the same folder so we can reuse the .enf file. 
@@ -274,30 +242,32 @@ Assuming our terraform was created sucessfully we are going to create one publis
 To create the subscriber run the following command:
 
 \begin{code}[numbers=none,keepspaces=true]{}
-  $ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1" --receive
+> docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1" --receive
 \end{code}
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/stacksub}
 \end{figure}
 
-Now lets start a publisher in another terminal but keep both terminals on your screen if you have space.
+Now start a publisher in another terminal.
 
 \begin{code}[numbers=none,keepspaces=true]{}
-  $ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1"
+> docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1"
 \end{code}
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/stackpub}
 \end{figure}
 
-When the publisher connects to the Queue it is going to put 100 messages of increasing increment into the queue. On the subscriber we will be able to see the messages being received, an example is provided below:
+When the publisher connects to the queue it is going to put 100 messages of increasing increment into the queue.
+On the subscriber we will be able to see the messages being received, an example is provided below:
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/stacksubdata}
 \end{figure}
 
-hopefully like our example you can see that some of the messages arrive out of order. Next add more publishers and subscribers and experiment with the differnt configurations. 
+Hopefully like our example you can see that some of the messages arrive out of order.
+Next add more publishers and subscribers and experiment with the different configurations.
 
 \info{
   When making multiple publishes you may want to change the client-name cli parameter so you can keep track of when the messages arrived at the subscribers.
@@ -305,16 +275,17 @@ hopefully like our example you can see that some of the messages arrive out of o
 
 
 \subsection{SQS FIFO}
-Now we will experiment with the FIFO based service offered by SQS. Like before we will start a subscriber but make sure the name of the queue matches the FIFO queue we created in terraform.
+Now we will experiment with the FIFO based service offered by SQS.
+Like before, we will start a subscriber but make sure the name of the queue matches the FIFO queue we created in terraform.
 
 \begin{code}[numbers=none,keepspaces=true]{}
-  $ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1" --receive
+> docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1" --receive
 \end{code}
 
-Now lets start a publisher in another terminal but keep both terminals on your screen if you have space.
+Now start a publisher in another terminal.
 
 \begin{code}[numbers=none,keepspaces=true]{}
-  $ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1"
+> docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1"
 \end{code}
 
 \begin{figure}[H]
@@ -327,13 +298,14 @@ On the subscriber we now see the messages arriving in order which is to be expec
   \includegraphics[width=\textwidth]{images/fifosub}
 \end{figure}
 
-If we re-run the publisher though we may not see any new messages make it to the consumer. This is because we have asked AWS to dedup messages where it can.
+If we re-run the publisher though we may not see any new messages make it to the consumer.
+This is because we have asked AWS to de-dupe messages where it can.
 
 \teacher{
   Theres a cli param which prepends to the message to allow you to rerun if needed. It is --prepend "abcdef"
 }
 
-Again as before try experimenting with differnt publisher / subscriber configurations to see how they behave.
+As before try experimenting with different publisher / subscriber configurations to see how they behave.
 
 \info{
   When making multiple publishes you may want to change the client-name cli parameter so you can keep track of when the messages arrived at the subscribers.
@@ -347,8 +319,9 @@ Again as before try experimenting with differnt publisher / subscriber configura
 
 When we last deployed a container on AWS,
 we used an existing hosted image.
-Now, we will be developing our own image so we will need a mechanism to host the image.
-For this, we will being using a AWS ECR, Docker, and Terraform.
+Now, we will be developing our own image,
+so we will need a mechanism to host the image.
+For this, we will being using an AWS ECR, Docker, and Terraform.
 AWS ECR is the Elastic Container Registry,
 it is a container registry like DockerHub or GitHub.
 We can use it to host our images,
@@ -361,16 +334,16 @@ using the process below:
 \end{enumerate}
 
 \info{
-This is a non-standard way process.
+This is a non-standard process.
 As you may have seen in the DevOps tutorial,
-we would ordinarily like our code commits to trigger a CI/CD pipeline which builds appropriate images and pushes from there.
-You can still use GitHub actions to build and push your container to the GitHub container registry and authenticate when you pull the image.
+we would ordinarily like our code commits to trigger a CI/CD pipeline which builds the images.
 
+If you would like, you can use GitHub actions to build and push your container to the GitHub container registry and authenticate when you pull the image.
 However, using ECR simplifies the process,
 despite the oddities introduced by having a non-persistent ECR repository.
 }
 
-First we will setup our initial Terraform configuration.
+We will setup our initial Terraform configuration.
 Note that now we introduce a new required provider.
 This provider is for Docker.
 
@@ -423,7 +396,7 @@ The URL for containers in the ECR following the format below:
 
 \url{{ACCOUNT_ID}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME}}
 
-Remember to push to a container registry,
+Remember --- to push to a container registry
 we need a local container whose tag matches the remote URL.
 We could then create and push the contianer locally with:
 
