@@ -443,22 +443,263 @@ It is popular and used in many large scale applications.
 It is also relatively easy to use and has comprehensive documentation.
 
 
-\subsection{TaskOverflow}
+\section{Task Calendar}
 
 TaskOverflow will use celery to distribute the work of generating a calendar view of tasks,
-as this could be a time-intensive task.
+as this could be a time-intensive task.%
+\footnote{In reality it is not but this is an example of a common use case for asynchronous tasks --- file generation such as PDFs or videos which do take time.}
 This will be done by a worker which will run in a separate container.
 The TaskOverflow server will place job requests on the Celery queue.
-The worker will pick-up jobs and generate the calendar view.
-The webserver can then display the calendar view to the user.
+The worker will pick-up jobs and generate the calendar.
+The webserver can then serve the calendar to the user.
 
 Calendar generation occurs asynchronously with this architecture.
 The user will not have to wait for the calendar view to be generated and the webserver can handle other requests.
 
-\todo{Add diagram}
-\todo{Add worker cli startup option}
-\todo{Add celery}
-\todo{Add job request}
+\subsection{API Extension}
+\label{sect:apiext}
+
+We will extend our existing API with the following endpoints.
+
+\begin{description}
+    \item[POST /todos/ical] Create an asynchronous calendar generation job.\footnote{Ideally a POST procedural endpoint should use a verb like \texttt{/generate}.}
+    \item[GET /todos/ical/\{task\_id\}/status] Check the status of the generation job.
+    \item[GET /todos/ical/\{task\_id\}/result] Download the generated iCal file when it is ready.
+\end{description}
+
+An example interaction with the API might look like:
+
+\begin{code}[language=bash,numbers=none]{}
+> curl -X POST http://localhost:6400/api/v1/todos/ical
+{
+  "task_id": "2e80aefd-4a69-4a94-b23a-45f2b8110988",
+  "task_url": "http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/status"
+}
+> curl -X GET http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/status
+{
+  "result_url": "http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/result",
+  "task_id": "2e80aefd-4a69-4a94-b23a-45f2b8110988",
+  "task_status": "PENDING"
+}
+> curl -X GET http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/status
+{
+  "result_url": "http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/result",
+  "task_id": "2e80aefd-4a69-4a94-b23a-45f2b8110988",
+  "task_status": "SUCCESS"
+}
+> curl -X GET http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/result
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Taskoverflow Calendar//mxm.dk//
+BEGIN:VEVENT
+SUMMARY:Project Proposal
+DTSTART:20230403T140000
+UID:1
+DESCRIPTION:CSSE6400 Project Proposal Due
+END:VEVENT
+END:VCALENDAR
+\end{code}
+
+We will stub out the implementation of these endpoints.
+
+\begin{code}[language=python]{todo/views/routes.py}
+@api.route('/todos/ical', methods=['POST'])
+def create_ical():
+    pass
+
+@api.route('/todos/ical/<task_id>/status', methods=['GET'])
+def get_task(task_id):
+    pass
+
+@api.route('/todos/ical/<task_id>/result', methods=['GET'])
+def get_calendar(task_id):
+    pass
+\end{code}
+
+\subsection{Queue and Workers}
+
+Next we will modify our \texttt{docker-compose.yml} to include a local queuing service called Redis.
+We will later use AWS SQS but as Celery supports multiple queues,
+we can use this to make the local development easier.
+
+\begin{code}[]{docker-compose.yml}
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+\end{code}
+
+Now we have a queue,
+we will create the worker that accepts jobs from the queue.
+We will create this worker in \texttt{todo/tasks/ical.py}.
+
+\begin{code}[language=python]{todo/tasks/ical.py}
+import os
+
+from celery import Celery
+
+celery = Celery(__name__)
+celery.conf.broker_url = os.environ.get("CELERY_BROKER_URL")
+celery.conf.result_backend = os.environ.get("CELERY_RESULT_BACKEND")
+
+@celery.task(name="ical")
+def create_ical(tasks):
+    return "Hello World"
+\end{code}
+
+Note that we are getting a URL from the environment variables:
+\texttt{CELERY\_BROKER\_URL} and \texttt{CELERY\_RESULT\_BACKEND}.
+We need to remember to set these variables in whichever environment the service is run in.
+
+We need to install Celery.
+We will do this in the same pipenv environment as the Flask server as we will later require our Flask server to use Celery to put jobs onto the task queue.
+
+\bash{pipenv install celery redis celery[sqs]}
+
+The above will install the Celery core and Redis and SQS drivers for communication.
+
+We will now start our local Redis queue and our worker to ensure that they can communicate.
+
+\bash{docker-compose up redis}
+
+\begin{code}[language=bash,numbers=none]{}
+> export CELERY_BROKER_URL=redis://localhost:6379
+> export CELERY_RESULT_BACKEND=redis://localhost:6379
+> pipenv run python3 -m celery --app todo.tasks.ical worker --loglevel=info
+\end{code}
+
+You should see something like the below.
+This indicates that the worker has successfully subscribed to the queue and is ready to accept events.
+
+\begin{code}[numbers=none]{}
+
+ -------------- celery@uqbwebb2-6842 v5.2.7 (dawn-chorus)
+--- ***** -----
+-- ******* ---- macOS-12.6.1-x86_64-i386-64bit 2023-04-04 18:51:09
+- *** --- * ---
+- ** ---------- [config]
+- ** ---------- .> app:         todo.tasks.ical:0x10432e7d0
+- ** ---------- .> transport:   redis://localhost:6379//
+- ** ---------- .> results:     redis://localhost:6379/
+- *** --- * --- .> concurrency: 8 (prefork)
+-- ******* ---- .> task events: OFF (enable -E to monitor tasks in this worker)
+--- ***** -----
+ -------------- [queues]
+                .> celery           exchange=celery(direct) key=celery
+
+
+[tasks]
+  . ical
+
+[2023-04-04 18:51:10,059: INFO/MainProcess] Connected to redis://localhost:6379//
+[2023-04-04 18:51:10,065: INFO/MainProcess] mingle: searching for neighbors
+[2023-04-04 18:51:11,200: INFO/MainProcess] mingle: sync with 1 nodes
+[2023-04-04 18:51:11,201: INFO/MainProcess] mingle: sync complete
+[2023-04-04 18:51:11,240: INFO/MainProcess] celery@uqbwebb2-6842 ready.
+\end{code}
+
+Finally, we will run Celery inside a new container.
+For this we will modify our \texttt{docker-compose.yml} file.
+
+\begin{code}[numbers=none]{docker-compose.yml}
+worker:
+  build:
+    context: .
+    dockerfile: Dockerfile.dev
+  restart: always
+  environment:
+    CELERY_BROKER_URL: redis://redis:6379
+    CELERY_RESULT_BACKEND: redis://redis:6379
+  command: celery --app todo.tasks.ical worker --loglevel=info
+\end{code}
+
+Note that we are re-using the same image development image as the Flask server.
+This makes sense since it shares very similar dependencies.
+It would make sense to separate the dependencies between the two containers as they grow larger.
+
+We are overriding the command to run when the container starts to use the celery command.
+We have also remembered to set the environment variables appropriately.
+We have to use the domain name of the redis image instead of the localhost because redis is not running on our localhost.
+Earlier we were able to pretend it was because the redis port, 6379, was being forwarded from our localhost to our redis container.
+
+\subsection{Creating Tasks}
+
+We will now return to our Flask server.
+We can modify our new endpoints to use Celery to create tasks on the task queue.
+
+\begin{code}[language=python]{todo/views/routes.py}
+from celery.result import AsyncResult
+from todo.tasks import ical
+
+...
+
+@api.route('/todos/ical', methods=['POST'])
+def create_ical():
+    # put all tasks in the database into a tasks variable
+    task = ical.create_ical.delay(tasks)
+    return jsonify({"task_id": task.id}), 202
+
+@api.route('/todos/ical/<task_id>/status', methods=['GET'])
+def get_task(task_id):
+    task = AsyncResult(task_id)
+    # use task to populate an appropriate JSON response
+    return jsonify(result), 200
+
+@api.route('/todos/ical/<task_id>/result', methods=['GET'])
+def get_calendar(task_id):
+    task_result = AsyncResult(task_id)
+    if task_result.status == 'SUCCESS':
+        return task_result.result, 200, {'Content-Type': 'text/calendar'}
+    else:
+        return jsonify({'error': 'Task not finished'}), 404
+\end{code}
+
+The variable that we create as tasks and pass to the delay method is the JSON data that is stored with the event.
+It is then deserialized from JSON and passed as a variable to the \texttt{create\_ical} function.
+Celery is able to create impressive abstractions so that message passing over a task queue looks almost like regular function calls.
+
+\subsection{Creating the Calendar}
+
+Once we have confirmed that the task queue can communicate with our worker,
+we can return to the calendar generation.
+We will use the \texttt{icalendar} library for this.
+
+\bash{pipenv install icalendar}
+
+\begin{code}[language=python,numbers=none]{todo/tasks/ical.py}
+import icalendar
+import time
+
+...
+
+def create_ical(tasks):
+    cal = icalendar.Calendar()
+    cal.add("prodid", "-//Taskoverflow Calendar//mxm.dk//")
+    cal.add("version", "2.0")
+
+    time.sleep(50)
+
+    for task in tasks:
+        event = icalendar.Event()
+        
+        event.add("uid", task["id"])
+        event.add("summary", task["title"])
+        event.add("description", task["description"])
+        event.add("dtstart", datetime.datetime.strptime(task["deadline_at"], "%Y-%m-%dT%H:%M:%S"))
+
+        cal.add_component(event)
+
+    return cal.to_ical().decode("utf-8")
+\end{code}
+
+Now you should be able to test your application.
+\begin{enumerate}
+    \item Start it with docker-compose.
+        \bash{docker-compose up --build}
+    \item Open the user interface on \url{http://localhost:6400} and create some tasks.
+    \item Follow the cURL interaction from Section \ref{sect:apiext} to generate an appropriate iCal.
+\end{enumerate}
 
 \subsubsection{Design Challenge}
 
