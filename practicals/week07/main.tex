@@ -315,6 +315,7 @@ As before try experimenting with different publisher / subscriber configurations
   \textbf{Please remember to terraform destroy to delete your resources}
 }
 
+
 \section{Hosting TaskOverflow Images}
 
 When we last deployed a container on AWS,
@@ -342,6 +343,22 @@ If you would like, you can use GitHub actions to build and push your container t
 However, using ECR simplifies the process,
 despite the oddities introduced by having a non-persistent ECR repository.
 }
+
+\paragraph{Getting Started}
+
+\begin{enumerate}
+    \item Using the GitHub Classroom link for this practical provided by your tutor in Slack, create a repository to work within.
+    \item Install Terraform if not already installed, as it will be required again this week.
+    \item Start your learner lab and copy the AWS Learner Lab credentials into a credentials file in the root of the repository.
+\end{enumerate}
+
+\paragraph{What's New}
+We are starting again with our todo application from roughly where we left off in the week 3 practical.
+We've added a new directory \texttt{todo/app} that has the static HTML files for the TaskOverflow website and added a route to serve these files.
+We have also created a production version of the server that uses gunicorn,
+the \texttt{bin} directory is used by this image.
+Our original Docker image is now in \texttt{Dockerfile.dev}.\\
+
 
 We will setup our initial Terraform configuration.
 Note that now we introduce a new required provider.
@@ -502,7 +519,7 @@ END:VCALENDAR
 
 We will stub out the implementation of these endpoints.
 
-\begin{code}[language=python]{todo/views/routes.py}
+\begin{code}[language=python,numbers=none]{todo/views/routes.py}
 @api.route('/todos/ical', methods=['POST'])
 def create_ical():
     pass
@@ -522,7 +539,7 @@ Next we will modify our \texttt{docker-compose.yml} to include a local queuing s
 We will later use AWS SQS but as Celery supports multiple queues,
 we can use this to make the local development easier.
 
-\begin{code}[]{docker-compose.yml}
+\begin{code}[numbers=none]{docker-compose.yml}
   redis:
     image: redis:latest
     restart: always
@@ -534,7 +551,7 @@ Now we have a queue,
 we will create the worker that accepts jobs from the queue.
 We will create this worker in \texttt{todo/tasks/ical.py}.
 
-\begin{code}[language=python]{todo/tasks/ical.py}
+\begin{code}[language=python,numbers=none]{todo/tasks/ical.py}
 import os
 
 from celery import Celery
@@ -542,6 +559,7 @@ from celery import Celery
 celery = Celery(__name__)
 celery.conf.broker_url = os.environ.get("CELERY_BROKER_URL")
 celery.conf.result_backend = os.environ.get("CELERY_RESULT_BACKEND")
+celery.conf.task_default_queue = os.environ.get("CELERY_DEFAULT_QUEUE", "ical")
 
 @celery.task(name="ical")
 def create_ical(tasks):
@@ -555,9 +573,9 @@ We need to remember to set these variables in whichever environment the service 
 We need to install Celery.
 We will do this in the same pipenv environment as the Flask server as we will later require our Flask server to use Celery to put jobs onto the task queue.
 
-\bash{pipenv install celery redis celery[sqs]}
+\bash{pipenv install celery redis celery\[sqs\] boto3}
 
-The above will install the Celery core and Redis and SQS drivers for communication.
+The above will install the Celery core and Redis and AWS SQS drivers for communication.
 
 We will now start our local Redis queue and our worker to ensure that they can communicate.
 
@@ -628,7 +646,7 @@ Earlier we were able to pretend it was because the redis port, 6379, was being f
 We will now return to our Flask server.
 We can modify our new endpoints to use Celery to create tasks on the task queue.
 
-\begin{code}[language=python]{todo/views/routes.py}
+\begin{code}[language=python,numbers=none]{todo/views/routes.py}
 from celery.result import AsyncResult
 from todo.tasks import ical
 
@@ -701,11 +719,80 @@ Now you should be able to test your application.
     \item Follow the cURL interaction from Section \ref{sect:apiext} to generate an appropriate iCal.
 \end{enumerate}
 
-\subsubsection{Design Challenge}
+\section{Deploying with SQS}
 
-Say we observe a user pattern that the majority of users will mark off multiple todo items at once. We have also moved our calendar from a PDF being displayed to the user to an iCal so that its visible in their chosen calendar application.
+First we will modify our worker so that it can run locally and connect to an SQS queue.
+We need to create an appropriate SQS queue.
 
-How could we improve the efficiency of our system to reduce the amount of time it takes to generate the calendar view?
+\begin{code}[language=terraform,numbers=none]{sqs.tf}
+resource "aws_sqs_queue" "ical_queue" {
+    name = "ical"
+}
+\end{code}
+
+\info{
+    Celery will automatically create a queue if it doesn't exist,
+    however, we want to manage it with Terraform so it is easier to destroy.
+}
+
+Now we need to tell our worker to use our SQS queue.
+To do this we will use the \texttt{sqs://} broker URL.
+This tells Celery to use SQS.
+Celery will then attempt to find appropriate AWS credentials to use to authenticate.
+We could pass these in as environment variables.
+However, for convinence we will mount the \texttt{credentials} file that already exists within our container.
+
+\begin{code}[numbers=none]{docker-compose.yml}
+volumes:
+  - ./todo:/app/todo
+  - ./credentials:/root/.aws/credentials
+environment:
+  CELERY_BROKER_URL: sqs://
+\end{code}
+
+Ensure that you update both the worker and the server.
+Note that we are using \texttt{/root} since the container is run as the root user and Celery will therefore look at \texttt{\textasciitilde/.aws/credentials}.
+
+We can use the SQS queue in this state to create tasks and our workers will pick it up.
+This is often sufficient,
+however, in our implementation we have made use of Celery's built-in functionality to track jobs with a persistent data store.
+This is by use of the \texttt{AsyncResult} class.
+If we tried to go to the status or result page for a task we submitted, we would receive an error.
+
+To work around this issue,
+we will use our existing PostgreSQL database as our persistent store to track tasks.
+
+We can update our \texttt{docker-compose.yml} as below to allow Celery to use our PostgreSQL database.
+
+\begin{code}[numbers=none]{docker-compose.yml}
+environment:
+    CELERY_RESULT_BACKEND: db+postgresql://administrator:verySecretPassword@database:5432/todo
+\end{code}
+
+This is the same as the \texttt{SQLALCHEMY\_DATABASE\_URI} except for \texttt{db+} at the start to help Celery identify the type of data store.
+
+\section{Deploying with ECS}
+
+Now we have;
+\begin{enumerate}
+    \item an SQS queue on AWS,
+    \item a worker Celery container running locally,
+    \item a server Flask container running locally, and
+    \item a PostgreSQL database running locally.
+\end{enumerate}
+
+Earlier in the practical we showed how to host a container on ECR.
+In previous practicals we used a hosted image to deploy containers on ECS or EC2.
+In previous practicals we also deployed a PostgreSQL database on RDS.
+
+We would strongly encourage you to try and deploy all components of our application on AWS infrastructure.
+This will be excellent practice for the cloud assignment.
+
+\paragraph{Hints}
+\begin{enumerate}
+    \item ECS/EC2 containers will automatically authenticate with your AWS account (so \texttt{credentials} isn't required).
+    \item Attempt to test each component is deployed correctly individually, e.g. deploy RDS and ensure the system works, then deploy the server and ensure the system works, etc.
+\end{enumerate}
 
 \bibliographystyle{ieeetr}
 \bibliography{books,ours}
