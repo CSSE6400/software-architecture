@@ -2749,7 +2749,7 @@ class="ectt-1200">:</span></span>
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">task</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">task_result</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">AsyncResult</span></span><span style="color:#000000"><span 
 class="ectt-1200">(</span></span><span style="color:#000000"><span 
@@ -2966,17 +2966,68 @@ event. It is then deserialized from JSON and passed as a variable to the <span
 class="ectt-1200">create_ical </span>function. Celery is able to
 create impressive abstractions so that message passing over a task queue looks almost like regular function
 calls.
-</p><!--l. 694--><p class="noindent" >
+</p><!--l. 694--><p class="indent" >   Before we can successfully use this endpoint to get our important &#8220;Hello World&#8221; result, we will also need to
+configure the server to talk to our Redis container.
+</p><!--l. 697--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 697--><p class="indent" >   <span 
+class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 697--><pre class="listings" id="listing-23"><span class="label"><a 
+ id="x1-21040r1"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">environment</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-21041r2"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">CELERY_BROKER_URL</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span style="color:#000000"><span 
+class="ectt-1200">:6379</span></span> 
+<span class="label"><a 
+ id="x1-21042r3"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">CELERY_RESULT_BACKEND</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span style="color:#000000"><span 
+class="ectt-1200">:6379</span></span>
+ 
+<span class="label"><a 
+ id="x1-21043r4"></a></span></pre>
+   </div>
+<!--l. 703--><p class="indent" >   You should now be able to start the server and worker with docker compose.
+</p>
+   <div class="framedenv" id="shaded*-1">
+   <!--l. 705-->
+<pre class="lstlisting" id="listing-24"><span class="label"><a 
+ id="x1-21044r1"></a></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">compose</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">up</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
+   </div>
+<!--l. 707--><p class="indent" >   You can now send a POST request to the <span 
+class="ectt-1200">/api/v1/todos/ical </span>endpoint to start a job and follow the
+subsequent URLs to see the result of the job.
+</p><!--l. 709--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">6.4    </span> <a 
  id="x1-220006.4"></a>Creating the Calendar</h4>
-<!--l. 696--><p class="noindent" >Once we have confirmed that the task queue can communicate with our worker, we can return to the calendar
+<!--l. 711--><p class="noindent" >Once we have confirmed that the task queue can communicate with our worker, we can return to the calendar
 generation. We will use the <span 
 class="ectt-1200">icalendar </span>library for this.
 </p>
    <div class="framedenv" id="shaded*-1">
-   <!--l. 700-->
-<pre class="lstlisting" id="listing-23"><span class="label"><a 
+   <!--l. 715-->
+<pre class="lstlisting" id="listing-25"><span class="label"><a 
  id="x1-22001r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">pipenv</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2984,9 +3035,9 @@ class="ectt-1200">install</span></span><span style="color:#000000"> </span><span
 class="ectt-1200">icalendar</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 702--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 702--><p class="indent" >   <span 
-class="ectt-1200">» cat todo/tasks/ical.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 702--><pre class="listings" id="listing-24"><span class="label"><a 
+<!--l. 717--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 717--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/tasks/ical.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 717--><pre class="listings" id="listing-26"><span class="label"><a 
  id="x1-22002r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">icalendar</span></span> 
@@ -3250,13 +3301,15 @@ class="ectt-1200">)</span></span>
 <span class="label"><a 
  id="x1-22025r24"></a></span></pre>
    </div>
-<!--l. 728--><p class="indent" >   Now you should be able to test your application.
+<!--l. 743--><p class="indent" >   Now you should be able to test your application.
       </p><ol  class="enumerate1" >
+                                                                                                    
+                                                                                                    
 <li 
   class="enumerate" id="x1-22027x1">
-      <!--l. 730--><p class="noindent" >Start it with docker-compose.  </p><div class="framedenv" id="shaded*-1">
-      <!--l. 731-->
-      <pre class="lstlisting" id="listing-25"><span class="label"><a 
+      <!--l. 745--><p class="noindent" >Start it with docker-compose.  </p><div class="framedenv" id="shaded*-1">
+      <!--l. 746-->
+      <pre class="lstlisting" id="listing-27"><span class="label"><a 
  id="x1-22028r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"><span 
@@ -3271,25 +3324,23 @@ class="ectt-1200">&#x00A0;</span></pre>
       </li>
 <li 
   class="enumerate" id="x1-22030x2">
-      <!--l. 732--><p class="noindent" >Open the user interface on <a 
+      <!--l. 747--><p class="noindent" >Open the user interface on <a 
 href="http://localhost:6400" class="url" ><span 
 class="ectt-1200">http://localhost:6400</span></a> and create some tasks.
       </p></li>
 <li 
   class="enumerate" id="x1-22032x3">
-      <!--l. 733--><p class="noindent" >Follow the cURL interaction from Section <a 
+      <!--l. 748--><p class="noindent" >Follow the cURL interaction from Section <a 
 href="#x1-190006.1">6.1<!--tex4ht:ref: sect:apiext --></a> to generate an appropriate iCal.</p></li></ol>
-                                                                                                    
-                                                                                                    
-<!--l. 736--><p class="noindent" >
+<!--l. 751--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">7    </span> <a 
  id="x1-230007"></a>Deploying with SQS</h3>
-<!--l. 738--><p class="noindent" >First we will modify our worker so that it can run locally and connect to an SQS queue. We need to create an
+<!--l. 753--><p class="noindent" >First we will modify our worker so that it can run locally and connect to an SQS queue. We need to create an
 appropriate SQS queue.
-</p><!--l. 741--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 741--><p class="indent" >   <span 
-class="ectt-1200">» cat sqs.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 741--><pre class="listings" id="listing-26"><span class="label"><a 
+</p><!--l. 756--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 756--><p class="indent" >   <span 
+class="ectt-1200">» cat sqs.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 756--><pre class="listings" id="listing-28"><span class="label"><a 
  id="x1-23001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -3318,20 +3369,20 @@ class="ectt-1200">}</span></span>
    </div>
    <div class="tcolorbox tcolorbox" id="tcolobox-10"> 
 <div class="tcolorbox-title">
-<!--l. 750--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 750--><p class="noindent" >Celery  will  automatically  create  a  queue  if  it  doesn&#8217;t  exist,  however,  we  want  to  manage  it  with
+<!--l. 765--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 765--><p class="noindent" >Celery  will  automatically  create  a  queue  if  it  doesn&#8217;t  exist,  however,  we  want  to  manage  it  with
 Terraform so it is easier to destroy.  </p> 
 </div> 
 </div>
-<!--l. 752--><p class="indent" >   Now we need to tell our worker to use our SQS queue. To do this we will use the <span 
+<!--l. 767--><p class="indent" >   Now we need to tell our worker to use our SQS queue. To do this we will use the <span 
 class="ectt-1200">sqs:// </span>broker URL. This tells
 Celery to use SQS. Celery will then attempt to find appropriate AWS credentials to use to authenticate. We could
 pass these in as environment variables. However, for convinence we will mount the <span 
 class="ectt-1200">credentials </span>file that already
 exists within our container.
-</p><!--l. 759--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 759--><p class="indent" >   <span 
-class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 759--><pre class="listings" id="listing-27"><span class="label"><a 
+</p><!--l. 774--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 774--><p class="indent" >   <span 
+class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 774--><pre class="listings" id="listing-29"><span class="label"><a 
  id="x1-23005r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">volumes</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
@@ -3372,22 +3423,25 @@ class="ectt-1200">://</span></span>
 <span class="label"><a 
  id="x1-23010r6"></a></span></pre>
    </div>
-<!--l. 767--><p class="indent" >   Ensure that you update both the worker and the server. Note that we are using <span 
+<!--l. 782--><p class="indent" >   Ensure that you update both the worker and the server. Note that we are using <span 
 class="ectt-1200">/root </span>since the container is run
 as the root user and Celery will therefore look at <span 
 class="ectt-1200">~/.aws/credentials</span>.
-</p><!--l. 770--><p class="indent" >   We can use the SQS queue in this state to create tasks and our workers will pick it up. This is often sufficient,
+</p><!--l. 785--><p class="indent" >   We can use the SQS queue in this state to create tasks and our workers will pick it up. This is often sufficient,
 however, in our implementation we have made use of Celery&#8217;s built-in functionality to track jobs with a persistent
 data store. This is by use of the <span 
 class="ectt-1200">AsyncResult </span>class. If we tried to go to the status or result page for a task we
 submitted, we would receive an error.
-</p><!--l. 776--><p class="indent" >   To work around this issue, we will use our existing PostgreSQL database as our persistent store to track
+</p><!--l. 791--><p class="indent" >   To work around this issue, we will use our existing PostgreSQL database as our persistent store to track
 tasks.
-</p><!--l. 779--><p class="indent" >   We can update our <span 
+</p><!--l. 794--><p class="indent" >   We can update our <span 
 class="ectt-1200">docker-compose.yml </span>as below to allow Celery to use our PostgreSQL database.
-</p><!--l. 781--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 781--><p class="indent" >   <span 
-class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 781--><pre class="listings" id="listing-28"><span class="label"><a 
+</p><!--l. 796--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 796--><p class="indent" >   <span 
+class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1">
+                                                                                                    
+                                                                                                    
+<!--l. 796--><pre class="listings" id="listing-30"><span class="label"><a 
  id="x1-23011r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">environment</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
@@ -3411,52 +3465,52 @@ class="ectt-1200">todo</span></span>
 <span class="label"><a 
  id="x1-23013r3"></a></span></pre>
    </div>
-<!--l. 786--><p class="indent" >   This is the same as the <span 
+<!--l. 801--><p class="indent" >   This is the same as the <span 
 class="ectt-1200">SQLALCHEMY_DATABASE_URI </span>except for <span 
 class="ectt-1200">db+ </span>at the start to help Celery identify the type
 of data store.
-</p><!--l. 788--><p class="noindent" >
+</p><!--l. 803--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">8    </span> <a 
  id="x1-240008"></a>Deploying with ECS</h3>
-<!--l. 790--><p class="noindent" >Now we have;
+<!--l. 805--><p class="noindent" >Now we have;
       </p><ol  class="enumerate1" >
 <li 
   class="enumerate" id="x1-24002x1">
-      <!--l. 792--><p class="noindent" >an SQS queue on AWS,
-                                                                                                    
-                                                                                                    
+      <!--l. 807--><p class="noindent" >an SQS queue on AWS,
       </p></li>
 <li 
   class="enumerate" id="x1-24004x2">
-      <!--l. 793--><p class="noindent" >a worker Celery container running locally,
+      <!--l. 808--><p class="noindent" >a worker Celery container running locally,
       </p></li>
 <li 
   class="enumerate" id="x1-24006x3">
-      <!--l. 794--><p class="noindent" >a server Flask container running locally, and
+      <!--l. 809--><p class="noindent" >a server Flask container running locally, and
       </p></li>
 <li 
   class="enumerate" id="x1-24008x4">
-      <!--l. 795--><p class="noindent" >a PostgreSQL database running locally.</p></li></ol>
-<!--l. 798--><p class="indent" >   Earlier in the practical we showed how to host a container on ECR. In previous practicals we used a hosted
+      <!--l. 810--><p class="noindent" >a PostgreSQL database running locally.</p></li></ol>
+<!--l. 813--><p class="indent" >   Earlier in the practical we showed how to host a container on ECR. In previous practicals we used a hosted
 image to deploy containers on ECS or EC2. In previous practicals we also deployed a PostgreSQL database on
 RDS.
-</p><!--l. 802--><p class="indent" >   We would strongly encourage you to try and deploy all components of our application on AWS infrastructure.
+</p><!--l. 817--><p class="indent" >   We would strongly encourage you to try and deploy all components of our application on AWS infrastructure.
 This will be excellent practice for the cloud assignment.
 </p>
-<!--l. 805--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 820--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-25000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Hints</span></span>
       </p><ol  class="enumerate1" >
 <li 
   class="enumerate" id="x1-25002x1">
-      <!--l. 807--><p class="noindent" >ECS/EC2 containers will automatically authenticate with your AWS account (so <span 
+      <!--l. 822--><p class="noindent" >ECS/EC2 containers will automatically authenticate with your AWS account (so <span 
 class="ectt-1200">credentials </span>isn&#8217;t
       required).
+                                                                                                    
+                                                                                                    
       </p></li>
 <li 
   class="enumerate" id="x1-25004x2">
-      <!--l. 808--><p class="noindent" >Attempt to test each component is deployed correctly individually, e.g. deploy RDS and ensure the
+      <!--l. 823--><p class="noindent" >Attempt to test each component is deployed correctly individually, e.g. deploy RDS and ensure the
       system works, then deploy the server and ensure the system works, etc.</p></li></ol>
 <!--l. 1--><p class="noindent" >
 </p>
@@ -3472,8 +3526,6 @@ href="https://csse6400.uqcloud.net/handouts/event.pdf" class="url" ><span
 class="ectt-1200">https://csse6400.uqcloud.net/handouts/event.pdf</span></a>.
 </p>
    </div>
-                                                                                                    
-                                                                                                    
    <div class="footnotes"><a 
  id="x1-18002x6"></a>
 <!--l. 467--><p class="indent" >       <span class="footnote-mark"><a 
