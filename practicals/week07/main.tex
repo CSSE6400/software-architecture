@@ -670,7 +670,7 @@ def create_ical():
 
 @api.route('/todos/ical/<task_id>/status', methods=['GET'])
 def get_task(task_id):
-    task = AsyncResult(task_id)
+    task_result = AsyncResult(task_id)
     result = {
         "task_id": task_id,
         "task_status": task_result.status,
@@ -690,6 +690,21 @@ def get_calendar(task_id):
 The variable that we create as tasks and pass to the delay method is the JSON data that is stored with the event.
 It is then deserialized from JSON and passed as a variable to the \texttt{create\_ical} function.
 Celery is able to create impressive abstractions so that message passing over a task queue looks almost like regular function calls.
+
+Before we can successfully use this endpoint to get our important ``Hello World'' result,
+we will also need to configure the server to talk to our Redis container.
+
+\begin{code}[numbers=none]{docker-compose.yml}
+  environment:
+    CELERY_BROKER_URL: redis://redis:6379
+    CELERY_RESULT_BACKEND: redis://redis:6379
+\end{code}
+
+You should now be able to start the server and worker with docker compose.
+
+\bash{docker-compose up}
+
+You can now send a POST request to the \texttt{/api/v1/todos/ical} endpoint to start a job and follow the subsequent URLs to see the result of the job.
 
 \subsection{Creating the Calendar}
 
