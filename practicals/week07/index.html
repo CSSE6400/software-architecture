@@ -1,4 +1,4 @@
-Last Updated on 2023/04/03     
+Last Updated on 2023/04/04     
 
 <?xml version="1.0" encoding="iso-8859-1" ?> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
@@ -1343,52 +1343,1783 @@ Python library Celery to create a simple worker queue for TaskOverflow.
 applications. It is also relatively easy to use and has comprehensive documentation.
 </p><!--l. 446--><p class="noindent" >
 </p>
-   <h4 class="subsectionHead"><span class="titlemark">5.2    </span> <a 
- id="x1-160005.2"></a>TaskOverflow</h4>
-<!--l. 448--><p class="noindent" >TaskOverflow will use celery to distribute the work of generating a calendar view of tasks, as this could be a
-time-intensive task. This will be done by a worker which will run in a separate container. The TaskOverflow server
-will place job requests on the Celery queue. The worker will pick-up jobs and generate the calendar view. The
-webserver can then display the calendar view to the user.
-</p><!--l. 455--><p class="indent" >   Calendar generation occurs asynchronously with this architecture. The user will not have to wait for the
+   <h3 class="sectionHead"><span class="titlemark">6    </span> <a 
+ id="x1-160006"></a>Task Calendar</h3>
+<!--l. 448--><p class="noindent" >TaskOverflow will use celery to distribute the work of generating a calendar view of tasks, as this could be a time-intensive
+task.<span class="footnote-mark"><a 
+href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
+ id="x1-16001f1"></a>
+This will be done by a worker which will run in a separate container. The TaskOverflow server will place job
+requests on the Celery queue. The worker will pick-up jobs and generate the calendar. The webserver can then
+serve the calendar to the user.
+</p><!--l. 456--><p class="indent" >   Calendar generation occurs asynchronously with this architecture. The user will not have to wait for the
 calendar view to be generated and the webserver can handle other requests.
+</p><!--l. 459--><p class="noindent" >
 </p>
-   <div class="tcolorbox tcolorbox" id="tcolobox-10">    
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 458--><p class="noindent" >TODO: Add diagram </p> 
-</div> 
-</div>                                                                                                                                                    <div class="tcolorbox tcolorbox" id="tcolobox-11">  
- 
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 459--><p class="noindent" >TODO: Add worker cli startup option </p> 
-</div> 
-</div>                                                                                                                      <div class="tcolorbox tcolorbox" id="tcolobox-12">  
- 
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 460--><p class="noindent" >TODO: Add celery </p> 
-</div> 
-</div>                                                                                                                                                        <div class="tcolorbox tcolorbox" id="tcolobox-13">  
- 
-<div class="tcolorbox-title">
-   </div> 
-<div class="tcolorbox-content"><!--l. 461--><p class="noindent" >TODO: Add job request </p> 
-</div> 
-</div>
-<!--l. 463--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">6.1    </span> <a 
+ id="x1-170006.1"></a>API Extension</h4>
+<!--l. 462--><p class="noindent" >We will extend our existing API with the following endpoints.
+</p><!--l. 464--><p class="indent" >
+      </p><dl class="description"><dt class="description">
+      <!--l. 465--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">POST /todos/ical</span> </p></dt><dd 
+class="description">
+      <!--l. 465--><p class="noindent" >Create an asynchronous calendar generation job.<span class="footnote-mark"><a 
+href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
+ id="x1-17001f2"></a>
+      </p></dd><dt class="description">
+      <!--l. 466--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">GET /todos/ical/{task_id}/status</span> </p></dt><dd 
+class="description">
+      <!--l. 466--><p class="noindent" >Check the status of the generation job.
+      </p></dd><dt class="description">
+      <!--l. 467--><p class="noindent" >
+<span 
+class="Cabin-Bold-tlf-t1-x-x-120">GET /todos/ical/{task_id}/result</span> </p></dt><dd 
+class="description">
+      <!--l. 467--><p class="noindent" >Download the generated iCal file when it is ready.</p></dd></dl>
+<!--l. 470--><p class="indent" >   An example interaction with the API might look like:
 </p>
-   <h5 class="subsubsectionHead"><span class="titlemark">5.2.1    </span> <a 
- id="x1-170005.2.1"></a>Design Challenge</h5>
-<!--l. 465--><p class="noindent" >Say we observe a user pattern that the majority of users will mark off multiple todo items at once. We have also
+   <div class="framedenv" id="code-1">
+<!--l. 472--><pre class="listings" id="listing-13"><span class="label"><a 
+ id="x1-17003r1"></a></span><span style="color:#000000"><span 
+class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">curl</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">X</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">POST</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">http</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">localhost</span></span><span style="color:#000000"><span 
+class="ectt-1200">:6400/</span></span><span style="color:#000000"><span 
+class="ectt-1200">api</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">v1</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">todos</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">ical</span></span> 
+<span class="label"><a 
+ id="x1-17004r2"></a></span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-17005r3"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">task_id</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">2</span></span><span style="color:#669900"><span 
+class="ectt-1200">e80aefd</span></span><span style="color:#669900"><span 
+class="ectt-1200">-4</span></span><span style="color:#669900"><span 
+class="ectt-1200">a69</span></span><span style="color:#669900"><span 
+class="ectt-1200">-4</span></span><span style="color:#669900"><span 
+class="ectt-1200">a94</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">b23a</span></span><span style="color:#669900"><span 
+class="ectt-1200">-45</span></span><span style="color:#669900"><span 
+class="ectt-1200">f2b8110988</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span> 
+<span class="label"><a 
+ id="x1-17006r4"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">task_url</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">http</span></span><span style="color:#669900"><span 
+class="ectt-1200">://</span></span><span style="color:#669900"><span 
+class="ectt-1200">localhost</span></span><span style="color:#669900"><span 
+class="ectt-1200">:6400/</span></span><span style="color:#669900"><span 
+class="ectt-1200">api</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">v1</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">todos</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">ical</span></span><span style="color:#669900"><span 
+class="ectt-1200">/2</span></span><span style="color:#669900"><span 
+class="ectt-1200">e80aefd</span></span><span style="color:#669900"><span 
+class="ectt-1200">-4</span></span><span style="color:#669900"><span 
+class="ectt-1200">a69</span></span><span style="color:#669900"><span 
+class="ectt-1200">-4</span></span><span style="color:#669900"><span 
+class="ectt-1200">a94</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">b23a</span></span><span style="color:#669900"><span 
+class="ectt-1200">-45</span></span><span style="color:#669900"><span 
+class="ectt-1200">f2b8110988</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">status</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-17007r5"></a></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-17008r6"></a></span><span style="color:#000000"><span 
+class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">curl</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">X</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">GET</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">http</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">localhost</span></span><span style="color:#000000"><span 
+class="ectt-1200">:6400/</span></span><span style="color:#000000"><span 
+class="ectt-1200">api</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">v1</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">todos</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">ical</span></span><span style="color:#000000"><span 
+class="ectt-1200">/2</span></span><span style="color:#000000"><span 
+class="ectt-1200">e80aefd</span></span><span style="color:#000000"><span 
+class="ectt-1200">-4</span></span><span style="color:#000000"><span 
+class="ectt-1200">a69</span></span><span style="color:#000000"><span 
+class="ectt-1200">-4</span></span><span style="color:#000000"><span 
+class="ectt-1200">a94</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">b23a</span></span><span style="color:#000000"><span 
+class="ectt-1200">-45</span></span><span style="color:#000000"><span 
+class="ectt-1200">f2b8110988</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">status</span></span> 
+<span class="label"><a 
+ id="x1-17009r7"></a></span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-17010r8"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">result_url</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">http</span></span><span style="color:#669900"><span 
+class="ectt-1200">://</span></span><span style="color:#669900"><span 
+class="ectt-1200">localhost</span></span><span style="color:#669900"><span 
+class="ectt-1200">:6400/</span></span><span style="color:#669900"><span 
+class="ectt-1200">api</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">v1</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">todos</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">ical</span></span><span style="color:#669900"><span 
+class="ectt-1200">/2</span></span><span style="color:#669900"><span 
+class="ectt-1200">e80aefd</span></span><span style="color:#669900"><span 
+class="ectt-1200">-4</span></span><span style="color:#669900"><span 
+class="ectt-1200">a69</span></span><span style="color:#669900"><span 
+class="ectt-1200">-4</span></span><span style="color:#669900"><span 
+class="ectt-1200">a94</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">b23a</span></span><span style="color:#669900"><span 
+class="ectt-1200">-45</span></span><span style="color:#669900"><span 
+class="ectt-1200">f2b8110988</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">result</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span> 
+<span class="label"><a 
+ id="x1-17011r9"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">task_id</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">2</span></span><span style="color:#669900"><span 
+class="ectt-1200">e80aefd</span></span><span style="color:#669900"><span 
+class="ectt-1200">-4</span></span><span style="color:#669900"><span 
+class="ectt-1200">a69</span></span><span style="color:#669900"><span 
+class="ectt-1200">-4</span></span><span style="color:#669900"><span 
+class="ectt-1200">a94</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">b23a</span></span><span style="color:#669900"><span 
+class="ectt-1200">-45</span></span><span style="color:#669900"><span 
+class="ectt-1200">f2b8110988</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span> 
+<span class="label"><a 
+ id="x1-17012r10"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">task_status</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">PENDING</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-17013r11"></a></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-17014r12"></a></span><span style="color:#000000"><span 
+class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">curl</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">X</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">GET</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">http</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">localhost</span></span><span style="color:#000000"><span 
+class="ectt-1200">:6400/</span></span><span style="color:#000000"><span 
+class="ectt-1200">api</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">v1</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">todos</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">ical</span></span><span style="color:#000000"><span 
+class="ectt-1200">/2</span></span><span style="color:#000000"><span 
+class="ectt-1200">e80aefd</span></span><span style="color:#000000"><span 
+class="ectt-1200">-4</span></span><span style="color:#000000"><span 
+class="ectt-1200">a69</span></span><span style="color:#000000"><span 
+class="ectt-1200">-4</span></span><span style="color:#000000"><span 
+class="ectt-1200">a94</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">b23a</span></span><span style="color:#000000"><span 
+class="ectt-1200">-45</span></span><span style="color:#000000"><span 
+class="ectt-1200">f2b8110988</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">status</span></span> 
+<span class="label"><a 
+ id="x1-17015r13"></a></span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-17016r14"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">result_url</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">http</span></span><span style="color:#669900"><span 
+class="ectt-1200">://</span></span><span style="color:#669900"><span 
+class="ectt-1200">localhost</span></span><span style="color:#669900"><span 
+class="ectt-1200">:6400/</span></span><span style="color:#669900"><span 
+class="ectt-1200">api</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">v1</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">todos</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">ical</span></span><span style="color:#669900"><span 
+class="ectt-1200">/2</span></span><span style="color:#669900"><span 
+class="ectt-1200">e80aefd</span></span><span style="color:#669900"><span 
+class="ectt-1200">-4</span></span><span style="color:#669900"><span 
+class="ectt-1200">a69</span></span><span style="color:#669900"><span 
+class="ectt-1200">-4</span></span><span style="color:#669900"><span 
+class="ectt-1200">a94</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">b23a</span></span><span style="color:#669900"><span 
+class="ectt-1200">-45</span></span><span style="color:#669900"><span 
+class="ectt-1200">f2b8110988</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">result</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span> 
+<span class="label"><a 
+ id="x1-17017r15"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">task_id</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">2</span></span><span style="color:#669900"><span 
+class="ectt-1200">e80aefd</span></span><span style="color:#669900"><span 
+class="ectt-1200">-4</span></span><span style="color:#669900"><span 
+class="ectt-1200">a69</span></span><span style="color:#669900"><span 
+class="ectt-1200">-4</span></span><span style="color:#669900"><span 
+class="ectt-1200">a94</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">b23a</span></span><span style="color:#669900"><span 
+class="ectt-1200">-45</span></span><span style="color:#669900"><span 
+class="ectt-1200">f2b8110988</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span> 
+<span class="label"><a 
+ id="x1-17018r16"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">task_status</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">SUCCESS</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-17019r17"></a></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-17020r18"></a></span><span style="color:#000000"><span 
+class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">curl</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">X</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">GET</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">http</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">localhost</span></span><span style="color:#000000"><span 
+class="ectt-1200">:6400/</span></span><span style="color:#000000"><span 
+class="ectt-1200">api</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">v1</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">todos</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">ical</span></span><span style="color:#000000"><span 
+class="ectt-1200">/2</span></span><span style="color:#000000"><span 
+class="ectt-1200">e80aefd</span></span><span style="color:#000000"><span 
+class="ectt-1200">-4</span></span><span style="color:#000000"><span 
+class="ectt-1200">a69</span></span><span style="color:#000000"><span 
+class="ectt-1200">-4</span></span><span style="color:#000000"><span 
+class="ectt-1200">a94</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">b23a</span></span><span style="color:#000000"><span 
+class="ectt-1200">-45</span></span><span style="color:#000000"><span 
+class="ectt-1200">f2b8110988</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">result</span></span> 
+<span class="label"><a 
+ id="x1-17021r19"></a></span><span style="color:#000000"><span 
+class="ectt-1200">BEGIN</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">VCALENDAR</span></span> 
+<span class="label"><a 
+ id="x1-17022r20"></a></span><span style="color:#000000"><span 
+class="ectt-1200">VERSION</span></span><span style="color:#000000"><span 
+class="ectt-1200">:2.0</span></span> 
+<span class="label"><a 
+ id="x1-17023r21"></a></span><span style="color:#000000"><span 
+class="ectt-1200">PRODID</span></span><span style="color:#000000"><span 
+class="ectt-1200">:-//</span></span><span style="color:#000000"><span 
+class="ectt-1200">Taskoverflow</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Calendar</span></span><span style="color:#000000"><span 
+class="ectt-1200">//</span></span><span style="color:#000000"><span 
+class="ectt-1200">mxm</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">dk</span></span><span style="color:#000000"><span 
+class="ectt-1200">//</span></span> 
+<span class="label"><a 
+ id="x1-17024r22"></a></span><span style="color:#000000"><span 
+class="ectt-1200">BEGIN</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">VEVENT</span></span> 
+<span class="label"><a 
+ id="x1-17025r23"></a></span><span style="color:#000000"><span 
+class="ectt-1200">SUMMARY</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">Project</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Proposal</span></span> 
+<span class="label"><a 
+ id="x1-17026r24"></a></span><span style="color:#000000"><span 
+class="ectt-1200">DTSTART</span></span><span style="color:#000000"><span 
+class="ectt-1200">:20230403</span></span><span style="color:#000000"><span 
+class="ectt-1200">T140000</span></span> 
+<span class="label"><a 
+ id="x1-17027r25"></a></span><span style="color:#000000"><span 
+class="ectt-1200">UID</span></span><span style="color:#000000"><span 
+class="ectt-1200">:1</span></span> 
+<span class="label"><a 
+ id="x1-17028r26"></a></span><span style="color:#000000"><span 
+class="ectt-1200">DESCRIPTION</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">CSSE6400</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Project</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Proposal</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Due</span></span> 
+<span class="label"><a 
+ id="x1-17029r27"></a></span><span style="color:#000000"><span 
+class="ectt-1200">END</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">VEVENT</span></span> 
+<span class="label"><a 
+ id="x1-17030r28"></a></span><span style="color:#000000"><span 
+class="ectt-1200">END</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">VCALENDAR</span></span>
+ 
+<span class="label"><a 
+ id="x1-17031r29"></a></span></pre>
+   </div>
+<!--l. 503--><p class="indent" >   We will stub out the implementation of these endpoints.
+</p><!--l. 505--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 505--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/views/routes.py</span> </p></div>   <div class="framedenv" id="code-1">
+                                                                                                    
+                                                                                                    
+<!--l. 505--><pre class="listings" id="listing-14"><span class="label"><a 
+ id="x1-17032r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#000000"><span 
+class="ectt-1200">@api</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">route</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">todos</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">ical</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">methods</span></span><span style="color:#000000"><span 
+class="ectt-1200">=[</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">POST</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">])</span></span> 
+<span class="label"><a 
+ id="x1-17033r2"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">2</span></span><span style="color:#006699"><span 
+class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">create_ical</span></span><span style="color:#000000"><span 
+class="ectt-1200">()</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-17034r3"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">pass</span></span> 
+<span class="label"><a 
+ id="x1-17035r4"></a></span> 
+<span class="label"><a 
+ id="x1-17036r5"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">5</span></span><span style="color:#000000"><span 
+class="ectt-1200">@api</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">route</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">todos</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">ical</span></span><span style="color:#669900"><span 
+class="ectt-1200">/&#x003C;</span></span><span style="color:#669900"><span 
+class="ectt-1200">task_id</span></span><span style="color:#669900"><span 
+class="ectt-1200">&#x003E;/</span></span><span style="color:#669900"><span 
+class="ectt-1200">status</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">methods</span></span><span style="color:#000000"><span 
+class="ectt-1200">=[</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">GET</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">])</span></span> 
+<span class="label"><a 
+ id="x1-17037r6"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">6</span></span><span style="color:#006699"><span 
+class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">get_task</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">task_id</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-17038r7"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">7</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">pass</span></span> 
+<span class="label"><a 
+ id="x1-17039r8"></a></span> 
+<span class="label"><a 
+ id="x1-17040r9"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">9</span></span><span style="color:#000000"><span 
+class="ectt-1200">@api</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">route</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">todos</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">ical</span></span><span style="color:#669900"><span 
+class="ectt-1200">/&#x003C;</span></span><span style="color:#669900"><span 
+class="ectt-1200">task_id</span></span><span style="color:#669900"><span 
+class="ectt-1200">&#x003E;/</span></span><span style="color:#669900"><span 
+class="ectt-1200">result</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">methods</span></span><span style="color:#000000"><span 
+class="ectt-1200">=[</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">GET</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">])</span></span> 
+<span class="label"><a 
+ id="x1-17041r10"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">10</span></span><span style="color:#006699"><span 
+class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">get_calendar</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">task_id</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-17042r11"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">11</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">pass</span></span>
+ 
+<span class="label"><a 
+ id="x1-17043r12"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">12 </span></span></pre>
+   </div>
+<!--l. 519--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">6.2    </span> <a 
+ id="x1-180006.2"></a>Queue and Workers</h4>
+<!--l. 521--><p class="noindent" >Next we will modify our <span 
+class="ectt-1200">docker-compose.yml </span>to include a local queuing service called Redis. We will later use
+AWS SQS but as Celery supports multiple queues, we can use this to make the local development
+easier.
+</p><!--l. 525--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 525--><p class="indent" >   <span 
+class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 525--><pre class="listings" id="listing-15"><span class="label"><a 
+ id="x1-18001r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-18002r2"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">2</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">image</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">latest</span></span> 
+<span class="label"><a 
+ id="x1-18003r3"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">restart</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">always</span></span> 
+<span class="label"><a 
+ id="x1-18004r4"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">4</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">ports</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-18005r5"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">5</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">"6379:6379"</span></span>
+ 
+<span class="label"><a 
+ id="x1-18006r6"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">6 </span></span></pre>
+   </div>
+<!--l. 533--><p class="indent" >   Now we have a queue, we will create the worker that accepts jobs from the queue. We will create this worker in
+<span 
+class="ectt-1200">todo/tasks/ical.py</span>.
+</p><!--l. 537--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 537--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/tasks/ical.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 537--><pre class="listings" id="listing-16"><span class="label"><a 
+ id="x1-18007r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#006699"><span 
+class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">os</span></span> 
+<span class="label"><a 
+ id="x1-18008r2"></a></span> 
+<span class="label"><a 
+ id="x1-18009r3"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span style="color:#006699"><span 
+class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">celery</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Celery</span></span> 
+<span class="label"><a 
+ id="x1-18010r4"></a></span> 
+<span class="label"><a 
+ id="x1-18011r5"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">5</span></span><span style="color:#000000"><span 
+class="ectt-1200">celery</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Celery</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">__name__</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-18012r6"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">6</span></span><span style="color:#000000"><span 
+class="ectt-1200">celery</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">conf</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">broker_url</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">os</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">environ</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">get</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">CELERY_BROKER_URL</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-18013r7"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">7</span></span><span style="color:#000000"><span 
+class="ectt-1200">celery</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">conf</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">result_backend</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">os</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">environ</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">get</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">CELERY_RESULT_BACKEND</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-18014r8"></a></span> 
+<span class="label"><a 
+ id="x1-18015r9"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">9</span></span><span style="color:#000000"><span 
+class="ectt-1200">@celery</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">task</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">name</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">ical</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-18016r10"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">10</span></span><span style="color:#006699"><span 
+class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">create_ical</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">tasks</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-18017r11"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">11</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">return</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">Hello</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">World</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span>
+ 
+<span class="label"><a 
+ id="x1-18018r12"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">12 </span></span></pre>
+   </div>
+<!--l. 551--><p class="indent" >   Note that we are getting a URL from the environment variables: <span 
+class="ectt-1200">CELERY_BROKER_URL </span>and
+<span 
+class="ectt-1200">CELERY_RESULT_BACKEND</span>. We need to remember to set these variables in whichever environment the service is
+run in.
+</p><!--l. 555--><p class="indent" >   We need to install Celery. We will do this in the same pipenv environment as the Flask server as we will later
+require our Flask server to use Celery to put jobs onto the task queue.
+</p>
+   <div class="framedenv" id="shaded*-1">
+   <!--l. 558-->
+<pre class="lstlisting" id="listing-17"><span class="label"><a 
+ id="x1-18019r1"></a></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">pipenv</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">install</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">celery</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">celery</span></span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#000000"><span 
+class="ectt-1200">sqs</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
+   </div>
+<!--l. 560--><p class="indent" >   The above will install the Celery core and Redis and SQS drivers for communication.
+</p><!--l. 562--><p class="indent" >   We will now start our local Redis queue and our worker to ensure that they can communicate.
+</p>
+   <div class="framedenv" id="shaded*-1">
+   <!--l. 564-->
+<pre class="lstlisting" id="listing-18"><span class="label"><a 
+ id="x1-18020r1"></a></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">compose</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">up</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
+   </div>
+   <div class="framedenv" id="code-1">
+<!--l. 566--><pre class="listings" id="listing-19"><span class="label"><a 
+ id="x1-18021r1"></a></span><span style="color:#000000"><span 
+class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">export</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">CELERY_BROKER_URL</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">localhost</span></span><span style="color:#000000"><span 
+class="ectt-1200">:6379</span></span> 
+<span class="label"><a 
+ id="x1-18022r2"></a></span><span style="color:#000000"><span 
+class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">export</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">CELERY_RESULT_BACKEND</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">localhost</span></span><span style="color:#000000"><span 
+class="ectt-1200">:6379</span></span> 
+<span class="label"><a 
+ id="x1-18023r3"></a></span><span style="color:#000000"><span 
+class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">pipenv</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">run</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">python3</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">m</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">celery</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">--</span></span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">todo</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">tasks</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">ical</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">worker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">--</span></span><span style="color:#000000"><span 
+class="ectt-1200">loglevel</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"><span 
+class="ectt-1200">info</span></span>
+ 
+<span class="label"><a 
+ id="x1-18024r4"></a></span></pre>
+   </div>
+<!--l. 572--><p class="indent" >   You should see something like the below. This indicates that the worker has successfully subscribed to the
+queue and is ready to accept events.
+</p>
+   <div class="framedenv" id="code-1">
+                                                                                                    
+                                                                                                    
+<!--l. 575--><pre class="listings" id="listing-20"><span class="label"><a 
+ id="x1-18025r1"></a></span> 
+<span class="label"><a 
+ id="x1-18026r2"></a></span><span style="color:#000000"><span 
+class="ectt-1200">--------------</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">celery@uqbwebb2</span></span><span style="color:#000000"><span 
+class="ectt-1200">-6842</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">v5</span></span><span style="color:#000000"><span 
+class="ectt-1200">.2.7</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">dawn</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">chorus</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-18027r3"></a></span><span style="color:#000000"><span 
+class="ectt-1200">---</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">*****</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-----</span></span> 
+<span class="label"><a 
+ id="x1-18028r4"></a></span><span style="color:#000000"><span 
+class="ectt-1200">--</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">*******</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">----</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">macOS</span></span><span style="color:#000000"><span 
+class="ectt-1200">-12.6.1-</span></span><span style="color:#000000"><span 
+class="ectt-1200">x86_64</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">i386</span></span><span style="color:#000000"><span 
+class="ectt-1200">-64</span></span><span style="color:#000000"><span 
+class="ectt-1200">bit</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">2023-04-04</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">18:51:09</span></span> 
+<span class="label"><a 
+ id="x1-18029r5"></a></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">***</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">---</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">---</span></span> 
+<span class="label"><a 
+ id="x1-18030r6"></a></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">**</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">----------</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#000000"><span 
+class="ectt-1200">config</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-18031r7"></a></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">**</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">----------</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">.&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">todo</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">tasks</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">ical</span></span><span style="color:#000000"><span 
+class="ectt-1200">:0</span></span><span style="color:#000000"><span 
+class="ectt-1200">x10432e7d0</span></span> 
+<span class="label"><a 
+ id="x1-18032r8"></a></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">**</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">----------</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">.&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">transport</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">localhost</span></span><span style="color:#000000"><span 
+class="ectt-1200">:6379//</span></span> 
+<span class="label"><a 
+ id="x1-18033r9"></a></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">**</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">----------</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">.&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">results</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">localhost</span></span><span style="color:#000000"><span 
+class="ectt-1200">:6379/</span></span> 
+<span class="label"><a 
+ id="x1-18034r10"></a></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">***</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">---</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">---</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">.&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">concurrency</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">8</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">prefork</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-18035r11"></a></span><span style="color:#000000"><span 
+class="ectt-1200">--</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">*******</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">----</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">.&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">task</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">events</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">OFF</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">enable</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">E</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">to</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">monitor</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">tasks</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">in</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">this</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">worker</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-18036r12"></a></span><span style="color:#000000"><span 
+class="ectt-1200">---</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">*****</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-----</span></span> 
+<span class="label"><a 
+ id="x1-18037r13"></a></span><span style="color:#000000"><span 
+class="ectt-1200">--------------</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#000000"><span 
+class="ectt-1200">queues</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-18038r14"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">.&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">celery</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">exchange</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"><span 
+class="ectt-1200">celery</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">direct</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">key</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"><span 
+class="ectt-1200">celery</span></span> 
+<span class="label"><a 
+ id="x1-18039r15"></a></span> 
+<span class="label"><a 
+ id="x1-18040r16"></a></span> 
+<span class="label"><a 
+ id="x1-18041r17"></a></span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#000000"><span 
+class="ectt-1200">tasks</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-18042r18"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ical</span></span> 
+<span class="label"><a 
+ id="x1-18043r19"></a></span> 
+<span class="label"><a 
+ id="x1-18044r20"></a></span><span style="color:#000000"><span 
+class="ectt-1200">[2023-04-04</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">18:51:10,059:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">MainProcess</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Connected</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">to</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">localhost</span></span><span style="color:#000000"><span 
+class="ectt-1200">:6379//</span></span> 
+<span class="label"><a 
+ id="x1-18045r21"></a></span><span style="color:#000000"><span 
+class="ectt-1200">[2023-04-04</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">18:51:10,065:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">MainProcess</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">mingle</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">searching</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">for</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">neighbors</span></span> 
+<span class="label"><a 
+ id="x1-18046r22"></a></span><span style="color:#000000"><span 
+class="ectt-1200">[2023-04-04</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">18:51:11,200:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">MainProcess</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">mingle</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">sync</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">with</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">nodes</span></span> 
+<span class="label"><a 
+ id="x1-18047r23"></a></span><span style="color:#000000"><span 
+class="ectt-1200">[2023-04-04</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">18:51:11,201:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">MainProcess</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">mingle</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">sync</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">complete</span></span> 
+<span class="label"><a 
+ id="x1-18048r24"></a></span><span style="color:#000000"><span 
+class="ectt-1200">[2023-04-04</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">18:51:11,240:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">MainProcess</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">celery@uqbwebb2</span></span><span style="color:#000000"><span 
+class="ectt-1200">-6842</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ready</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span>
+ 
+<span class="label"><a 
+ id="x1-18049r25"></a></span></pre>
+   </div>
+<!--l. 602--><p class="indent" >   Finally, we will run Celery inside a new container. For this we will modify our <span 
+class="ectt-1200">docker-compose.yml</span>
+file.
+</p><!--l. 605--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 605--><p class="indent" >   <span 
+class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 605--><pre class="listings" id="listing-21"><span class="label"><a 
+ id="x1-18050r1"></a></span><span style="color:#000000"><span 
+class="ectt-1200">worker</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-18051r2"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">build</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-18052r3"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">context</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span> 
+<span class="label"><a 
+ id="x1-18053r4"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">dockerfile</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Dockerfile</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">dev</span></span> 
+<span class="label"><a 
+ id="x1-18054r5"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">restart</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">always</span></span> 
+<span class="label"><a 
+ id="x1-18055r6"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">environment</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-18056r7"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">CELERY_BROKER_URL</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span style="color:#000000"><span 
+class="ectt-1200">:6379</span></span> 
+<span class="label"><a 
+ id="x1-18057r8"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">CELERY_RESULT_BACKEND</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">redis</span></span><span style="color:#000000"><span 
+class="ectt-1200">:6379</span></span> 
+<span class="label"><a 
+ id="x1-18058r9"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">command</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">celery</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">--</span></span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">todo</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">tasks</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">ical</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">worker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">--</span></span><span style="color:#000000"><span 
+class="ectt-1200">loglevel</span></span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"><span 
+class="ectt-1200">info</span></span>
+ 
+<span class="label"><a 
+ id="x1-18059r10"></a></span></pre>
+   </div>
+<!--l. 617--><p class="indent" >   Note that we are re-using the same image development image as the Flask server. This makes sense since it
+shares very similar dependencies. It would make sense to separate the dependencies between the two containers
+as they grow larger.
+</p><!--l. 621--><p class="indent" >   We are overriding the command to run when the container starts to use the celery command. We have also
+remembered to set the environment variables appropriately. We have to use the domain name of the redis
+image instead of the localhost because redis is not running on our localhost. Earlier we were able to
+pretend it was because the redis port, 6379, was being forwarded from our localhost to our redis
+container.
+</p><!--l. 626--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">6.3    </span> <a 
+ id="x1-190006.3"></a>Creating Tasks</h4>
+<!--l. 628--><p class="noindent" >We will now return to our Flask server. We can modify our new endpoints to use Celery to create tasks on the task
+queue.
+</p><!--l. 631--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 631--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/views/routes.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 631--><pre class="listings" id="listing-22"><span class="label"><a 
+ id="x1-19001r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#006699"><span 
+class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">celery</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">result</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">AsyncResult</span></span> 
+<span class="label"><a 
+ id="x1-19002r2"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">2</span></span><span style="color:#006699"><span 
+class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">todo</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">tasks</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ical</span></span> 
+<span class="label"><a 
+ id="x1-19003r3"></a></span> 
+<span class="label"><a 
+ id="x1-19004r4"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">4</span></span><span style="color:#000000"><span 
+class="ectt-1200">...</span></span> 
+<span class="label"><a 
+ id="x1-19005r5"></a></span> 
+<span class="label"><a 
+ id="x1-19006r6"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">6</span></span><span style="color:#000000"><span 
+class="ectt-1200">@api</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">route</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">todos</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">ical</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">methods</span></span><span style="color:#000000"><span 
+class="ectt-1200">=[</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">POST</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">])</span></span> 
+<span class="label"><a 
+ id="x1-19007r7"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">7</span></span><span style="color:#006699"><span 
+class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">create_ical</span></span><span style="color:#000000"><span 
+class="ectt-1200">()</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-19008r8"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">8</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">put</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">all</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">tasks</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">in</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">the</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">database</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">into</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">a</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">tasks</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">variable</span></span> 
+<span class="label"><a 
+ id="x1-19009r9"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">9</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">task</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ical</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">create_ical</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">delay</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">tasks</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-19010r10"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">10</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">return</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">jsonify</span></span><span style="color:#000000"><span 
+class="ectt-1200">({</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">task_id</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">task</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#006699"><span 
+class="ectt-1200">id</span></span><span style="color:#000000"><span 
+class="ectt-1200">})</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">202</span></span> 
+<span class="label"><a 
+ id="x1-19011r11"></a></span> 
+<span class="label"><a 
+ id="x1-19012r12"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">12</span></span><span style="color:#000000"><span 
+class="ectt-1200">@api</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">route</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">todos</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">ical</span></span><span style="color:#669900"><span 
+class="ectt-1200">/&#x003C;</span></span><span style="color:#669900"><span 
+class="ectt-1200">task_id</span></span><span style="color:#669900"><span 
+class="ectt-1200">&#x003E;/</span></span><span style="color:#669900"><span 
+class="ectt-1200">status</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">methods</span></span><span style="color:#000000"><span 
+class="ectt-1200">=[</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">GET</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">])</span></span> 
+<span class="label"><a 
+ id="x1-19013r13"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">13</span></span><span style="color:#006699"><span 
+class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">get_task</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">task_id</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-19014r14"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">14</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">task</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">AsyncResult</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">task_id</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-19015r15"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">15</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">use</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">task</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">to</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">populate</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">an</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">appropriate</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">JSON</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">response</span></span> 
+<span class="label"><a 
+ id="x1-19016r16"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">16</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">return</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">jsonify</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">result</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">200</span></span> 
+<span class="label"><a 
+ id="x1-19017r17"></a></span> 
+<span class="label"><a 
+ id="x1-19018r18"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">18</span></span><span style="color:#000000"><span 
+class="ectt-1200">@api</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">route</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">todos</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">ical</span></span><span style="color:#669900"><span 
+class="ectt-1200">/&#x003C;</span></span><span style="color:#669900"><span 
+class="ectt-1200">task_id</span></span><span style="color:#669900"><span 
+class="ectt-1200">&#x003E;/</span></span><span style="color:#669900"><span 
+class="ectt-1200">result</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">methods</span></span><span style="color:#000000"><span 
+class="ectt-1200">=[</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">GET</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">])</span></span> 
+<span class="label"><a 
+ id="x1-19019r19"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">19</span></span><span style="color:#006699"><span 
+class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">get_calendar</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">task_id</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-19020r20"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">20</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">task_result</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">AsyncResult</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">task_id</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-19021r21"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">21</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">if</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">task_result</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">status</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">==</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">SUCCESS</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-19022r22"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">22</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">return</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">task_result</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">result</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">200,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">Content</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">Type</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">text</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">calendar</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-19023r23"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">23</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">else</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-19024r24"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">24</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">return</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">jsonify</span></span><span style="color:#000000"><span 
+class="ectt-1200">({</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">error</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#669900"><span 
+class="ectt-1200">Task</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">not</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">finished</span></span><span style="color:#669900"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">})</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">404</span></span>
+ 
+<span class="label"><a 
+ id="x1-19025r25"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">25 </span></span></pre>
+   </div>
+<!--l. 658--><p class="indent" >   The variable that we create as tasks and pass to the delay method is the JSON data that is stored with the
+event. It is then deserialized from JSON and passed as a variable to the <span 
+class="ectt-1200">create_ical </span>function. Celery is able to
+create impressive abstractions so that message passing over a task queue looks almost like regular function
+calls.
+</p><!--l. 662--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">6.4    </span> <a 
+ id="x1-200006.4"></a>Creating the Calendar</h4>
+<!--l. 664--><p class="noindent" >Once we have confirmed that the task queue can communicate with our worker, we can return to the calendar
+generation. We will use the <span 
+class="ectt-1200">icalendar </span>library for this.
+</p>
+   <div class="framedenv" id="shaded*-1">
+   <!--l. 668-->
+<pre class="lstlisting" id="listing-23"><span class="label"><a 
+ id="x1-20001r1"></a></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">pipenv</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">install</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">icalendar</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
+   </div>
+<!--l. 670--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 670--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/tasks/ical.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 670--><pre class="listings" id="listing-24"><span class="label"><a 
+ id="x1-20002r1"></a></span><span style="color:#006699"><span 
+class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">icalendar</span></span> 
+<span class="label"><a 
+ id="x1-20003r2"></a></span><span style="color:#006699"><span 
+class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">time</span></span> 
+<span class="label"><a 
+ id="x1-20004r3"></a></span> 
+<span class="label"><a 
+ id="x1-20005r4"></a></span><span style="color:#000000"><span 
+class="ectt-1200">...</span></span> 
+<span class="label"><a 
+ id="x1-20006r5"></a></span> 
+<span class="label"><a 
+ id="x1-20007r6"></a></span><span style="color:#006699"><span 
+class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">create_ical</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">tasks</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-20008r7"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">cal</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">icalendar</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">Calendar</span></span><span style="color:#000000"><span 
+class="ectt-1200">()</span></span> 
+<span class="label"><a 
+ id="x1-20009r8"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">cal</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">add</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">prodid</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">-//</span></span><span style="color:#669900"><span 
+class="ectt-1200">Taskoverflow</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">Calendar</span></span><span style="color:#669900"><span 
+class="ectt-1200">//</span></span><span style="color:#669900"><span 
+class="ectt-1200">mxm</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">dk</span></span><span style="color:#669900"><span 
+class="ectt-1200">//</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-20010r9"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">cal</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">add</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">version</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">2.0</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-20011r10"></a></span> 
+<span class="label"><a 
+ id="x1-20012r11"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">time</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">sleep</span></span><span style="color:#000000"><span 
+class="ectt-1200">(50)</span></span> 
+<span class="label"><a 
+ id="x1-20013r12"></a></span> 
+<span class="label"><a 
+ id="x1-20014r13"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">for</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">task</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">in</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">tasks</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span> 
+<span class="label"><a 
+ id="x1-20015r14"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">event</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">icalendar</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">Event</span></span><span style="color:#000000"><span 
+class="ectt-1200">()</span></span> 
+<span class="label"><a 
+ id="x1-20016r15"></a></span> 
+<span class="label"><a 
+ id="x1-20017r16"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">event</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">add</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">uid</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">task</span></span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">id</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">])</span></span> 
+<span class="label"><a 
+ id="x1-20018r17"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">event</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">add</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">summary</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">task</span></span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">title</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">])</span></span> 
+<span class="label"><a 
+ id="x1-20019r18"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">event</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">add</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">description</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">task</span></span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">description</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">])</span></span> 
+<span class="label"><a 
+ id="x1-20020r19"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">event</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">add</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">dtstart</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">datetime</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">datetime</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">strptime</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">task</span></span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">deadline_at</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">],</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">%</span></span><span style="color:#669900"><span 
+class="ectt-1200">Y</span></span><span style="color:#669900"><span 
+class="ectt-1200">-%</span></span><span style="color:#669900"><span 
+class="ectt-1200">m</span></span><span style="color:#669900"><span 
+class="ectt-1200">-%</span></span><span style="color:#669900"><span 
+class="ectt-1200">dT</span></span><span style="color:#669900"><span 
+class="ectt-1200">%</span></span><span style="color:#669900"><span 
+class="ectt-1200">H</span></span><span style="color:#669900"><span 
+class="ectt-1200">:%</span></span><span style="color:#669900"><span 
+class="ectt-1200">M</span></span><span style="color:#669900"><span 
+class="ectt-1200">:%</span></span><span style="color:#669900"><span 
+class="ectt-1200">S</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-20021r20"></a></span> 
+<span class="label"><a 
+ id="x1-20022r21"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">cal</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">add_component</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">event</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-20023r22"></a></span> 
+<span class="label"><a 
+ id="x1-20024r23"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">return</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">cal</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">to_ical</span></span><span style="color:#000000"><span 
+class="ectt-1200">()</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">decode</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">utf</span></span><span style="color:#669900"><span 
+class="ectt-1200">-8</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span>
+ 
+<span class="label"><a 
+ id="x1-20025r24"></a></span></pre>
+                                                                                                    
+                                                                                                    
+   </div>
+<!--l. 696--><p class="indent" >   Now you should be able to test your application.
+      </p><ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x1-20027x1">
+      <!--l. 698--><p class="noindent" >Start it with docker-compose.  </p><div class="framedenv" id="shaded*-1">
+      <!--l. 699-->
+      <pre class="lstlisting" id="listing-25"><span class="label"><a 
+ id="x1-20028r1"></a></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">compose</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">up</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">--</span></span><span style="color:#000000"><span 
+class="ectt-1200">build</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
+      
+      </div>
+      </li>
+<li 
+  class="enumerate" id="x1-20030x2">
+      <!--l. 700--><p class="noindent" >Open the user interface on <a 
+href="http://localhost:6400" class="url" ><span 
+class="ectt-1200">http://localhost:6400</span></a> and create some tasks.
+      </p></li>
+<li 
+  class="enumerate" id="x1-20032x3">
+      <!--l. 701--><p class="noindent" >Follow the cURL interaction from Section <a 
+href="#x1-170006.1">6.1<!--tex4ht:ref: sect:apiext --></a> to generate an appropriate iCal.</p></li></ol>
+<!--l. 704--><p class="noindent" >
+</p>
+   <h5 class="subsubsectionHead"><span class="titlemark">6.4.1    </span> <a 
+ id="x1-210006.4.1"></a>Design Challenge</h5>
+<!--l. 706--><p class="noindent" >Say we observe a user pattern that the majority of users will mark off multiple todo items at once. We have also
 moved our calendar from a PDF being displayed to the user to an iCal so that its visible in their chosen calendar
 application.
-</p><!--l. 467--><p class="indent" >   How could we improve the efficiency of our system to reduce the amount of time it takes to generate the
+</p><!--l. 708--><p class="indent" >   How could we improve the efficiency of our system to reduce the amount of time it takes to generate the
 calendar view?
 </p><!--l. 1--><p class="noindent" >
 </p>
    <h3 class="likesectionHead"><a 
- id="x1-18000"></a>References</h3>
+ id="x1-22000"></a>References</h3>
 <!--l. 1--><p class="noindent" >
    </p><div class="thebibliography">
    <p class="bibitem" ><span class="biblabel">
@@ -1399,7 +3130,20 @@ href="https://csse6400.uqcloud.net/handouts/event.pdf" class="url" ><span
 class="ectt-1200">https://csse6400.uqcloud.net/handouts/event.pdf</span></a>.
 </p>
    </div>
-    
+   <div class="footnotes"><a 
+ id="x1-16002x6"></a>
+<!--l. 450--><p class="indent" >       <span class="footnote-mark"><a 
+href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span><span 
+class="Cabin-Regular-tlf-t1-">In reality it is not but this is an example of a common use case for asynchronous tasks &#8212; file generation such as PDFs or videos</span>
+<span 
+class="Cabin-Regular-tlf-t1-">which do take time.</span></p><a 
+ id="x1-17002x6.1"></a>
+<!--l. 465--><p class="noindent" ><span class="footnote-mark"><a 
+href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span><span 
+class="Cabin-Regular-tlf-t1-">Ideally a POST procedural endpoint should use a verb like </span><span 
+class="ectt-1000">/generate</span><span 
+class="Cabin-Regular-tlf-t1-">.</span></p>                                                                                                </div>
+ 
 </body></html> 
 
                                                                                                     
