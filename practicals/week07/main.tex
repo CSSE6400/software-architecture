@@ -79,7 +79,7 @@ you can easily migrate to AWS without having to rewrite code.
 \raggedleft -- AWS
 \end{oldquote}
 
-\aside{Not available in the lab environments}
+\aside{Not available in the lab environments.}
 
 \subsubsection{AWS MSK ( Managed Streaming for Apache Kafka )}
 \begin{oldquote}
@@ -94,7 +94,7 @@ You can use Amazon MSK to create clusters that use any of the Apache Kafka versi
 \raggedleft -- AWS
 \end{oldquote}
 
-\aside{Not available in the lab environments}
+\aside{Not available in the lab environments.}
 
 \subsubsection{Redis}
 \begin{oldquote}
@@ -121,32 +121,18 @@ Furthermore, ElastiCache also offers support for Memcached, another popular open
 \raggedleft -- AWS
 \end{oldquote}
 
-\aside{Not available in the lab environments}
+\aside{Not available in the lab environments.}
 
 \section{Talking to the Simple Queue Service (SQS)}
 
-\warning{
-    For terminal examples in this section,
-    lines that begin with a \$ indicate a line which you should type while the other lines are example output that you should expect.
-    Not all of the output is captured in the examples to save on space.  
+\info{
+    This section is intended to be demonstrated by your practical tutor.
+    You may work through it on your own if you wish.
 }
 
-Today we will be creating and experimenting with the two queue flavours of AWS SQS.
+We will demonstrate working with the two queue flavours of AWS SQS.
 A standard queue, named \texttt{csse6400\_prac} and a FIFO queue, named \texttt{csse6400\_prac.fifo}.
 The Terraform code below can be used to create these two queues.
-
-\info{
-  If you have forgotten how to get started you will need to run the following commands in a local terminal.
-
-  \bash{
-    terraform init^^J
-    ...^^J
-    $ terraform plan^^J
-    ...^^J
-    $ terraform apply^^J
-    ...
-  }
-}
 
 \teacher{
   In the below terraform it is pretty simple and relies a lot on defaults.
@@ -210,15 +196,10 @@ we can browse the queue configurations and metrics.
 
 \subsection{Queue Command-line Interface}
 
-We have provided a small docker container for you to use with your queues to see the differnce between the implementations.
+We have provided a small docker container to demonstrate the differnce between the implementations.
 First we must retrieve our AWS credentials and setup our environment.
 
-With our learner lab grab the AWS credentials but instead of creating a credentials file we will be using environment variables.
-Make a folder for the practi.
-
-\begin{code}[language=shell, numbers=none]{}
-$ mkdir queues && cd queues
-\end{code}
+Grab the AWS credentials from the Learner Lab but instead of creating a credentials file we will be using environment variables.
 
 Now we need to create an environment file for our docker container to read so that it can access AWS. Create a ``.env'' file in the current directory and edit the contents so that it looks similar to the below: The AWS keys will be from the credentials shown in your lab environment.
 
@@ -230,7 +211,7 @@ AWS_SESSION_TOKEN=...
 \end{code}
 
 \begin{code}[numbers=none,keepspaces=true]{}
-$ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "test" --client-name "Client 1"
+> docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "test" --client-name "Client 1"
 
 
   __________
@@ -248,24 +229,11 @@ $ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "test" 
 Unable to find a Queue by this name test
 \end{code}
 
-If your program shows the above then your ready to head to the next section :).
-  
-
-% \begin{code}[language=shell, numbers=none]{}
-% docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "hello" --sender
-% \end{code}
-
-% \begin{code}[language=shell, numbers=none]{}
-%   docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "hello" --sender
-% \end{code}
-  
-
-
 
 \subsection{SQS Standard}
 
-As we have stated above the ``Standard'' offering of SQS does not guarantee order or ``only once delivery''. 
-Assuming our terraform was created sucessfully we are going to create one publisher and one subscriber.
+The ``standard'' offering of SQS does not guarantee order or ``only once delivery''. 
+We will create a message publisher and a message subscriber.
 
 \info{
   For the rest of this practical you will require multiple terminals. Make sure these are all in the same folder so we can reuse the .enf file. 
@@ -274,30 +242,32 @@ Assuming our terraform was created sucessfully we are going to create one publis
 To create the subscriber run the following command:
 
 \begin{code}[numbers=none,keepspaces=true]{}
-  $ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1" --receive
+> docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1" --receive
 \end{code}
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/stacksub}
 \end{figure}
 
-Now lets start a publisher in another terminal but keep both terminals on your screen if you have space.
+Now start a publisher in another terminal.
 
 \begin{code}[numbers=none,keepspaces=true]{}
-  $ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1"
+> docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1"
 \end{code}
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/stackpub}
 \end{figure}
 
-When the publisher connects to the Queue it is going to put 100 messages of increasing increment into the queue. On the subscriber we will be able to see the messages being received, an example is provided below:
+When the publisher connects to the queue it is going to put 100 messages of increasing increment into the queue.
+On the subscriber we will be able to see the messages being received, an example is provided below:
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/stacksubdata}
 \end{figure}
 
-hopefully like our example you can see that some of the messages arrive out of order. Next add more publishers and subscribers and experiment with the differnt configurations. 
+Hopefully like our example you can see that some of the messages arrive out of order.
+Next add more publishers and subscribers and experiment with the different configurations.
 
 \info{
   When making multiple publishes you may want to change the client-name cli parameter so you can keep track of when the messages arrived at the subscribers.
@@ -305,16 +275,17 @@ hopefully like our example you can see that some of the messages arrive out of o
 
 
 \subsection{SQS FIFO}
-Now we will experiment with the FIFO based service offered by SQS. Like before we will start a subscriber but make sure the name of the queue matches the FIFO queue we created in terraform.
+Now we will experiment with the FIFO based service offered by SQS.
+Like before, we will start a subscriber but make sure the name of the queue matches the FIFO queue we created in terraform.
 
 \begin{code}[numbers=none,keepspaces=true]{}
-  $ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1" --receive
+> docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1" --receive
 \end{code}
 
-Now lets start a publisher in another terminal but keep both terminals on your screen if you have space.
+Now start a publisher in another terminal.
 
 \begin{code}[numbers=none,keepspaces=true]{}
-  $ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1"
+> docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1"
 \end{code}
 
 \begin{figure}[H]
@@ -327,13 +298,14 @@ On the subscriber we now see the messages arriving in order which is to be expec
   \includegraphics[width=\textwidth]{images/fifosub}
 \end{figure}
 
-If we re-run the publisher though we may not see any new messages make it to the consumer. This is because we have asked AWS to dedup messages where it can.
+If we re-run the publisher though we may not see any new messages make it to the consumer.
+This is because we have asked AWS to de-dupe messages where it can.
 
 \teacher{
   Theres a cli param which prepends to the message to allow you to rerun if needed. It is --prepend "abcdef"
 }
 
-Again as before try experimenting with differnt publisher / subscriber configurations to see how they behave.
+As before try experimenting with different publisher / subscriber configurations to see how they behave.
 
 \info{
   When making multiple publishes you may want to change the client-name cli parameter so you can keep track of when the messages arrived at the subscribers.
@@ -343,12 +315,14 @@ Again as before try experimenting with differnt publisher / subscriber configura
   \textbf{Please remember to terraform destroy to delete your resources}
 }
 
+
 \section{Hosting TaskOverflow Images}
 
 When we last deployed a container on AWS,
 we used an existing hosted image.
-Now, we will be developing our own image so we will need a mechanism to host the image.
-For this, we will being using a AWS ECR, Docker, and Terraform.
+Now, we will be developing our own image,
+so we will need a mechanism to host the image.
+For this, we will being using an AWS ECR, Docker, and Terraform.
 AWS ECR is the Elastic Container Registry,
 it is a container registry like DockerHub or GitHub.
 We can use it to host our images,
@@ -361,16 +335,32 @@ using the process below:
 \end{enumerate}
 
 \info{
-This is a non-standard way process.
+This is a non-standard process.
 As you may have seen in the DevOps tutorial,
-we would ordinarily like our code commits to trigger a CI/CD pipeline which builds appropriate images and pushes from there.
-You can still use GitHub actions to build and push your container to the GitHub container registry and authenticate when you pull the image.
+we would ordinarily like our code commits to trigger a CI/CD pipeline which builds the images.
 
+If you would like, you can use GitHub actions to build and push your container to the GitHub container registry and authenticate when you pull the image.
 However, using ECR simplifies the process,
 despite the oddities introduced by having a non-persistent ECR repository.
 }
 
-First we will setup our initial Terraform configuration.
+\paragraph{Getting Started}
+
+\begin{enumerate}
+    \item Using the GitHub Classroom link for this practical provided by your tutor in Slack, create a repository to work within.
+    \item Install Terraform if not already installed, as it will be required again this week.
+    \item Start your learner lab and copy the AWS Learner Lab credentials into a credentials file in the root of the repository.
+\end{enumerate}
+
+\paragraph{What's New}
+We are starting again with our todo application from roughly where we left off in the week 3 practical.
+We've added a new directory \texttt{todo/app} that has the static HTML files for the TaskOverflow website and added a route to serve these files.
+We have also created a production version of the server that uses gunicorn,
+the \texttt{bin} directory is used by this image.
+Our original Docker image is now in \texttt{Dockerfile.dev}.\\
+
+
+We will setup our initial Terraform configuration.
 Note that now we introduce a new required provider.
 This provider is for Docker.
 
@@ -423,7 +413,7 @@ The URL for containers in the ECR following the format below:
 
 \url{{ACCOUNT_ID}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME}}
 
-Remember to push to a container registry,
+Remember --- to push to a container registry
 we need a local container whose tag matches the remote URL.
 We could then create and push the contianer locally with:
 
@@ -470,28 +460,369 @@ It is popular and used in many large scale applications.
 It is also relatively easy to use and has comprehensive documentation.
 
 
-\subsection{TaskOverflow}
+\section{Task Calendar}
 
 TaskOverflow will use celery to distribute the work of generating a calendar view of tasks,
-as this could be a time-intensive task.
+as this could be a time-intensive task.%
+\footnote{In reality it is not but this is an example of a common use case for asynchronous tasks --- file generation such as PDFs or videos which do take time.}
 This will be done by a worker which will run in a separate container.
 The TaskOverflow server will place job requests on the Celery queue.
-The worker will pick-up jobs and generate the calendar view.
-The webserver can then display the calendar view to the user.
+The worker will pick-up jobs and generate the calendar.
+The webserver can then serve the calendar to the user.
 
 Calendar generation occurs asynchronously with this architecture.
 The user will not have to wait for the calendar view to be generated and the webserver can handle other requests.
 
-\todo{Add diagram}
-\todo{Add worker cli startup option}
-\todo{Add celery}
-\todo{Add job request}
+\subsection{API Extension}
+\label{sect:apiext}
 
-\subsubsection{Design Challenge}
+We will extend our existing API with the following endpoints.
 
-Say we observe a user pattern that the majority of users will mark off multiple todo items at once. We have also moved our calendar from a PDF being displayed to the user to an iCal so that its visible in their chosen calendar application.
+\begin{description}
+    \item[POST /todos/ical] Create an asynchronous calendar generation job.\footnote{Ideally a POST procedural endpoint should use a verb like \texttt{/generate}.}
+    \item[GET /todos/ical/\{task\_id\}/status] Check the status of the generation job.
+    \item[GET /todos/ical/\{task\_id\}/result] Download the generated iCal file when it is ready.
+\end{description}
 
-How could we improve the efficiency of our system to reduce the amount of time it takes to generate the calendar view?
+An example interaction with the API might look like:
+
+\begin{code}[language=bash,numbers=none]{}
+> curl -X POST http://localhost:6400/api/v1/todos/ical
+{
+  "task_id": "2e80aefd-4a69-4a94-b23a-45f2b8110988",
+  "task_url": "http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/status"
+}
+> curl -X GET http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/status
+{
+  "result_url": "http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/result",
+  "task_id": "2e80aefd-4a69-4a94-b23a-45f2b8110988",
+  "task_status": "PENDING"
+}
+> curl -X GET http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/status
+{
+  "result_url": "http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/result",
+  "task_id": "2e80aefd-4a69-4a94-b23a-45f2b8110988",
+  "task_status": "SUCCESS"
+}
+> curl -X GET http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/result
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Taskoverflow Calendar//mxm.dk//
+BEGIN:VEVENT
+SUMMARY:Project Proposal
+DTSTART:20230403T140000
+UID:1
+DESCRIPTION:CSSE6400 Project Proposal Due
+END:VEVENT
+END:VCALENDAR
+\end{code}
+
+We will stub out the implementation of these endpoints.
+
+\begin{code}[language=python,numbers=none]{todo/views/routes.py}
+@api.route('/todos/ical', methods=['POST'])
+def create_ical():
+    pass
+
+@api.route('/todos/ical/<task_id>/status', methods=['GET'])
+def get_task(task_id):
+    pass
+
+@api.route('/todos/ical/<task_id>/result', methods=['GET'])
+def get_calendar(task_id):
+    pass
+\end{code}
+
+\subsection{Queue and Workers}
+
+Next we will modify our \texttt{docker-compose.yml} to include a local queuing service called Redis.
+We will later use AWS SQS but as Celery supports multiple queues,
+we can use this to make the local development easier.
+
+\begin{code}[numbers=none]{docker-compose.yml}
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+\end{code}
+
+Now we have a queue,
+we will create the worker that accepts jobs from the queue.
+We will create this worker in \texttt{todo/tasks/ical.py}.
+
+\begin{code}[language=python,numbers=none]{todo/tasks/ical.py}
+import os
+
+from celery import Celery
+
+celery = Celery(__name__)
+celery.conf.broker_url = os.environ.get("CELERY_BROKER_URL")
+celery.conf.result_backend = os.environ.get("CELERY_RESULT_BACKEND")
+celery.conf.task_default_queue = os.environ.get("CELERY_DEFAULT_QUEUE", "ical")
+
+@celery.task(name="ical")
+def create_ical(tasks):
+    return "Hello World"
+\end{code}
+
+Note that we are getting a URL from the environment variables:
+\texttt{CELERY\_BROKER\_URL} and \texttt{CELERY\_RESULT\_BACKEND}.
+We need to remember to set these variables in whichever environment the service is run in.
+
+We need to install Celery.
+We will do this in the same pipenv environment as the Flask server as we will later require our Flask server to use Celery to put jobs onto the task queue.
+
+\bash{pipenv install celery redis celery\[sqs\] boto3}
+
+The above will install the Celery core and Redis and AWS SQS drivers for communication.
+
+We will now start our local Redis queue and our worker to ensure that they can communicate.
+
+\bash{docker-compose up redis}
+
+\begin{code}[language=bash,numbers=none]{}
+> export CELERY_BROKER_URL=redis://localhost:6379
+> export CELERY_RESULT_BACKEND=redis://localhost:6379
+> pipenv run python3 -m celery --app todo.tasks.ical worker --loglevel=info
+\end{code}
+
+You should see something like the below.
+This indicates that the worker has successfully subscribed to the queue and is ready to accept events.
+
+\begin{code}[numbers=none]{}
+
+ -------------- celery@uqbwebb2-6842 v5.2.7 (dawn-chorus)
+--- ***** -----
+-- ******* ---- macOS-12.6.1-x86_64-i386-64bit 2023-04-04 18:51:09
+- *** --- * ---
+- ** ---------- [config]
+- ** ---------- .> app:         todo.tasks.ical:0x10432e7d0
+- ** ---------- .> transport:   redis://localhost:6379//
+- ** ---------- .> results:     redis://localhost:6379/
+- *** --- * --- .> concurrency: 8 (prefork)
+-- ******* ---- .> task events: OFF (enable -E to monitor tasks in this worker)
+--- ***** -----
+ -------------- [queues]
+                .> celery           exchange=celery(direct) key=celery
+
+
+[tasks]
+  . ical
+
+[2023-04-04 18:51:10,059: INFO/MainProcess] Connected to redis://localhost:6379//
+[2023-04-04 18:51:10,065: INFO/MainProcess] mingle: searching for neighbors
+[2023-04-04 18:51:11,200: INFO/MainProcess] mingle: sync with 1 nodes
+[2023-04-04 18:51:11,201: INFO/MainProcess] mingle: sync complete
+[2023-04-04 18:51:11,240: INFO/MainProcess] celery@uqbwebb2-6842 ready.
+\end{code}
+
+Finally, we will run Celery inside a new container.
+For this we will modify our \texttt{docker-compose.yml} file.
+
+\begin{code}[numbers=none]{docker-compose.yml}
+worker:
+  build:
+    context: .
+    dockerfile: Dockerfile.dev
+  restart: always
+  environment:
+    CELERY_BROKER_URL: redis://redis:6379
+    CELERY_RESULT_BACKEND: redis://redis:6379
+  command: celery --app todo.tasks.ical worker --loglevel=info
+\end{code}
+
+Note that we are re-using the same image development image as the Flask server.
+This makes sense since it shares very similar dependencies.
+It would make sense to separate the dependencies between the two containers as they grow larger.
+
+We are overriding the command to run when the container starts to use the celery command.
+We have also remembered to set the environment variables appropriately.
+We have to use the domain name of the redis image instead of the localhost because redis is not running on our localhost.
+Earlier we were able to pretend it was because the redis port, 6379, was being forwarded from our localhost to our redis container.
+
+\subsection{Creating Tasks}
+
+We will now return to our Flask server.
+We can modify our new endpoints to use Celery to create tasks on the task queue.
+
+\begin{code}[language=python,numbers=none]{todo/views/routes.py}
+from celery.result import AsyncResult
+from todo.tasks import ical
+
+...
+
+@api.route('/todos/ical', methods=['POST'])
+def create_ical():
+    todos = Todo.query.order_by(Todo.created_at.desc()).all()
+    todo_input = []
+    for todo in todos:
+        todo_input.append(todo.to_dict())
+
+    task = ical.create_ical.delay(todo_input)
+
+    result = {
+        'task_id': task.id,
+        'task_url': f'{request.host_url}api/v1/todos/ical/{task.id}/status'
+    }
+
+    return jsonify(result), 202
+
+@api.route('/todos/ical/<task_id>/status', methods=['GET'])
+def get_task(task_id):
+    task_result = AsyncResult(task_id)
+    result = {
+        "task_id": task_id,
+        "task_status": task_result.status,
+        "result_url": f'{request.host_url}api/v1/todos/ical/{task_id}/result'
+    }
+    return jsonify(result), 200
+
+@api.route('/todos/ical/<task_id>/result', methods=['GET'])
+def get_calendar(task_id):
+    task_result = AsyncResult(task_id)
+    if task_result.status == 'SUCCESS':
+        return task_result.result, 200, {'Content-Type': 'text/calendar'}
+    else:
+        return jsonify({'error': 'Task not finished'}), 404
+\end{code}
+
+The variable that we create as tasks and pass to the delay method is the JSON data that is stored with the event.
+It is then deserialized from JSON and passed as a variable to the \texttt{create\_ical} function.
+Celery is able to create impressive abstractions so that message passing over a task queue looks almost like regular function calls.
+
+Before we can successfully use this endpoint to get our important ``Hello World'' result,
+we will also need to configure the server to talk to our Redis container.
+
+\begin{code}[numbers=none]{docker-compose.yml}
+  environment:
+    CELERY_BROKER_URL: redis://redis:6379
+    CELERY_RESULT_BACKEND: redis://redis:6379
+\end{code}
+
+You should now be able to start the server and worker with docker compose.
+
+\bash{docker-compose up}
+
+You can now send a POST request to the \texttt{/api/v1/todos/ical} endpoint to start a job and follow the subsequent URLs to see the result of the job.
+
+\subsection{Creating the Calendar}
+
+Once we have confirmed that the task queue can communicate with our worker,
+we can return to the calendar generation.
+We will use the \texttt{icalendar} library for this.
+
+\bash{pipenv install icalendar}
+
+\begin{code}[language=python,numbers=none]{todo/tasks/ical.py}
+import icalendar
+import time
+import datetime
+
+...
+
+def create_ical(tasks):
+    cal = icalendar.Calendar()
+    cal.add("prodid", "-//Taskoverflow Calendar//mxm.dk//")
+    cal.add("version", "2.0")
+
+    time.sleep(50)
+
+    for task in tasks:
+        event = icalendar.Event()
+        
+        event.add("uid", task["id"])
+        event.add("summary", task["title"])
+        event.add("description", task["description"])
+        event.add("dtstart", datetime.datetime.strptime(task["deadline_at"], "%Y-%m-%dT%H:%M:%S"))
+
+        cal.add_component(event)
+
+    return cal.to_ical().decode("utf-8")
+\end{code}
+
+Now you should be able to test your application.
+\begin{enumerate}
+    \item Start it with docker-compose.
+        \bash{docker-compose up --build}
+    \item Open the user interface on \url{http://localhost:6400} and create some tasks.
+    \item Follow the cURL interaction from Section \ref{sect:apiext} to generate an appropriate iCal.
+\end{enumerate}
+
+\section{Deploying with SQS}
+
+First we will modify our worker so that it can run locally and connect to an SQS queue.
+We need to create an appropriate SQS queue.
+
+\begin{code}[language=terraform,numbers=none]{sqs.tf}
+resource "aws_sqs_queue" "ical_queue" {
+    name = "ical"
+}
+\end{code}
+
+\info{
+    Celery will automatically create a queue if it doesn't exist,
+    however, we want to manage it with Terraform so it is easier to destroy.
+}
+
+Now we need to tell our worker to use our SQS queue.
+To do this we will use the \texttt{sqs://} broker URL.
+This tells Celery to use SQS.
+Celery will then attempt to find appropriate AWS credentials to use to authenticate.
+We could pass these in as environment variables.
+However, for convinence we will mount the \texttt{credentials} file that already exists within our container.
+
+\begin{code}[numbers=none]{docker-compose.yml}
+volumes:
+  - ./todo:/app/todo
+  - ./credentials:/root/.aws/credentials
+environment:
+  CELERY_BROKER_URL: sqs://
+\end{code}
+
+Ensure that you update both the worker and the server.
+Note that we are using \texttt{/root} since the container is run as the root user and Celery will therefore look at \texttt{\textasciitilde/.aws/credentials}.
+
+We can use the SQS queue in this state to create tasks and our workers will pick it up.
+This is often sufficient,
+however, in our implementation we have made use of Celery's built-in functionality to track jobs with a persistent data store.
+This is by use of the \texttt{AsyncResult} class.
+If we tried to go to the status or result page for a task we submitted, we would receive an error.
+
+To work around this issue,
+we will use our existing PostgreSQL database as our persistent store to track tasks.
+
+We can update our \texttt{docker-compose.yml} as below to allow Celery to use our PostgreSQL database.
+
+\begin{code}[numbers=none]{docker-compose.yml}
+environment:
+    CELERY_RESULT_BACKEND: db+postgresql://administrator:verySecretPassword@database:5432/todo
+\end{code}
+
+This is the same as the \texttt{SQLALCHEMY\_DATABASE\_URI} except for \texttt{db+} at the start to help Celery identify the type of data store.
+
+\section{Deploying with ECS}
+
+Now we have;
+\begin{enumerate}
+    \item an SQS queue on AWS,
+    \item a worker Celery container running locally,
+    \item a server Flask container running locally, and
+    \item a PostgreSQL database running locally.
+\end{enumerate}
+
+Earlier in the practical we showed how to host a container on ECR.
+In previous practicals we used a hosted image to deploy containers on ECS or EC2.
+In previous practicals we also deployed a PostgreSQL database on RDS.
+
+We would strongly encourage you to try and deploy all components of our application on AWS infrastructure.
+This will be excellent practice for the cloud assignment.
+
+\paragraph{Hints}
+\begin{enumerate}
+    \item ECS/EC2 containers will automatically authenticate with your AWS account (so \texttt{credentials} isn't required).
+    \item Attempt to test each component is deployed correctly individually, e.g. deploy RDS and ensure the system works, then deploy the server and ensure the system works, etc.
+\end{enumerate}
 
 \bibliographystyle{ieeetr}
 \bibliography{books,ours}
