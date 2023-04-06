@@ -44,7 +44,7 @@ paths:
         For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
 
         Each service has a separate health endpoint to allow for flexibility in your implementation.
-        We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.
+        __We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.__
       responses:
         200:
           description: Service is healthy.
@@ -79,20 +79,20 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
-  /users/{user_id}:
+  /users/{id}:
     get:
       operationId: ac
       tags:
       - user
       summary: Get information for a particular user.
       description: |
-        Get the hard-coded user information for a particular user based on their user_id.
+        Get the hard-coded user information for a particular user based on their id.
         Refer to the /users endpoint for what data to return.
 
         It is another teams responsibility to implement this service.
         You need to create this mock endpoint for your service to query.
       parameters:
-      - name: user_id
+      - name: id
         in: path
         description: The user identifier.
         required: true
@@ -120,7 +120,7 @@ paths:
         For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
 
         Each service has a separate health endpoint to allow for flexibility in your implementation.
-        We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.
+        __We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.__
       responses:
         200:
           description: Service is healthy.
@@ -151,6 +151,7 @@ paths:
       tags:
       - concert
       summary: Register a new concert for TicketOverflow.
+      description: You may assume a concert has a capacity less than or equal to 150,000.
       requestBody:
         content:
           application/json:
@@ -164,8 +165,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Concert'
-              example:
-                concert_id: "2"
         400:
           description: |
             Body parameter was malformed or invalid.
@@ -177,14 +176,14 @@ paths:
             response should attempt to contain a description of the error.
           content: {}
       x-codegen-request-body-name: body
-  /concerts/{concert_id}:
+  /concerts/{id}:
     get:
       operationId: bd
       tags:
       - concert
       summary: Get details for a particular concert.
       parameters:
-      - name: concert_id
+      - name: id
         in: path
         description: The concert identifier.
         required: true
@@ -208,8 +207,10 @@ paths:
       description: |
         The request body can be any subset of the concert,
         e.g. "{'status': 'CANCELLED'}" is a valid request body.
+
+        Any existing printed tickets need to be removed.
       parameters:
-      - name: concert_id
+      - name: id
         in: path
         description: The concert identifier.
         required: true
@@ -219,7 +220,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ConcertRequest'
+              $ref: '#/components/schemas/ConcertPut'
         required: true
       responses:
         200:
@@ -228,8 +229,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Concert'
-              example:
-                concert_id: "2"
         400:
           description: |
             Body parameter was malformed or invalid.
@@ -244,16 +243,20 @@ paths:
             response should attempt to contain a description of the error.
           content: {}
       x-codegen-request-body-name: body
-  /concerts/{concert_id}/seats:
+  /concerts/{id}/seats:
     get:
       operationId: bf
       tags:
       - concert
       summary: Get the seating plan as an SVG for a particular concert.
       description:
-        The SVG must be generated using the provided command line tool.
+        The SVG must be generated using the provided command line tool according to the spec.
+
+
+        The generated seating plan is allowed to be up to 3 minutes out of sync with the real state of the seats,
+        i.e. once a seat is purchased it must be rendered in the seating plan within 3 minutes.
       parameters:
-      - name: concert_id
+      - name: id
         in: path
         description: The concert identifier.
         required: true
@@ -266,7 +269,21 @@ paths:
             image/svg+xml:
               schema:
                 type: string
-                format: binary
+                example: |
+                  <?xml version="1.0"?>
+                  <!-- Generated by SVGo -->
+                  <svg width="1200" height="300"
+                       xmlns="http://www.w3.org/2000/svg"
+                       xmlns:xlink="http://www.w3.org/1999/xlink">
+                  <desc>12345678-1234-1234-1234-123456789012|5738|2340</desc>
+                  <rect x="0" y="0" width="1200" height="2600" style="fill:rgb(255,255,255)" />
+                  <text x="600" y="100" style="text-anchor:middle;font-size:36px;fill:black" >Phantom of the Opera</text>
+                  <text x="600" y="150" style="text-anchor:middle;font-size:24px;fill:black" >Sydney Opera House</text>
+                  <line x1="300" y1="170" x2="900" y2="170" style="stroke:rgb(0,0,0);stroke-width:2" />
+                  <rect x="582" y="240" width="20" height="20" style="fill:rgb(50,98,115);stroke-width:1;stroke:rgb(0,0,0)" />
+                  <rect x="602" y="240" width="20" height="20" style="fill:rgb(50,98,115);stroke-width:1;stroke:rgb(0,0,0)" />
+                  ...
+                  </svg>
         404:
           description: The concert does not exist.
           content: {}
@@ -285,7 +302,7 @@ paths:
         For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
 
         Each service has a separate health endpoint to allow for flexibility in your implementation.
-        We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.
+        __We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.__
       responses:
         200:
           description: Service is healthy.
@@ -335,6 +352,9 @@ paths:
       description: |
         The ticket must be purchased for a concert that exists.
         The ticket must be purchased by a user that exists.
+
+        Tickets should start in the NOT_PRINTED status.
+        A separate call to the */tickets/{id}/print* triggers the printing.
       requestBody:
         content:
           application/json:
@@ -360,14 +380,14 @@ paths:
             response should attempt to contain a description of the error.
           content: {}
       x-codegen-request-body-name: body
-  /tickets/{ticket_id}:
+  /tickets/{id}:
     get:
       operationId: cd
       tags:
       - ticket
       summary: Get information for a particular ticket.
       parameters:
-      - name: ticket_id
+      - name: id
         in: path
         description: The ticket identifier.
         required: true
@@ -383,7 +403,7 @@ paths:
         404:
           description: The ticket does not exist.
           content: {}
-  /tickets/{ticket_id}/print:
+  /tickets/{id}/print:
     post:
       operationId: ce
       tags:
@@ -396,7 +416,7 @@ paths:
         When a request is made, the ticket print status should be set to PENDING
         until it is finished with either ERROR or PRINTED.
       parameters:
-      - name: ticket_id
+      - name: id
         in: path
         description: The ticket identifier.
         required: true
@@ -420,7 +440,7 @@ paths:
       - ticket
       summary: Get the printed ticket if it exists.
       parameters:
-      - name: ticket_id
+      - name: id
         in: path
         description: The ticket identifier.
         required: true
@@ -433,7 +453,30 @@ paths:
             image/svg+xml:
               schema:
                 type: string
-                format: binary
+                example: |
+                  <?xml version="1.0"?>
+                  <!-- Generated by SVGo -->
+                  <svg width="1200" height="518"
+                       xmlns="http://www.w3.org/2000/svg"
+                       xmlns:xlink="http://www.w3.org/1999/xlink">
+                  <desc>12345678-1234-1234-1234-123456789012</desc>
+                  <rect x="0" y="0" width="1200" height="518" style="fill:rgb(255,255,255)" />
+                  <rect x="0" y="0" width="200" height="518" style="fill:rgb(92,158,173)" />
+                  <rect x="200" y="0" width="20" height="518" style="fill:rgb(50,98,115)" />
+                  <circle cx="210" cy="100" r="50" style="fill:rgb(50,98,115)" />
+                  <text x="300" y="100" style="text-anchor:left;font-size:36px;fill:black" >Phantom of the Opera</text>
+                  <text x="300" y="150" style="text-anchor:left;font-size:24px;fill:black" >2023-06-07</text>
+                  <text x="300" y="200" style="text-anchor:left;font-size:24px;fill:black" >Sydney Opera House</text>
+                  <text x="300" y="250" style="text-anchor:left;font-size:24px;fill:black" >12345678-1234-1234-1234-123456789012</text>
+                  <line x1="300" y1="300" x2="900" y2="300" style="stroke:rgb(0,0,0);stroke-width:2" />
+                  <text x="300" y="350" style="text-anchor:left;font-size:24px;fill:black" >Evan Hughes</text>
+                  <text x="300" y="400" style="text-anchor:left;font-size:24px;fill:black" >example@uq.edu.au</text>
+                  <text x="300" y="450" style="text-anchor:left;font-size:24px;fill:black" >12345678-1234-1234-1234-123456789012</text>
+                  <rect x="1190" y="0" width="10" height="518" style="fill:rgb(255,215,0)" />
+                  <rect x="1000" y="80" width="150" height="1" style="fill:rgb(0,0,0)" />
+                  ...
+                  </svg>
+
         404:
           description: The ticket does not exist or has not been printed yet.
           content: {}
@@ -443,11 +486,11 @@ components:
     User:
       type: object
       example:
-        user_id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
+        id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
         name: "Evan Hughes"
         email: "noreply@uq.edu.au"
       properties:
-        user_id:
+        id:
           type: string
           description: Unique user identifier.
         name:
@@ -471,34 +514,34 @@ components:
     Ticket:
       type: object
       example:
-        ticket_id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
+        id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
         concert:
-          concert_id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
-          concert_url: "/concerts/e571964f-f2b7-4200-9fb0-2af749092fa1"
+          id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
+          url: "http://tickets.api.ticketoverflow.com/api/v1/concerts/e571964f-f2b7-4200-9fb0-2af749092fa1"
         user:
-          user_id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
-          user_url: "/users/e571964f-f2b7-4200-9fb0-2af749092fa1"
+          id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
+          url: "http://tickets.api.ticketoverflow.com/api/v1/users/e571964f-f2b7-4200-9fb0-2af749092fa1"
         print_status: "PRINTED"
       properties:
-        ticket_id:
+        id:
           type: string
           description: Unique ticket identifier.
         concert:
           type: object
           properties:
-            concert_id:
+            id:
               type: string
               description: Unique concert identifier.
-            concert_url:
+            url:
               type: string
               description: URL path to the concert resource.
         user:
           type: object
           properties:
-            user_id:
+            id:
               type: string
               description: Unique user identifier
-            user_url:
+            url:
               type: string
               description: URL path to the user resource.
         print_status:
@@ -512,13 +555,14 @@ components:
     Concert:
       type: object
       example:
-        concert_id: e571964f-f2b7-4200-9fb0-2af749092fa1
+        id: e571964f-f2b7-4200-9fb0-2af749092fa1
         name: The Beatles
         venue: The Gabba
+        date: 2023-06-07
         capacity: 250
         status: ACTIVE
       properties:
-        concert_id:
+        id:
           type: string
           description: Unique concert identifier.
         name:
@@ -527,6 +571,9 @@ components:
         venue:
           type: string
           description: The arena or venue where a concert is to be held.
+        date:
+          type: string
+          description: The date of the concert performance.
         capacity:
           type: integer
           description: Maximum capacity for the concert.
@@ -542,6 +589,7 @@ components:
       example:
         name: The Beatles
         venue: The Gabba
+        date: 2023-06-07
         capacity: 250
         status: ACTIVE
       properties:
@@ -551,6 +599,9 @@ components:
         venue:
           type: string
           description: The arena or venue where a concert is to be held.
+        date:
+          type: string
+          description: The date of the concert performance.
         capacity:
           type: integer
           description: Maximum capacity for the concert.
@@ -561,5 +612,28 @@ components:
           - ACTIVE
           - CANCELLED
           - SOLD_OUT
-
+    ConcertPut:
+      type: object
+      example:
+        name: The Beatles
+        venue: The Gabba
+        date: 2023-06-07
+        status: ACTIVE
+      properties:
+        name:
+          type: string
+          description: Name of the concert.
+        venue:
+          type: string
+          description: The arena or venue where a concert is to be held.
+        date:
+          type: string
+          description: The date of the concert performance.
+        status:
+          type: string
+          description: The current status of the concert.
+          enum:
+          - ACTIVE
+          - CANCELLED
+          - SOLD_OUT
 
