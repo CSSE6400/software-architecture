@@ -2,9 +2,18 @@ openapi: 3.0.1
 info:
   title: TicketOverflow
   description: |
-    An API service that supports ticket purchasing, ticket generation, and seating plan generationg for TicketOverflow.
+    An API service that supports ticket purchasing, ticket generation, and seating plan generation for TicketOverflow.
+
+    You must implement the concerts and tickets endpoints.
+    
+    You must also implement a mock users endpoint as a placeholder while another team develops the users service.
+    See the users endpoint for more details on what data to use for mocking.
 
     Note that the URL used in the cURL examples below are just illustrative, you should replace [http://tickets.api.ticketoverflow.com/api/v1/](http://tickets.api.ticketoverflow.com/api/v1) with the host of your service.
+
+    We have used UUID formatted identifiers in the examples but may use any style of unique string identifier you wish.
+
+    You should start with the users service, then concerts, then tickets.
   contact:
     name: CSSE6400
     url: https://csse6400.uqcloud.net
@@ -13,18 +22,19 @@ info:
 servers:
 - url: http://tickets.api.ticketoverflow.com/api/v1
 tags:
-- name: ticket
-  description: Ticket service
 - name: user
   description: Users service
 - name: concert
   description: Concerts service
+- name: ticket
+  description: Ticket service
 paths:
-  /health:
+  /users/health:
     get:
+      operationId: aa
       tags:
-      - ticket
-      summary: Query the health of the service.
+      - user
+      summary: Query the health of the users service.
       description: |
         The health endpoint is a useful for determining whether an instance is still healthy.
         This can help if you are configuring auto-scaling groups or load balancers.
@@ -32,6 +42,9 @@ paths:
         We do not specify the response payload for this endpoint,
         however you may find it useful to return a more detailed status of your system.
         For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
+
+        Each service has a separate health endpoint to allow for flexibility in your implementation.
+        We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.
       responses:
         200:
           description: Service is healthy.
@@ -44,6 +57,7 @@ paths:
           content: {}
   /users:
     get:
+      operationId: ab
       tags:
       - user
       summary: List all registered users for the service.
@@ -57,7 +71,8 @@ paths:
         The list of hard-coded users is available here: https://github.com/csse6400/ticketoverflow-users
       responses:
         200:
-          description: List of all registered users for the service.
+          description: |
+            List of all registered users for the service.
           content:
             application/json:
               schema:
@@ -74,6 +89,7 @@ paths:
                   $ref: '#/components/schemas/User'
   /users/{user_id}:
     get:
+      operationId: ac
       tags:
       - user
       summary: Get information for a particular user.
@@ -97,8 +113,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+  /concerts/health:
+    get:
+      operationId: ba
+      tags:
+      - concert
+      summary: Query the health of the concerts service.
+      description: |
+        The health endpoint is a useful for determining whether an instance is still healthy.
+        This can help if you are configuring auto-scaling groups or load balancers.
+
+        We do not specify the response payload for this endpoint,
+        however you may find it useful to return a more detailed status of your system.
+        For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
+
+        Each service has a separate health endpoint to allow for flexibility in your implementation.
+        We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.
+      responses:
+        200:
+          description: Service is healthy.
+          content: {}
+        500:
+          description: Service is not healthy.
+          content: {}
+        503:
+          description: Service is not healthy.
+          content: {}
   /concerts:
     get:
+      operationId: bb
       tags:
       - concert
       summary: List all the concerts registered with TicketOverflow.
@@ -112,6 +155,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Concert'
     post:
+      operationId: bc
       tags:
       - concert
       summary: Register a new concert for TicketOverflow.
@@ -143,9 +187,10 @@ paths:
       x-codegen-request-body-name: body
   /concerts/{concert_id}:
     get:
+      operationId: bd
       tags:
       - concert
-      summary: Get information for a particular concert.
+      summary: Get details for a particular concert.
       parameters:
       - name: concert_id
         in: path
@@ -164,6 +209,7 @@ paths:
           description: The concert does not exist.
           content: {}
     put:
+      operationId: be
       tags:
         - concert
       summary: Update details about a concert.
@@ -205,6 +251,7 @@ paths:
       x-codegen-request-body-name: body
   /concerts/{concert_id}/seats:
     get:
+      operationId: bf
       tags:
       - concert
       summary: Get the seating plan as an SVG for a particular concert.
@@ -228,8 +275,35 @@ paths:
         404:
           description: The concert does not exist.
           content: {}
+  /tickets/health:
+    get:
+      operationId: ca
+      tags:
+      - ticket
+      summary: Query the health of the tickets service.
+      description: |
+        The health endpoint is a useful for determining whether an instance is still healthy.
+        This can help if you are configuring auto-scaling groups or load balancers.
+
+        We do not specify the response payload for this endpoint,
+        however you may find it useful to return a more detailed status of your system.
+        For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
+
+        Each service has a separate health endpoint to allow for flexibility in your implementation.
+        We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.
+      responses:
+        200:
+          description: Service is healthy.
+          content: {}
+        500:
+          description: Service is not healthy.
+          content: {}
+        503:
+          description: Service is not healthy.
+          content: {}
   /tickets:
     get:
+      operationId: cb
       tags:
       - ticket
       summary: List all of the purchased tickets.
@@ -259,6 +333,7 @@ paths:
           description: Unknown resource identifier.
           content: {}
     post:
+      operationId: cc
       tags:
       - ticket
       summary: Purchase a ticket for a concert.
@@ -292,6 +367,7 @@ paths:
       x-codegen-request-body-name: body
   /tickets/{ticket_id}:
     get:
+      operationId: cd
       tags:
       - ticket
       summary: Get information for a particular ticket.
@@ -314,6 +390,7 @@ paths:
           content: {}
   /tickets/{ticket_id}/print:
     post:
+      operationId: ce
       tags:
       - ticket
       summary: Request that a ticket is printed asynchronously.
@@ -343,6 +420,7 @@ paths:
             response should attempt to contain a description of the error.
           content: {}
     get:
+      operationId: cf
       tags:
       - ticket
       summary: Get the printed ticket if it exists.
