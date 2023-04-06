@@ -311,6 +311,9 @@ li.L8 {
 * {
   font-family: 'Source Code Pro', sans-serif;
 }
+strong {
+  font-family: sans-serif;
+}
 body {
   min-width: 980px;
 }
@@ -853,7 +856,7 @@ ul.nav-tabs {
     defs["Concert"] = {
   "type" : "object",
   "properties" : {
-    "concert_id" : {
+    "id" : {
       "type" : "string",
       "description" : "Unique concert identifier."
     },
@@ -864,6 +867,10 @@ ul.nav-tabs {
     "venue" : {
       "type" : "string",
       "description" : "The arena or venue where a concert is to be held."
+    },
+    "date" : {
+      "type" : "string",
+      "description" : "The date of the concert performance."
     },
     "capacity" : {
       "type" : "integer",
@@ -876,10 +883,39 @@ ul.nav-tabs {
     }
   },
   "example" : {
-    "concert_id" : "e571964f-f2b7-4200-9fb0-2af749092fa1",
+    "id" : "e571964f-f2b7-4200-9fb0-2af749092fa1",
     "name" : "The Beatles",
     "venue" : "The Gabba",
+    "date" : "2023-06-07",
     "capacity" : 250,
+    "status" : "ACTIVE"
+  }
+};
+    defs["ConcertPut"] = {
+  "type" : "object",
+  "properties" : {
+    "name" : {
+      "type" : "string",
+      "description" : "Name of the concert."
+    },
+    "venue" : {
+      "type" : "string",
+      "description" : "The arena or venue where a concert is to be held."
+    },
+    "date" : {
+      "type" : "string",
+      "description" : "The date of the concert performance."
+    },
+    "status" : {
+      "type" : "string",
+      "description" : "The current status of the concert.",
+      "enum" : [ "ACTIVE", "CANCELLED", "SOLD_OUT" ]
+    }
+  },
+  "example" : {
+    "name" : "The Beatles",
+    "venue" : "The Gabba",
+    "date" : "2023-06-07",
     "status" : "ACTIVE"
   }
 };
@@ -894,6 +930,10 @@ ul.nav-tabs {
       "type" : "string",
       "description" : "The arena or venue where a concert is to be held."
     },
+    "date" : {
+      "type" : "string",
+      "description" : "The date of the concert performance."
+    },
     "capacity" : {
       "type" : "integer",
       "description" : "Maximum capacity for the concert."
@@ -907,6 +947,7 @@ ul.nav-tabs {
   "example" : {
     "name" : "The Beatles",
     "venue" : "The Gabba",
+    "date" : "2023-06-07",
     "capacity" : 250,
     "status" : "ACTIVE"
   }
@@ -914,7 +955,7 @@ ul.nav-tabs {
     defs["Ticket"] = {
   "type" : "object",
   "properties" : {
-    "ticket_id" : {
+    "id" : {
       "type" : "string",
       "description" : "Unique ticket identifier."
     },
@@ -931,14 +972,14 @@ ul.nav-tabs {
     }
   },
   "example" : {
-    "ticket_id" : "e571964f-f2b7-4200-9fb0-2af749092fa1",
+    "id" : "e571964f-f2b7-4200-9fb0-2af749092fa1",
     "concert" : {
-      "concert_id" : "e571964f-f2b7-4200-9fb0-2af749092fa1",
-      "concert_url" : "/concerts/e571964f-f2b7-4200-9fb0-2af749092fa1"
+      "id" : "e571964f-f2b7-4200-9fb0-2af749092fa1",
+      "url" : "http://tickets.api.ticketoverflow.com/api/v1/concerts/e571964f-f2b7-4200-9fb0-2af749092fa1"
     },
     "user" : {
-      "user_id" : "e571964f-f2b7-4200-9fb0-2af749092fa1",
-      "user_url" : "/users/e571964f-f2b7-4200-9fb0-2af749092fa1"
+      "id" : "e571964f-f2b7-4200-9fb0-2af749092fa1",
+      "url" : "http://tickets.api.ticketoverflow.com/api/v1/users/e571964f-f2b7-4200-9fb0-2af749092fa1"
     },
     "print_status" : "PRINTED"
   }
@@ -946,11 +987,11 @@ ul.nav-tabs {
     defs["Ticket_concert"] = {
   "type" : "object",
   "properties" : {
-    "concert_id" : {
+    "id" : {
       "type" : "string",
       "description" : "Unique concert identifier."
     },
-    "concert_url" : {
+    "url" : {
       "type" : "string",
       "description" : "URL path to the concert resource."
     }
@@ -976,11 +1017,11 @@ ul.nav-tabs {
     defs["Ticket_user"] = {
   "type" : "object",
   "properties" : {
-    "user_id" : {
+    "id" : {
       "type" : "string",
       "description" : "Unique user identifier"
     },
-    "user_url" : {
+    "url" : {
       "type" : "string",
       "description" : "URL path to the user resource."
     }
@@ -989,7 +1030,7 @@ ul.nav-tabs {
     defs["User"] = {
   "type" : "object",
   "properties" : {
-    "user_id" : {
+    "id" : {
       "type" : "string",
       "description" : "Unique user identifier."
     },
@@ -1003,7 +1044,7 @@ ul.nav-tabs {
     }
   },
   "example" : {
-    "user_id" : "e571964f-f2b7-4200-9fb0-2af749092fa1",
+    "id" : "e571964f-f2b7-4200-9fb0-2af749092fa1",
     "name" : "Evan Hughes",
     "email" : "noreply@uq.edu.au"
   }
@@ -1037,13 +1078,13 @@ ul.nav-tabs {
                       <a href="#api-Concert-bc"><span style="float:right;text-transform:uppercase">post</span>/concerts</a>
                     </li>
                     <li data-group="Concert" data-name="bd" class="">
-                      <a href="#api-Concert-bd"><span style="float:right;text-transform:uppercase">get</span>/concerts/{concert_id}</a>
+                      <a href="#api-Concert-bd"><span style="float:right;text-transform:uppercase">get</span>/concerts/{id}</a>
                     </li>
                     <li data-group="Concert" data-name="be" class="">
-                      <a href="#api-Concert-be"><span style="float:right;text-transform:uppercase">put</span>/concerts/{concert_id}</a>
+                      <a href="#api-Concert-be"><span style="float:right;text-transform:uppercase">put</span>/concerts/{id}</a>
                     </li>
                     <li data-group="Concert" data-name="bf" class="">
-                      <a href="#api-Concert-bf"><span style="float:right;text-transform:uppercase">get</span>/concerts/{concert_id}/seats</a>
+                      <a href="#api-Concert-bf"><span style="float:right;text-transform:uppercase">get</span>/concerts/{id}/seats</a>
                     </li>
                 <li class="nav-header" data-group="Ticket"><a href="#api-Ticket">Ticket Service</a></li>
                     <li data-group="Ticket" data-name="ca" class="">
@@ -1056,13 +1097,13 @@ ul.nav-tabs {
                       <a href="#api-Ticket-cc"><span style="float:right;text-transform:uppercase">post</span>/tickets</a>
                     </li>
                     <li data-group="Ticket" data-name="cd" class="">
-                      <a href="#api-Ticket-cd"><span style="float:right;text-transform:uppercase">get</span>/tickets/{ticket_id}</a>
+                      <a href="#api-Ticket-cd"><span style="float:right;text-transform:uppercase">get</span>/tickets/{id}</a>
                     </li>
                     <li data-group="Ticket" data-name="ce" class="">
-                      <a href="#api-Ticket-ce"><span style="float:right;text-transform:uppercase">post</span>/tickets/{ticket_id}/print</a>
+                      <a href="#api-Ticket-ce"><span style="float:right;text-transform:uppercase">post</span>/tickets/{id}/print</a>
                     </li>
                     <li data-group="Ticket" data-name="cf" class="">
-                      <a href="#api-Ticket-cf"><span style="float:right;text-transform:uppercase">get</span>/tickets/{ticket_id}/print</a>
+                      <a href="#api-Ticket-cf"><span style="float:right;text-transform:uppercase">get</span>/tickets/{id}/print</a>
                     </li>
                 <li class="nav-header" data-group="User"><a href="#api-User">User Service</a></li>
                     <li data-group="User" data-name="aa" class="">
@@ -1072,7 +1113,7 @@ ul.nav-tabs {
                       <a href="#api-User-ab"><span style="float:right;text-transform:uppercase">get</span>/users</a>
                     </li>
                     <li data-group="User" data-name="ac" class="">
-                      <a href="#api-User-ac"><span style="float:right;text-transform:uppercase">get</span>/users/{user_id}</a>
+                      <a href="#api-User-ac"><span style="float:right;text-transform:uppercase">get</span>/users/{id}</a>
                     </li>
           </ul>
         </nav>
@@ -1122,7 +1163,7 @@ however you may find it useful to return a more detailed status of your system.
 For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
 
 Each service has a separate health endpoint to allow for flexibility in your implementation.
-We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.
+__We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.__
 </p>
                         <p></p>
                         <br />
@@ -1421,7 +1462,7 @@ We do not require a separate service for each of the endpoints, i.e. one server 
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked"></p>
+                        <p class="marked">You may assume a concert has a capacity less than or equal to 150,000.</p>
                         <p></p>
                         <br />
 
@@ -1433,6 +1474,7 @@ We do not require a separate service for each of the endpoints, i.e. one server 
  -d '{
   &quot;name&quot; : &quot;The Beatles&quot;,
   &quot;venue&quot; : &quot;The Gabba&quot;,
+  &quot;date&quot; : &quot;2023-06-07&quot;,
   &quot;capacity&quot; : 250,
   &quot;status&quot; : &quot;ACTIVE&quot;
 }'
@@ -1526,9 +1568,6 @@ $(document).ready(function() {
     "application/json" : {
       "schema" : {
         "$ref" : "#/components/schemas/Concert"
-      },
-      "example" : {
-        "concert_id" : "2"
       }
     }
   }
@@ -1685,7 +1724,7 @@ Return value is not specified but should describe the error.
                       <article id="api-Concert-bd-0" data-group="User" data-name="bd" data-version="0">
                         <div class="pull-left">
                           <!-- <h1>bd</h1> -->
-                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/concerts/{concert_id}</span></code></pre></h1>
+                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/concerts/{id}</span></code></pre></h1>
                           <p>Get details for a particular concert.</p>
                         </div>
                         <div class="pull-right"></div>
@@ -1698,7 +1737,7 @@ Return value is not specified but should describe the error.
                         <h3>Curl Request Example</h3>
                         <pre class="prettyprint"><code class="language-bsh">curl -X GET \
  -H "Accept: application/json" \
- "http://tickets.api.ticketoverflow.com/api/v1/concerts/{concert_id}"
+ "http://tickets.api.ticketoverflow.com/api/v1/concerts/{id}"
 </code></pre>
 
                           <h2 class="methodsubtabletitle">Path parameters</h2>
@@ -1707,11 +1746,11 @@ Return value is not specified but should describe the error.
                                 <th width="150px">Name</th>
                                 <th>Description</th>
                               </tr>
-                                <tr><td style="width:150px;">concert_id*</td>
+                                <tr><td style="width:150px;">id*</td>
 <td>
 
 
-    <div id="d2e199_bd_concertId">
+    <div id="d2e199_bd_id">
         <div class="json-schema-view">
             <div class="primitive">
                 <span class="type">
@@ -1870,7 +1909,7 @@ The concert identifier.
                       <article id="api-Concert-be-0" data-group="User" data-name="be" data-version="0">
                         <div class="pull-left">
                           <!-- <h1>be</h1> -->
-                          <h1><pre class="prettyprint language-html prettyprinted" data-type="put"><code><span class="pln">/concerts/{concert_id}</span></code></pre></h1>
+                          <h1><pre class="prettyprint language-html prettyprinted" data-type="put"><code><span class="pln">/concerts/{id}</span></code></pre></h1>
                           <p>Update details about a concert.</p>
                         </div>
                         <div class="pull-right"></div>
@@ -1878,6 +1917,8 @@ The concert identifier.
                         <p></p>
                         <p class="marked">The request body can be any subset of the concert,
 e.g. &quot;{&#39;status&#39;: &#39;CANCELLED&#39;}&quot; is a valid request body.
+
+Any existing printed tickets need to be removed.
 </p>
                         <p></p>
                         <br />
@@ -1886,11 +1927,11 @@ e.g. &quot;{&#39;status&#39;: &#39;CANCELLED&#39;}&quot; is a valid request body
                         <pre class="prettyprint"><code class="language-bsh">curl -X PUT \
  -H "Accept: application/json" \
  -H "Content-Type: application/json" \
- "http://tickets.api.ticketoverflow.com/api/v1/concerts/{concert_id}" \
+ "http://tickets.api.ticketoverflow.com/api/v1/concerts/{id}" \
  -d '{
   &quot;name&quot; : &quot;The Beatles&quot;,
   &quot;venue&quot; : &quot;The Gabba&quot;,
-  &quot;capacity&quot; : 250,
+  &quot;date&quot; : &quot;2023-06-07&quot;,
   &quot;status&quot; : &quot;ACTIVE&quot;
 }'
 </code></pre>
@@ -1901,11 +1942,11 @@ e.g. &quot;{&#39;status&#39;: &#39;CANCELLED&#39;}&quot; is a valid request body
                                 <th width="150px">Name</th>
                                 <th>Description</th>
                               </tr>
-                                <tr><td style="width:150px;">concert_id*</td>
+                                <tr><td style="width:150px;">id*</td>
 <td>
 
 
-    <div id="d2e199_be_concertId">
+    <div id="d2e199_be_id">
         <div class="json-schema-view">
             <div class="primitive">
                 <span class="type">
@@ -1942,7 +1983,7 @@ $(document).ready(function() {
   "content" : {
     "application/json" : {
       "schema" : {
-        "$ref" : "#/components/schemas/ConcertRequest"
+        "$ref" : "#/components/schemas/ConcertPut"
       }
     }
   },
@@ -2013,9 +2054,6 @@ $(document).ready(function() {
     "application/json" : {
       "schema" : {
         "$ref" : "#/components/schemas/Concert"
-      },
-      "example" : {
-        "concert_id" : "2"
       }
     }
   }
@@ -2228,20 +2266,22 @@ Return value is not specified but should describe the error.
                       <article id="api-Concert-bf-0" data-group="User" data-name="bf" data-version="0">
                         <div class="pull-left">
                           <!-- <h1>bf</h1> -->
-                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/concerts/{concert_id}/seats</span></code></pre></h1>
+                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/concerts/{id}/seats</span></code></pre></h1>
                           <p>Get the seating plan as an SVG for a particular concert.</p>
                         </div>
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked">The SVG must be generated using the provided command line tool.</p>
+                        <p class="marked">The SVG must be generated using the provided command line tool according to the spec.
+
+The generated seating plan is allowed to be up to 3 minutes out of sync with the real state of the seats, i.e. once a seat is purchased it must be rendered in the seating plan within 3 minutes.</p>
                         <p></p>
                         <br />
 
                         <h3>Curl Request Example</h3>
                         <pre class="prettyprint"><code class="language-bsh">curl -X GET \
  -H "Accept: image/svg+xml" \
- "http://tickets.api.ticketoverflow.com/api/v1/concerts/{concert_id}/seats"
+ "http://tickets.api.ticketoverflow.com/api/v1/concerts/{id}/seats"
 </code></pre>
 
                           <h2 class="methodsubtabletitle">Path parameters</h2>
@@ -2250,11 +2290,11 @@ Return value is not specified but should describe the error.
                                 <th width="150px">Name</th>
                                 <th>Description</th>
                               </tr>
-                                <tr><td style="width:150px;">concert_id*</td>
+                                <tr><td style="width:150px;">id*</td>
 <td>
 
 
-    <div id="d2e199_bf_concertId">
+    <div id="d2e199_bf_id">
         <div class="json-schema-view">
             <div class="primitive">
                 <span class="type">
@@ -2299,6 +2339,9 @@ The concert identifier.
                                   <a data-toggle="tab" href="#responses-Concert-bf-200-schema">Schema</a>
                                 </li>
 
+                                  <li class="">
+                                    <a data-toggle="tab" href="#examples-Concert-bf-200-example">Response Body Example</a>
+                                  </li>
 
 
 
@@ -2316,7 +2359,7 @@ The concert identifier.
     "image/svg+xml" : {
       "schema" : {
         "type" : "string",
-        "format" : "binary"
+        "example" : "<?xml version=\"1.0\"?>\n<!-- Generated by SVGo -->\n<svg width=\"1200\" height=\"300\"\n     xmlns=\"http://www.w3.org/2000/svg\"\n     xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n<desc>12345678-1234-1234-1234-123456789012|5738|2340</desc>\n<rect x=\"0\" y=\"0\" width=\"1200\" height=\"2600\" style=\"fill:rgb(255,255,255)\" />\n<text x=\"600\" y=\"100\" style=\"text-anchor:middle;font-size:36px;fill:black\" >Phantom of the Opera</text>\n<text x=\"600\" y=\"150\" style=\"text-anchor:middle;font-size:24px;fill:black\" >Sydney Opera House</text>\n<line x1=\"300\" y1=\"170\" x2=\"900\" y2=\"170\" style=\"stroke:rgb(0,0,0);stroke-width:2\" />\n<rect x=\"582\" y=\"240\" width=\"20\" height=\"20\" style=\"fill:rgb(50,98,115);stroke-width:1;stroke:rgb(0,0,0)\" />\n<rect x=\"602\" y=\"240\" width=\"20\" height=\"20\" style=\"fill:rgb(50,98,115);stroke-width:1;stroke:rgb(0,0,0)\" />\n...\n</svg>\n"
       }
     }
   }
@@ -2347,7 +2390,21 @@ The concert identifier.
                                   <input id='responses-Concert-bf-200-schema-data' type='hidden' value=''></input>
                                 </div>
                                 <div class="tab-pane" id="examples-Concert-bf-200-example">
-                                  <pre class="prettyprint"><code class="json"></code></pre>
+                                  <pre class="prettyprint"><code class="json">&lt;?xml version&#x3D;&quot;1.0&quot;?&gt;
+&lt;!-- Generated by SVGo --&gt;
+&lt;svg width&#x3D;&quot;1200&quot; height&#x3D;&quot;300&quot;
+     xmlns&#x3D;&quot;http://www.w3.org/2000/svg&quot;
+     xmlns:xlink&#x3D;&quot;http://www.w3.org/1999/xlink&quot;&gt;
+&lt;desc&gt;12345678-1234-1234-1234-123456789012|5738|2340&lt;/desc&gt;
+&lt;rect x&#x3D;&quot;0&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;1200&quot; height&#x3D;&quot;2600&quot; style&#x3D;&quot;fill:rgb(255,255,255)&quot; /&gt;
+&lt;text x&#x3D;&quot;600&quot; y&#x3D;&quot;100&quot; style&#x3D;&quot;text-anchor:middle;font-size:36px;fill:black&quot; &gt;Phantom of the Opera&lt;/text&gt;
+&lt;text x&#x3D;&quot;600&quot; y&#x3D;&quot;150&quot; style&#x3D;&quot;text-anchor:middle;font-size:24px;fill:black&quot; &gt;Sydney Opera House&lt;/text&gt;
+&lt;line x1&#x3D;&quot;300&quot; y1&#x3D;&quot;170&quot; x2&#x3D;&quot;900&quot; y2&#x3D;&quot;170&quot; style&#x3D;&quot;stroke:rgb(0,0,0);stroke-width:2&quot; /&gt;
+&lt;rect x&#x3D;&quot;582&quot; y&#x3D;&quot;240&quot; width&#x3D;&quot;20&quot; height&#x3D;&quot;20&quot; style&#x3D;&quot;fill:rgb(50,98,115);stroke-width:1;stroke:rgb(0,0,0)&quot; /&gt;
+&lt;rect x&#x3D;&quot;602&quot; y&#x3D;&quot;240&quot; width&#x3D;&quot;20&quot; height&#x3D;&quot;20&quot; style&#x3D;&quot;fill:rgb(50,98,115);stroke-width:1;stroke:rgb(0,0,0)&quot; /&gt;
+...
+&lt;/svg&gt;
+</code></pre>
                                 </div>
                             </div>
                             
@@ -2431,7 +2488,7 @@ however you may find it useful to return a more detailed status of your system.
 For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
 
 Each service has a separate health endpoint to allow for flexibility in your implementation.
-We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.
+__We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.__
 </p>
                         <p></p>
                         <br />
@@ -2835,6 +2892,9 @@ Filter only the tickets purchased for the given concert. This is an optional que
                         <p></p>
                         <p class="marked">The ticket must be purchased for a concert that exists.
 The ticket must be purchased by a user that exists.
+
+Tickets should start in the NOT_PRINTED status.
+A separate call to the */tickets/{id}/print* triggers the printing.
 </p>
                         <p></p>
                         <br />
@@ -3095,7 +3155,7 @@ Return value is not specified but should describe the error.
                       <article id="api-Ticket-cd-0" data-group="User" data-name="cd" data-version="0">
                         <div class="pull-left">
                           <!-- <h1>cd</h1> -->
-                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/tickets/{ticket_id}</span></code></pre></h1>
+                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/tickets/{id}</span></code></pre></h1>
                           <p>Get information for a particular ticket.</p>
                         </div>
                         <div class="pull-right"></div>
@@ -3108,7 +3168,7 @@ Return value is not specified but should describe the error.
                         <h3>Curl Request Example</h3>
                         <pre class="prettyprint"><code class="language-bsh">curl -X GET \
  -H "Accept: application/json" \
- "http://tickets.api.ticketoverflow.com/api/v1/tickets/{ticket_id}"
+ "http://tickets.api.ticketoverflow.com/api/v1/tickets/{id}"
 </code></pre>
 
                           <h2 class="methodsubtabletitle">Path parameters</h2>
@@ -3117,11 +3177,11 @@ Return value is not specified but should describe the error.
                                 <th width="150px">Name</th>
                                 <th>Description</th>
                               </tr>
-                                <tr><td style="width:150px;">ticket_id*</td>
+                                <tr><td style="width:150px;">id*</td>
 <td>
 
 
-    <div id="d2e199_cd_ticketId">
+    <div id="d2e199_cd_id">
         <div class="json-schema-view">
             <div class="primitive">
                 <span class="type">
@@ -3280,7 +3340,7 @@ The ticket identifier.
                       <article id="api-Ticket-ce-0" data-group="User" data-name="ce" data-version="0">
                         <div class="pull-left">
                           <!-- <h1>ce</h1> -->
-                          <h1><pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/tickets/{ticket_id}/print</span></code></pre></h1>
+                          <h1><pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/tickets/{id}/print</span></code></pre></h1>
                           <p>Request that a ticket is printed asynchronously.</p>
                         </div>
                         <div class="pull-right"></div>
@@ -3297,7 +3357,7 @@ until it is finished with either ERROR or PRINTED.
 
                         <h3>Curl Request Example</h3>
                         <pre class="prettyprint"><code class="language-bsh">curl -X POST \
- "http://tickets.api.ticketoverflow.com/api/v1/tickets/{ticket_id}/print"
+ "http://tickets.api.ticketoverflow.com/api/v1/tickets/{id}/print"
 </code></pre>
 
                           <h2 class="methodsubtabletitle">Path parameters</h2>
@@ -3306,11 +3366,11 @@ until it is finished with either ERROR or PRINTED.
                                 <th width="150px">Name</th>
                                 <th>Description</th>
                               </tr>
-                                <tr><td style="width:150px;">ticket_id*</td>
+                                <tr><td style="width:150px;">id*</td>
 <td>
 
 
-    <div id="d2e199_ce_ticketId">
+    <div id="d2e199_ce_id">
         <div class="json-schema-view">
             <div class="primitive">
                 <span class="type">
@@ -3512,7 +3572,7 @@ The ticket identifier.
                       <article id="api-Ticket-cf-0" data-group="User" data-name="cf" data-version="0">
                         <div class="pull-left">
                           <!-- <h1>cf</h1> -->
-                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/tickets/{ticket_id}/print</span></code></pre></h1>
+                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/tickets/{id}/print</span></code></pre></h1>
                           <p>Get the printed ticket if it exists.</p>
                         </div>
                         <div class="pull-right"></div>
@@ -3525,7 +3585,7 @@ The ticket identifier.
                         <h3>Curl Request Example</h3>
                         <pre class="prettyprint"><code class="language-bsh">curl -X GET \
  -H "Accept: image/svg+xml" \
- "http://tickets.api.ticketoverflow.com/api/v1/tickets/{ticket_id}/print"
+ "http://tickets.api.ticketoverflow.com/api/v1/tickets/{id}/print"
 </code></pre>
 
                           <h2 class="methodsubtabletitle">Path parameters</h2>
@@ -3534,11 +3594,11 @@ The ticket identifier.
                                 <th width="150px">Name</th>
                                 <th>Description</th>
                               </tr>
-                                <tr><td style="width:150px;">ticket_id*</td>
+                                <tr><td style="width:150px;">id*</td>
 <td>
 
 
-    <div id="d2e199_cf_ticketId">
+    <div id="d2e199_cf_id">
         <div class="json-schema-view">
             <div class="primitive">
                 <span class="type">
@@ -3583,6 +3643,9 @@ The ticket identifier.
                                   <a data-toggle="tab" href="#responses-Ticket-cf-200-schema">Schema</a>
                                 </li>
 
+                                  <li class="">
+                                    <a data-toggle="tab" href="#examples-Ticket-cf-200-example">Response Body Example</a>
+                                  </li>
 
 
 
@@ -3600,7 +3663,7 @@ The ticket identifier.
     "image/svg+xml" : {
       "schema" : {
         "type" : "string",
-        "format" : "binary"
+        "example" : "<?xml version=\"1.0\"?>\n<!-- Generated by SVGo -->\n<svg width=\"1200\" height=\"518\"\n     xmlns=\"http://www.w3.org/2000/svg\"\n     xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n<desc>12345678-1234-1234-1234-123456789012</desc>\n<rect x=\"0\" y=\"0\" width=\"1200\" height=\"518\" style=\"fill:rgb(255,255,255)\" />\n<rect x=\"0\" y=\"0\" width=\"200\" height=\"518\" style=\"fill:rgb(92,158,173)\" />\n<rect x=\"200\" y=\"0\" width=\"20\" height=\"518\" style=\"fill:rgb(50,98,115)\" />\n<circle cx=\"210\" cy=\"100\" r=\"50\" style=\"fill:rgb(50,98,115)\" />\n<text x=\"300\" y=\"100\" style=\"text-anchor:left;font-size:36px;fill:black\" >Phantom of the Opera</text>\n<text x=\"300\" y=\"150\" style=\"text-anchor:left;font-size:24px;fill:black\" >2023-06-07</text>\n<text x=\"300\" y=\"200\" style=\"text-anchor:left;font-size:24px;fill:black\" >Sydney Opera House</text>\n<text x=\"300\" y=\"250\" style=\"text-anchor:left;font-size:24px;fill:black\" >12345678-1234-1234-1234-123456789012</text>\n<line x1=\"300\" y1=\"300\" x2=\"900\" y2=\"300\" style=\"stroke:rgb(0,0,0);stroke-width:2\" />\n<text x=\"300\" y=\"350\" style=\"text-anchor:left;font-size:24px;fill:black\" >Evan Hughes</text>\n<text x=\"300\" y=\"400\" style=\"text-anchor:left;font-size:24px;fill:black\" >example@uq.edu.au</text>\n<text x=\"300\" y=\"450\" style=\"text-anchor:left;font-size:24px;fill:black\" >12345678-1234-1234-1234-123456789012</text>\n<rect x=\"1190\" y=\"0\" width=\"10\" height=\"518\" style=\"fill:rgb(255,215,0)\" />\n<rect x=\"1000\" y=\"80\" width=\"150\" height=\"1\" style=\"fill:rgb(0,0,0)\" />\n...\n</svg>\n"
       }
     }
   }
@@ -3631,7 +3694,29 @@ The ticket identifier.
                                   <input id='responses-Ticket-cf-200-schema-data' type='hidden' value=''></input>
                                 </div>
                                 <div class="tab-pane" id="examples-Ticket-cf-200-example">
-                                  <pre class="prettyprint"><code class="json"></code></pre>
+                                  <pre class="prettyprint"><code class="json">&lt;?xml version&#x3D;&quot;1.0&quot;?&gt;
+&lt;!-- Generated by SVGo --&gt;
+&lt;svg width&#x3D;&quot;1200&quot; height&#x3D;&quot;518&quot;
+     xmlns&#x3D;&quot;http://www.w3.org/2000/svg&quot;
+     xmlns:xlink&#x3D;&quot;http://www.w3.org/1999/xlink&quot;&gt;
+&lt;desc&gt;12345678-1234-1234-1234-123456789012&lt;/desc&gt;
+&lt;rect x&#x3D;&quot;0&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;1200&quot; height&#x3D;&quot;518&quot; style&#x3D;&quot;fill:rgb(255,255,255)&quot; /&gt;
+&lt;rect x&#x3D;&quot;0&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;200&quot; height&#x3D;&quot;518&quot; style&#x3D;&quot;fill:rgb(92,158,173)&quot; /&gt;
+&lt;rect x&#x3D;&quot;200&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;20&quot; height&#x3D;&quot;518&quot; style&#x3D;&quot;fill:rgb(50,98,115)&quot; /&gt;
+&lt;circle cx&#x3D;&quot;210&quot; cy&#x3D;&quot;100&quot; r&#x3D;&quot;50&quot; style&#x3D;&quot;fill:rgb(50,98,115)&quot; /&gt;
+&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;100&quot; style&#x3D;&quot;text-anchor:left;font-size:36px;fill:black&quot; &gt;Phantom of the Opera&lt;/text&gt;
+&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;150&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;2023-06-07&lt;/text&gt;
+&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;200&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;Sydney Opera House&lt;/text&gt;
+&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;250&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;12345678-1234-1234-1234-123456789012&lt;/text&gt;
+&lt;line x1&#x3D;&quot;300&quot; y1&#x3D;&quot;300&quot; x2&#x3D;&quot;900&quot; y2&#x3D;&quot;300&quot; style&#x3D;&quot;stroke:rgb(0,0,0);stroke-width:2&quot; /&gt;
+&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;350&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;Evan Hughes&lt;/text&gt;
+&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;400&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;example@uq.edu.au&lt;/text&gt;
+&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;450&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;12345678-1234-1234-1234-123456789012&lt;/text&gt;
+&lt;rect x&#x3D;&quot;1190&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;10&quot; height&#x3D;&quot;518&quot; style&#x3D;&quot;fill:rgb(255,215,0)&quot; /&gt;
+&lt;rect x&#x3D;&quot;1000&quot; y&#x3D;&quot;80&quot; width&#x3D;&quot;150&quot; height&#x3D;&quot;1&quot; style&#x3D;&quot;fill:rgb(0,0,0)&quot; /&gt;
+...
+&lt;/svg&gt;
+</code></pre>
                                 </div>
                             </div>
                             
@@ -3715,7 +3800,7 @@ however you may find it useful to return a more detailed status of your system.
 For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
 
 Each service has a separate health endpoint to allow for flexibility in your implementation.
-We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.
+__We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.__
 </p>
                         <p></p>
                         <br />
@@ -4016,13 +4101,13 @@ The list of hard-coded users is available here: https://github.com/csse6400/tick
                       <article id="api-User-ac-0" data-group="User" data-name="ac" data-version="0">
                         <div class="pull-left">
                           <!-- <h1>ac</h1> -->
-                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/users/{user_id}</span></code></pre></h1>
+                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/users/{id}</span></code></pre></h1>
                           <p>Get information for a particular user.</p>
                         </div>
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked">Get the hard-coded user information for a particular user based on their user_id.
+                        <p class="marked">Get the hard-coded user information for a particular user based on their id.
 Refer to the /users endpoint for what data to return.
 
 It is another teams responsibility to implement this service.
@@ -4034,7 +4119,7 @@ You need to create this mock endpoint for your service to query.
                         <h3>Curl Request Example</h3>
                         <pre class="prettyprint"><code class="language-bsh">curl -X GET \
  -H "Accept: application/json" \
- "http://tickets.api.ticketoverflow.com/api/v1/users/{user_id}"
+ "http://tickets.api.ticketoverflow.com/api/v1/users/{id}"
 </code></pre>
 
                           <h2 class="methodsubtabletitle">Path parameters</h2>
@@ -4043,11 +4128,11 @@ You need to create this mock endpoint for your service to query.
                                 <th width="150px">Name</th>
                                 <th>Description</th>
                               </tr>
-                                <tr><td style="width:150px;">user_id*</td>
+                                <tr><td style="width:150px;">id*</td>
 <td>
 
 
-    <div id="d2e199_ac_userId">
+    <div id="d2e199_ac_id">
         <div class="json-schema-view">
             <div class="primitive">
                 <span class="type">
