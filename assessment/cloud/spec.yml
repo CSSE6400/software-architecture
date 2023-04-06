@@ -77,14 +77,6 @@ paths:
             application/json:
               schema:
                 type: array
-                example: |
-                  [
-                    {
-                      "user_id": "e571964f-f2b7-4200-9fb0-2af749092fa1",
-                      "name": "Evan Hughes"
-                    },
-                    ...
-                  ]
                 items:
                   $ref: '#/components/schemas/User'
   /users/{user_id}:
@@ -163,7 +155,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Concert'
+              $ref: '#/components/schemas/ConcertRequest'
         required: true
       responses:
         200:
@@ -213,6 +205,9 @@ paths:
       tags:
         - concert
       summary: Update details about a concert.
+      description: |
+        The request body can be any subset of the concert,
+        e.g. "{'status': 'CANCELLED'}" is a valid request body.
       parameters:
       - name: concert_id
         in: path
@@ -224,7 +219,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Concert'
+              $ref: '#/components/schemas/ConcertRequest'
         required: true
       responses:
         200:
@@ -447,15 +442,20 @@ components:
   schemas:
     User:
       type: object
+      example:
+        user_id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
+        name: "Evan Hughes"
+        email: "noreply@uq.edu.au"
       properties:
         user_id:
           type: string
           description: Unique user identifier.
-          example: e571964f-f2b7-4200-9fb0-2af749092fa1
         name:
           type: string
           description: Full name of the user.
-          example: Evan Hughes
+        email:
+          type: string
+          description: Email address of the user.
     TicketPurchase:
       type: object
       example:
@@ -465,11 +465,9 @@ components:
         concert_id:
           type: string
           description: Unique concert identifier.
-          example: "e571964f-f2b7-4200-9fb0-2af749092fa1"
         user_id:
           type: string
           description: Unique user identifier.
-          example: "e571964f-f2b7-4200-9fb0-2af749092fa1"
     Ticket:
       type: object
       example:
@@ -485,14 +483,12 @@ components:
         ticket_id:
           type: string
           description: Unique ticket identifier.
-          example: "e571964f-f2b7-4200-9fb0-2af749092fa1"
         concert:
           type: object
           properties:
             concert_id:
               type: string
               description: Unique concert identifier.
-              example: "e571964f-f2b7-4200-9fb0-2af749092fa1"
             concert_url:
               type: string
               description: URL path to the concert resource.
@@ -502,11 +498,9 @@ components:
             user_id:
               type: string
               description: Unique user identifier
-              example: "e571964f-f2b7-4200-9fb0-2af749092fa1"
             user_url:
               type: string
               description: URL path to the user resource.
-              example: "/users/e571964f-f2b7-4200-9fb0-2af749092fa1"
         print_status:
           type: string
           description: The printed status of the ticket.
@@ -527,19 +521,15 @@ components:
         concert_id:
           type: string
           description: Unique concert identifier.
-          example: e571964f-f2b7-4200-9fb0-2af749092fa1
         name:
           type: string
           description: Name of the concert.
-          example: The Beatles
         venue:
           type: string
           description: The arena or venue where a concert is to be held.
-          example: The Gabba
         capacity:
           type: integer
           description: Maximum capacity for the concert.
-          example: 250
         status:
           type: string
           description: The current status of the concert.
@@ -547,4 +537,29 @@ components:
           - ACTIVE
           - CANCELLED
           - SOLD_OUT
+    ConcertRequest:
+      type: object
+      example:
+        name: The Beatles
+        venue: The Gabba
+        capacity: 250
+        status: ACTIVE
+      properties:
+        name:
+          type: string
+          description: Name of the concert.
+        venue:
+          type: string
+          description: The arena or venue where a concert is to be held.
+        capacity:
+          type: integer
+          description: Maximum capacity for the concert.
+        status:
+          type: string
+          description: The current status of the concert.
+          enum:
+          - ACTIVE
+          - CANCELLED
+          - SOLD_OUT
+
 
