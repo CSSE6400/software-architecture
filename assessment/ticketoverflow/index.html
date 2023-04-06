@@ -855,23 +855,19 @@ ul.nav-tabs {
   "properties" : {
     "concert_id" : {
       "type" : "string",
-      "description" : "Unique concert identifier.",
-      "example" : "e571964f-f2b7-4200-9fb0-2af749092fa1"
+      "description" : "Unique concert identifier."
     },
     "name" : {
       "type" : "string",
-      "description" : "Name of the concert.",
-      "example" : "The Beatles"
+      "description" : "Name of the concert."
     },
     "venue" : {
       "type" : "string",
-      "description" : "The arena or venue where a concert is to be held.",
-      "example" : "The Gabba"
+      "description" : "The arena or venue where a concert is to be held."
     },
     "capacity" : {
       "type" : "integer",
-      "description" : "Maximum capacity for the concert.",
-      "example" : 250
+      "description" : "Maximum capacity for the concert."
     },
     "status" : {
       "type" : "string",
@@ -887,13 +883,40 @@ ul.nav-tabs {
     "status" : "ACTIVE"
   }
 };
+    defs["ConcertRequest"] = {
+  "type" : "object",
+  "properties" : {
+    "name" : {
+      "type" : "string",
+      "description" : "Name of the concert."
+    },
+    "venue" : {
+      "type" : "string",
+      "description" : "The arena or venue where a concert is to be held."
+    },
+    "capacity" : {
+      "type" : "integer",
+      "description" : "Maximum capacity for the concert."
+    },
+    "status" : {
+      "type" : "string",
+      "description" : "The current status of the concert.",
+      "enum" : [ "ACTIVE", "CANCELLED", "SOLD_OUT" ]
+    }
+  },
+  "example" : {
+    "name" : "The Beatles",
+    "venue" : "The Gabba",
+    "capacity" : 250,
+    "status" : "ACTIVE"
+  }
+};
     defs["Ticket"] = {
   "type" : "object",
   "properties" : {
     "ticket_id" : {
       "type" : "string",
-      "description" : "Unique ticket identifier.",
-      "example" : "e571964f-f2b7-4200-9fb0-2af749092fa1"
+      "description" : "Unique ticket identifier."
     },
     "concert" : {
       "$ref" : "#/components/schemas/Ticket_concert"
@@ -925,8 +948,7 @@ ul.nav-tabs {
   "properties" : {
     "concert_id" : {
       "type" : "string",
-      "description" : "Unique concert identifier.",
-      "example" : "e571964f-f2b7-4200-9fb0-2af749092fa1"
+      "description" : "Unique concert identifier."
     },
     "concert_url" : {
       "type" : "string",
@@ -939,13 +961,11 @@ ul.nav-tabs {
   "properties" : {
     "concert_id" : {
       "type" : "string",
-      "description" : "Unique concert identifier.",
-      "example" : "e571964f-f2b7-4200-9fb0-2af749092fa1"
+      "description" : "Unique concert identifier."
     },
     "user_id" : {
       "type" : "string",
-      "description" : "Unique user identifier.",
-      "example" : "e571964f-f2b7-4200-9fb0-2af749092fa1"
+      "description" : "Unique user identifier."
     }
   },
   "example" : {
@@ -958,13 +978,11 @@ ul.nav-tabs {
   "properties" : {
     "user_id" : {
       "type" : "string",
-      "description" : "Unique user identifier",
-      "example" : "e571964f-f2b7-4200-9fb0-2af749092fa1"
+      "description" : "Unique user identifier"
     },
     "user_url" : {
       "type" : "string",
-      "description" : "URL path to the user resource.",
-      "example" : "/users/e571964f-f2b7-4200-9fb0-2af749092fa1"
+      "description" : "URL path to the user resource."
     }
   }
 };
@@ -973,14 +991,21 @@ ul.nav-tabs {
   "properties" : {
     "user_id" : {
       "type" : "string",
-      "description" : "Unique user identifier.",
-      "example" : "e571964f-f2b7-4200-9fb0-2af749092fa1"
+      "description" : "Unique user identifier."
     },
     "name" : {
       "type" : "string",
-      "description" : "Full name of the user.",
-      "example" : "Evan Hughes"
+      "description" : "Full name of the user."
+    },
+    "email" : {
+      "type" : "string",
+      "description" : "Email address of the user."
     }
+  },
+  "example" : {
+    "user_id" : "e571964f-f2b7-4200-9fb0-2af749092fa1",
+    "name" : "Evan Hughes",
+    "email" : "noreply@uq.edu.au"
   }
 };
 
@@ -1406,7 +1431,6 @@ We do not require a separate service for each of the endpoints, i.e. one server 
  -H "Content-Type: application/json" \
  "http://tickets.api.ticketoverflow.com/api/v1/concerts" \
  -d '{
-  &quot;concert_id&quot; : &quot;e571964f-f2b7-4200-9fb0-2af749092fa1&quot;,
   &quot;name&quot; : &quot;The Beatles&quot;,
   &quot;venue&quot; : &quot;The Gabba&quot;,
   &quot;capacity&quot; : 250,
@@ -1431,7 +1455,7 @@ $(document).ready(function() {
   "content" : {
     "application/json" : {
       "schema" : {
-        "$ref" : "#/components/schemas/Concert"
+        "$ref" : "#/components/schemas/ConcertRequest"
       }
     }
   },
@@ -1852,7 +1876,9 @@ The concert identifier.
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked"></p>
+                        <p class="marked">The request body can be any subset of the concert,
+e.g. &quot;{&#39;status&#39;: &#39;CANCELLED&#39;}&quot; is a valid request body.
+</p>
                         <p></p>
                         <br />
 
@@ -1862,7 +1888,6 @@ The concert identifier.
  -H "Content-Type: application/json" \
  "http://tickets.api.ticketoverflow.com/api/v1/concerts/{concert_id}" \
  -d '{
-  &quot;concert_id&quot; : &quot;e571964f-f2b7-4200-9fb0-2af749092fa1&quot;,
   &quot;name&quot; : &quot;The Beatles&quot;,
   &quot;venue&quot; : &quot;The Gabba&quot;,
   &quot;capacity&quot; : 250,
@@ -1917,7 +1942,7 @@ $(document).ready(function() {
   "content" : {
     "application/json" : {
       "schema" : {
-        "$ref" : "#/components/schemas/Concert"
+        "$ref" : "#/components/schemas/ConcertRequest"
       }
     }
   },
@@ -3930,9 +3955,6 @@ The list of hard-coded users is available here: https://github.com/csse6400/tick
                                   <a data-toggle="tab" href="#responses-User-ab-200-schema">Schema</a>
                                 </li>
 
-                                  <li class="">
-                                    <a data-toggle="tab" href="#examples-User-ab-200-example">Response Body Example</a>
-                                  </li>
 
 
 
@@ -3950,7 +3972,6 @@ The list of hard-coded users is available here: https://github.com/csse6400/tick
     "application/json" : {
       "schema" : {
         "type" : "array",
-        "example" : "[\n  {\n    \"user_id\": \"e571964f-f2b7-4200-9fb0-2af749092fa1\",\n    \"name\": \"Evan Hughes\"\n  },\n  ...\n]\n",
         "items" : {
           "$ref" : "#/components/schemas/User"
         }
@@ -3984,14 +4005,7 @@ The list of hard-coded users is available here: https://github.com/csse6400/tick
                                   <input id='responses-User-ab-200-schema-data' type='hidden' value=''></input>
                                 </div>
                                 <div class="tab-pane" id="examples-User-ab-200-example">
-                                  <pre class="prettyprint"><code class="json">[
-  {
-    &quot;user_id&quot;: &quot;e571964f-f2b7-4200-9fb0-2af749092fa1&quot;,
-    &quot;name&quot;: &quot;Evan Hughes&quot;
-  },
-  ...
-]
-</code></pre>
+                                  <pre class="prettyprint"><code class="json"></code></pre>
                                 </div>
                             </div>
                             
