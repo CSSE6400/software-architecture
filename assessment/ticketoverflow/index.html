@@ -883,7 +883,7 @@ ul.nav-tabs {
     }
   },
   "example" : {
-    "id" : "e571964f-f2b7-4200-9fb0-2af749092fa1",
+    "id" : "786d3bb4-a858-49ba-8803-15ffa2ec3678",
     "name" : "The Beatles",
     "venue" : "The Gabba",
     "date" : "2023-06-07",
@@ -972,16 +972,16 @@ ul.nav-tabs {
     }
   },
   "example" : {
-    "id" : "e571964f-f2b7-4200-9fb0-2af749092fa1",
+    "id" : "a4c5211f-2402-4de9-9664-b9e78454da35",
     "concert" : {
-      "id" : "e571964f-f2b7-4200-9fb0-2af749092fa1",
-      "url" : "http://tickets.api.ticketoverflow.com/api/v1/concerts/e571964f-f2b7-4200-9fb0-2af749092fa1"
+      "id" : "786d3bb4-a858-49ba-8803-15ffa2ec3678",
+      "url" : "http://tickets.api.ticketoverflow.com/api/v1/concerts/786d3bb4-a858-49ba-8803-15ffa2ec3678"
     },
     "user" : {
       "id" : "e571964f-f2b7-4200-9fb0-2af749092fa1",
       "url" : "http://tickets.api.ticketoverflow.com/api/v1/users/e571964f-f2b7-4200-9fb0-2af749092fa1"
     },
-    "print_status" : "PRINTED"
+    "print_status" : "NOT_ PRINTED"
   }
 };
     defs["Ticket_concert"] = {
@@ -1010,7 +1010,7 @@ ul.nav-tabs {
     }
   },
   "example" : {
-    "concert_id" : "e571964f-f2b7-4200-9fb0-2af749092fa1",
+    "concert_id" : "786d3bb4-a858-49ba-8803-15ffa2ec3678",
     "user_id" : "e571964f-f2b7-4200-9fb0-2af749092fa1"
   }
 };
@@ -1136,8 +1136,8 @@ ul.nav-tabs {
 <p>You must also implement a mock users endpoint as a placeholder while another team develops the users service.
 See the users endpoint for more details on what data to use for mocking.</p>
 <p>Note that the URL used in the cURL examples below are just illustrative, you should replace <a href="http://tickets.api.ticketoverflow.com/api/v1">http://tickets.api.ticketoverflow.com/api/v1/</a> with the host of your service.</p>
-<p>We have used UUID formatted identifiers in the examples but may use any style of unique string identifier you wish.</p>
-<p>You should start with the users service, then concerts, then tickets.</p>
+<p>We have used UUID formatted identifiers in the examples but you may use any style of unique string identifier you wish.</p>
+<p>You should start with the users service, then concerts, and then tickets.</p>
 
             </div>
           </div>
@@ -1155,7 +1155,7 @@ See the users endpoint for more details on what data to use for mocking.</p>
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked">The health endpoint is a useful for determining whether an instance is still healthy.
+                        <p class="marked">The health endpoint is useful for determining whether an instance is still healthy.
 This can help if you are configuring auto-scaling groups or load balancers.
 
 We do not specify the response payload for this endpoint,
@@ -1163,7 +1163,7 @@ however you may find it useful to return a more detailed status of your system.
 For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
 
 Each service has a separate health endpoint to allow for flexibility in your implementation.
-__We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.__
+__We do not require a separate server for each of the endpoints, i.e. one server can handle requests for all endpoints.__
 </p>
                         <p></p>
                         <br />
@@ -1664,7 +1664,8 @@ Return value is not specified but should describe the error.
                             <h3 id="examples-Concert-bc-title-500"></h3>
                             <p id="examples-Concert-bc-description-500" class="marked"></p>
                             <script>
-                              var responseConcert500_description = `An unknown error occurred trying to process the request. The response should attempt to contain a description of the error.`;
+                              var responseConcert500_description = `An unknown error occurred trying to process the request.
+Return value is not specified but should attempt to describe the error.`;
                               var responseConcert500_description_break = responseConcert500_description.indexOf('\n');
                               if (responseConcert500_description_break == -1) {
                                 $("#examples-Concert-bc-title-500").text("Status Code: 500 - " + responseConcert500_description);
@@ -1687,7 +1688,7 @@ Return value is not specified but should describe the error.
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "An unknown error occurred trying to process the request. The response should attempt to contain a description of the error.",
+  "description" : "An unknown error occurred trying to process the request.\nReturn value is not specified but should attempt to describe the error.",
   "content" : { }
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
@@ -1779,7 +1780,7 @@ The concert identifier.
                             <h3 id="examples-Concert-bd-title-200"></h3>
                             <p id="examples-Concert-bd-description-200" class="marked"></p>
                             <script>
-                              var responseConcert200_description = `Concert information for the given concert.`;
+                              var responseConcert200_description = `Information about the requested concert.`;
                               var responseConcert200_description_break = responseConcert200_description.indexOf('\n');
                               if (responseConcert200_description_break == -1) {
                                 $("#examples-Concert-bd-title-200").text("Status Code: 200 - " + responseConcert200_description);
@@ -1807,7 +1808,7 @@ The concert identifier.
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "Concert information for the given concert.",
+  "description" : "Information about the requested concert.",
   "content" : {
     "application/json" : {
       "schema" : {
@@ -1917,8 +1918,9 @@ The concert identifier.
                         <p></p>
                         <p class="marked">The request body can be any subset of the concert,
 e.g. &quot;{&#39;status&#39;: &#39;CANCELLED&#39;}&quot; is a valid request body.
+The concert id cannot be modified.
 
-Any existing printed tickets need to be removed.
+Any existing tickets that have been generated need to be removed.
 </p>
                         <p></p>
                         <br />
@@ -2206,7 +2208,8 @@ Return value is not specified but should describe the error.
                             <h3 id="examples-Concert-be-title-500"></h3>
                             <p id="examples-Concert-be-description-500" class="marked"></p>
                             <script>
-                              var responseConcert500_description = `An unknown error occurred trying to process the request. The response should attempt to contain a description of the error.`;
+                              var responseConcert500_description = `An unknown error occurred trying to process the request.
+Return value is not specified but should attempt to describe the error.`;
                               var responseConcert500_description_break = responseConcert500_description.indexOf('\n');
                               if (responseConcert500_description_break == -1) {
                                 $("#examples-Concert-be-title-500").text("Status Code: 500 - " + responseConcert500_description);
@@ -2229,7 +2232,7 @@ Return value is not specified but should describe the error.
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "An unknown error occurred trying to process the request. The response should attempt to contain a description of the error.",
+  "description" : "An unknown error occurred trying to process the request.\nReturn value is not specified but should attempt to describe the error.",
   "content" : { }
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
@@ -2272,7 +2275,7 @@ Return value is not specified but should describe the error.
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked">The SVG must be generated using the provided command line tool according to the spec.
+                        <p class="marked">The SVG must be generated using the provided command line tool, as indicated in the assignment specification.
 
 The generated seating plan is allowed to be up to 3 minutes out of sync with the real state of the seats, i.e. once a seat is purchased it must be rendered in the seating plan within 3 minutes.</p>
                         <p></p>
@@ -2480,7 +2483,7 @@ The concert identifier.
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked">The health endpoint is a useful for determining whether an instance is still healthy.
+                        <p class="marked">The health endpoint is useful for determining whether an instance is still healthy.
 This can help if you are configuring auto-scaling groups or load balancers.
 
 We do not specify the response payload for this endpoint,
@@ -2488,7 +2491,7 @@ however you may find it useful to return a more detailed status of your system.
 For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
 
 Each service has a separate health endpoint to allow for flexibility in your implementation.
-__We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.__
+__We do not require a separate server for each of the endpoints, i.e. one server can handle requests for all endpoints.__
 </p>
                         <p></p>
                         <br />
@@ -2692,7 +2695,7 @@ __We do not require a separate service for each of the endpoints, i.e. one serve
                         <h3>Curl Request Example</h3>
                         <pre class="prettyprint"><code class="language-bsh">curl -X GET \
  -H "Accept: application/json" \
- "http://tickets.api.ticketoverflow.com/api/v1/tickets?user_id=e571964f-f2b7-4200-9fb0-2af749092fa1&concert_id=e571964f-f2b7-4200-9fb0-2af749092fa1"
+ "http://tickets.api.ticketoverflow.com/api/v1/tickets?user_id=e571964f-f2b7-4200-9fb0-2af749092fa1&concert_id=786d3bb4-a858-49ba-8803-15ffa2ec3678"
 </code></pre>
 
 
@@ -2751,7 +2754,7 @@ Filter only the tickets purchased for the given concert. This is an optional que
                             <h3 id="examples-Ticket-cb-title-200"></h3>
                             <p id="examples-Ticket-cb-description-200" class="marked"></p>
                             <script>
-                              var responseTicket200_description = `Successfully found a text resource.`;
+                              var responseTicket200_description = `List of all purchased tickets, as per request.`;
                               var responseTicket200_description_break = responseTicket200_description.indexOf('\n');
                               if (responseTicket200_description_break == -1) {
                                 $("#examples-Ticket-cb-title-200").text("Status Code: 200 - " + responseTicket200_description);
@@ -2779,7 +2782,7 @@ Filter only the tickets purchased for the given concert. This is an optional que
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "Successfully found a text resource.",
+  "description" : "List of all purchased tickets, as per request.",
   "content" : {
     "application/json" : {
       "schema" : {
@@ -2824,7 +2827,7 @@ Filter only the tickets purchased for the given concert. This is an optional que
                             <h3 id="examples-Ticket-cb-title-404"></h3>
                             <p id="examples-Ticket-cb-description-404" class="marked"></p>
                             <script>
-                              var responseTicket404_description = `Unknown resource identifier.`;
+                              var responseTicket404_description = `Unknown identifier provided as filter parameter.`;
                               var responseTicket404_description_break = responseTicket404_description.indexOf('\n');
                               if (responseTicket404_description_break == -1) {
                                 $("#examples-Ticket-cb-title-404").text("Status Code: 404 - " + responseTicket404_description);
@@ -2847,7 +2850,7 @@ Filter only the tickets purchased for the given concert. This is an optional que
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "Unknown resource identifier.",
+  "description" : "Unknown identifier provided as filter parameter.",
   "content" : { }
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
@@ -2893,8 +2896,9 @@ Filter only the tickets purchased for the given concert. This is an optional que
                         <p class="marked">The ticket must be purchased for a concert that exists.
 The ticket must be purchased by a user that exists.
 
-Tickets should start in the NOT_PRINTED status.
-A separate call to the */tickets/{id}/print* triggers the printing.
+Tickets should have an initial status of being NOT_PRINTED.
+A separate call to */tickets/{id}/print* triggers the printing
+(i.e. generation of a downloadable ticket SVG).
 </p>
                         <p></p>
                         <br />
@@ -2905,7 +2909,7 @@ A separate call to the */tickets/{id}/print* triggers the printing.
  -H "Content-Type: application/json" \
  "http://tickets.api.ticketoverflow.com/api/v1/tickets" \
  -d '{
-  &quot;concert_id&quot; : &quot;e571964f-f2b7-4200-9fb0-2af749092fa1&quot;,
+  &quot;concert_id&quot; : &quot;786d3bb4-a858-49ba-8803-15ffa2ec3678&quot;,
   &quot;user_id&quot; : &quot;e571964f-f2b7-4200-9fb0-2af749092fa1&quot;
 }'
 </code></pre>
@@ -3095,7 +3099,8 @@ Return value is not specified but should describe the error.
                             <h3 id="examples-Ticket-cc-title-500"></h3>
                             <p id="examples-Ticket-cc-description-500" class="marked"></p>
                             <script>
-                              var responseTicket500_description = `An unknown error occurred trying to process the request. The response should attempt to contain a description of the error.`;
+                              var responseTicket500_description = `An unknown error occurred trying to process the request.
+Return value is not specified but should attempt to describe the error.`;
                               var responseTicket500_description_break = responseTicket500_description.indexOf('\n');
                               if (responseTicket500_description_break == -1) {
                                 $("#examples-Ticket-cc-title-500").text("Status Code: 500 - " + responseTicket500_description);
@@ -3118,7 +3123,7 @@ Return value is not specified but should describe the error.
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "An unknown error occurred trying to process the request. The response should attempt to contain a description of the error.",
+  "description" : "An unknown error occurred trying to process the request.\nReturn value is not specified but should attempt to describe the error.",
   "content" : { }
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
@@ -3210,7 +3215,7 @@ The ticket identifier.
                             <h3 id="examples-Ticket-cd-title-200"></h3>
                             <p id="examples-Ticket-cd-description-200" class="marked"></p>
                             <script>
-                              var responseTicket200_description = `Ticket information for the given ticket.`;
+                              var responseTicket200_description = `Information about the requested ticket.`;
                               var responseTicket200_description_break = responseTicket200_description.indexOf('\n');
                               if (responseTicket200_description_break == -1) {
                                 $("#examples-Ticket-cd-title-200").text("Status Code: 200 - " + responseTicket200_description);
@@ -3238,7 +3243,7 @@ The ticket identifier.
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "Ticket information for the given ticket.",
+  "description" : "Information about the requested ticket.",
   "content" : {
     "application/json" : {
       "schema" : {
@@ -3346,11 +3351,12 @@ The ticket identifier.
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked">Asynchronously start the printing of a ticket.
-This must use the provided command line tool.
+                        <p class="marked">Asynchronously start the generation of a ticket SVG.
+This must use the provided command line tool, as indicated in the assignment specification.
 
-When a request is made, the ticket print status should be set to PENDING
-until it is finished with either ERROR or PRINTED.
+When a request is made, the ticket print status should be set to PENDING.
+When the command line tool successfully generates a SVG, the ticket print status should be set to PRINTED.
+If a SVG is not generated for some reason, the ticket print status should be set to ERROR.
 </p>
                         <p></p>
                         <br />
@@ -3512,7 +3518,8 @@ The ticket identifier.
                             <h3 id="examples-Ticket-ce-title-500"></h3>
                             <p id="examples-Ticket-ce-description-500" class="marked"></p>
                             <script>
-                              var responseTicket500_description = `An unknown error occurred trying to process the request. The response should attempt to contain a description of the error.`;
+                              var responseTicket500_description = `An unknown error occurred trying to process the request.
+Return value is not specified but should attempt to describe the error.`;
                               var responseTicket500_description_break = responseTicket500_description.indexOf('\n');
                               if (responseTicket500_description_break == -1) {
                                 $("#examples-Ticket-ce-title-500").text("Status Code: 500 - " + responseTicket500_description);
@@ -3535,7 +3542,7 @@ The ticket identifier.
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "An unknown error occurred trying to process the request. The response should attempt to contain a description of the error.",
+  "description" : "An unknown error occurred trying to process the request.\nReturn value is not specified but should attempt to describe the error.",
   "content" : { }
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
@@ -3792,7 +3799,7 @@ The ticket identifier.
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked">The health endpoint is a useful for determining whether an instance is still healthy.
+                        <p class="marked">The health endpoint is useful for determining whether an instance is still healthy.
 This can help if you are configuring auto-scaling groups or load balancers.
 
 We do not specify the response payload for this endpoint,
@@ -3800,7 +3807,7 @@ however you may find it useful to return a more detailed status of your system.
 For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
 
 Each service has a separate health endpoint to allow for flexibility in your implementation.
-__We do not require a separate service for each of the endpoints, i.e. one server can handle requests for all endpoints.__
+__We do not require a separate server for each of the endpoints, i.e. one server can handle requests for all endpoints.__
 </p>
                         <p></p>
                         <br />
@@ -4000,7 +4007,7 @@ __We do not require a separate service for each of the endpoints, i.e. one serve
                         <p class="marked">Provides a list of registered users.
 The users are currently a hard-coded list of JSON objects.
 
-It is another teams responsibility to implement this service.
+It is another team&#39;s responsibility to implement this service.
 You need to create this mock endpoint for your service to query.
 
 The list of hard-coded users is available here: https://github.com/csse6400/ticketoverflow-users
@@ -4110,7 +4117,7 @@ The list of hard-coded users is available here: https://github.com/csse6400/tick
                         <p class="marked">Get the hard-coded user information for a particular user based on their id.
 Refer to the /users endpoint for what data to return.
 
-It is another teams responsibility to implement this service.
+It is another team&#39;s responsibility to implement this service.
 You need to create this mock endpoint for your service to query.
 </p>
                         <p></p>
@@ -4161,7 +4168,7 @@ The user identifier.
                             <h3 id="examples-User-ac-title-200"></h3>
                             <p id="examples-User-ac-description-200" class="marked"></p>
                             <script>
-                              var responseUser200_description = `User information for the given user.`;
+                              var responseUser200_description = `Information about the requested user.`;
                               var responseUser200_description_break = responseUser200_description.indexOf('\n');
                               if (responseUser200_description_break == -1) {
                                 $("#examples-User-ac-title-200").text("Status Code: 200 - " + responseUser200_description);
@@ -4189,7 +4196,7 @@ The user identifier.
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "User information for the given user.",
+  "description" : "Information about the requested user.",
   "content" : {
     "application/json" : {
       "schema" : {
@@ -4225,6 +4232,62 @@ The user identifier.
                                 </div>
                                 <div class="tab-pane" id="examples-User-ac-200-example">
                                   <pre class="prettyprint"><code class="json"></code></pre>
+                                </div>
+                            </div>
+                            
+                            <h3 id="examples-User-ac-title-404"></h3>
+                            <p id="examples-User-ac-description-404" class="marked"></p>
+                            <script>
+                              var responseUser404_description = `The user does not exist.`;
+                              var responseUser404_description_break = responseUser404_description.indexOf('\n');
+                              if (responseUser404_description_break == -1) {
+                                $("#examples-User-ac-title-404").text("Status Code: 404 - " + responseUser404_description);
+                              } else {
+                                $("#examples-User-ac-title-404").text("Status Code: 404 - " + responseUser404_description.substring(0, responseUser404_description_break));
+                                $("#examples-User-ac-description-404").html(responseUser404_description.substring(responseUser404_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-User-ac-404" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-User-ac-404-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-User-ac-404-schema">
+                                  <div id="responses-User-ac-schema-404" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "The user does not exist.",
+  "content" : { }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-User-ac-404-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-User-ac-schema-404');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-User-ac-404-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
                             
