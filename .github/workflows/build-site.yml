@@ -10,6 +10,7 @@ on:
       - Build Tutorials
       - Build Slides
       - Build Cloud Assignment Requirements
+      - Build Button OpenAPI
     branches: [main]
     types: 
       - completed
@@ -84,6 +85,16 @@ jobs:
           path: cloud-spec
 
       - run: cp -r ./cloud-spec/cloud-spec ./public/assessment/ticketoverflow
+
+      - name: Download button specification
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: build-button-spec.yml
+          workflow_conclusion: success
+          branch: main
+          path: button-spec
+
+      - run: cp -r ./button-spec/button-spec ./public/examples/button
 
       - name: Publish GH Pages
         if: github.ref == 'refs/heads/main'
