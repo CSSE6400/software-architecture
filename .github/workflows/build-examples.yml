@@ -1,0 +1,38 @@
+name: Build Examples
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - examples/**
+
+jobs:
+  build-examples:
+    runs-on: ubuntu-latest
+    container: texlive/texlive:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Disable git owner warning
+        run: git config --global safe.directory '*'
+
+      - name: Install Java
+        run: apt-get update && apt-get install -y default-jre graphviz
+
+      - name: Correct last modified
+        run: ./.github/workflows/set-last-updated.sh
+
+      - name: Compile Examples
+        run: ./bin/build_examples.sh
+
+      - name: Upload Examples
+        uses: actions/upload-artifact@v3
+        with:
+          name: examples
+          path: |
+            ./dist/**/*
+  
