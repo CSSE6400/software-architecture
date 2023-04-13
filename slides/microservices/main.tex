@@ -2,6 +2,7 @@
 
 \usepackage{changepage}
 \usepackage{tabto}
+\usepackage{tikz}
 % \usepackage{pgfpages}
 % \setbeameroption{show notes on second screen}
 
@@ -14,20 +15,42 @@
 
 \maketitle
 
-\point[Microservices]{Inspired by DDD}
-
-\definition{Bounded Context}{Logical boundary of a domain where particular terms and rules apply consistently.}
-
-\image[height=.97\textheight]{diagrams/bounded-context.png}
-
-%\image[height=.96\textheight]{diagrams/microservices-arch.png}
-
-\image[trim=39 50 22 39,clip,height=\textheight]{../../notes/microservices/diagrams/microservices-arch.png}
+\begin{frame}{}
+	\centering
+	\includegraphics[trim=45 45 45 45,clip,height=\textheight]{diagrams/general-topology-deployment.png}
+	\begin{tikzpicture}[overlay,remember picture]
+	\node[rectangle,shift={(0.9,0.8)},
+		  text width=7cm,above,rotate=90] at (current page.west) {\color{primary}\Large Microservices General Topology};
+	\end{tikzpicture}   
+\end{frame}
+\note{Multiple clients demonstrates common scenario of multiple interfaces to system (e.g. mobile, web).}
 \note[itemize]{
-    \item Basic structure of a microservices architecture.
-    \item UIs are fairly monolithic to provide a rich interface.
-    \item Fairly common to have multiple UIs, some of which use a different combination of services.
+    \item Multiple clients demonstrates common scenario of multiple interfaces to system (e.g. mobile, web).
+    \item Client UIs may be monolithic to provide a rich interface.
 }
+
+\begin{frame}{}
+	\centering
+	\includegraphics[trim=45 45 45 45,clip,height=\textheight]{diagrams/general-topology-api-component.png}
+	\begin{tikzpicture}[overlay,remember picture]
+	\node[rectangle,shift={(0.9,1.7)},
+		  text width=5.1cm,above,rotate=90] at (current page.west) {\color{primary}\Large API Layer Components};
+	\end{tikzpicture}   
+\end{frame}
+\note[itemize]{
+    \item Each client may use a different combination of services.
+    \item API layer provides reverse proxy or gateway services, see Service-Based Architecture notes \& slides.
+    \item Typically Service APIs in this layer have a one-to-one relationship with Services and are designed by the Service teams.
+    \item Routing behaviour may not be required.
+}
+
+\begin{frame}{Service 1 Components}
+    \begin{adjustwidth}{-10.5mm}{-10mm}
+        \centering
+        \includegraphics[trim=45 45 45 45,clip,width=0.99\paperwidth]{diagrams/general-topology-service1-component.png}
+    \end{adjustwidth}
+\end{frame}
+\note{Services 2 \& 3 are essentially the same.}
 
 \image[trim=39 50 22 39,clip,height=\textheight]{../../notes/microservices/diagrams/microservices-ui2.png}
 \note[itemize]{
@@ -36,13 +59,41 @@
     \item Can still have multiple UIs (e.g. web, mobile, ...).
 }
 
-\definition{Service Cohesion Principle}{Services are cohesive business processes. They are a bounded context.}
+\point[DDD Influence]{Services are \highlight{bounded contexts}.
+
+Bounded contexts are not necessarily \highlight{services}.}
+
+\definition{Bounded Context}{Logical boundary of a domain where particular terms and rules apply consistently.}
+
+\begin{frame}{}
+	\centering
+	\includegraphics[height=.97\textheight]{diagrams/bounded-context.png}
+	\begin{tikzpicture}[overlay,remember picture]
+	\node[rectangle,shift={(-4.6,0)},
+		  text width=6.5cm,above] at (current page.south) {\color{primary}\tiny From \url{https://martinfowler.com/bliki/BoundedContext.html}};
+	\end{tikzpicture}   
+\end{frame}
+
+\definition{Service Cohesion Principle}{
+Services are cohesive business processes.
+
+They are a bounded context.
+}
+
+\begin{frame}{Large Bounded Contexts}
+\LARGE
+A bounded context may be too large to be a single service.
+\\~\\
+Split it into services that are \highlight{independent} sub-processes.
+\end{frame}
 
 \definition{Service Independence Principle}{Services should not depend on the implementation of other services.}
 
 \corollary{Low Coupling}{Services should have minimal coupling with other services.}
 
-\corollary{No Reuse}{Services do not reuse components from other services, to avoid dependencies.}
+\corollary{No Reuse}{Avoid dependencies between services.
+
+Do not reuse components between services.}
 
 \point[Choreography \& Orchestration]{
 \begin{description}

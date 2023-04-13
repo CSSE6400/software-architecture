@@ -3,6 +3,9 @@ workspace "Microservices" "Simple microservices architecture example" {
     model {
         group "Microservices Examples" {
             topology = softwareSystem "Microservices Topology" {
+                client1 = container "Client 1" "" "" "client"
+                client2 = container "Client 2" "" "" "client"
+
                 ui = container "Monolithic User Interface" "" "" "ui" {
                     uiMonolith = component "Integrated User Interface" "" "" "ui"
                     uiPart1 = component "User Interface Component 1" "" "" "ui"
@@ -21,7 +24,6 @@ workspace "Microservices" "Simple microservices architecture example" {
                     s1part1 = component "Component 1" "" "" "service1" 
                     s1part2 = component "Component 2" "" "" "service1" 
                 }
-                
                 service1DB = container "Service 1 DB" "" "" "db"
                 
                 service2 = container "Service 2" "" "" "service2"  {
@@ -29,7 +31,6 @@ workspace "Microservices" "Simple microservices architecture example" {
                     s2part1 = component "Component 3" "" "" "service2"
                     s2part2 = component "Component 4" "" "" "service2"
                 }
-                
                 service2DB = container "Service 2 DB" "" "" "db"
                 
                 service3 = container "Service 3" "" "" "service3" {
@@ -37,24 +38,30 @@ workspace "Microservices" "Simple microservices architecture example" {
                     s3part1 = component "Component 5" "" "" "service3"
                     s3part2 = component "Component 6" "" "" "service3"
                 }
-                
                 service3DB = container "Service 3 DB" "" "" "db"
                 
-                msgQueue = container "Message Queue" {
+                msgQueue = container "Message Queue" "" "" "queue" {
                     eventBroker = component "Event Broker"
                 }
             }
             
             client1App = softwareSystem "Client 1 App" "" "external" {
-                client1 = container "Client 1" "" "" "external"
             }
             
             client2App = softwareSystem "Client 2 App" "" "external" {
-                client2 = container "Client 2" "" "" "external"
             }
         }
-        
+
+
         # Microservices Topology Relationships
+
+        # Client -> API Layer Relationships for General Topology Deployment Diagram
+        # Comment out following block to produce other diagrams.
+#        client1 -> service1API "APIs"
+#        client2 -> service2API "APIs"
+
+        # Client Relationships for General Topology Diagrams
+        # Comment out following block to produce General Topology Deployment diagram.
         client1 -> service1API "API 1"
         client1 -> service2API "API 2"
         client2 -> service2API "API 2"
@@ -78,22 +85,28 @@ workspace "Microservices" "Simple microservices architecture example" {
         s3part1 -> service3DB
         s3part2 -> service3DB
 
+
         # Monolithic UI Relationships
+
         uiMonolith -> uiPart1
         uiMonolith -> uiPart2
         uiMonolith -> uiPart3
 
-        # Comment out following block to produce Microservices Topology - API Layer component diagram
+        # Comment out following block to produce Microservices Topology - API Layer component diagram.
+        ui -> api "APIs"
         uiPart1 -> service1API "API 1"
         uiPart2 -> service2API "API 2"
         uiPart3 -> service3API "API 3"
+
         
         # Event Broker Coordination Relationships
-        # Comment out following block to produce Microservices Topology - container diagram & Service component diagrams
+
+        # Comment out following block to produce Microservices Topology - container diagram & Service component diagrams.
         s1part2 -> eventBroker
         s2part2 -> eventBroker
         s3part2 -> eventBroker
-        
+
+
         deploymentEnvironment "Microservices Topology" {
             deploymentNode "Client 1" "e.g. Mobile App" "" {
                 client1Instance = containerInstance client1
@@ -152,6 +165,7 @@ workspace "Microservices" "Simple microservices architecture example" {
         }
     }
 
+
     views {
         deployment * "Microservices Topology" "topology_deployment_diagram" {
             include *
@@ -194,6 +208,12 @@ workspace "Microservices" "Simple microservices architecture example" {
         }
 
         styles {
+            element "Software System" {
+                shape Box
+            }
+            element "Container" {
+                shape RoundedBox
+            }
             element "Component" {
                 shape Component
             }
@@ -204,6 +224,11 @@ workspace "Microservices" "Simple microservices architecture example" {
             }
             element external {
                 background #09355c
+                /* colour is text colour. */
+                colour #FFFFFF
+            }
+            element client {
+                background #0f3d87
                 /* colour is text colour. */
                 colour #FFFFFF
             }
