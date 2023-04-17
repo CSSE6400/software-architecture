@@ -3,14 +3,24 @@ workspace "Microservices" "Simple microservices architecture example" {
     model {
         group "Microservices Examples" {
             topology = softwareSystem "Microservices Topology" {
-                client1 = container "Client 1" "" "" "client"
-                client2 = container "Client 2" "" "" "client"
+                client1 = container "Client 1" "e.g. Mobile Interface" "" "client" {
+                    client1UI = component "Client 1 Integrated UI" "" "e.g. React Native" "ui"
+                    client1S1UI = component "Service 1 UI" "" "e.g. React Native" "ui"
+                    client1S2UI = component "Service 2 UI" "" "e.g. React Native" "ui"
+                }
+                
+                client2 = container "Client 2" "e.g. Web Interface" "" "client" {
+                    client2UI = component "Client 2 Integrated UI" "" "" "ui"
+                    client2S2UI = component "Service 2 UI" "" "" "ui"
+                    client2S3UI = component "Service 3 UI" "" "" "ui"
+                }
 
+                # Probably Delete All of the Monolithic UI Detail
                 ui = container "Monolithic User Interface" "" "" "ui" {
-                    uiMonolith = component "Integrated User Interface" "" "" "ui"
-                    uiPart1 = component "User Interface Component 1" "" "" "ui"
-                    uiPart2 = component "User Interface Component 2" "" "" "ui"
-                    uiPart3 = component "User Interface Component 3" "" "" "ui"
+                    uiMonolith = component "Integrated UI" "" "" "ui"
+                    uiPart1 = component "Service 1 UI" "" "" "ui"
+                    uiPart2 = component "Service 2 UI" "" "" "ui"
+                    uiPart3 = component "Service 3 UI" "" "" "ui"
                 }
 
                 api = container "API Layer" "Interface to external services." "" "api" {
@@ -44,33 +54,35 @@ workspace "Microservices" "Simple microservices architecture example" {
                     eventBroker = component "Event Broker"
                 }
             }
-            
-            client1App = softwareSystem "Client 1 App" "" "external" {
-            }
-            
-            client2App = softwareSystem "Client 2 App" "" "external" {
-            }
         }
 
 
         # Microservices Topology Relationships
 
-        # Client -> API Layer Relationships for General Topology Deployment Diagram
+        # Client -> API Layer Relationships for Deployment Diagrams
         # Comment out following block to produce other diagrams.
 #        client1 -> service1API "APIs"
 #        client2 -> service2API "APIs"
 
         # Client Relationships for General Topology Diagrams
         # Comment out following block to produce General Topology Deployment diagram.
-        client1 -> service1API "API 1"
-        client1 -> service2API "API 2"
-        client2 -> service2API "API 2"
-        client2 -> service3API "API 3"
+        client1S1UI -> service1API "API 1"
+        client1S2UI -> service2API "API 2"
+        client2S2UI -> service2API "API 2"
+        client2S3UI -> service3API "API 3"
         
+        # Client UIs Internal Relationships
+        client1UI -> client1S1UI
+        client1UI -> client1S2UI
+        client2UI -> client2S2UI
+        client2UI -> client2S3UI
+        
+        # API Layer Internal Relationships
         service1API -> s1facade "Service 1 API"
         service2API -> s2facade "Service 2 API"
         service3API -> s3facade "Service 3 API"
         
+        # API Layer to Services Relationships
         s1facade -> s1part1
         s1facade -> s1part2
         s2facade -> s2part1
@@ -78,6 +90,7 @@ workspace "Microservices" "Simple microservices architecture example" {
         s3facade -> s3part1
         s3facade -> s3part2
 
+        # Services Internal Relationships
         s1part1 -> service1DB
         s1part2 -> service1DB
         s2part1 -> service2DB
@@ -93,18 +106,18 @@ workspace "Microservices" "Simple microservices architecture example" {
         uiMonolith -> uiPart3
 
         # Comment out following block to produce Microservices Topology - API Layer component diagram.
-        ui -> api "APIs"
-        uiPart1 -> service1API "API 1"
-        uiPart2 -> service2API "API 2"
-        uiPart3 -> service3API "API 3"
+#        ui -> api "APIs"
+#        uiPart1 -> service1API "API 1"
+#        uiPart2 -> service2API "API 2"
+#        uiPart3 -> service3API "API 3"
 
         
         # Event Broker Coordination Relationships
 
         # Comment out following block to produce Microservices Topology - container diagram & Service component diagrams.
-        s1part2 -> eventBroker
-        s2part2 -> eventBroker
-        s3part2 -> eventBroker
+        s1part2 -> eventBroker "Queue API"
+        s2part2 -> eventBroker "Queue API"
+        s3part2 -> eventBroker "Queue API"
 
 
         deploymentEnvironment "Microservices Topology" {
@@ -119,26 +132,59 @@ workspace "Microservices" "Simple microservices architecture example" {
             }
             deploymentNode "Service 1" {
                 service1Instance = containerInstance service1
-                db1Server = deploymentNode "DB 1 Server" {
-                    db1Instance = containerInstance service1DB
-                }
+            }
+            db1Server = deploymentNode "DB 1 Server" {
+                db1Instance = containerInstance service1DB
             }
             deploymentNode "Service 2" {
                 service2Instance = containerInstance service2
-                db2Server = deploymentNode "DB 2 Server" {
-                    db2Instance = containerInstance service2DB
-                }
+            }
+            db2Server = deploymentNode "DB 2 Server" {
+                db2Instance = containerInstance service2DB
             }
             deploymentNode "Service 3" {
                 service3Instance = containerInstance service3
-                db3Server = deploymentNode "DB 3 Server" {
-                    db3Instance = containerInstance service3DB
-                }
+            }
+            db3Server = deploymentNode "DB 3 Server" {
+                db3Instance = containerInstance service3DB
+            }
+        }
+
+        deploymentEnvironment "Microservices with Event Queue" {
+            deploymentNode "Client 1" "e.g. Mobile App" "" {
+                client1EventInstance = containerInstance client1
+            }
+            deploymentNode "Client 2" "e.g. Web App" "" {
+                client2EventInstance = containerInstance client2
+            }
+            deploymentNode "API Layer" {
+                apiEventInstance = containerInstance api
+            }
+            deploymentNode "Service 1" {
+                service1EventInstance = containerInstance service1
+            }
+            db1EventServer = deploymentNode "DB 1 Server" {
+                db1EventInstance = containerInstance service1DB
+            }
+            deploymentNode "Service 2" {
+                service2EventInstance = containerInstance service2
+            }
+            db2EventServer = deploymentNode "DB 2 Server" {
+                db2EventInstance = containerInstance service2DB
+            }
+            deploymentNode "Service 3" {
+                service3EventInstance = containerInstance service3
+            }
+            db3EventServer = deploymentNode "DB 3 Server" {
+                db3EventInstance = containerInstance service3DB
+            }
+            deploymentNode "Message Queue" {
+                msgQueueInstance = containerInstance msgQueue
             }
         }
         
         deploymentEnvironment "Monolithic User Interface" {
-            deploymentNode "UI Platform" "" "" {
+            deploymentNode "UI Platform" "e.g. Mobile App" "" {
                 uiMonolithInstance = containerInstance ui
             }
             deploymentNode "API Layer" {
@@ -172,7 +218,7 @@ workspace "Microservices" "Simple microservices architecture example" {
 #            autoLayout tb
         }
         
-        deployment * "Monolithic User Interface" "monolithic_ui_deployment_diagram" {
+        deployment * "Microservices with Event Queue" "event_queue_deployment_diagram" {
             include *
 #            autoLayout tb
         }
@@ -188,6 +234,11 @@ workspace "Microservices" "Simple microservices architecture example" {
         }
         
         component api "api_component_diagram" {
+            include *
+#            autoLayout tb
+        }
+        
+        component client1 "client1_component_diagram" {
             include *
 #            autoLayout tb
         }
