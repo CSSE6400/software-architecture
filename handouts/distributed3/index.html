@@ -1,4 +1,4 @@
-Last Updated on 2023/03/06     
+Last Updated on 2023/04/23      
 
 <?xml version="1.0" encoding="iso-8859-1" ?> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
@@ -37,12 +37,12 @@ class="Cabin-Italic-tlf-t1-x-x-120">if</span>
 class="Cabin-Italic-tlf-t1-x-x-120">anything can go wrong it will</span>, to the context of distributed systems. We will now move on to O&#8217;Toole&#8217;s Commentary,
 <span 
 class="Cabin-Italic-tlf-t1-x-x-120">Murphy was an optimist</span>.
-</p><!--l. 14--><p class="indent" >   Large distributed systems consist of thousands of computing platforms, communicating over large distances
-and over unreliable internet connections. Failure of some part of the system is practically guaranteed <span class="cite">[<a 
-href="#Xdatacenter-computer">2</a>]</span>, the
-system must be designed to cater for <span 
-class="Cabin-Italic-tlf-t1-x-x-120">partial failure</span>. Even for small systems, some part will eventually fail, so fault
-handling must be part of the design.
+</p><!--l. 14--><p class="indent" >   Large distributed systems may consist of hundreds or thousands of computing platforms, communicating
+over large distances and using unreliable internet connections. Failure of some part of the system is practically
+guaranteed <span class="cite">[<a 
+href="#Xdatacenter-computer">2</a>]</span>, the system must be designed to cater for <span 
+class="Cabin-Italic-tlf-t1-x-x-120">partial failure</span>. Even for small systems, some part will
+eventually fail, so fault handling must be part of the design.
 </p><!--l. 22--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
@@ -50,8 +50,8 @@ handling must be part of the design.
 <!--l. 24--><p class="noindent" >We mentioned that, paradoxically, distributed systems can be more reliable than non-distributed systems
 because a distributed system spreads risk of failure over multiple machines <span class="cite">[<a 
 href="#Xdistributed1-notes">1</a>]</span>. This is managed through health
-checks, load-balancing and auto-scaling. We have also described the use of transactions as a mechanism to deal
-with some potential failures that affect storage of persistent data <span class="cite">[<a 
+checks, load-balancing and auto-scaling. We also described the use of transactions as a mechanism to deal with
+some potential failures that affect storage of persistent data <span class="cite">[<a 
 href="#Xdistributed2-notes">3</a>]</span>.
 </p><!--l. 30--><p class="indent" >   The challenge, particularly when implementing health checks, is determining when a fault has occurred. Most
 distributed systems communicate over a TCP/IP network. This introduces a layer of uncertainty in trying to
@@ -79,7 +79,7 @@ delayed, or the response may not be received. Possible causes of these faults in
       </p></li>
       <li class="itemize">
       <!--l. 41--><p class="noindent" >The response may be delayed and will be received later.</p></li></ul>
-<!--l. 44--><p class="noindent" >There are some techniques that can be used to identify some faults, but they are not perfect. </p>
+<!--l. 44--><p class="noindent" >There are techniques that can be used to identify some faults, but they are not perfect. </p>
       <ul class="itemize1">
       <li class="itemize">
       <!--l. 47--><p class="noindent" >If a compute node is running and reachable, but does not have a process listening on the destination
@@ -87,13 +87,13 @@ delayed, or the response may not be received. Possible causes of these faults in
       FIN packet being received by the message sender, with the caveat that the packet may be lost.
       </p></li>
       <li class="itemize">
-      <!--l. 48--><p class="noindent" >If a process crashes but the compute node is still running, a monitor program running on the node
+      <!--l. 48--><p class="noindent" >If a process crashes, but the compute node is still running, a monitor program running on the node
       can report the failure to a health monitoring sub-system.
       </p></li>
       <li class="itemize">
       <!--l. 49--><p class="noindent" >If a router knows that an IP address is not reachable, it can reply with a destination unreachable
-      packet. But, the router has no additional ways of knowing if an address is not reachable as the rest of
-      the system.
+      packet. But, a router has no additional ways of knowing if an address is not reachable than the rest
+      of the system.
       </p></li>
       <li class="itemize">
       <!--l. 50--><p class="noindent" >If the system is running on your own hardware, you may be able to query network switches to detect
@@ -147,7 +147,7 @@ message and processed it, but the response failed to be returned to the sender. 
 operation, but that may have an adverse effect on the receiver if it repeats the behaviour.
 </p><!--l. 97--><p class="indent" >   One option is for each message to have an identifier. The receiver can decide that it has already processed the
 message and just return the result without processing it again. Or, if the operation will not have any adverse effect
-(e.g. it is a query returning a value), it can be processed again.
+(e.g. it is a query with no side effects), it can be processed again.
 </p><!--l. 101--><p class="indent" >   The intent is that the server&#8217;s state will be the same, regardless of whether it receives
 a message once or multiple times. This behaviour is called the <a 
 href="https://chrisrichardson.net/post/microservices/patterns/2020/10/16/idempotent-consumer.html" >idempotent consumer
@@ -200,10 +200,10 @@ href="#Xdata-intensive">10</a>]</span>.
 href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
  id="x1-6001f2"></a>
 faults are those that are caused by nodes that &#8220; lie&#8221;. Most distributed systems are implemented with the
-assumption that nodes are &#8220; honest&#8221;. An honest node is one that provides responses which the system can
-assume are correct. Faults relate to the node not responding. A lying node is one whose response may not be
-correct. Two common scenarios of a lying node are if it sends confirmation of receipt of a message but loses the
-message, or if it sends contradictory data to different nodes.
+assumption that nodes are &#8220;honest&#8221;. An honest node is one that provides responses which the system can assume
+are correct. Faults relate to the node not responding. A lying node is one whose response may not be correct. Two
+common scenarios of a lying node are, if it sends confirmation of receipt of a message but loses the message, or if
+it sends contradictory data to different nodes.
 </p><!--l. 151--><p class="noindent" >
 </p>
    <h5 class="likesubsubsectionHead"><a 
@@ -425,7 +425,7 @@ does not matter if they execute in a different order on a replica.
 </p><!--l. 329--><p class="indent" >   A single-leader replicated database can record an increasing sequence number with every write operation it
 records in its log. Followers can then read the log to execute writes in sequence number order. All followers will
 then be causally consistent with the leader. The drawback is that a single-leader cannot be scaled if asynchronous
-writes occur faster than it can process them. There is also the difficulty in handling the situation where the leader
+writes occur faster than it can process them. There is also the difficulty of handling the situation where the leader
 fails and selecting a new leader.
 </p><!--l. 335--><p class="noindent" >
 </p>
@@ -490,11 +490,11 @@ class="ectt-1200">1</span>, so it increases it to <span
 class="ectt-1200">4 </span>and
 returns it to <span 
 class="ectt-1200">InventoryUpdater</span>.
-</p><!--l. 362--><p class="indent" >   Lamport timestamps define causal ordering for operations but they do not guarantee consistency when an
+</p><!--l. 362--><p class="indent" >   Lamport timestamps define causal ordering for operations, but they do not guarantee consistency when an
 operation is performed. If two orders are sent to <span 
 class="ectt-1200">ProductDB1 </span>and <span 
 class="ectt-1200">ProductDB2 </span>at the same time and there is only
-one item in stock, Lamport timestamps provide a way to decide which order occurred first, but only after the
+one item in stock, Lamport timestamps provide a way to decide which order occurred first, but only emphafter the
 orders are processed.
 </p><!--l. 366--><p class="indent" >   To enforce a constraint that would not allow two orders for the last item in stock, there needs to be a
 mechanism to indicate when the order is completed. <span 
@@ -583,19 +583,18 @@ section <a
 href="#x1-170003.3">3.3<!--tex4ht:ref: sec:causal-order --></a>. It requires that messages are delivered exactly once, and in the same order, to all nodes. This provides
 a result equivalent to multiple rounds of consensus determining the order in which messages are
 sent.
-</p><!--l. 421--><p class="indent" >   Most consensus algorithms assume that there are no Byzantine faults, which are described in
-section <a 
-href="#x1-60002.3">2.3<!--tex4ht:ref: sec:byzantine --></a> (e.g. a node sending contradictory messages to other nodes). It is possible to implement
-a consensus algorithm that can manage Byzantine faults, as long as fewer than one-third of the
-nodes generate Byzantine faults <span class="cite">[<a 
-href="#Xbyzantine-tolerance-2002">20</a>]</span>. The details of how to do this are beyond the scope of this
-course.
+</p><!--l. 421--><p class="indent" >   Most consensus algorithms assume that there are no Byzantine faults, as described in section <a 
+href="#x1-60002.3">2.3<!--tex4ht:ref: sec:byzantine --></a> (e.g. a node
+sending contradictory messages to other nodes). It is possible to implement a consensus algorithm that can
+manage Byzantine faults, as long as fewer than one-third of the nodes generate Byzantine faults <span class="cite">[<a 
+href="#Xbyzantine-tolerance-2002">20</a>]</span>. The details
+of how to do this are beyond the scope of this course.
 </p><!--l. 427--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.2    </span> <a 
  id="x1-210004.2"></a>Distributed Transactions</h4>
-<!--l. 429--><p class="noindent" >A distributed system that needs to enforce a transaction across multiple compute nodes needs a
-mechanism to gain consensus between all nodes participating in the transaction that it can be committed.
+<!--l. 429--><p class="noindent" >A distributed system that needs to enforce a transaction across multiple compute nodes needs a mechanism
+to gain consensus between all nodes participating in the transaction, so that it can be committed.
 This is called the <span 
 class="Cabin-Italic-tlf-t1-x-x-120">atomic commit </span>problem, based on the idea of transaction atomicity from ACID
 <span class="cite">[<a 
@@ -606,9 +605,9 @@ to the primary index. Distributed transactions may also occur where events or me
 transaction. An example of this is sending a message to a message queue, while storing data in a database. In the
 Sahara eCommerce system, when an order is placed it is stored in the order table in the database
 and a message is placed in the notification queue to notify the customer that the order has been
-                                                                                                    
-                                                                                                    
 successful. Storing the order may be a transaction in only a single database partition, but to ensure
+                                                                                                    
+                                                                                                    
 the notification message is only added to the queue if the order is successful requires a distributed
 transaction.
 </p><!--l. 442--><p class="noindent" >
@@ -652,12 +651,12 @@ class="Cabin-Italic-tlf-t1-x-x-120">single-node </span>transactions on each,
 attaching the <span 
 class="ectt-1200">transId </span>to the transaction. The client can perform multiple reads and writes as part of the
 transaction.
-</p><!--l. 465--><p class="indent" >   When the client is ready to commit the transaction it notifies the <span 
+</p><!--l. 465--><p class="indent" >   When the client is ready to commit the transaction it requests the <span 
 class="ectt-1200">TransactionManager </span>to perform the
 commit. The <span 
 class="ectt-1200">TransactionManager </span>sends a prepare message to all the participants. If a prepare message times
 out, or any participant reports a failure, the <span 
-class="ectt-1200">TransactionManager </span>send an abort message to all participants and
+class="ectt-1200">TransactionManager </span>sends an abort message to all participants and
 reports the failure to the client.
 </p><!--l. 470--><p class="indent" >   When a participant receives the prepare message, it confirms that it can commit the transaction, regardless of
 any fault that may occur after replying to the prepare message. (i.e. The participant has saved all changes as part of
@@ -719,7 +718,7 @@ transactions.
 <!--l. 520--><p class="noindent" >Section <a 
 href="#x1-120003.2.2">3.2.2<!--tex4ht:ref: sec:slr --></a> mentions issues around choosing the leader for a single-leader replicated database. Some database
 systems allow the leader to be automatically elected. This allows single-leader replication to be fault tolerant as a
-new leader can be elected if the leader fails. This concept scales up to general consensus algorithms, which need a
+new leader can be elected if the leader fails. This concept generalises to consensus algorithms, which need a
 leader to achieve consensus.
 </p><!--l. 525--><p class="indent" >   <span 
 class="Cabin-Italic-tlf-t1-x-x-120">Epoch numbers </span>are used to manage this approach. The systems guarantee that there is only one leader per
@@ -736,8 +735,8 @@ otherwise the check fails.
    <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
  id="x1-240005"></a>Conclusion</h3>
 <!--l. 542--><p class="noindent" >Designing reliable distributed systems is a complex, but manageable, process. These notes have introduced some
-of the less intuitive issues that arise in distributed systems and how to design the system to work in the presence
-of these issues.
+of the less intuitive issues that arise in distributed systems and how to design a system to work in the presence of
+these issues.
 </p><!--l. 546--><p class="indent" >   It is possible to go a step further and prove the correctness of distributed systems. This involves creating a model of
 the system and every service in the system. Assumptions about system behaviour can be stated within the model. The
 algorithms used to implement the system can be proven to work within the system model and its assumptions.
