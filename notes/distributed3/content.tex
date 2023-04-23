@@ -11,8 +11,8 @@ Some of these fallacies (e.g. the network is reliable, the network is secure and
 apply Murphy's Law, \textit{if anything can go wrong it will}, to the context of distributed systems.
 We will now move on to O'Toole's Commentary, \textit{Murphy was an optimist}.
 
-Large distributed systems consist of thousands of computing platforms,
-communicating over large distances and over unreliable internet connections.
+Large distributed systems may consist of hundreds or thousands of computing platforms,
+communicating over large distances and using unreliable internet connections.
 Failure of some part of the system is practically guaranteed \cite{datacenter-computer},
 the system must be designed to cater for \emph{partial failure}.
 Even for small systems, some part will eventually fail,
@@ -24,7 +24,7 @@ so fault handling must be part of the design.
 We mentioned that, paradoxically, distributed systems can be more reliable than non-distributed systems
 because a distributed system spreads risk of failure over multiple machines \cite{distributed1-notes}.
 This is managed through health checks, load-balancing and auto-scaling.
-We have also described the use of transactions as a mechanism to deal with some potential failures
+We also described the use of transactions as a mechanism to deal with some potential failures
 that affect storage of persistent data \cite{distributed2-notes}.
 
 The challenge, particularly when implementing health checks, is determining when a fault has occurred.
@@ -42,11 +42,11 @@ Possible causes of these faults include the following.
 \end{itemize}
 
 \noindent
-There are some techniques that can be used to identify some faults, but they are not perfect.
+There are techniques that can be used to identify some faults, but they are not perfect.
 \begin{itemize}
     \item If a compute node is running and reachable, but does not have a process listening on the destination port, the operating system should close or refuse the TCP connection. This should result in a RST or FIN packet being received by the message sender, with the caveat that the packet may be lost.
-    \item If a process crashes but the compute node is still running, a monitor program running on the node can report the failure to a health monitoring sub-system.
-    \item If a router knows that an IP address is not reachable, it can reply with a destination unreachable packet. But, the router has no additional ways of knowing if an address is not reachable as the rest of the system.
+    \item If a process crashes, but the compute node is still running, a monitor program running on the node can report the failure to a health monitoring sub-system.
+    \item If a router knows that an IP address is not reachable, it can reply with a destination unreachable packet. But, a router has no additional ways of knowing if an address is not reachable than the rest of the system.
     \item If the system is running on your own hardware, you may be able to query network switches to detect link failures.
 \end{itemize}
 
@@ -96,7 +96,7 @@ The sender can retry the operation, but that may have an adverse effect on the r
 
 One option is for each message to have an identifier.
 The receiver can decide that it has already processed the message and just return the result without processing it again.
-Or, if the operation will not have any adverse effect (e.g. it is a query returning a value), it can be processed again.
+Or, if the operation will not have any adverse effect (e.g. it is a query with no side effects), it can be processed again.
 
 The intent is that the server's state will be the same, regardless of whether it receives a message once or multiple times.
 This behaviour is called the \link{idempotent consumer pattern}
@@ -141,11 +141,11 @@ and suggests some solution options, with their attendant tradeoffs \cite{data-in
 Byzantine\footnote{Byzantine carries a connotation of being an excessively complicated, intrigue filled and corrupt environment.
 This is probably a smear of the Byzantine Empire (\url{https://www.britannica.com/place/Byzantine-Empire}).}
 faults are those that are caused by nodes that `` lie''.
-Most distributed systems are implemented with the assumption that nodes are `` honest''.
+Most distributed systems are implemented with the assumption that nodes are ``honest''.
 An honest node is one that provides responses which the system can assume are correct.
 Faults relate to the node not responding.
 A lying node is one whose response may not be correct.
-Two common scenarios of a lying node are if it sends confirmation of receipt of a message but loses the message,
+Two common scenarios of a lying node are, if it sends confirmation of receipt of a message but loses the message,
 or if it sends contradictory data to different nodes.
 
 \subsubsection*{Byzantine Generals Problem}
@@ -330,7 +330,7 @@ A single-leader replicated database can record an increasing sequence number wit
 Followers can then read the log to execute writes in sequence number order.
 All followers will then be causally consistent with the leader.
 The drawback is that a single-leader cannot be scaled if asynchronous writes occur faster than it can process them.
-There is also the difficulty in handling the situation where the leader fails and selecting a new leader.
+There is also the difficulty of handling the situation where the leader fails and selecting a new leader.
 
 \subsubsection{Lamport Timestamps}
 If the system does not have a single-leader, the logical clock approach mentioned in section \ref{timing} provides a mechanism to define causal ordering.
@@ -359,9 +359,9 @@ When \texttt{InventoryUpdater} sends message \texttt{5} to \texttt{ProductDB1},
 the message includes \texttt{InventoryUpdater}'s maximum value of \texttt{3}.
 \texttt{ProductDB1}'s counter value was \texttt{1}, so it increases it to \texttt{4} and returns it to \texttt{InventoryUpdater}.
 
-Lamport timestamps define causal ordering for operations but they do not guarantee consistency when an operation is performed.
+Lamport timestamps define causal ordering for operations, but they do not guarantee consistency when an operation is performed.
 If two orders are sent to \texttt{ProductDB1} and \texttt{ProductDB2} at the same time and there is only one item in stock,
-Lamport timestamps provide a way to decide which order occurred first, but only after the orders are processed.
+Lamport timestamps provide a way to decide which order occurred first, but only emph{after} the orders are processed.
 
 To enforce a constraint that would not allow two orders for the last item in stock,
 there needs to be a mechanism to indicate when the order is completed.
@@ -418,7 +418,7 @@ They typically implement total order broadcast, as mentioned in section \ref{sec
 It requires that messages are delivered exactly once, and in the same order, to all nodes.
 This provides a result equivalent to multiple rounds of consensus determining the order in which messages are sent.
 
-Most consensus algorithms assume that there are no Byzantine faults, which are described in section \ref{sec:byzantine}
+Most consensus algorithms assume that there are no Byzantine faults, as described in section \ref{sec:byzantine}
 (e.g. a node sending contradictory messages to other nodes).
 It is possible to implement a consensus algorithm that can manage Byzantine faults,
 as long as fewer than one-third of the nodes generate Byzantine faults \cite{byzantine-tolerance-2002}.
@@ -427,7 +427,7 @@ The details of how to do this are beyond the scope of this course.
 \subsection{Distributed Transactions}
 
 A distributed system that needs to enforce a transaction across multiple compute nodes
-needs a mechanism to gain consensus between all nodes participating in the transaction that it can be committed.
+needs a mechanism to gain consensus between all nodes participating in the transaction, so that it can be committed.
 This is called the \emph{atomic commit} problem, based on the idea of transaction atomicity from ACID \cite{distributed2-notes}.
 
 In a database, a distributed transaction may happen when the database is partitioned and data in different partitions are part of the transaction.
@@ -462,10 +462,10 @@ requests to start a distributed transaction and receives a unique transaction id
 The client starts \emph{single-node} transactions on each, attaching the \texttt{transId} to the transaction.
 The client can perform multiple reads and writes as part of the transaction.
 
-When the client is ready to commit the transaction it notifies the \texttt{TransactionManager} to perform the commit.
+When the client is ready to commit the transaction it requests the \texttt{TransactionManager} to perform the commit.
 The \texttt{TransactionManager} sends a prepare message to all the participants.
 If a prepare message times out, or any participant reports a failure,
-the \texttt{TransactionManager} send an abort message to all participants and reports the failure to the client.
+the \texttt{TransactionManager} sends an abort message to all participants and reports the failure to the client.
 
 When a participant receives the prepare message, it confirms that it can commit the transaction,
 regardless of any fault that may occur after replying to the prepare message.
@@ -501,7 +501,7 @@ implement the standard.
 
 A two-phase commit is called a \emph{blocking} atomic commit,
 as completion of the commit can take a long time if a participant or the \texttt{TransactionManager} fail.
-Even worse, if the transaction log on the \texttt{TransactionManager} or a participant are corrupted when they fail,
+Even worse, if the transaction log on the \texttt{Transaction\-Manager} or a participant are corrupted when they fail,
 this may lead to rows in the database never being unlocked.
 This usually requires manual intervention to decide whether to complete the commit or roll it back, to maintain atomicity.
 Some libraries that support two-phase commit can make an automated decision in this case,
@@ -520,7 +520,7 @@ Consequently, most NoSQL databases and many cloud-based relational databases do 
 Section \ref{sec:slr} mentions issues around choosing the leader for a single-leader replicated database.
 Some database systems allow the leader to be automatically elected.
 This allows single-leader replication to be fault tolerant as a new leader can be elected if the leader fails.
-This concept scales up to general consensus algorithms, which need a leader to achieve consensus.
+This concept generalises to consensus algorithms, which need a leader to achieve consensus.
 
 \emph{Epoch numbers} are used to manage this approach.
 The systems guarantee that there is only one leader per epoch, rather than there only ever being one leader.
@@ -541,7 +541,7 @@ otherwise the check fails.
 
 Designing reliable distributed systems is a complex, but manageable, process.
 These notes have introduced some of the less intuitive issues that arise in distributed systems
-and how to design the system to work in the presence of these issues.
+and how to design a system to work in the presence of these issues.
 
 It is possible to go a step further and prove the correctness of distributed systems.
 This involves creating a model of the system and every service in the system.
