@@ -1,14 +1,14 @@
 \documentclass{slide}
 
-% \usepackage{pgfpages}
-% \setbeameroption{show notes on second screen}
+%\usepackage{pgfpages}
+%\setbeameroption{show notes on second screen}
 
 \title{Distributed Computing III}
 \subtitle{\textit{Murphy was an optimist} \newline \newline   % O'Toole's Commentary
 CSSE6400}
 
 \author{Richard Thomas}
-\date{\week{10}}
+\date{\week{9}}
 
 \begin{document}
 
@@ -16,38 +16,29 @@ CSSE6400}
 
 \questionanswer{What communication faults may occur?}{
     \begin{itemize}[<+(1)->]
-        \item Message not delivered
-        \item Message delayed
-        \item Receiver failed
-        \item Receiver busy
-        \item Reply not received
-        \item Reply delayed
+        \item Message not delivered	\note<2>{Lost in transit.}
+        \item Message delayed		\note<3>{Network delay or receiver overloaded,\\but message will be processed later.}
+        \item Receiver failed		\note<4>{Receiver software has crashed or node has died.}
+        \item Receiver busy			\note<5>{Receiver temporarily not replying\\(e.g. garbage collection has frozen other processes).}
+        \item Reply not received		\note<6>{Request was processed but reply lost in transit.}
+        \item Reply delayed			\note<7>{Reply will be received later.}
     \end{itemize}
-}
-\note[itemize]{
-    \item Lost in transit
-    \item Network delay or receiver overloaded, but message will be processed later
-    \item Receiver software has crashed or node has died
-    \item Receiver temporarily not replying (e.g. garbage collection has frozen other processes)
-    \item Request was processed but reply lost in transit
-    \item Reply will be received later
 }
 
 \questionanswer{How do we detect faults?}{
     \begin{itemize}[<+(1)->]
         \item No listener on port -- RST or FIN packet
+        		\note<2>{Assumes node is running \& reachable.\\OS should close or refuse connection.\\
+        				 Error packet may be lost in transit.}
         \item Process crashes -- Monitor report failure
+        		\note<3>{Assumes node is running \& reachable.\\Most reliable.}
         \item IP address not reachable -- unreachable packet
-        \item Query switches
-        \item Timeout
+        		\note<4>{Router has to determine address is not reachable,\\which is no easier than for your application.}
+        \item Query switches						
+        		\note<5>{Need permissions to do this.\\Will only have this in your own data centre.}
+        \item Timeout									
+        		\note<6>{UDP reduces network transmission time guarantee\\-- does not perform retransmission.}
     \end{itemize}
-}
-\note[itemize]{
-    \item Assumes node is running \& reachable. OS should close or refuse connection. Error packet may be lost in transit.
-    \item Assumes node is running \& reachable. Most reliable.
-    \item Router has to determine address is not reachable, which is no easier than for your application.
-    \item Need permissions to do this. Will only have this in your own data centre.
-    \item UDP reduces network transmission time guarantee -- does not perform retransmission
 }
 
 \questionanswer{What to do if fault is detected?}{
@@ -86,7 +77,7 @@ CSSE6400}
         {\LARGE
         \begin{itemize}
             \item $n$ generals need to agree on plan
-            \vspace{2mm}
+%            \vspace{2mm}
             \item Can only communicate via messenger
             \item Messenger may be delayed or lost
             \vspace{2mm}
@@ -96,6 +87,8 @@ CSSE6400}
                 \Large\item Send dishonest messages
                 \vspace{1mm}
                 \Large\item Pretend to have not received message
+                \vspace{1mm}
+                \Large\item Send messages pretending to be another general
             \end{itemize}
         \end{itemize}
         }
@@ -104,7 +97,7 @@ CSSE6400}
 \note{Link analogy to Byzantine faults}
 
 \definition{Byzantine Faults}{
-    Nodes in a distributed system may `lie' -- send faulty or corrupted messages or responses.
+    Nodes in a distributed system may `lie' --- send faulty or corrupted messages or responses.
 }
 \note[itemize]{
     \item A message that causes the receiver to fail.
@@ -169,35 +162,25 @@ CSSE6400}
 }
 
 \point{Normal Message Flow}
+% Sequence of slides animating a poison message.
+% First 3 slides are an example of a message being queued and processed.
+% Slides 4-8 are an example of a poison message blocking the queue.
+
+% Message being queued and processed normally.
 
 \image[trim=40 90 40 90,clip,width=\textwidth]{diagrams/poison-message-01.png}
 \note[itemize]{
-    \item Sequence of slides with an animation of a poison message.
-    \item First 3 slides are an example of a message being queued and processed.
-    \item Slides 4-8 are an example of a poison message blocking the queue.
-    \item Should comment that poison messages block processing regardless of how they're delivered.
-    \item A message queue or service isn't the key blocking point.
-    \item Async messages sent directly to a consumer requires it to queue them as they're processed, leading to the same blocking issue.
+    \item Normal message/event is sent from a Producer.
 }
 
 \image[trim=40 90 40 90,clip,width=\textwidth]{diagrams/poison-message-02.png}
 \note[itemize]{
-    \item Sequence of slides with an animation of a poison message.
-    \item First 3 slides are an example of a message being queued and processed.
-    \item Slides 4-8 are an example of a poison message blocking the queue.
-    \item Should comment that poison messages block processing regardless of how they're delivered.
-    \item A message queue or service isn't the key blocking point.
-    \item Async messages sent directly to a consumer requires it to queue them as they're processed, leading to the same blocking issue.
+    \item Normal message/event is queued (in Message Queue).
 }
 
 \image[trim=40 90 40 90,clip,width=\textwidth]{diagrams/poison-message-03.png}
 \note[itemize]{
-    \item Sequence of slides with an animation of a poison message.
-    \item First 3 slides are an example of a message being queued and processed.
-    \item Slides 4-8 are an example of a poison message blocking the queue.
-    \item Should comment that poison messages block processing regardless of how they're delivered.
-    \item A message queue or service isn't the key blocking point.
-    \item Async messages sent directly to a consumer requires it to queue them as they're processed, leading to the same blocking issue.
+    \item Normal message/event is dequeued and processed by a Consumer.
 }
 
 \begin{frame}
@@ -206,7 +189,8 @@ CSSE6400}
         \huge Poison Message
 
       \column{0.5\textwidth}
-        \includegraphics[width=0.5\textwidth]{images/poison-bottle.png}  % From https://pixabay.com/vectors/poison-bottle-toxic-chemistry-4662212/
+        \includegraphics[width=0.5\textwidth]{images/poison-bottle.png}
+        % From https://pixabay.com/vectors/poison-bottle-toxic-chemistry-4662212/
     \end{columns}
 \end{frame}
 \note[itemize]{
@@ -218,52 +202,40 @@ CSSE6400}
     \item Blocks sending of following messages.
 }
 
+% Next 5 slides are an example of a poison message blocking the queue.
+
 \image[trim=40 90 40 90,clip,width=\textwidth]{diagrams/poison-message-04.png}
 \note[itemize]{
-    \item Sequence of slides with an animation of a poison message.
-    \item First 3 slides are an example of a message being queued and processed.
-    \item Slides 4-8 are an example of a poison message blocking the queue.
-    \item Should comment that poison messages block processing regardless of how they're delivered.
-    \item A message queue or service isn't the key blocking point.
-    \item Async messages sent directly to a consumer requires it to queue them as they're processed, leading to the same blocking issue.
+    \item This set of slides is an example of a poison message blocking the queue.
+    \item Poison message is at head of queue.
+blocking issue.
 }
 
 \image[trim=40 90 40 90,clip,width=\textwidth]{diagrams/poison-message-05.png}
 \note[itemize]{
-    \item Sequence of slides with an animation of a poison message.
-    \item First 3 slides are an example of a message being queued and processed.
-    \item Slides 4-8 are an example of a poison message blocking the queue.
-    \item Should comment that poison messages block processing regardless of how they're delivered.
-    \item A message queue or service isn't the key blocking point.
-    \item Async messages sent directly to a consumer requires it to queue them as they're processed, leading to the same blocking issue.
+    \item This set of slides is an example of a poison message blocking the queue.
+    \item Poison message is dequeued by a Consumer.
 }
 
 \image[trim=40 90 40 90,clip,width=\textwidth]{diagrams/poison-message-06.png}
 \note[itemize]{
-    \item Sequence of slides with an animation of a poison message.
-    \item First 3 slides are an example of a message being queued and processed.
-    \item Slides 4-8 are an example of a poison message blocking the queue.
-    \item Should comment that poison messages block processing regardless of how they're delivered.
-    \item A message queue or service isn't the key blocking point.
-    \item Async messages sent directly to a consumer requires it to queue them as they're processed, leading to the same blocking issue.
+    \item This set of slides is an example of a poison message blocking the queue.
+    \item Consumer fails (crashes).
+    \item Poison message is added back to the head of the queue (re-try).
 }
 
 \image[trim=40 90 40 90,clip,width=\textwidth]{diagrams/poison-message-07.png}
 \note[itemize]{
-    \item Sequence of slides with an animation of a poison message.
-    \item First 3 slides are an example of a message being queued and processed.
-    \item Slides 4-8 are an example of a poison message blocking the queue.
-    \item Should comment that poison messages block processing regardless of how they're delivered.
-    \item A message queue or service isn't the key blocking point.
-    \item Async messages sent directly to a consumer requires it to queue them as they're processed, leading to the same blocking issue.
+    \item This set of slides is an example of a poison message blocking the queue.
+    \item Next Consumer dequeues poison message and fails (crashes).
 }
 
 \image[trim=40 90 40 90,clip,width=\textwidth]{diagrams/poison-message-08.png}
 \note[itemize]{
-    \item Sequence of slides with an animation of a poison message.
-    \item First 3 slides are an example of a message being queued and processed.
-    \item Slides 4-8 are an example of a poison message blocking the queue.
-    \item Should comment that poison messages block processing regardless of how they're delivered.
+    \item This set of slides is an example of a poison message blocking the queue.
+    \item Poison message is added back to the head of the queue again (re-try).
+    \item Infinite loop ...
+    \item \textbf{Comment} that poison messages block processing regardless of how they're delivered.
     \item A message queue or service isn't the key blocking point.
     \item Async messages sent directly to a consumer requires it to queue them as they're processed, leading to the same blocking issue.
 }
@@ -276,6 +248,14 @@ CSSE6400}
                 \vspace{1mm}
                 \Large\item Error handling doesn't cater for error case
             \end{itemize}
+        		\note<2>{Invalid content may be
+        				 \begin{itemize}
+        				 	\item corrupted data,
+        				 	\item old version of data structure,
+        				 	\item incorrect data, or
+        				 	\item malicious data.
+        				 \end{itemize}
+        				}
             \vspace{2mm}
         \item<3-> System state is invalid
             \begin{itemize}
@@ -286,18 +266,14 @@ CSSE6400}
                     \large\item Insidious asynchronous faults
                 \end{itemize}
             \end{itemize}
-    \end{itemize}
-}
-\note[itemize]{
-    \item Invalid content may be
-    \item corrupted data,
-    \item old version of data structure,
-    \item incorrect data, or
-    \item malicious data.
-    \item Invalid state may be
-    \item events out of order (e.g. delete then update),
-    \item logic error making state invalid, or
-    \item external corruption of persistent state.
+         	\note<3>{Invalid state may be
+        				 \begin{itemize}
+        				 	\item events out of order (e.g. delete then update),
+        				 	\item logic error making state invalid, or
+        				 	\item external corruption of persistent state.
+        				 \end{itemize}
+        				}
+   \end{itemize}
 }
 
 \begin{frame}{Detecting Poison Messages}
@@ -406,14 +382,14 @@ CSSE6400}
 \definition{Poison Pill Message}{
     Special message used to notify receiver it should no longer wait for messages.
 }
-\note{Emphasise that this is different to a poison message}
+\note{Emphasise that this is \textbf{different} to a poison message}
 
 \questionanswer{Why use a poison pill message?}{
     Graceful shutdown of system.
 }
 \note[itemize]{
-    \item Implementation is challenging with multiple producers and/or consumers
-    \item It must be the last message received by all consumers
+    \item Implementation is challenging with multiple producers and/or consumers.
+    \item It must be the last message received by all consumers.
 }
 
 \questionanswer{How to order asynchronous messages?}{
@@ -434,7 +410,7 @@ CSSE6400}
     \item Finite precision -- two events may end up with the same timestamp, if they occur in quick succession
 }
 
-\point{Data Issues}
+\section{Data Issues}
 
 \point[Consistency]{
     \begin{description}
@@ -450,7 +426,7 @@ CSSE6400}
     \vspace{3mm}
     \item May be appropriate for some systems
     \begin{itemize}
-        \LARGE\item e.g. Social media updates\footnote{See \href{https://csse6400.uqcloud.net/slides/distributed2.pdf}{Distributed II slides 40 - 44}.}
+        \LARGE\item e.g. Social media updates\footnote{See \href{https://csse6400.uqcloud.net/slides/distributed2.pdf}{Distributed II slides 41 - 46}.}
     \end{itemize}
 \end{itemize}
 }
@@ -461,24 +437,20 @@ CSSE6400}
     \begin{itemize}
         \LARGE\item<1-> Regardless of replica read from
     \end{itemize}
+        	\note<1>{Abstraction over replicated database.\\Used when uniqueness needs to be guaranteed.}
     \item<2-> Single-leader replication
     \begin{itemize}
         \LARGE\item<2-> Read from leader
         \LARGE\item<2-> Read from synchronous follower
     \end{itemize}
+        	\note<2>{SLR -- defeats most performance benefits.\\Maintains reliability benefits.}
     \item<3-> Multi-leader replication can't be linearised
     \item<4-> Leaderless replication
     \begin{itemize}
         \LARGE\item<4-> Lock value on quorum before writing
     \end{itemize}
+        	\note<4>{Leaderless -- similar performance cost to SLR.}
 \end{itemize}
-}
-\note[itemize]{
-    \item Abstraction over replicated database
-    \item Used when uniqueness needs to be guaranteed
-    \item e.g. Multiple withdrawals from an account
-    \item SLR -- defeats most performance benefits
-    \item Leaderless -- similar performance cost to SLR
 }
 
 \point[Causal Order]{
@@ -488,6 +460,12 @@ CSSE6400}
         \LARGE\item<1-> What event needs to happen before another
         \LARGE\item<1-> Allows concurrent events
     \end{itemize}
+		\note[itemize]<1>{
+		    \item Linearisation defines a total order.
+		    \item Causal ordering defines a partial order.
+		    \item e.g. Git repo history with branching as causal order.
+		    \item Not as strict as linearisability, so less performance cost.
+		}
     \vspace{3mm}
     \item<2-> Single-leader replication
     \begin{itemize}
@@ -497,14 +475,21 @@ CSSE6400}
     \item<3-> Lamport timestamps
 \end{itemize}
 }
-\note[itemize]{
-    \item Linearisation defines a total order
-    \item Causal ordering defines a partial order
-    \item e.g. Git repo history with branching as causal order
-    \item Not as strict as linearisability, so less performance cost
-}
 
 \image[trim=60 189 450 35,clip,height=\textheight]{../../notes/distributed3/diagrams/lamport-timestamp-seq.png}
+\note[itemize]{
+    \item Each node has an id, \& counts number of operations.
+    \item Timestamp is a tuple (\emph{counterValue}, \emph{nodeID}).
+    \item \emph{nodeID} guarantees every timestamp is unique, even if they have the same counter value.
+    \item Every node stores the maximum counter value seen so far.
+    \item Maximum is passed in every request to another node.
+    \item If a node receives a request or response with a maximum counter value greater than its own counter value,
+          it increases its own counter to the new maximum.
+    \item \textbf{Message 4:} InventoryUpdater sends its current maximum value (\textbf{1}).
+    		  ProductDB2’s counter is \textbf{2}, so it increases it to \textbf{3} \& returns to InventoryUpdater.
+    		  InventoryUpdater records \textbf{3} as its new maximum value.
+    		  \textbf{Message 5:} Updates ProductDB1's max value \& then counts operation.
+}
 
 \definition{Consensus}{
     A set of nodes in the system agree on some aspect of the system’s state.
@@ -584,6 +569,7 @@ CSSE6400}
         \begin{itemize}
             \Large\item Node fails and never restarts
         \end{itemize}
+        		\note<1>{Cloud-based system that kills crashed nodes.}
         \vspace{2mm}
         \item<2-> Crash Recovery
         \begin{itemize}
@@ -592,6 +578,11 @@ CSSE6400}
                 \large\item Requires persistent memory to recover to close to prior state
             \end{itemize}
         \end{itemize}
+        		\note<2>{\begin{itemize}
+        				 	\item Any system that allows nodes to be restarted.
+        				 	\item May lose some steps in memory for non-critical tasks.
+        				 \end{itemize}
+        				}
         \vspace{2mm}
         \item<3-> Arbitrary Failure
         \begin{itemize}
@@ -600,16 +591,10 @@ CSSE6400}
                 \large\item Byzantine faults
             \end{itemize}
         \end{itemize}
+        		\note<3>{Nodes may send faulty or malicious messages.}
     \end{itemize}
     }
 \end{frame}
-\note[itemize]{
-    \item Crash Stop -- Cloud-based system that kills crashed nodes.
-    \item Crash Recovery -- Any system that allows nodes to be restarted.
-    \item Crash Recovery -- May lose some steps in memory for non-critical tasks.
-    \item Arbitrary Failure -- Nodes may send faulty or malicious messages.
-}
-
 \point{
 \begin{itemize}
     \item Distributed systems are hard to build

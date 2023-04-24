@@ -1,346 +1,654 @@
-swagger: "2.0"
+openapi: 3.0.1
 info:
+  title: TicketOverflow
   description: |
-    An API service that supports ticket purchasing, ticket generation, and seating plan generationg for TicketOverflow.
+    An API service that supports ticket purchasing, ticket generation, and seating plan generation for TicketOverflow.
+
+    You must implement the concerts and tickets endpoints.
+    
+    You must also implement a mock users endpoint as a placeholder while another team develops the users service.
+    See the users endpoint for more details on what data to use for mocking.
 
     Note that the URL used in the cURL examples below are just illustrative, you should replace [http://tickets.api.ticketoverflow.com/api/v1/](http://tickets.api.ticketoverflow.com/api/v1) with the host of your service.
-  version: "0.0.1"
-  title: "TicketOverflow"
+
+    We have used UUID formatted identifiers in the examples but you may use any style of unique string identifier you wish.
+
+    You should start with the users service, then concerts, and then tickets.
   contact:
     name: CSSE6400
     url: https://csse6400.uqcloud.net
     email: noreply@uq.edu.au
-host: "tickets.api.ticketoverflow.com"
-basePath: "/api/v1"
+  version: 0.1.1
+servers:
+- url: http://tickets.api.ticketoverflow.com/api/v1
 tags:
-- name: "ticket"
-  description: "Ticket service"
-- name: "user"
-  description: "Users service"
-- name: "concert"
-  description: "Concerts service"
-schemes:
-- "http"
+- name: user
+  description: Users service
+- name: concert
+  description: Concerts service
+- name: ticket
+  description: Ticket service
 paths:
-  /health:
+  /users/health:
     get:
-      tags: ["ticket"]
-      summary: "Query the health of the service."
+      operationId: aa
+      tags:
+      - user
+      summary: Query the health of the users service.
       description: |
-        The health endpoint is a useful for determining whether an instance is still healthy.
+        The health endpoint is useful for determining whether an instance is still healthy.
         This can help if you are configuring auto-scaling groups or load balancers.
-        
+
         We do not specify the response payload for this endpoint,
         however you may find it useful to return a more detailed status of your system.
         For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
+
+        Each service has a separate health endpoint to allow for flexibility in your implementation.
+        __We do not require a separate server for each of the endpoints, i.e. one server can handle requests for all endpoints.__
       responses:
-        "200":
-          description: "Service is healthy."
-        "500":
-          description: "Service is not healthy."
-        "503":
-          description: "Service is not healthy."
+        200:
+          description: Service is healthy.
+          content: {}
+        500:
+          description: Service is not healthy.
+          content: {}
+        503:
+          description: Service is not healthy.
+          content: {}
   /users:
     get:
-      tags: ["user"]
-      summary: "List all registered users for the service."
+      operationId: ab
+      tags:
+      - user
+      summary: List all registered users for the service.
       description: |
         Provides a list of registered users.
         The users are currently a hard-coded list of JSON objects.
 
-        It is another teams responsibility to implement this service.
+        It is another team's responsibility to implement this service.
         You need to create this mock endpoint for your service to query.
 
         The list of hard-coded users is available here: https://github.com/csse6400/ticketoverflow-users
-      produces:
-        - "application/json"
       responses:
-        "200":
-          description: "List of all registered users for the service."
-          schema:
-            type: array
-            items:
-              $ref: "#/definitions/User"
-            example: |
-              [
-                {
-                  "user_id": "e571964f-f2b7-4200-9fb0-2af749092fa1",
-                  "name": "Evan Hughes"
-                },
-                ...
-              ]
-  /users/{user_id}:
-    parameters:
-      - name: "user_id"
-        in: "path"
-        required: true
-        type: string
-        description: "The user identifier."
-    get:
-      tags: ["user"]
-      summary: "Get information for a particular user."
-      description: |
-        Get the hard-coded user information for a particular user based on their user_id.
-        Refer to the /users endpoint for what data to return.
-
-        It is another teams responsibility to implement this service.
-        You need to create this mock endpoint for your service to query.
-      produces:
-        - "application/json"
-      responses:
-        "200":
-          description: "User information for the given user."
-          schema:
-            $ref: "#/definitions/User"
-  /text:
-    get:
-      tags: ["tts"]
-      summary: "List all generated audios."
-      description: |
-        List all of the generated audios in descending order of creation date-time.
-        The response is paginated with 10 elements on each page by default.
-      produces:
-        - "application/json"
-      parameters:
-        - in: query
-          name: start
-          type: integer
-          default: 0
-          required: false
+        200:
           description: |
-            Starting index of the results.
-        - in: query
-          name: limit
-          type: integer
-          default: 10
-          required: false
-          description: |
-            The maximum amount of results to return.
-      responses:
-        "200":
-          description: "List of generated audios."
-          schema:
-            type: object
-            
-            properties:
-              size:
-                type: integer
-                example: 1
-                description: |
-                  The length of the response. Must be under the requested limit.
-              start:
-                type: integer
-                example: 0
-                description: |
-                  The starting index of the results, should equal the request parameter.
-              _links:
-                type: object
-                properties: 
-                  next:
-                    type: string
-                    nullable: true
-                    description: |
-                      The endpoint of the next page of results.
-
-                      Limit parameter should equal request.
-
-                      If there are no more results, field should be null.
-                    example: http://chatterbox.services.its.uq.edu.au/api/v1/text?limit=5&start=10
-                  prev:
-                    type: string
-                    description: |
-                      The endpoint of the previous page of results.
-
-                      Limit parameter should equal request.
-
-                      If there are no prior results, field should be null.
-                    example: http://chatterbox.services.its.uq.edu.au/api/v1/text?limit=5&start=0
-
-              data:
+            List of all registered users for the service.
+          content:
+            application/json:
+              schema:
                 type: array
                 items:
-                  $ref: "#/definitions/TextResponse"
-
-              error:
-                type: object
-                description: Unspecified field to describe any errors.
-            
-    post:
-      tags: ["tts"]
-      summary: Request a new message is translated into synthesized speech.
+                  $ref: '#/components/schemas/User'
+  /users/{id}:
+    get:
+      operationId: ac
+      tags:
+      - user
+      summary: Get information for a particular user.
       description: |
-        - If the requested operation is SYNC, the request should not return until a speech file has been generated (or error).
+        Get the hard-coded user information for a particular user based on their id.
+        Refer to the /users endpoint for what data to return.
 
-        - If the requested operation is ASYNC, the request should return immediantly regardless of whether the request has finished, if the request is still working the status should just be PENDING.
-
-        - Messages greater than 280 characters must be ASYNC or a bad request should be returned.
-
-        The error field in the response is left unspecified, you should populate this field as you see appropriate.
-      consumes:
-        - "application/json"
-      produces:
-        - "application/json"
+        It is another team's responsibility to implement this service.
+        You need to create this mock endpoint for your service to query.
       parameters:
-        - name: "body"
-          in: "body"
-          required: true
-          schema:
-            $ref: "#/definitions/TextRequest"
+      - name: id
+        in: path
+        description: The user identifier.
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
-          description: "The request returned successfully."
-          schema:
-            $ref: "#/definitions/TextResponse"
-        "400":
+        200:
+          description: Information about the requested user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: The user does not exist.
+          content: {}
+  /concerts/health:
+    get:
+      operationId: ba
+      tags:
+      - concert
+      summary: Query the health of the concerts service.
+      description: |
+        The health endpoint is useful for determining whether an instance is still healthy.
+        This can help if you are configuring auto-scaling groups or load balancers.
+
+        We do not specify the response payload for this endpoint,
+        however you may find it useful to return a more detailed status of your system.
+        For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
+
+        Each service has a separate health endpoint to allow for flexibility in your implementation.
+        __We do not require a separate server for each of the endpoints, i.e. one server can handle requests for all endpoints.__
+      responses:
+        200:
+          description: Service is healthy.
+          content: {}
+        500:
+          description: Service is not healthy.
+          content: {}
+        503:
+          description: Service is not healthy.
+          content: {}
+  /concerts:
+    get:
+      operationId: bb
+      tags:
+      - concert
+      summary: List all the concerts registered with TicketOverflow.
+      responses:
+        200:
+          description: List of all concerts.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Concert'
+    post:
+      operationId: bc
+      tags:
+      - concert
+      summary: Register a new concert for TicketOverflow.
+      description: You may assume a concert has a capacity less than or equal to 150,000.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConcertRequest'
+        required: true
+      responses:
+        200:
+          description: The request returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Concert'
+        400:
           description: |
             Body parameter was malformed or invalid.
 
             Return value is not specified but should describe the error.
-        "500":
-          description: "An unknown error occurred trying to process the request. The response should contain as much of the payload as possible, the error field should be populated in this case."
-          schema:
-            $ref: "#/definitions/TextResponse"
-  /text/{id}:
-    parameters:
-      - name: "id"
-        in: "path"
-        required: true
-        type: string
-        description: "The identifier of the text resource."
+          content: {}
+        500:
+          description: An unknown error occurred trying to process the request.
+
+            Return value is not specified but should attempt to describe the error.
+          content: {}
+      x-codegen-request-body-name: body
+  /concerts/{id}:
     get:
-      tags: ["tts"]
-      summary: "Retrieve details about a text-to-speech request."
-      produces:
-        - "application/json"
-      
+      operationId: bd
+      tags:
+      - concert
+      summary: Get details for a particular concert.
+      parameters:
+      - name: id
+        in: path
+        description: The concert identifier.
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
-          description: "Successfully found a text resource."
-          schema:
-            $ref: "#/definitions/TextResponse"
-        "404":
-          description: "Unknown resource identifier."
-    delete:
-      tags: ["tts"]
-      summary: "Delete a text-to-speech job."
+        200:
+          description: Information about the requested concert.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Concert'
+        404:
+          description: The concert does not exist.
+          content: {}
+    put:
+      operationId: be
+      tags:
+        - concert
+      summary: Update details about a concert.
       description: |
-        This endpoint will remove all known information about a text-to-speech job, including any generated audio files.
-      responses:
-        "200":
-          description: "Resource successfully deleted."
-        "404":
-          description: "Unknown resource identifier."
-  /model/{id}:
-    parameters:
-      - name: "id"
-        in: "path"
+        The concert's name, venue, date or status may be updated.
+        The concert's id and capacity may not be updated.
+        
+        The request body can be any subset of the updatable content,
+        e.g. "{'status': 'CANCELLED'}" is a valid request body.
+
+        Any existing tickets that have been generated need to be removed.
+      parameters:
+      - name: id
+        in: path
+        description: The concert identifier.
         required: true
-        type: string
-        description: The string identifier of the model as listed by the /model endpoint.
-    get:
-      tags: ["tts"]
-      summary: "Retrieve details about a specified text-to-speech model."
-      description: "Details can be found here: [https://github.com/CSSE6400/tts-cli/blob/main/chatterbox/.models.json](https://github.com/CSSE6400/tts-cli/blob/main/chatterbox/.models.json)"
-      produces:
-        - "application/json"
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConcertPut'
+        required: true
       responses:
-        "200":
-          description: "All known details about the text-to-speech model."
-          schema:
-            $ref: "#/definitions/Model"
-            example: |
-              {
-                "name": "tts_models.en.ljspeech.glow-tts",
-                "description": "",
-                "author": "Eren Gölge @erogol",
-                "license": "MPL",
-                "url": "https://coqui.gateway.scarf.sh/v0.0.9/tts_models--en--ljspeech--glow-tts.zip"
-              }
-        "404":
-          description: "Unknown resource identifier."
-definitions:
-  User:
-    type: "object"
-    properties:
-      user_id:
-        type: "string"
-        description: "Unique user identifier."
+        200:
+          description: The request returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Concert'
+        400:
+          description: |
+            Body parameter was malformed or invalid.
+
+            Return value is not specified but should describe the error.
+          content: {}
+        404:
+          description: The concert does not exist.
+          content: {}
+        500:
+          description: An unknown error occurred trying to process the request.
+
+            Return value is not specified but should attempt to describe the error.
+          content: {}
+      x-codegen-request-body-name: body
+  /concerts/{id}/seats:
+    get:
+      operationId: bf
+      tags:
+      - concert
+      summary: Get the seating plan as an SVG for a particular concert.
+      description:
+        The SVG must be generated using the provided command line tool, as indicated in the assignment specification.
+
+
+        The generated seating plan is allowed to be up to 3 minutes out of sync with the real state of the seats,
+        i.e. once a seat is purchased it must be rendered in the seating plan within 3 minutes.
+      parameters:
+      - name: id
+        in: path
+        description: The concert identifier.
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Seating plan for the given concert.
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+                example: |
+                  <?xml version="1.0"?>
+                  <!-- Generated by SVGo -->
+                  <svg width="1200" height="300"
+                       xmlns="http://www.w3.org/2000/svg"
+                       xmlns:xlink="http://www.w3.org/1999/xlink">
+                  <desc>12345678-1234-1234-1234-123456789012|5738|2340</desc>
+                  <rect x="0" y="0" width="1200" height="2600" style="fill:rgb(255,255,255)" />
+                  <text x="600" y="100" style="text-anchor:middle;font-size:36px;fill:black" >Phantom of the Opera</text>
+                  <text x="600" y="150" style="text-anchor:middle;font-size:24px;fill:black" >Sydney Opera House</text>
+                  <line x1="300" y1="170" x2="900" y2="170" style="stroke:rgb(0,0,0);stroke-width:2" />
+                  <rect x="582" y="240" width="20" height="20" style="fill:rgb(50,98,115);stroke-width:1;stroke:rgb(0,0,0)" />
+                  <rect x="602" y="240" width="20" height="20" style="fill:rgb(50,98,115);stroke-width:1;stroke:rgb(0,0,0)" />
+                  ...
+                  </svg>
+        404:
+          description: The concert does not exist.
+          content: {}
+  /tickets/health:
+    get:
+      operationId: ca
+      tags:
+      - ticket
+      summary: Query the health of the tickets service.
+      description: |
+        The health endpoint is useful for determining whether an instance is still healthy.
+        This can help if you are configuring auto-scaling groups or load balancers.
+
+        We do not specify the response payload for this endpoint,
+        however you may find it useful to return a more detailed status of your system.
+        For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
+
+        Each service has a separate health endpoint to allow for flexibility in your implementation.
+        __We do not require a separate server for each of the endpoints, i.e. one server can handle requests for all endpoints.__
+      responses:
+        200:
+          description: Service is healthy.
+          content: {}
+        500:
+          description: Service is not healthy.
+          content: {}
+        503:
+          description: Service is not healthy.
+          content: {}
+  /tickets:
+    get:
+      operationId: cb
+      tags:
+      - ticket
+      summary: List all of the purchased tickets.
+      parameters:
+      - name: user_id
+        in: query
+        description: Filter only the tickets purchased by the given user. This is an optional query parameter.
+        schema:
+          type: string
         example: "e571964f-f2b7-4200-9fb0-2af749092fa1"
-      name:
-        type: "string"
-        description: "Full name of the user."
-        example: "Evan Hughes"
-  Model:
-    type: "object"
-    properties: 
-      name:
-        type: "string"
-        description: "Text-to-speech model"
-        example: "tts_models.en.ljspeech.glow-tts"
-      description: 
-        type: "string"
-        description: "A description of the model"
-        example: ""
-      author:
-        type: "string"
-        description: "Author of the model. This field may be null."
-        example: "Eren Gölge @erogol"
-      license:
-        type: "string"
-        description: "License of the model. This field may be null."
-        example: "MPL"
-      url:
-        type: "string"
-        format: "uri"
-        description: "URL to download the model. This field may be null."
-        example: "https://coqui.gateway.scarf.sh/v0.0.9/tts_models--en--ljspeech--glow-tts.zip"
-  TextRequest:
-    type: "object"
-    properties:
-      message:
-        type: "string"
-        example: "Hello, CSSE6400!"
-        description: "Content of the text request, synchronous requests must be between 1 and 280 characters. Asynchronous requests must be less than 9001 characters."
-      operation:
-        type: "string"
-        description: "Perform the request synchronously or asynchronously"
-        enum:
-          - SYNC
-          - ASYNC
-      model:
-        type: "string"
-        description: "Text-to-speech model"
-        example: "tts_models.en.ljspeech.glow-tts"
-  TextResponse:
-    allOf:
-      - type: "object"
-        properties:
-          id:
-            type: "string"
-            format: "uuid"
-            description: "Unique identifier of the text request"
-      - $ref: "#/definitions/TextRequest"
-      - type: "object"
-        properties:
-          status:
-            type: "string"
-            enum:
-              - PENDING
-              - COMPLETED
-              - FAILED
-          resource:
-            type: "string"
-            format: "uri"
-            description: "URL where the .wav file can be found, if the request is completed."
-            example: "https://presignedurldemo.s3.eu-west-2.amazonaws.com/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAJJWZ7B6WCRGMKFGQ%2F20180210%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20180210T171315Z&X-Amz-Expires=1800&X-Amz-Signature=12b74b0788aa036bc7c3d03b3f20c61f1f91cc9ad8873e3314255dc479a25351&X-Amz-SignedHeaders=host"
-          created_at:
-            type: "string"
-            format: "date-time"
-            example: "2022-04-01T00:43:29.111Z"
-          processed_at:
-            type: "string"
-            format: "date-time"
-            example: "2022-04-09T07:43:31.111Z"
-          error:
-            type: "object"
+      - name: concert_id
+        in: query
+        description: Filter only the tickets purchased for the given concert. This is an optional query parameter.
+        schema:
+          type: string
+        example: "786d3bb4-a858-49ba-8803-15ffa2ec3678"
+      responses:
+        200:
+          description: List of all purchased tickets, as per request.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ticket'
+        404:
+          description: Unknown identifier provided as filter parameter.
+          content: {}
+    post:
+      operationId: cc
+      tags:
+      - ticket
+      summary: Purchase a ticket for a concert.
+      description: |
+        The ticket must be purchased for a concert that exists.
+        The ticket must be purchased by a user that exists.
+
+        Tickets should have an initial status of being NOT_PRINTED.
+        A separate call to */tickets/{id}/print* triggers the printing
+        (i.e. generation of a downloadable ticket SVG).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketPurchase'
+        required: true
+      responses:
+        200:
+          description: The request returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        400:
+          description: |
+            Body parameter was malformed or invalid.
+            This includes passing concerts or users that do not exist.
+
+            Return value is not specified but should describe the error.
+          content: {}
+        422:
+          description: Ticket purchase failed as no tickets were available (i.e. the concert has sold out).
+          content: {}
+        500:
+          description: An unknown error occurred trying to process the request.
+
+            Return value is not specified but should attempt to describe the error.
+          content: {}
+      x-codegen-request-body-name: body
+  /tickets/{id}:
+    get:
+      operationId: cd
+      tags:
+      - ticket
+      summary: Get information for a particular ticket.
+      parameters:
+      - name: id
+        in: path
+        description: The ticket identifier.
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Information about the requested ticket.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        404:
+          description: The ticket does not exist.
+          content: {}
+  /tickets/{id}/print:
+    post:
+      operationId: ce
+      tags:
+      - ticket
+      summary: Request that a ticket is printed asynchronously.
+      description: |
+        Asynchronously start the generation of a ticket SVG.
+        This must use the provided command line tool, as indicated in the assignment specification.
+        
+        When a request is made, the ticket print status should be set to PENDING.
+        When the command line tool successfully generates a SVG, the ticket print status should be set to PRINTED.
+        If a SVG is not generated for some reason, the ticket print status should be set to ERROR.
+      parameters:
+      - name: id
+        in: path
+        description: The ticket identifier.
+        required: true
+        schema:
+          type: string
+      responses:
+        202:
+          description: The asynchronous request was successfully started.
+          content: {}
+        404:
+          description: |
+            The ticket does not exist.
+          content: {}
+        500:
+          description: An unknown error occurred trying to process the request.
+
+            Return value is not specified but should attempt to describe the error.
+          content: {}
+    get:
+      operationId: cf
+      tags:
+      - ticket
+      summary: Get the printed ticket if it exists.
+      parameters:
+      - name: id
+        in: path
+        description: The ticket identifier.
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: The printed ticket SVG.
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+                example: |
+                  <?xml version="1.0"?>
+                  <!-- Generated by SVGo -->
+                  <svg width="1200" height="518"
+                       xmlns="http://www.w3.org/2000/svg"
+                       xmlns:xlink="http://www.w3.org/1999/xlink">
+                  <desc>12345678-1234-1234-1234-123456789012</desc>
+                  <rect x="0" y="0" width="1200" height="518" style="fill:rgb(255,255,255)" />
+                  <rect x="0" y="0" width="200" height="518" style="fill:rgb(92,158,173)" />
+                  <rect x="200" y="0" width="20" height="518" style="fill:rgb(50,98,115)" />
+                  <circle cx="210" cy="100" r="50" style="fill:rgb(50,98,115)" />
+                  <text x="300" y="100" style="text-anchor:left;font-size:36px;fill:black" >Phantom of the Opera</text>
+                  <text x="300" y="150" style="text-anchor:left;font-size:24px;fill:black" >2023-06-07</text>
+                  <text x="300" y="200" style="text-anchor:left;font-size:24px;fill:black" >Sydney Opera House</text>
+                  <text x="300" y="250" style="text-anchor:left;font-size:24px;fill:black" >12345678-1234-1234-1234-123456789012</text>
+                  <line x1="300" y1="300" x2="900" y2="300" style="stroke:rgb(0,0,0);stroke-width:2" />
+                  <text x="300" y="350" style="text-anchor:left;font-size:24px;fill:black" >Evan Hughes</text>
+                  <text x="300" y="400" style="text-anchor:left;font-size:24px;fill:black" >example@uq.edu.au</text>
+                  <text x="300" y="450" style="text-anchor:left;font-size:24px;fill:black" >12345678-1234-1234-1234-123456789012</text>
+                  <rect x="1190" y="0" width="10" height="518" style="fill:rgb(255,215,0)" />
+                  <rect x="1000" y="80" width="150" height="1" style="fill:rgb(0,0,0)" />
+                  ...
+                  </svg>
+
+        404:
+          description: The ticket does not exist or has not been printed yet.
+          content: {}
+    
+components:
+  schemas:
+    User:
+      type: object
+      example:
+        id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
+        name: "Evan Hughes"
+        email: "noreply@uq.edu.au"
+      properties:
+        id:
+          type: string
+          description: Unique user identifier.
+        name:
+          type: string
+          description: Full name of the user.
+        email:
+          type: string
+          description: Email address of the user.
+    TicketPurchase:
+      type: object
+      example:
+        concert_id: "786d3bb4-a858-49ba-8803-15ffa2ec3678"
+        user_id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
+      properties:
+        concert_id:
+          type: string
+          description: Unique concert identifier.
+        user_id:
+          type: string
+          description: Unique user identifier.
+    Ticket:
+      type: object
+      example:
+        id: "a4c5211f-2402-4de9-9664-b9e78454da35"
+        concert:
+          id: "786d3bb4-a858-49ba-8803-15ffa2ec3678"
+          url: "http://tickets.api.ticketoverflow.com/api/v1/concerts/786d3bb4-a858-49ba-8803-15ffa2ec3678"
+        user:
+          id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
+          url: "http://tickets.api.ticketoverflow.com/api/v1/users/e571964f-f2b7-4200-9fb0-2af749092fa1"
+        print_status: "NOT_PRINTED"
+      properties:
+        id:
+          type: string
+          description: Unique ticket identifier.
+        concert:
+          type: object
+          properties:
+            id:
+              type: string
+              description: Unique concert identifier.
+            url:
+              type: string
+              description: URL path to the concert resource.
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+              description: Unique user identifier
+            url:
+              type: string
+              description: URL path to the user resource.
+        print_status:
+          type: string
+          description: The printed status of the ticket.
+          enum:
+          - NOT_PRINTED
+          - PRINTED
+          - ERROR
+          - PENDING
+    Concert:
+      type: object
+      example:
+        id: 786d3bb4-a858-49ba-8803-15ffa2ec3678
+        name: The Beatles
+        venue: The Gabba
+        date: 2023-06-07
+        capacity: 250
+        status: ACTIVE
+      properties:
+        id:
+          type: string
+          description: Unique concert identifier.
+        name:
+          type: string
+          description: Name of the concert.
+        venue:
+          type: string
+          description: The arena or venue where a concert is to be held.
+        date:
+          type: string
+          description: The date of the concert performance.
+        capacity:
+          type: integer
+          description: Maximum capacity for the concert.
+        status:
+          type: string
+          description: The current status of the concert.
+          enum:
+          - ACTIVE
+          - CANCELLED
+          - SOLD_OUT
+    ConcertRequest:
+      type: object
+      example:
+        name: The Beatles
+        venue: The Gabba
+        date: 2023-06-07
+        capacity: 250
+        status: ACTIVE
+      properties:
+        name:
+          type: string
+          description: Name of the concert.
+        venue:
+          type: string
+          description: The arena or venue where a concert is to be held.
+        date:
+          type: string
+          description: The date of the concert performance.
+        capacity:
+          type: integer
+          description: Maximum capacity for the concert.
+        status:
+          type: string
+          description: The current status of the concert.
+          enum:
+          - ACTIVE
+          - CANCELLED
+          - SOLD_OUT
+    ConcertPut:
+      type: object
+      example:
+        name: The Beatles
+        venue: The Gabba
+        date: 2023-06-07
+        status: ACTIVE
+      properties:
+        name:
+          type: string
+          description: Name of the concert.
+        venue:
+          type: string
+          description: The arena or venue where a concert is to be held.
+        date:
+          type: string
+          description: The date of the concert performance.
+        status:
+          type: string
+          description: The current status of the concert.
+          enum:
+          - ACTIVE
+          - CANCELLED
+          - SOLD_OUT
 

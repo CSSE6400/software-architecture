@@ -1,0 +1,71 @@
+openapi: 3.0.1
+info:
+  title: Button
+  description: |
+    An API service that allows users to press a button that increments a counter.
+
+    Note that the URL used in the cURL examples below are just illustrative, you should replace [http://button.uq.edu.au/api/v1/](http://button.uq.edu.au/api/v1) with the host of your service.
+  contact:
+    name: CSSE6400
+    url: https://csse6400.uqcloud.net
+    email: noreply@uq.edu.au
+  version: 0.1.0
+servers:
+- url: http://button.uq.edu.au/api/v1
+tags:
+- name: button
+  description: Button service
+paths:
+  /button:
+    get:
+      operationId: cb
+      tags:
+      - button
+      summary: Gets the current count
+      responses:
+        200:
+          description: Count of the number of times the button has been pressed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    description: The current count.
+                    example: 42
+        404:
+          description: Unknown identifier provided as filter parameter.
+          content: {}
+    post:
+      operationId: cc
+      tags:
+      - button
+      summary: Increment a counter.
+      description: |
+        The counter is incremented by one and the new value is returned.
+      responses:
+        200:
+          description: The request returned successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    description: The current count.
+                    example: 42
+        400:
+          description: |
+            Body parameter was malformed or invalid.
+            This includes passing concerts or users that do not exist.
+
+            Return value is not specified but should describe the error.
+          content: {}
+        500:
+          description: An unknown error occurred trying to process the request.
+
+            Return value is not specified but should attempt to describe the error.
+          content: {}
+      x-codegen-request-body-name: body
