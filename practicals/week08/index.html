@@ -1,4 +1,4 @@
-Last Updated on 2023/02/12      
+Last Updated on 2023/04/24      
 
 <?xml version="1.0" encoding="iso-8859-1" ?> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
@@ -6,7 +6,7 @@ Last Updated on 2023/02/12
 <!--http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd-->  
 <html xmlns="http://www.w3.org/1999/xhtml"  
 > 
-<head> <title>Empty Practical</title> 
+<head> <title>Load Testing &amp; Bottlenecks</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> 
 <meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
 <meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
@@ -21,9 +21,9 @@ dl dd {text-align: left}</style>
 >
    <div class="maketitle"><a 
  id="Q1-1-1"></a>
-_________________________________________________________________________________________________
-<h2 class="titleHead">Empty Practical</h2>                                                                              Software Architecture
-   <div class="date" >February 13, 2023</div>                                                                                                                     <div class="author" >Evan Hughes &amp; Brae
+_________________________________________________________________________________________________ <h2 class="titleHead">Load
+Testing &amp; Bottlenecks</h2>                                                                   Software Architecture
+   <div class="date" >April 19, 2023</div>                                                                                                                                                          <div class="author" >Brae
 Webb</div>
 ______________________________________________________________________________________________
    </div>
@@ -31,47 +31,609 @@ ________________________________________________________________________________
 >
                                                                                                     
                                                                                                     
-<a 
- id="x1-2r1"></a>
                                                                                                     
                                                                                                     
-<!--l. 20--><p class="noindent" ><a 
-href="https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/ch02.html" ><img 
-src="images/databases.png" alt="PIC"  
-width="525" height="525"  /> </a>
-<br /> </p><div class="caption" 
-><span class="id">Figure&#x00A0;1: </span><span  
-class="content">A map of data storage techniques from Designing Data-Intensive Applications <span class="cite">[<a 
-href="#Xdata-intensive">1</a>]</span>.</span></div><!--tex4ht:label?: x1-2r1 -->
+<!--l. 19--><p class="noindent" ><img 
+src="images/bottleneck.png" alt="PIC"  
+width="420" height="420"  />
                                                                                                     
                                                                                                     
+</p>
    </div><hr class="endfigure" />
    <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
  id="x1-10001"></a>This Week</h3>
-<!--l. 25--><p class="noindent" >This week our goal is to: </p>
+<!--l. 23--><p class="noindent" >Our goal is to: </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 27--><p class="noindent" >fill in content here.</p></li></ul>
-<!--l. 30--><p class="noindent" >
+      <!--l. 25--><p class="noindent" >Introduce structured logging to TaskOverflow.
+      </p></li>
+      <li class="itemize">
+      <!--l. 26--><p class="noindent" >Deploy TaskOverflow to AWS.
+      </p></li>
+      <li class="itemize">
+      <!--l. 27--><p class="noindent" >Write k6 tests to ensure TaskOverflow can handle given scenarios.
+      </p></li>
+      <li class="itemize">
+      <!--l. 28--><p class="noindent" >Uncover and fix bottlenecks in the TaskOverflow application using the logs.</p></li></ul>
+<!--l. 31--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
- id="x1-20002"></a>Databases and Data Models</h3>
-<!--l. 31--><p class="noindent" >stuff here.
-</p><!--l. 1--><p class="noindent" >
+ id="x1-20002"></a>Watchtower</h3>
+<!--l. 32--><p class="noindent" >In this course we have repeatedly claimed that there is value in montoring and logging. This week, we aim to prove
+it by using logging to help diagnose issues with a deployment of TaskOverflow. For this task, we have integrated
+<a 
+href="https://pypi.org/project/watchtower/" >Watchtower</a><span class="footnote-mark"><a 
+href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
+ id="x1-2001f1"></a>
+into the project. Watchtower is a Python library that allows us to send logs to AWS CloudWatch, allowing us to
+monitor the applications performance in real time.
+</p><!--l. 38--><p class="indent" >   Currently the project is configured to log API accesses made with Flask and to log database queries created by
+SQL Alchemy. This results in an unstructured log stream as seen in Figure <a 
+href="#x1-2003r1">1<!--tex4ht:ref: fig:cloud-logs --></a>.
 </p>
-   <h3 class="likesectionHead"><a 
- id="x1-3000"></a>References</h3>
-<!--l. 1--><p class="noindent" >
-   </p><div class="thebibliography">
-   <p class="bibitem" ><span class="biblabel">
- [1]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
- id="Xdata-intensive"></a>M.&#x00A0;Kleppmann,  <span 
-class="Cabin-Italic-tlf-t1-x-x-120">Designing  Data-Intensive  Applications:  The  big  ideas  behind  reliable,  scalable,  and</span>
-   <span 
-class="Cabin-Italic-tlf-t1-x-x-120">maintainable systems</span>. O&#8217;Reilly Media, Inc., March 2017.
-</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-2003r1"></a>
+                                                                                                    
+                                                                                                    
+<!--l. 42--><p class="noindent" ><img 
+src="images/cloud-watch-log.png" alt="PIC"  
+width="525" height="525"  />
+<br /> </p><div class="caption" 
+><span class="id">Figure&#x00A0;1: </span><span  
+class="content">An example of logs made to AWS CloudWatch for a DELETE request in the TaskOverflow API.</span></div><!--tex4ht:label?: x1-2003r1 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 47--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-3000"></a><span 
+class="Cabin-Bold-tlf-t1-x-x-120">Getting Started</span></span>
+      </p><ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x1-3002x1">
+      <!--l. 49--><p class="noindent" >Using the GitHub Classroom link for this practical provided by your tutor in Slack, create a repository
+      to work within.
+      </p></li>
+<li 
+  class="enumerate" id="x1-3004x2">
+      <!--l. 50--><p class="noindent" >Install Terraform if not already installed, as it will be required again this week.
+      </p></li>
+<li 
+  class="enumerate" id="x1-3006x3">
+      <!--l. 51--><p class="noindent" >Start your learner lab and copy the AWS Learner Lab credentials into a credentials file in the root of
+      the repository.</p></li></ol>
+<!--l. 54--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-4000"></a><span 
+class="Cabin-Bold-tlf-t1-x-x-120">What&#8217;s New</span></span>
+   We are returning to TaskOverflow roughly from the state at the end of the last practical. The following notable
+changes have been made: </p>
+      <ul class="itemize1">
+      <li class="itemize">
+      <!--l. 58--><p class="noindent" ><span 
+class="ectt-1200">Watchtower </span>has been installed as a dependency.
+      </p></li>
+      <li class="itemize">
+      <!--l. 59--><p class="noindent" >In <span 
+class="ectt-1200">docker-compose.yml</span>, we mount the <span 
+class="ectt-1200">credentials </span>file to <span 
+class="ectt-1200">/root/.aws/credentials</span>. This allows
+      local testing of <span 
+class="ectt-1200">watchtower </span>to log to AWS CloudWatch.
+      </p></li>
+      <li class="itemize">
+      <!--l. 61--><p class="noindent" >Logging has been introduced for Flask and SQL Alchemy.</p></li></ul>
+<!--l. 64--><p class="indent" >   Our first task will be to replicate the above logs in Figure <a 
+href="#x1-2003r1">1<!--tex4ht:ref: fig:cloud-logs --></a>. Once you have copied <span 
+class="ectt-1200">credentials </span>into the project
+root, start docker compose with:  </p><div class="framedenv" id="shaded*-1">
+   <!--l. 67-->
+<pre class="lstlisting" id="listing-1"><span class="label"><a 
+ id="x1-4001r1"></a></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">compose</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">up</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
    </div>
-    
+   <div class="framedenv" id="code-1">
+<!--l. 69--><pre class="listings" id="listing-2"><span class="label"><a 
+ id="x1-4002r1"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Serving</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Flask</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">todo</span></span><span style="color:#000000"><span 
+class="tctt-1200">'</span></span> 
+<span class="label"><a 
+ id="x1-4003r2"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Debug</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">mode</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">on</span></span> 
+<span class="label"><a 
+ id="x1-4004r3"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">werkzeug</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">WARNING</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">This</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">is</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">a</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">development</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">server</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Do</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">not</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">use</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">it</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">in</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">a</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">production</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">deployment</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Use</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">a</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">production</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">WSGI</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">server</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">instead</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span> 
+<span class="label"><a 
+ id="x1-4005r4"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Running</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">on</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">all</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">addresses</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">(0.0.0.0)</span></span> 
+<span class="label"><a 
+ id="x1-4006r5"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Running</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">on</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">http</span></span><span style="color:#000000"><span 
+class="ectt-1200">://127.0.0.1:6400</span></span> 
+<span class="label"><a 
+ id="x1-4007r6"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Running</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">on</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">http</span></span><span style="color:#000000"><span 
+class="ectt-1200">://192.168.96.3:6400</span></span> 
+<span class="label"><a 
+ id="x1-4008r7"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">werkzeug</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">Press</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">CTRL</span></span><span style="color:#000000"><span 
+class="ectt-1200">+</span></span><span style="color:#000000"><span 
+class="ectt-1200">C</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">to</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">quit</span></span> 
+<span class="label"><a 
+ id="x1-4009r8"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">werkzeug</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Restarting</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">with</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">stat</span></span> 
+<span class="label"><a 
+ id="x1-4010r9"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">botocore</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">credentials</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">Found</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">credentials</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">in</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">shared</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">credentials</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">file</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">~/.</span></span><span style="color:#000000"><span 
+class="ectt-1200">aws</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">credentials</span></span> 
+<span class="label"><a 
+ id="x1-4011r10"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">sqlalchemy</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">Engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">select</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">pg_catalog</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">version</span></span><span style="color:#000000"><span 
+class="ectt-1200">()</span></span> 
+<span class="label"><a 
+ id="x1-4012r11"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">sqlalchemy</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">Engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">:[</span></span><span style="color:#000000"><span 
+class="ectt-1200">raw</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">sql</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{}</span></span> 
+<span class="label"><a 
+ id="x1-4013r12"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">sqlalchemy</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">Engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">select</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">current_schema</span></span><span style="color:#000000"><span 
+class="ectt-1200">()</span></span> 
+<span class="label"><a 
+ id="x1-4014r13"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">sqlalchemy</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">Engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">:[</span></span><span style="color:#000000"><span 
+class="ectt-1200">raw</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">sql</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{}</span></span> 
+<span class="label"><a 
+ id="x1-4015r14"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">sqlalchemy</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">Engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">show</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">standard_conforming_strings</span></span> 
+<span class="label"><a 
+ id="x1-4016r15"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">sqlalchemy</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">Engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">:[</span></span><span style="color:#000000"><span 
+class="ectt-1200">raw</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">sql</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{}</span></span> 
+<span class="label"><a 
+ id="x1-4017r16"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">sqlalchemy</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">Engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">BEGIN</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">implicit</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-4018r17"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">sqlalchemy</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">Engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">SELECT</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">pg_catalog</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">pg_class</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">relname</span></span> 
+<span class="label"><a 
+ id="x1-4019r18"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">FROM</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">pg_catalog</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">pg_class</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">JOIN</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">pg_catalog</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">pg_namespace</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ON</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">pg_catalog</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">pg_namespace</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">oid</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">pg_catalog</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">pg_class</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">relnamespace</span></span> 
+<span class="label"><a 
+ id="x1-4020r19"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">WHERE</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">pg_catalog</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">pg_class</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">relname</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">%(</span></span><span style="color:#000000"><span 
+class="ectt-1200">table_name</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">AND</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">pg_catalog</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">pg_class</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">relkind</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ANY</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">ARRAY</span></span><span style="color:#000000"><span 
+class="ectt-1200">[%(</span></span><span style="color:#000000"><span 
+class="ectt-1200">param_1</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">%(</span></span><span style="color:#000000"><span 
+class="ectt-1200">param_2</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">%(</span></span><span style="color:#000000"><span 
+class="ectt-1200">param_3</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">%(</span></span><span style="color:#000000"><span 
+class="ectt-1200">param_4</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">%(</span></span><span style="color:#000000"><span 
+class="ectt-1200">param_5</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"><span 
+class="ectt-1200">])</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">AND</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">pg_catalog</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">pg_table_is_visible</span></span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#000000"><span 
+class="ectt-1200">pg_catalog</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">pg_class</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">oid</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">AND</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">pg_catalog</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">pg_namespace</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">nspname</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">!=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">%(</span></span><span style="color:#000000"><span 
+class="ectt-1200">nspname_1</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span> 
+<span class="label"><a 
+ id="x1-4021r20"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">sqlalchemy</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">Engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">:[</span></span><span style="color:#000000"><span 
+class="ectt-1200">generated</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">in</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">0.00011</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">table_name</span></span><span style="color:#000000"><span 
+class="tctt-1200">'</span><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">todos</span></span><span style="color:#000000"><span 
+class="tctt-1200">'</span><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">param_1</span></span><span style="color:#000000"><span 
+class="tctt-1200">'</span><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">r</span></span><span style="color:#000000"><span 
+class="tctt-1200">'</span><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">param_2</span></span><span style="color:#000000"><span 
+class="tctt-1200">'</span><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">p</span></span><span style="color:#000000"><span 
+class="tctt-1200">'</span><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">param_3</span></span><span style="color:#000000"><span 
+class="tctt-1200">'</span><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">f</span></span><span style="color:#000000"><span 
+class="tctt-1200">'</span><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">param_4</span></span><span style="color:#000000"><span 
+class="tctt-1200">'</span><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">v</span></span><span style="color:#000000"><span 
+class="tctt-1200">'</span><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">param_5</span></span><span style="color:#000000"><span 
+class="tctt-1200">'</span><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">m</span></span><span style="color:#000000"><span 
+class="tctt-1200">'</span><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">nspname_1</span></span><span style="color:#000000"><span 
+class="tctt-1200">'</span><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="tctt-1200">'</span></span><span style="color:#000000"><span 
+class="ectt-1200">pg_catalog</span></span><span style="color:#000000"><span 
+class="tctt-1200">'</span><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-4022r21"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">sqlalchemy</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">Engine</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">COMMIT</span></span> 
+<span class="label"><a 
+ id="x1-4023r22"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">WARNING</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">werkzeug</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Debugger</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">is</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">active</span></span><span style="color:#000000"><span 
+class="ectt-1200">!</span></span>
+ 
+<span class="label"><a 
+ id="x1-4024r23"></a></span></pre>
+                                                                                                    
+                                                                                                    
+   </div>
+<!--l. 94--><p class="indent" >   You should see logs similar to the above. Notice that information about Flask is prefixed with <span 
+class="ectt-1200">INFO:werkzeug</span>
+and information about SQL Alchemy is prefixed with <span 
+class="ectt-1200">INFO:sqlalchemy.engine.Engine</span>. This prefix indicates
+which log stream they are put into.
+</p><!--l. 98--><p class="indent" >   Open the AWS CloudWatch console and go to <span 
+class="ectt-1200">Log groups </span>on the side panel. You should see a log group
+called <span 
+class="ectt-1200">taskoverflow</span>, if you click on that group you can see the two log streams.
+</p>
+<div class="center" 
+>
+<!--l. 102--><p class="noindent" >
+</p><!--l. 103--><p class="noindent" ><img 
+src="images/log-group.png" alt="PIC"  
+width="420" height="420"  /></p></div>
+<!--l. 106--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">2.1    </span> <a 
+ id="x1-50002.1"></a>Structured Logging</h4>
+<!--l. 108--><p class="noindent" >Our first task will be to convert the current logging into a structured logging format. As we saw in last weeks
+tutorial, structured logging can be as simple as logging a JSON object. This allows logging services to quickly filter
+through logs based on criteria on the objects fields.
+</p><!--l. 112--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">2.2    </span> <a 
+ id="x1-60002.2"></a>Correlation IDs</h4>
+<!--l. 114--><p class="noindent" >Correlation IDs are a mechanism to help understand the path of a request, event, message, etc. through a system.
+When logging it can be helpful to be able to trace the execution of a particular request.
+</p>
+   <div class="footnotes"><a 
+ id="x1-2002x2"></a>
+<!--l. 34--><p class="indent" >       <span class="footnote-mark"><a 
+href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span><a 
+href="https://pypi.org/project/watchtower/" class="url" ><span 
+class="ectt-1000">https://pypi.org/project/watchtower/</span></a></p>                                                        </div>
+ 
 </body></html> 
 
                                                                                                     
