@@ -429,6 +429,35 @@ See if you can find out from the logs how this occured.
 Use the correlation IDs that we have now included to see where potential bottlenecks may be occuring.
 You can introduce more fine-grained logs to find where time is being spent.
 
+\subsection{Back-of-the-envelope}
+Back-of-the-envelope calculations are normally quite helpful when trying to scale services.
+You need some rough estimates of how many requests your infrastructure can handle to help identify bottlenecks.
+
+Our production service is deployed using Gunicorn,
+which is a Python WSGI HTTP Server for UNIX.\footnote{\url{https://docs.gunicorn.org/en/stable/design.html}}
+It is a pre-fork worker model,
+which means that it will create a number of worker processes when it starts.
+Each worker process can handle the amount of available threads concurrently.
+This means that the number of concurrent requests that can be handled by the service is the number of workers multiplied by the number of threads.
+
+The number of sync gunicorn workers is determined by the number of CPUs:
+$$
+workers = (2 * cpu) + 1
+$$
+
+You can use the logs that you have produced to help measure the time it takes each request to process.
+We can then use this to calculate how many requests each worker can handle per second.
+
+You can use the sleeps in the load tests and the number of virtual users to calculate how many requests are made per second.
+
+The service also makes use of RDS.
+The formula for calculating the amount of concurrent connections RDS can handle is roughly:
+$$
+LEAST({DBInstanceClassMemory/9531392}, 5000)
+$$
+
+Use these calculations to work out the amount of resources required to scale your service to handle the traffic produced by the tests.
+
 \teacher{
 Solutions are roughly:
 
