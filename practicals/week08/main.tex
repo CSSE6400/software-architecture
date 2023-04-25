@@ -9,7 +9,7 @@
 \title{Load Testing \& Bottlenecks}
 \author{Brae Webb}
 
-\date{\week[practical]{8}}
+\date{\week[practical]{9}}
 \begin{document}
 
 \maketitle
@@ -109,12 +109,329 @@ Our first task will be to convert the current logging into a structured logging 
 As we saw in last weeks tutorial, structured logging can be as simple as logging a JSON object.
 This allows logging services to quickly filter through logs based on criteria on the objects fields.
 
+In \texttt{todo/\_\_init\_\_.py} we have the following code within the \texttt{create\_app} function.
+This code configures watchtower to log to AWS CloudWatch.
+
+\begin{code}[language=python,numbers=none]{todo/\_\_init\_\_.py}
+handler = watchtower.CloudWatchLogHandler(
+    log_group_name="taskoverflow",
+    boto3_client=boto3.client("logs", region_name="us-east-1")
+)
+app.logger.addHandler(handler)
+...
+\end{code}
+
+We want to wrap all our logs in JSON objects and inject metadata to these objects.
+This allows us to search the logs with greater ease.
+To do this,
+we will create a custom log formatter that is a subclass of \texttt{watchtower.CloudWatchLogFormatter}.
+
+\begin{code}[language=python,numbers=none]{todo/\_\_init\_\_.py}
+from flask import has_request_context, request
+...
+
+class StructuredFormatter(watchtower.CloudWatchLogFormatter):
+    def format(self, record):
+        record.msg = {
+            'timestamp': record.created,
+            'location': record.name,
+            'message': record.msg,
+        }
+        if has_request_context():
+            record.msg['request_id'] = request.environ.get('REQUEST_ID')
+            record.msg['url'] = request.environ.get('PATH_INFO')
+            record.msg['method'] = request.environ.get('REQUEST_METHOD')
+        return super().format(record)
+
+...
+handler.setFormatter(StructuredFormatter())
+...
+\end{code}
+
+These are just some metadata fields we might want to add to our logging.
+We may also consider \texttt{socket.gethostname()} to identify the instance handling a request or other helpful information.
+
 \subsection{Correlation IDs}
 
 Correlation IDs are a mechanism to help understand the path of a request, event, message, etc. through a system.
 When logging it can be helpful to be able to trace the execution of a particular request.
 
-%\bibliographystyle{ieeetr}
-%\bibliography{books,ours}
+For our system we will generate a new random identifier for each incoming request.
+This identifier will be included as part of the logging metadata.
+For a system with multiple API endpoints requests will often come with an established REQUEST\_ID header.
+
+\begin{code}[language=python,numbers=none]{todo/\_\_init\_\_.py}
+import uuid
+...
+
+requests = logging.getLogger("requests")
+requests.addHandler(handler)
+
+@app.before_request
+def before_request():
+   request.environ['REQUEST_ID'] = str(uuid.uuid4())
+   requests.info("Request started")
+
+@app.after_request
+def after_request(response):
+   requests.info("Request finished")
+   return response
+\end{code}
+
+The above in \texttt{create\_app} will generate a unique identifier to each incoming request.
+It will also log when a request starts being processed and when it finishes processing.
+
+
+\subsection{Verify and Refine}
+Ensure that the above modifications are working as expected by returning to the AWS CloudWatch logs.
+Launch the service locally and make some API requests.
+
+You should now be able to go to the \textsl{Log Insights} interface from the sidebar.
+As we saw in the tutorial,
+this interface allows you to make queries about structured logging data.
+Give the following query a try to ensure that your logs seem sensible.
+
+\begin{code}[numbers=none]{}
+fields request_id, url, method, @timestamp, message.message, @message, @method
+| filter not isempty(request_id)
+| limit 400
+\end{code}
+
+Take the time to refine your logging now to produce logs that are easy to search through and understand the trace of your API requests.
+
+
+\section{Load Testing}
+
+We will now generate some load on our API using \texttt{k6} and see how it performs.
+We briefly saw \texttt{k6} at the end of the week 7 practical.
+To refresh, \texttt{k6} is a load testing tool that is written in Go but provides an interface using a JavaScript subset.
+
+It will help us to generate a large number of concurrent API requests.
+Go ahead and install \texttt{k6}:
+\url{https://k6.io/docs/get-started/installation/}
+
+\subsection{Scenario}
+We want to simulate the following scenario using our testing framework.
+
+\paragraph{Indecisive planners and studious reviewers}
+Our TaskOverflow application is being used at a point in semester where most students have already setup their tasks.
+These students are routinely visiting the website and listing the tasks they have yet to complete.
+At the same time, there are 40 very indecisive students who,
+quite late in semester,
+are trying to setup their tasks for the rest of semester.
+They continually create a task,
+realise that they're mis-typed,
+delete the task,
+and start over.
+
+As the tasks are shared globally amongst all students,
+the indecisive planners are altering the list of task seen by the organised students.
+
+\subsection{Setup}
+To get started,
+we will create a file called \texttt{planners-and-studiers.js}.
+Most \texttt{k6} tests start with the following imports.
+
+\begin{code}[language=JavaScript,numbers=none]{planners-and-studiers.js}
+import http from "k6/http";
+import { check, sleep } from "k6";
+
+const ENDPOINT = __ENV.ENDPOINT;
+\end{code}
+
+\begin{itemize}
+    \item \texttt{http} holds the methods used to make HTTP requests,
+    \item \texttt{check} allows us to assert the state of HTTP responses, and
+    \item \texttt{sleep} gives us the ability to put a simulated user to sleep rather than continuously spamming the service with requests.
+\end{itemize}
+
+The ENDPOINT line retrieves the endpoint URL from the ENDPOINT environment variable.
+
+\subsection{User Simulation}
+
+The behaviour of our users will be defined by an exported JavaScript function.
+Our studying student will be listing out all of the tasks they have left to complete by using the \texttt{/api/v1/todos} endpoint.
+
+\begin{code}[language=JavaScript,numbers=none]{planners-and-studiers.js}
+export function studyingStudent() {
+    let url = ENDPOINT + `/api/v1/todos`;
+
+    // What tasks do I have left to work on?
+    let request = http.get(url);
+
+    check(request, {
+        'is status 200': (r) => r.status === 200,
+    });
+    
+    // Alright I'll go work on my next task for around 2 minutes
+    sleep(120);
+}
+\end{code}
+
+Of course,
+this test is very basic as it only ensures the reponse code is 200.
+There is no guarantee that the returned data is sensible.
+
+\info{
+If you would like a challenge,
+you can use the \texttt{randomIntBetween} function to have the studier occasionally tick off tasks.
+
+\url{https://k6.io/docs/javascript-api/jslib/utils/randomintbetween/}
+}
+
+Next we need to handle our indecisive users.
+For them, we will need to make a POST request to the \texttt{/api/v1/todos} endpoint to create a task.
+Then we will need to use the ID given by the POST response to DELETE the mis-typed task.
+
+\begin{code}[language=JavaScript,numbers=none]{planners-and-studiers.js}
+export function indecisivePlanner() {
+    let url = ENDPOINT + `/api/v1/todos`;
+
+    // I need to work on the CSSE6400 Cloud Assignment!
+    const payload = JSON.stringify({
+        "title": "CSSE6400 Clout Assignment",
+        "completed": false,
+        "description": "",
+        "deadline_at": "2023-12-04T14:00:00",
+    });
+
+    const params = {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    };
+
+    let request = http.post(url, payload, params);
+    check(request, {
+        'is status 200': (r) => r.status === 200,
+    });
+
+    sleep(10);
+
+    // Oh no! Not the Clout assignment, the Cloud assignment!
+    const wrongId = request.id;
+
+    request = http.delete(`${url}/${wrongId}`);
+
+    check(request, {
+        'is status 200': (r) => r.status === 200,
+    });
+
+    // I'll come back to it later :(
+    sleep(10);
+}
+\end{code}
+
+\subsection{Configure Behaviour}
+
+We have now outlined how our user agents will interact with our API.
+We can use the \texttt{options} to configure how these interactions occur over time.
+To prevent overloading the API immediately,
+and allow any auto-scaling behaviour to be triggers,
+we will slowly increase the amount of studiers.
+We will have a consistent amount of planners, 20,
+who will perform a total of 200 corrections over the test.
+
+\begin{code}[language=JavaScript,numbers=none]{planners-and-studiers.js}
+export const options = {
+    scenarios: {
+        studier: {
+            exec: 'studyingStudent',
+            executor: "ramping-vus",
+            stages: [
+                { duration: "2m", target: 1000 },
+                { duration: "2m", target: 2500 },
+                { duration: "2m", target: 0 },
+            ],
+        },
+        planner: {
+            exec: 'indecisivePlanner',
+            executor: "shared-iterations",
+            vus: 20,
+            iterations: 400,
+        },
+    },
+};
+\end{code}
+
+\subsection{Running the tests}
+
+Now we have a completed load test.
+Deploy the service to AWS:
+
+\bash{terraform apply}
+
+Once the deployment is finished,
+you should be given a URL where the endpoint is deployed.
+Use that endpoint to set the \texttt{ENDPOINT} environment variable and run the tests.
+
+\begin{code}[language=bash,numbers=none]{}
+> export ENDPOINT=...
+> k6 run planners-and-studiers.js
+\end{code}
+
+These tests should take about 10 minutes to run.
+You should see that most of the tests pass but that there will be a few failures throughout,
+as seen below.
+
+\begin{code}[language=bash,numbers=none]{}
+WARN[0152] Request Failed                                error="Get \"http://54.166.206.229:6400//api/v1/todos\": request timeout"
+WARN[0183] Request Failed                                error="Get \"http://54.166.206.229:6400/api/v1/todos\": request timeout"
+WARN[0239] Request Failed                                error="Get \"http://54.166.206.229:6400/api/v1/todos\": request timeout"
+WARN[0241] Request Failed                                error="Get \"http://54.166.206.229:6400/api/v1/todos\": request timeout"
+WARN[0272] Request Failed                                error="Get \"http://54.166.206.229:6400/api/v1/todos\": request timeout"
+WARN[0330] Request Failed                                error="Get \"http://54.166.206.229:6400/api/v1/todos\": request timeout"
+WARN[0339] Request Failed                                error="Get \"http://54.166.206.229:6400/api/v1/todos\": request timeout"
+WARN[0371] Request Failed                                error="Get \"http://54.166.206.229:6400/api/v1/todos\": request timeout"
+WARN[0412] Request Failed                                error="Get \"http://54.166.206.229:6400/api/v1/todos\": request timeout"
+WARN[0412] Request Failed                                error="Get \"http://54.166.206.229:6400/api/v1/todos\": request timeout"
+WARN[0467] Request Failed                                error="Get \"http://54.166.206.229:6400/api/v1/todos\": request timeout"
+
+running (09m30.0s), 0000/2520 VUs, 4914 complete and 1947 interrupted iterations
+planner  [ 100% ] 20 VUs         07m09.0s/10m0s  400/400 shared iters
+studier  [ 100% ] 0000/2500 VUs  9m0s
+
+      is status 200
+       94%   6646 /  411
+
+     checks.........................: 94.17%  6646       411
+     data_received..................: 166 MB 292 kB/s
+     data_sent......................: 727 kB 1.3 kB/s
+     iterations.....................: 4914   8.620734/s
+     vus............................: 1      min=1       max=2520
+     vus_max........................: 2520   min=2520    max=2520
+\end{code}
+
+\section{Debugging}
+
+Now we can start to debug our service.
+We desire to not only increase our 94\% pass rate to 100\% but also to increase the amount of studiers and planners.
+
+\subsection{Tips}
+
+\paragraph{Open TaskOverflow}
+If you open TaskOverflow,
+you should find it has been left in an unusual state after the tests.
+See if you can find out from the logs how this occured.
+
+\paragraph{Follow an Interaction}
+Use the correlation IDs that we have now included to see where potential bottlenecks may be occuring.
+You can introduce more fine-grained logs to find where time is being spent.
+
+\teacher{
+Solutions are roughly:
+
+1. Discover that DELETE /api/v1/todos/undefined is being requested from the logs.
+Change 
+    const wrongId = request.id;
+to
+    const wrongId = request.json().id;
+
+2. Find that more tests are failing then there are timeouts.
+Change expected HTTP status code for POST to 201.
+
+3. Recognise that even with these fixes, the requests still timeout.
+Upgrade the ECS task from 1 CPU / 2GB memory to maybe 4 CPU / 8GB memory.
+}
 
 \end{document}
