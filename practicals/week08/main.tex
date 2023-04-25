@@ -3,8 +3,8 @@
 % \teachermodetrue
 
 \usepackage{float}
-
 \usepackage{languages}
+\usepackage{changepage}
 
 \title{Load Testing \& Bottlenecks}
 \author{Brae Webb}
@@ -33,20 +33,23 @@ In this course we have repeatedly claimed that there is value in montoring and l
 This week, we aim to prove it by using logging to help diagnose issues with a deployment of TaskOverflow.
 For this task, we have integrated \link{Watchtower}{https://pypi.org/project/watchtower/} into the project.
 Watchtower is a Python library that allows us to send logs to AWS CloudWatch,
-allowing us to monitor the applications performance in real time.
+allowing us to monitor the application's performance in real time.
 
 Currently the project is configured to log API accesses made with Flask and to log database queries created by SQL Alchemy.
 This results in an unstructured log stream as seen in Figure \ref{fig:cloud-logs}.
 
 \begin{figure}[ht]
-    \includegraphics[width=\textwidth]{images/cloud-watch-log}
+    \centering
+    \begin{adjustwidth}{-7.5mm}{-7.5mm}
+        \includegraphics[width=0.95\paperwidth]{images/cloud-watch-log}
+    \end{adjustwidth}
     \caption{An example of logs made to AWS CloudWatch for a DELETE request in the TaskOverflow API.}
     \label{fig:cloud-logs}
 \end{figure}
 
 \paragraph{Getting Started}
 \begin{enumerate}
-    \item Using the GitHub Classroom link for this practical provided by your tutor in Slack, create a repository to work within.
+    \item Using the GitHub Classroom link for this practical, provided by your tutor in Slack, create a repository to work within.
     \item Install Terraform if not already installed, as it will be required again this week.
     \item Start your learner lab and copy the AWS Learner Lab credentials into a credentials file in the root of the repository.
 \end{enumerate}
@@ -106,8 +109,8 @@ if you click on that group you can see the two log streams.
 \subsection{Structured Logging}
 
 Our first task will be to convert the current logging into a structured logging format.
-As we saw in last weeks tutorial, structured logging can be as simple as logging a JSON object.
-This allows logging services to quickly filter through logs based on criteria on the objects fields.
+As we saw in last week's tutorial, structured logging can be as simple as logging a JSON object.
+This allows logging services to quickly filter through logs based on criteria of the object's fields.
 
 In \texttt{todo/\_\_init\_\_.py} we have the following code within the \texttt{create\_app} function.
 This code configures watchtower to log to AWS CloudWatch.
@@ -123,8 +126,8 @@ def create_app(config_overrides=None):
     ...
 \end{code}
 
-We want to wrap all our logs in JSON objects and inject metadata to these objects.
-This allows us to search the logs with greater ease.
+We want to wrap all our logs in JSON objects and inject metadata into these objects.
+This makes it easier to search the logs.
 To do this,
 we will create a custom log formatter that is a subclass of \texttt{watchtower.CloudWatchLogFormatter}.
 
@@ -153,12 +156,12 @@ def create_app(config_overrides=None):
 \end{code}
 
 These are just some metadata fields we might want to add to our logging.
-We may also consider \texttt{socket.gethostname()} to identify the instance handling a request or other helpful information.
+We may also consider \texttt{socket.gethostname()} to identify the instance handling a request, or other helpful information.
 
 \subsection{Correlation IDs}
 
 Correlation IDs are a mechanism to help understand the path of a request, event, message, etc. through a system.
-When logging it can be helpful to be able to trace the execution of a particular request.
+When logging it is often helpful to be able to trace the execution of a particular request.
 
 For our system we will generate a new random identifier for each incoming request.
 This identifier will be included as part of the logging metadata.
@@ -185,7 +188,7 @@ def create_app(config_overrides=None):
     ...
 \end{code}
 
-The above in \texttt{create\_app} will generate a unique identifier to each incoming request.
+The code above in \texttt{create\_app} will generate a unique identifier for each incoming request.
 It will also log when a request starts being processed and when it finishes processing.
 
 
@@ -196,7 +199,7 @@ Launch the service locally and make some API requests.
 You should now be able to go to the \textsl{Log Insights} interface from the sidebar.
 As we saw in the tutorial,
 this interface allows you to make queries about structured logging data.
-Give the following query a try to ensure that your logs seem sensible.
+Try the following query to ensure that your logs seem sensible.
 
 \begin{code}[numbers=none]{}
 fields request_id, url, method, @timestamp, message.message, @message, @method
@@ -204,7 +207,8 @@ fields request_id, url, method, @timestamp, message.message, @message, @method
 | limit 400
 \end{code}
 
-Take the time to refine your logging now to produce logs that are easy to search through and understand the trace of your API requests.
+Take the time to refine your logging now to produce logs that are easy to search through
+and understand the trace of your API requests.
 
 
 \section{Load Testing}
