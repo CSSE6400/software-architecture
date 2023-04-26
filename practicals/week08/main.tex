@@ -218,7 +218,7 @@ We briefly saw \texttt{k6} at the end of the week 7 practical.
 To refresh, \texttt{k6} is a load testing tool that is written in Go but provides an interface using a JavaScript subset.
 
 It will help us to generate a large number of concurrent API requests.
-Go ahead and install \texttt{k6}:
+Install \texttt{k6} from:
 \url{https://k6.io/docs/get-started/installation/}
 
 \subsection{Scenario}
@@ -231,7 +231,7 @@ At the same time, there are 40 very indecisive students who,
 quite late in semester,
 are trying to setup their tasks for the rest of semester.
 They continually create a task,
-realise that they're mis-typed,
+realise that they have mis-typed,
 delete the task,
 and start over.
 
@@ -265,7 +265,7 @@ Our studying student will be listing out all of the tasks they have left to comp
 
 \begin{code}[language=JavaScript,numbers=none]{planners-and-studiers.js}
 export function studyingStudent() {
-    let url = ENDPOINT + `/api/v1/todos`;
+    let url = ENDPOINT + '/api/v1/todos';
 
     // What tasks do I have left to work on?
     let request = http.get(url);
@@ -280,7 +280,7 @@ export function studyingStudent() {
 \end{code}
 
 Of course,
-this test is very basic as it only ensures the reponse code is 200.
+this test is very basic as it only ensures the response code is 200.
 There is no guarantee that the returned data is sensible.
 
 \info{
@@ -296,7 +296,7 @@ Then we will need to use the ID given by the POST response to DELETE the mis-typ
 
 \begin{code}[language=JavaScript,numbers=none]{planners-and-studiers.js}
 export function indecisivePlanner() {
-    let url = ENDPOINT + `/api/v1/todos`;
+    let url = ENDPOINT + '/api/v1/todos';
 
     // I need to work on the CSSE6400 Cloud Assignment!
     const payload = JSON.stringify({
@@ -322,7 +322,7 @@ export function indecisivePlanner() {
     // Oh no! Not the Clout assignment, the Cloud assignment!
     const wrongId = request.id;
 
-    request = http.delete(`${url}/${wrongId}`);
+    request = http.delete('${url}/${wrongId}');
 
     check(request, {
         'is status 200': (r) => r.status === 200,
@@ -365,7 +365,7 @@ export const options = {
 };
 \end{code}
 
-\subsection{Running the tests}
+\subsection{Running the Tests}
 
 Now we have a completed load test.
 Deploy the service to AWS:
@@ -423,40 +423,11 @@ We desire to not only increase our 94\% pass rate to 100\% but also to increase 
 \paragraph{Open TaskOverflow}
 If you open TaskOverflow,
 you should find it has been left in an unusual state after the tests.
-See if you can find out from the logs how this occured.
+See if you can find out from the logs how this occurred.
 
 \paragraph{Follow an Interaction}
-Use the correlation IDs that we have now included to see where potential bottlenecks may be occuring.
+Use the correlation IDs that we have included to see where potential bottlenecks may be occurring.
 You can introduce more fine-grained logs to find where time is being spent.
-
-\subsection{Back-of-the-envelope}
-Back-of-the-envelope calculations are normally quite helpful when trying to scale services.
-You need some rough estimates of how many requests your infrastructure can handle to help identify bottlenecks.
-
-Our production service is deployed using Gunicorn,
-which is a Python WSGI HTTP Server for UNIX.\footnote{\url{https://docs.gunicorn.org/en/stable/design.html}}
-It is a pre-fork worker model,
-which means that it will create a number of worker processes when it starts.
-Each worker process can handle the amount of available threads concurrently.
-This means that the number of concurrent requests that can be handled by the service is the number of workers multiplied by the number of threads.
-
-The number of sync gunicorn workers is determined by the number of CPUs:
-$$
-workers = (2 * cpu) + 1
-$$
-
-You can use the logs that you have produced to help measure the time it takes each request to process.
-We can then use this to calculate how many requests each worker can handle per second.
-
-You can use the sleeps in the load tests and the number of virtual users to calculate how many requests are made per second.
-
-The service also makes use of RDS.
-The formula for calculating the amount of concurrent connections RDS can handle is roughly:
-$$
-LEAST({DBInstanceClassMemory/9531392}, 5000)
-$$
-
-Use these calculations to work out the amount of resources required to scale your service to handle the traffic produced by the tests.
 
 \teacher{
 Solutions are roughly:
