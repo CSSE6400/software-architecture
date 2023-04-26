@@ -2672,13 +2672,53 @@ out from the logs how this occured.
 class="Cabin-Bold-tlf-t1-x-x-120">Follow an Interaction</span></span>
    Use the correlation IDs that we have now included to see where potential bottlenecks may be occuring. You
 can introduce more fine-grained logs to find where time is being spent.
+</p><!--l. 428--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">4.2    </span> <a 
+ id="x1-190004.2"></a>Back-of-the-envelope</h4>
+<!--l. 429--><p class="noindent" >Back-of-the-envelope calculations are normally quite helpful when trying to scale services. You need some rough
+estimates of how many requests your infrastructure can handle to help identify bottlenecks.
+</p><!--l. 432--><p class="indent" >   Our production service is deployed using Gunicorn, which is a Python WSGI HTTP Server for
+UNIX.<span class="footnote-mark"><a 
+href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
+ id="x1-19001f2"></a> It
+is a pre-fork worker model, which means that it will create a number of worker processes when it starts. Each
+worker process can handle the amount of available threads concurrently. This means that the number of
+concurrent requests that can be handled by the service is the number of workers multiplied by the number of
+threads.
+</p><!--l. 439--><p class="indent" >   The number of sync gunicorn workers is determined by the number of CPUs:
+</p>
+   <div class="math-display" >
+<img 
+src="main0x.png" alt="workers  = (2 * cpu ) + 1
+" class="math-display"  /></div>
+<!--l. 444--><p class="indent" >   You can use the logs that you have produced to help measure the time it takes each request to process. We can
+then use this to calculate how many requests each worker can handle per second.
+</p><!--l. 447--><p class="indent" >   You can use the sleeps in the load tests and the number of virtual users to calculate how many requests are
+made per second.
+</p><!--l. 449--><p class="indent" >   The service also makes use of RDS. The formula for calculating the amount of concurrent connections RDS
+can handle is roughly:
+                                                                                                    
+                                                                                                    
+</p>
+   <div class="math-display" >
+<img 
+src="main1x.png" alt="LEAST   (DBInstanceClassM     emory &#x2215;9531392, 5000 )
+" class="math-display"  /></div>
+<!--l. 455--><p class="indent" >   Use these calculations to work out the amount of resources required to scale your service to handle the traffic
+produced by the tests.
 </p>
    <div class="footnotes"><a 
  id="x1-2002x2"></a>
 <!--l. 34--><p class="indent" >       <span class="footnote-mark"><a 
 href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span><a 
 href="https://pypi.org/project/watchtower/" class="url" ><span 
-class="ectt-1000">https://pypi.org/project/watchtower/</span></a></p>                                                        </div>
+class="ectt-1000">https://pypi.org/project/watchtower/</span></a></p><a 
+ id="x1-19002x4.2"></a>
+<!--l. 433--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span><a 
+href="https://docs.gunicorn.org/en/stable/design.html" class="url" ><span 
+class="ectt-1000">https://docs.gunicorn.org/en/stable/design.html</span></a></p>                                             </div>
  
 </body></html> 
 
