@@ -63,6 +63,14 @@ At the scale that TicketOverflow hopes to operate,
 it would be inappropriate to run the servers required to meet demand at all times.
 Thus, our service must be elastic --- able to scale up to meet demand and able to scale down to preserve costs.
 
+Persistence is an important characteristic of a ticket booking platform.
+Customers naturally will be upset if they purchase a ticket and the system loses it because a server crashed.
+Upon receiving a ticket purchase request,
+the system must guarantee that the data has been saved to persistent storage before returning a success response.
+(Note: The course coordinator had the experience of selling 400 duplicate tickets for a concert,
+and having the duplicate ticket holders show up at the venue,
+all because the system failed to record that those tickets had already been sold.)
+
 \section{Interface}
 As you are operating in a microservices context,
 other service providers have been given an API specification for your service.
@@ -316,8 +324,22 @@ The simple queries in the API are worth much less of the mark compared to the AP
 
 %Backend processing is the synchronous and asynchronous conversion of text to speech.
 %Synchronous processing is worth 12\% and asynchronous processing is worth 8\%.
-All functionality marks are based solely on correct implementation of the functionality,
-as assessed by the automated functionality tests.
+Functionality marks are based on correct implementation of the functionality,
+which is primarily assessed by the automated functionality tests.
+
+Persistence is a core functional requirement of the system.
+If your implementation does not save all new concert registrations and ticket purchases to persistent storage,
+your grade for the assignment will be capped at 4.
+
+Your persistence mechanism must be robust, so that it can cope with catastrophic failure of the system.
+If all running instances of your services are terminated,
+the system must be able to restart and guarantee that it has not lost any data about concerts or ticket purchases
+for which it returned a success response to the caller.
+There will not be a test that explicitly kills all services and restarts the system.
+This will be assessed based on the services you use and how your implementation invokes those services.
+If you do not store data to a persistent data store,
+or you return a success response before the data has been saved,
+are the criteria that determine whether you have successfully implemented persistence.
 
 Scaling your application to deliver the quality scenarios accounts for the other 60\% of the marks.
 The scenarios described in section \ref{sec:scenarios} provide guidance as to the type of scalability issues your system is expected to handle.
