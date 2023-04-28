@@ -2,6 +2,15 @@
 
 \usepackage{enumitem}
 
+%Change space before start of \paragraph to 1.5ex.
+\makeatletter
+\renewcommand{\paragraph}{%
+  \@startsection{paragraph}{4}%
+  {\z@}{1.5ex \@plus 1ex \@minus .2ex}{-1em}%
+  {\normalfont\normalsize\bfseries}%
+}
+\makeatother
+
 % RUBRIC
 \usepackage{multirow}
 \usepackage{array}
@@ -28,7 +37,7 @@ Now, as the capstone project, you are required to
     \item propose a non-trivial software project,
     \item identify the primary quality attributes which would enable success of the project,
     \item design an architecture suitable for the aims of the project,
-    \item deploy the architecture, utlising any techniques you have learnt in or out of the course, and
+    \item deploy the architecture, utilising any techniques you have learnt in or out of the course, and
     \item evaluate and report on the success of the software project.
 \end{itemize}
 
@@ -158,13 +167,15 @@ All development work and documentation are to be committed to the repository.
 All project artefacts are to be submitted via this repository.
 
 \begin{itemize}
-    \item Model artefacts (e.g. Structurizr DSL or PUML files) should be stored in the \texttt{/model} directory.
-    \item ADRs are to be stored in the \texttt{/model/adrs} directory.
-    \item The report must be stored in the \texttt{/report} directory.
+    \item Model artefacts (e.g. Structurizr DSL or PUML files) should be stored in the \textbf{\texttt{/model}} directory.
+    \item ADRs are to be stored in the \textbf{\texttt{/model/adrs}} directory.
+    \item The report must be stored in the \textbf{\texttt{/report}} directory.
+    \item The link to your demonstration video must be in a file called \textbf{\texttt{demo.md}}.
 \end{itemize}
 
-Do not commit large binary files to the repository.
-(i.e. Do \textbf{\emph{not}} commit Word documents or frequently changing PDF files to the repository.)
+Do \textbf{\emph{not}} commit large binary files to the repository.
+(i.e. Do not commit Word documents or frequently changing PDF files to the repository.
+Do not store your demonstration video in your repository.)
 It is recommended that you use LaTeX, or possibly markdown, to write your report.
 If you use LaTeX, you should use GitHub actions to produce a PDF of the report.
 
@@ -204,10 +215,78 @@ if the design is your own and you have verified that the code is correct.
 
 \section{Demonstration}
 Your team needs to demonstrate your project's functionality and how well it achieves its goals.
-This should include a demonstration of how quality attributes are achieved,
-or a brief summary of how the architecture facilitates delivering a quality attribute.
+This should include demonstrating how quality attributes are achieved,
+or briefly summarising how the architecture facilitates delivering a quality attribute.
 
-The details of the format of this demonstration and how your team will deliver it will be provided later in the semester.
+Your project demonstration will be a video.
+Provide a link to the video in a file called \textbf{\texttt{demo.md}}, stored in the root directory of your repository.
+Do \textbf{\textit{not}} store the video in your GitHub repository.
+The link may be to the video on a platform like YouTube, or a file sharing site from where the video may be downloaded.
+If you upload the video to a platform like YouTube, you may make it private.
+If it is a private video, you must share it with \texttt{richard.thomas@uq.edu.au}, \texttt{b.webb@uq.edu.au},
+\texttt{evan.hughes@uq.edu.au}, \texttt{m.holloway@uq.\textbf{net}.au}, and all of your team members.
+The video must remain available until at least 31 July 2023.
+Viewers must be able to easily see what is being demonstrated and read any text or images.
+Audio must be clear and comprehensible.
+
+The video timeline should be as follows.
+
+\begin{description}
+    \item[3 min] Introduction to the project.
+    \item[3 min] Demonstration of the functional requirements.
+    \item[3 min] Demonstration of the non-functional requirements.
+    \item[3 min] Overview of the software architecture.
+    \item[3 min] Summary of your reflection on lessons learnt from implementing the software.
+\end{description}
+
+\noindent
+The total duration of your video should be \textbf{\emph{less}} than 15 minutes.
+
+\paragraph{Introduction} Briefly introduce the project context and summarise the delivered functional and non-functional requirements.
+Mention any differences between what was originally proposed, what was renegotiated, and what was delivered.
+Briefly explain why changes in scope were made.
+The tutor who may have approved a change in scope may not be the tutor marking your demonstration.
+If you did not deliver everything in the revised scope of the project, the marker needs to know why that occurred.
+
+\paragraph{Functional Requirements} Demonstrate the key features of the software.
+You do not have time to demonstrate every feature of the software.
+Plan your time wisely to highlight the completeness and quality of your delivered system.
+
+\paragraph{Non-Functional Requirements} Show how well the software delivers its important quality attributes.
+This may take some thought and planning to demonstrate within a short time frame.
+Delivery of some non-functional requirements can be shown by test results.
+Delivery of other non-functional requirements may be shown through a combination of tests, metrics, and commentary.
+
+For example, you cannot show ten minutes of k6 testing to demonstrate scalability.
+You could provide screenshots of different stages of the testing, or an edited video of parts of the testing.
+You would provide commentary summarising how the testing was done and explaining how well the system scaled under different loads.
+
+For security, you could show results of simple fuzz testing of APIs.
+You could then show examples of parts of your design, explaining how it demonstrates following key security design principles.
+
+For extensibility or interoperability, you could calculate one or more complexity metrics for parts of the design.
+You could then use the data from these metrics to support an argument as to why the design was extensible or had a simple interface.
+For example, if many interfaces could be shown to have high cohesion and there was low coupling between different modules
+or services in the design, you could argue how this shows that the design is likely to be extensible.
+You could measure documentation for interfaces or APIs,
+and use that to argue that mechanisms used to extend the design, or that the APIs, were comprehensible.
+
+These are examples to help you to start thinking about demonstrating how your design delivers non-functional requirements.
+They are not a definitive list of the only or best approaches.
+For the demonstration, focus on the most important non-functional requirements for your project.
+You should discuss your ideas with a tutor if you are unsure of the effectiveness of an approach.
+
+\paragraph{Software Architecture} Provide an overview the system's architecture.
+Briefly explain how well it supports delivery of the MVP's, and the full system's, functional and non-functional requirements.
+
+\paragraph{Reflection} Summarise the lessons you learnt from implementing the software.
+What would you do differently and why?
+Explain how you would apply those lessons to design a different architecture or take a different approach to implementing the project.
+Or, explain how the lessons learnt demonstrate that you made good choices at each stage of development.
+
+\paragraph{Presentation} There are no constraints on who in your team presents in the video.
+One person could present all parts of the video, or you could have different people presenting each part.
+Assume that the viewer has read the project proposal but may not yet have read the project report.
 
 %You may use this \link{booking page}{https://calendly.com/richard-thomas-uq/csse6400-demo}
 %to schedule a time to demonstrate your project between June 10 and 17.
@@ -221,9 +300,9 @@ The details of the format of this demonstration and how your team will deliver i
 %and for which at least all of your key team members are available.
 
 
-\section{Marking Criteria}
+\section{Grading Criteria}
 
-\begin{description}
+\begin{description}[itemsep=3pt]
     \item[20\%] Extent to which project's scope was delivered.
     \item[20\%] Suitability of architecture to deliver system goals.
     \item[20\%] Quality and thoroughness of testing.
