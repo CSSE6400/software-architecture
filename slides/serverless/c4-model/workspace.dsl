@@ -3,12 +3,13 @@ workspace "Serverless Architecture" "A simple example of serverless architecture
         # Actors
         customer = person "Customer" "Someone who shops at the Sahara on-line store."
         fulfilmentPersonnel = person "Fulfilment Personnel" "Prepares orders for shipping."
+        
         # External Services
         paymentProviderService = softwareSystem "Payment Provider" "Payment facilities provided by Stripe." "external" {
-            paymentProvider = container "Payment Provider" "Payment facilities provided by Stripe." "" "external"
+            paymentProvider = container "Payment Provider" "Payment facilities provided by Stripe." "Stripe" "external"
         }
         authServiceProvider = softwareSystem "Authorisation Service" "User authentication provided by Auth0." "external" {
-            authService = container "Authorisation Service" "User authentication provided by Auth0" "" "external"
+            authService = container "Authorisation Service" "User authentication provided by Auth0" "AUth0" "external"
         }
         apiGateway = softwareSystem "API Gateway" "AWS API Gateway." "Amazon Web Services - API Gateway" {
             apiGatewayService = container "API Gateway" "AWS API Gateway." "" "Amazon Web Services - API Gateway"
@@ -34,6 +35,7 @@ workspace "Serverless Architecture" "A simple example of serverless architecture
         orderDbHost = softwareSystem "Order Database Host" "Google cloud SQL database storing orders." "Amazon Web Services - RDS MySQL instance" {
             orderDB = container "Order Database" "Database storing orders." "MySQL 8.0" "Amazon Web Services - RDS MySQL instance"
         }
+        
         # Serverless Functions
         searchFunc = softwareSystem "Search for Product" "Find product from customer's query." "Amazon Web Services - Lambda" {
             searchQuery = container "Search for Product" "Find product from customer's query." "Java" "Amazon Web Services - Lambda Lambda Function" {
@@ -78,7 +80,7 @@ workspace "Serverless Architecture" "A simple example of serverless architecture
 #        }
         }
         
-        enterprise "Simple On-line Store" {
+        group "Simple On-line Store" {
             simpleBaaSStore = softwareSystem "Simple BaaS On-line Store" "Simple app using BaaS to allow customers to browse and search for items and to order them." {
                 BaasWebApp = container "Simple BaaS Web Application" "Delivers the web front-end for the on-line store." "React" "browser" {
                     spaSignIn = component "Sign In" "Allows customers to sign into the on-line store. Also provides customer registration." "JS"
@@ -95,7 +97,7 @@ workspace "Serverless Architecture" "A simple example of serverless architecture
             }
         }
         
-        enterprise "Simple FaaS Store" {
+        group "Simple FaaS Store" {
             simpleFaaSStore = softwareSystem "Simple FaaS On-line Store" "Simple app using FaaS to allow customers to browse and search for items and to order them." {
                 faasWebApp = container "Simple FaaS Web Application" "Delivers the web front-end for the on-line store." "React" "browser" {
                     faasWebSignIn = component "Sign In" "Allows customers to sign into the on-line store. Also provides customer registration." "JS"
@@ -114,7 +116,7 @@ workspace "Serverless Architecture" "A simple example of serverless architecture
 
         # Sahara eCommerce enterprise-wide system.
         # Software systems, containers and components.
-        enterprise "Sahara eCommerce" {
+        group "Sahara eCommerce" {
             onlineStore = softwareSystem "Sahara On-line Store" "Allows customers to browse and search for items and to order them." {
                 webApp = container "Sahara Web Application" "Delivers the web front-end for the on-line store." "React" {
                     signIn = component "Sign In" "Allows customers to sign into the on-line store. Also provides customer registration." "JS"
@@ -133,8 +135,7 @@ workspace "Serverless Architecture" "A simple example of serverless architecture
                     mobilePurchase = component "Purchase Product" "Customers can view the contents of their shopping cart and checkout." "JS"
                 }
                 fulfilmentApp = container "Fulfilment App" "Coordinates fulfliment of orders." "React Native" "mobile"
-                productFulfilment = container "Product Fulfilment" "Provides backend logic for fulfilling orders." "Java" {
-                }
+                productFulfilment = container "Product Fulfilment" "Provides backend logic for fulfilling orders." "Java"
                 inventoryMgt = container "Inventory Management" "Provides backend logic for managing inventory." "Java"
             }
         }
