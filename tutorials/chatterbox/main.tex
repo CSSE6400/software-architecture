@@ -1,0 +1,129 @@
+\documentclass{csse4400}
+
+%\teachermodetrue
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows}
+
+\usepackage{float}
+
+\usepackage{enumitem}
+
+\usepackage{languages}
+
+\title{Chatterbox}
+\author{Brae Webb}
+
+\date{\week[tutorial]{10}}
+\begin{document}
+
+\maketitle
+
+\section{Brief}
+
+Text-to-speech software supports accessibility,
+enables smart-home devices,
+and even breaks down language barriers.
+Unfortunately, text-to-speech is computationally intensive.
+While the technology has made great advances over the past few decades,
+many open-source implementations are still inefficient.
+
+The University of Queensland is looking to convert all course content into speech.
+This will support visually impaired students in their studies.
+All course content from slack messages and blackboard announcements to textbooks must be converted to speech.
+You will be responsible for designing and implementing a service to generate synthesized speech for use across the entire university.
+
+
+\section{Requirements}
+
+As you might imagine,
+blackboard announcements occur frequently and should be translated in almost real time.
+While textbooks are set ahead of semester and may take several days to process.
+The university will experience peaks of usage.
+At the start of semester,
+instructors set many textbooks which need to be processed.
+The university will also experience usage lows over the summer holiday period when few translations will be required.
+The university is not willing to pay for the resources required during usage peaks all year round.
+Your implementation must be able to scale dynamically based on the current amount of jobs to be processed.
+Your implementation must use AWS cloud resources.
+
+Your implementation must implement the following API specification:\\
+\url{https://csse6400.uqcloud.net/tutorials/chatterbox-spec}
+
+\section{Outline}
+
+\subsection*{Introduction (5 minutes)}
+Introduction to the brief
+and resources including the API specification and quality scenarios.
+
+\subsection*{Planning (10 minutes)}
+In small groups, begin a discussion,
+the discussion may include:
+
+\begin{enumerate}
+    \item What are the key requirements introduced by the quality scenarios?
+    \item What strategies can you implement to support these scenarios?
+    \item What AWS resources would prove helpful?
+    \item What are the likely bottlenecks?
+\end{enumerate}
+
+\subsection*{Design (20 minutes)}
+
+In your group, design an appropriate system.
+You need to consider the flow of an API request through your system,
+use the API specification to ensure all use cases have been considered.
+
+\subsection*{Presentation (15 minutes)}
+
+In the remaining time,
+each group should present their proposed design.
+This is an opportunity for discussion amoungst the class to point out limitations of the proposed system designs.
+
+\section{Quality Scenarios}\label{sec:scenarios}
+
+\paragraph{Semester break}
+Your application will see decreased usage during the semester break.
+Minimal students and staff may periodically query pre-generated speech when revising content.
+During this period we might see traffic of not more than 20 parallel users,
+querying read-only endpoints.
+
+\paragraph{Exam revision}
+During the 20 minutes prior to an exam of a larger course, such as CSSE1001,
+you might expect the entire cohort, all one thousand users,
+revising the content.
+Revising the content will consist primarily of read-only requests.
+
+\paragraph{Monday of exam block}
+Courses with large enrollments tend to have their exam scheduled at the start of exam block.
+This enables course staff the most possible time to mark these exam papers.
+At 8am on Monday of exam block,
+the 4 largest cohorts will begin using your service for revision.
+
+In addition, teaching staff for exams later in the week have begun uploading revision material.
+We might expect about 30 staff members to upload their one page course summaries,
+about 3,500 characters each.
+
+\paragraph{Teaching cancelled}
+Queensland has seen `unprecedented' rainfall causing the university to flood.
+The university admin have made the call to cancel teaching for the week.
+Coordinators are responsible for disseminating this information to their students.
+All 1,957 courses must send announcements averaging 100 characters (many exact copies of the suggested announcement),
+to relay this information.
+
+\paragraph{Reading list due date}
+The library has a deadline for course coordinators to submit their course reading lists.
+In this completely fictional example,
+we can imagine that coordinators have left uploading their reading list until the last minute.
+Suddenly your system receives a large amount of requests to generate the spoken version of textbooks (we will vastly under-estimate that textbooks are round 7,000 characters).
+About 100 coordinators submit their reading list at the last minute.
+
+\paragraph{In-semester Monday morning}
+Each semester there are a small number of new courses running for the first time.
+These courses, in an attempt to keep up with the passage of time,
+upload the course material for the week on a Monday morning.
+About 20 courses uploading 2,500 characters of material.
+At the same time, many coordinators like to send our announcements on Monday mornings summarizing the weeks content.
+These announcements are typically around 80 characters long and sent out by 75 or so coordinators.
+
+\end{document}
