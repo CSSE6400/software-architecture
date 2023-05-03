@@ -7,7 +7,7 @@ on:
       - tutorials/**
 
 jobs:
-  build-notes:
+  build-tutorials:
     runs-on: ubuntu-latest
     container: texlive/texlive:latest
 
@@ -25,17 +25,6 @@ jobs:
 
       - name: Compile Tutorials
         run: ./bin/build_tutorials.sh
-
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Build Chatterbox Spec
-        uses: openapi-generators/openapitools-generator-action@v1
-        with:
-          generator: html2
-          openapi-file: ./tutorials/chatterbox/spec.yml
-          command-args: --output ./dist/tutorials/chatterbox-spec --template-dir ./assessment/cloud/docs-template
 
       - name: Upload Slides
         uses: actions/upload-artifact@v3
