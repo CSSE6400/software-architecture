@@ -28,3 +28,4 @@ tlmgr install ltablex
 tlmgr install pdflscape
 tlmgr install accsupp
 tlmgr install tikzmark
+tlmgr install setspace
