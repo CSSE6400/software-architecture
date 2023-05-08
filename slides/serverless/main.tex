@@ -8,7 +8,7 @@
 \title{Serverless Architecture}
 \subtitle{Software Architecture}
 \author{Richard Thomas}
-\date{\week{12}}
+\date{\week{11}}
 
 \begin{document}
 
@@ -42,7 +42,9 @@
     \item Front-end could have a layered design, though many SPAs don't.
 }
 
-\definition{Functions as a Service (FaaS)}{Application logic that is triggered by an event and runs in a transient, stateless compute node.}
+\definition{Functions as a Service (FaaS)}{
+Application logic that is triggered by an event and runs in a \highlight{transient}, \highlight{stateless} compute node.
+}
 \note[itemize]{
     \item Node may only exist for duration of function call.
     \item Server infrastructure (e.g. type of node, lifespan, scaling, \dots) are managed by hosting provider.
@@ -70,7 +72,7 @@
 \definition{Serverless Architecture}{Software system delivering functionality through BaaS or FaaS.}
 \note[itemize]{
     \item Many people focus on FaaS when considering Serverless.
-    \item Some simple Single Page Web Apps (SPA) coordinate.
+    \item Some simple Single Page Web Apps (SPA) coordinate services.
     \item Front-end ties back-end services together to deliver the application's functionality.
 }
 
@@ -92,7 +94,7 @@
     \item Order Scenario 5: Payment success causes Payment Confirmed function to be invoked.
     \item Order Scenario 6: Payment Confirmed updates order in DB with payment status.
     \item Order Scenario 7: Payment Confirmed adds Payment Confirmation message to the Queue.
-    \item Order Scenario 8: Payment Confirmation message is picked up by a fulfillment function to pack \& send order.
+    \item Order Scenario 8: Payment Confirmation message is picked up by a fulfilment function to pack \& send order.
     \item Order Scenario 9: Once order is shipped, another message would trigger an `order sent' function.
 }
 
@@ -108,7 +110,7 @@
     \item Shows Lambda Service polling Queue, demonstrating how Lambda Functions are invoked via events in a message queue.
     \item Fulfilment Scenario 1: Lambda Service monitors Queue for `ship order' messages.
     \item Fulfilment Scenario 2: Lambda Service batches groups of `ship order' messages and sends them to Fulfill Order function.
-    \item Fulfilment Scenario 3: Fulfill Order gets order details from DB and sends pick list to Fulfilment App.
+    \item Fulfilment Scenario 3: Fulfil Order gets order details from DB and sends pick list to Fulfilment App.
     \item Fulfilment Scenario 4: When order is shipped, Fulfilment App calls Order Shipped function via API Gateway.
     \item Fulfilment Scenario 5: Order Shipped sends email to customer and updates order status in DB.
     \item Fulfilment Scenario 5a: Simplification of order picking, packing and shipping steps.
@@ -131,7 +133,6 @@
     \begin{itemize}
         \LARGE\item No server idle time
     \end{itemize}
-%    \vspace{1mm}
     \item<3-> Reduced server management
     \vspace{1mm}
     \item<4-> Easier to run closer to client
@@ -147,36 +148,37 @@
 {\huge
 \begin{itemize}
      \item<1-> Front-end accesses database directly
-     \vspace{-2pt}
+     \vspace{-4pt}
     \begin{itemize}
         \LARGE\item Front-end needs to sanitise inputs
-        \vspace{2pt}
+        \vspace{3pt}
         \LARGE\item Easy to spoof messages from front-end
         \begin{itemize}
             \Large\item Hope DB provider is secure
         \end{itemize}
     \end{itemize}
+    \note<1>{Spoofing messages is an issue for all BaaS services.}
     \vspace{1mm}
     \item<2-> Application logic is in front-end
-    \vspace{-2pt}
+    \vspace{-4pt}
     \begin{itemize}
         \LARGE\item Less modularisation
-        \vspace{5pt}
+        \vspace{6pt}
         \LARGE\item Duplication of logic with multiple front-ends
         \begin{itemize}
             \Large\item Web, mobile, \dots
         \end{itemize}
     \end{itemize}
-%    \vspace{2mm}
+    \note<2>{
+    		\begin{itemize}
+    			\item Modern expectations are that almost all systems will have multiple front-ends.
+    			\item Duplication of front-end logic is a smaller, but still partial, concern for FaaS.
+    		\end{itemize}
+    	}
     \item<3-> No control over server optimisation
 \end{itemize}
 }
 \end{frame}
-\note[itemize]{
-    \item Spoofing messages is an issue for all BaaS services.
-    \item Modern expectations are that almost all systems will have multiple front-ends.
-    \item Duplication of front-end logic is a smaller, but still partial, concern for FaaS.
-}
 
 \begin{frame}{FaaS Tradeoffs}
 \vspace{1pt}
@@ -190,36 +192,40 @@
             \Large\item Not just persistent state
         \end{itemize}
     \end{itemize}
+    \note<1>{
+    		\begin{itemize}
+    			\item Server running function can be killed when function is not running.
+    			\item Can occasionally send messages to functions to keep them alive.
+    		\end{itemize}
+    	}
     \vspace{1mm}
     \item<2-> Execution duration
     \vspace{4pt}
     \begin{itemize}
         \LARGE\item Can't be long running process
         \begin{itemize}
-            \Large\item AWS Lambda is up to 15 minutes
+            \Large\item AWS Lambda -- up to 15 minutes
         \end{itemize}
     \end{itemize}
     \vspace{1mm}
     \item<3-> Startup latency
+    \vspace{2pt}
     \begin{itemize}
         \LARGE\item Functions take time to start
         \begin{itemize}
             \Large\item Some languages worse than others (e.g. Java)
         \end{itemize}
     \end{itemize}
+    \note<3>{Java has concurrency benefits over other languages.}
     \vspace{1mm}
     \item<4-> Proliferation of functions
+    \vspace{-4pt}
     \begin{itemize}
         \LARGE\item Loss of encapsulation
     \end{itemize}
 \end{itemize}
 }
 \end{frame}
-\note[itemize]{
-    \item Server running function can be killed when function is not running.
-    \item Can occassionally send messages to functions to keep them alive.
-    \item Java has concurrency benefits over other languages.
-}
 
 \questionanswer{When is serverless appropriate?}{
     \begin{itemize}
