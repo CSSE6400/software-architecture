@@ -3,7 +3,7 @@ workspace "Monolith Decomposition" "Example decomposition of a monolith." {
         # Actors
         client = person "Client" ""
 
-        enterprise "Monolith Decomposition" {
+        group "Monolith Decomposition" {
             application = softwareSystem "Application" "" {
                 monolith = container "Monolith" "Monolith being decomposed." "" ""
                 db = container "Application Database" "" "MySQL" "db"
