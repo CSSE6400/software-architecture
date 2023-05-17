@@ -20,6 +20,8 @@
 
 \maketitle
 
+\info{For 2023 this tutorial is a presentation and not an activity. Please ignore the timing for each activity.}
+
 \section{Brief}
 
 Recent controversy has brought attention to the monopoly held by certain ticketing companies.
@@ -64,6 +66,98 @@ the discussion may include:
     \item What are the likely bottlenecks?
 \end{enumerate}
 
+\teacher{
+    \subsection{What are the key requirements introduced by the quality scenarios?}
+
+    \begin{itemize}
+        \item Q1, Q2, Q3 all introduce load to the system for ticket purchasing
+        \item Q4 introduces load on the concerts endpoint for every purchase
+        \item Q5 introduces that we need to handle load on the same endpoint for multiple entries and the printing of tickets at scale.
+        \item Q6 adds priorities to the mix for ticket printing
+        \item Q7 adds the need to cancel / alter async process that are in flight
+        \item Q8 introduces a large amount of load thats expected to push the system to the limit, so I should expect to crash and have to recover.
+        \item API specifies that concert seating must be updated within 3 minutes.
+    \end{itemize}
+}
+\teacher{
+    \subsection{What strategies can you implement to support these scenarios?}
+}
+\teacher{
+    \paragraph{Ticket Rendering}
+    Looking at the hamilton documentation we have been given the expected runtime and memory usage to create an individual ticket. We can see that the process is CPU intensive and small on memory and takes a few seconds. We could possibly get away with running this sequently but with the CPU required we may want to offload.
+
+    \textcolor{purple}{\textbf{+ Queue Ticket Rendering to offload processing}}
+}
+\teacher{
+    \paragraph{Ticket Priority}
+    Given the scenarios we can see that there is a significant amount of time between the two concerts so we could apply more novel approaches to the problem.
+
+    \begin{itemize}
+        \item Create buckets of priority and assign jobs based on the concert time compared to todays date.
+        \item Stage queued jobs into a table where a queue manager selectivly pulls jobs from the table based on priority. \textcolor{red}{The queue manager would keep the queue fed with a small amount of jobs such that it is just enough for the workers.}
+    \end{itemize}
+
+    \textcolor{purple}{\textbf{+ Buckets for priority due to simplicity but the staging table is more versatile}}
+}
+\teacher{
+    \paragraph{Seating Rendering}
+    As above we see that seating requires more time due to CPU load but is relativly the same. We must proactivly render the seating to ensure that we can meet the 3 minute requirement. Some stratergies for this:
+
+    \begin{itemize}
+        \item Render with every ticket purchase. \textcolor{red}{Means we cant render tickets in parallel if they also render the seating.}
+        \item Queue a render for every purchase.
+        \item Queue on an exclusive queue for every purchase. \textcolor{red}{A queue that only allows 1 of every ID to be in the queue at a time.}
+        \item Cron to render seating every minute if there are more tickets than last render.
+    \end{itemize}
+
+    The exclusive queue design would allow for seating to be updated as fast as possible while also reducing the resources required in large loads. On the other hand the cron job is a elegant design in simplicity while also meeting the expectations of the users.
+
+    \textcolor{purple}{\textbf{+ Cron to queue rendering of seating}}
+}
+\teacher{
+    \paragraph{Printing Invalidation}
+
+    Depending on your queue implementation you may be able to cancel jobs that are in fly. Optionally by resetting the ticket status when our render job gets processed it can skip the printing step. To avoid race conditions we can use a lock on the concert when changes are being processed.
+
+    Other methods could be storing a version of a concert and when printing we also get the version of the concert. When requesting a printed ticket we can check the versions and if they do not match then we can invalidate the ticket.
+
+    \textcolor{purple}{\textbf{+ Check ticket status during printing}}
+}
+\teacher{
+    \paragraph{Ticket Purchasing}
+    Purchasing a ticket requires making sure that we have not oversold the concert.
+
+    \begin{itemize}
+        \item Count all tickets before selling a new one. \textcolor{red}{This can potentially allow overselling if two requests are made at the same time.}
+        \item Lock the concert when selling a ticket. \textcolor{red}{This would cause a bottleneck on the concert endpoint.}
+        \item Use a atomic counter to count the tickets for each concert.
+        \item Use multiple atomic counters to distribute waiting for a lock. \textcolor{red}{By splitting the counters into buckets of tickets we can allow the client to random select a bucket which may have tickets available.}
+    \end{itemize}
+
+    \textcolor{purple}{\textbf{+ Use one or more atomic counters to count tickets}}
+}
+
+\teacher{
+    \subsection{What AWS resources would prove helpful?}
+
+    \begin{itemize}
+        \item Lambda for compute
+        \item ECS for compute
+        \item EC2 for compute
+        \item DynamoDB for querying/caching/locking
+        \item RDS for querying
+        \item Redis for caching/locking/queueing
+        \item S3 for storage
+        \item SQS for queueing
+    \end{itemize}
+}
+
+\teacher{
+    \subsection{What are the likely bottlenecks?}
+
+    Ticket purchasing is the most likely bottleneck due to the atomic counters needed.
+}
+
 \subsection*{Design (20 minutes)}
 
 In your group, design an appropriate system.
@@ -78,37 +172,37 @@ This is an opportunity for discussion amoungst the class to point out limitation
 
 \section{Quality Scenarios}\label{sec:scenarios}
 
-\paragraph{Small concert}
+\paragraph{Q1: Small concert}
 As TicketOverflow is starting out,
 it will need to scale to the size of a small concert.
 Playhouse at QPAC is one of the first venues to sign up for the service.
 Their customers purchase tickets in advance over a longer period of time.
 
-\paragraph{Pre-sale for Hamilton}
+\paragraph{Q2: Pre-sale for Hamilton}
 Hamilton is now showing at the Lyric Theatre at QPAC and the pre-sale tickets are released for a limited time.
 The tickets are in high demand, and there are a large number of customers trying to purchase tickets at the same time.
 
-\paragraph{General sale for Hamilton}
+\paragraph{Q3: General sale for Hamilton}
 The general sale for Hamilton has started, and there is a surge of customers trying to purchase tickets at the same time.
 This leads to a high traffic volume on the website, which puts a strain on TicketOverflow.
 
-\paragraph{Seating plan launch}
+\paragraph{Q4: Seating plan launch}
 The frontend team at TicketOverflow have developed a new ticket purchasing interface that shows users the seating plan before they purchase.
 A large concert is being used to trial this new feature.
 You need to ensure that the rendering of the seating plan does not interfere with the high volume of associated ticket purchases.
 
-\paragraph{Evening shows at QPAC}
+\paragraph{Q5: Evening shows at QPAC}
 All QPAC venues are now supported in TicketOverflow.
 Each evening there are multiple concerts that run concurrently.
 TicketOverflow must be able to handle a steady stream of parallel purchases, ticket generation, and seating plan generation.
 
-\paragraph{Priority tickets}
+\paragraph{Q6: Priority tickets}
 Tickets recently went on sale for a large concert in four months time.
 Some of the ticket purchasers are downloading their tickets in advance.
 Meanwhile an evening show for a smaller concert is starting in a few minutes.
 The evening show attendees should be able to download their tickets without being impacted by the later concert.
 
-\paragraph{Copyright infringement}
+\paragraph{Q7: Copyright infringement}
 Due to a copyright notice, ``Elsa on Ice'', has to be renamed to ``Bob on Ice''.
 Unfortunately, this is a last minute name change while many users are logging in to generate their tickets.
 Your system must ensure that they are not shown incorrect tickets and gracefully handles re-generation of tickets.
@@ -123,7 +217,7 @@ You need to ensure that tickets with a \texttt{PENDING} status cannot print tick
 It is the client's responsibility to determine that the ticket status has changed and to re-print the ticket.
 Your system has to manage the load.
 
-\paragraph{Taylor Swift tour}
+\paragraph{Q8: Taylor Swift tour}
 Taylor Swift has chosen TicketOverflow for the release of her Eras Tour.
 It is estimated that there will be about 2.8 million purchases during this time.
 Your service should do its best to remain responsive during the launch of the tour.
