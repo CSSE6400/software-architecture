@@ -1,0 +1,92 @@
+@startuml ticketoverflow
+title TicketOverflow - Deployment
+
+left to right direction
+
+!include <C4/C4_Container>
+!include <C4/C4_Context>
+!include <C4/C4_Deployment>
+
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v14.0/dist
+!include AWSPuml/AWSCommon.puml
+!include AWSPuml/AWSC4Integration.puml
+!include AWSPuml/Groups/all.puml
+!include AWSPuml/NetworkingContentDelivery/all.puml
+!include AWSPuml/Database/all.puml
+!include AWSPuml/Compute/all.puml
+!include AWSPuml/Containers/all.puml
+!include AWSPuml/ApplicationIntegration/all.puml
+
+skinparam PackageTitleAlignment Center
+UpdateElementStyle(Container, $bgColor="#FFFFFF", $borderColor="#d3d3d3", $fontColor="#000000")
+skinparam rectangle {
+    roundCorner 25
+}
+skinparam rectangle<<RDS>> {
+
+    BorderColor AWS_COLOR_BLUE
+}
+skinparam rectangle<<AuroraPostgreSQLInstance>> {
+    BorderColor AWS_COLOR_BLUE
+}
+skinparam rectangle<<ElasticLoadBalancingApplicationLoadBalancer>> {
+    BorderColor AWS_COLOR_PURPLE
+}
+skinparam rectangle<<Route53>> {
+    BorderColor AWS_COLOR_PURPLE
+}
+
+Person(client, "Client", "Client")
+
+AWSCloudGroup(aws, "Amazon Web Services") {
+    RegionGroup(useast1, "us-east-1") {
+        RDS(rds, "Amazon RDS", "") {
+            AuroraPostgreSQLInstance(postgres, "PostgreSQL - TicketOverflow", "db.t4g.medium") {
+                ContainerDb(db, "TicketOverflow Database", "Stores all persistant data")
+            }
+        }
+
+        DynamoDB(dynamodb, "DynamoDB", "OnDemand") {
+            DynamoDBTable(cache, "Cache", "KeyValue Cache")
+            DynamoDBTable(locks, "Locks and Counters", "Atomic Counters and Locks")
+        }
+
+        SimpleQueueService(sqs, "Amazon SQS", "") {
+            SimpleQueueServiceQueue(high, "High Priority", "Seating Rendering")
+            SimpleQueueServiceQueue(medium, "Medium Priority", "Urgent Tickets")
+            SimpleQueueServiceQueue(low, "Low Priority", "Tickets")
+        }
+
+        ElasticContainerService(eksgp, "Amazon ECS", "TicketOverflow Cluster") {
+            Fargate(fargate, "Fargate", "") {
+                ElasticContainerServiceTask(backend, "API", "PHP/Laravel", "REST API for TicketOverflow")
+                ElasticContainerServiceTask(worker, "Worker", "PHP/Laravel", "Worker for TicketOverflow") {
+                    Container(cron, "Cron", "Cron processor running every second")
+                    Container(printer, "Printer", "Prints Tickets and Seating plans")
+                }
+            }
+        }
+
+        ElasticLoadBalancingApplicationLoadBalancer(alb, "Application Load Balancer", "HTTP/80")
+    }
+}
+
+Rel_R(client, alb, "HTTP", "80")
+Rel_R(alb, backend, "HTTP", "80")
+Rel(backend, db, "TCP", "5402")
+Rel(backend, cache, "TCP", "")
+Rel(backend, locks, "TCP", "")
+Rel(backend, high, "SQS", "")
+Rel(backend, medium, "SQS", "")
+Rel(backend, low, "SQS", "")
+Rel(high, printer, "SQS", "")
+Rel(medium, printer, "SQS", "")
+Rel(low, printer, "SQS", "")
+Rel(cron, locks, "TCP", "")
+Rel(cron, db, "TCP", "5402")
+Rel_U(cron, high, "SQS", "")
+Rel(printer, db, "TCP", "5402")
+
+
+SHOW_LEGEND(true)
+@enduml
