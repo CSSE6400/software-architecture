@@ -1,0 +1,131 @@
+\documentclass{csse4400}
+
+\teachermodetrue
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows}
+
+\usepackage{float}
+
+\usepackage{enumitem}
+
+\usepackage{languages}
+
+\title{TicketOverflow}
+\author{Evan Hughes}
+
+\date{\week[tutorial]{10}}
+\begin{document}
+
+\maketitle
+
+\section{Brief}
+
+Recent controversy has brought attention to the monopoly held by certain ticketing companies.
+In hopes of an eventual collapse of the current monopoly,
+we aim to develop TicketOverflow,
+an online concert ticket booking system.
+
+\paragraph{Task}
+You are working for TicketOverflow,
+a new competitor in the online ticket booking space.
+TicketOverflow uses a microservices based architecture to implement their new platform.
+The CEO saw on your resume that you took Software Architecture and has assigned you to design and implement the ticket purchasing service.
+This service must be scalable to cope with a large influx of bookings.
+
+You also need to implement a mock of the users service.
+This service is being implemented by another team at TicketOverflow.
+You need to implement a mock to allow your ticket purchasing service to be tested.
+Your mock of this service will use a hard-coded list of users.
+
+\paragraph{Requirements}
+As you may be aware,
+ticket booking platforms have intense peaks of traffic.
+At the scale that TicketOverflow hopes to operate,
+it would be inappropriate to run the servers required to meet demand at all times.
+Thus, our service must be elastic --- able to scale up to meet demand and able to scale down to preserve costs.
+
+
+\section{Outline}
+
+\subsection*{Introduction (5 minutes)}
+Introduction to the brief
+and resources including the API specification and quality scenarios.
+
+\subsection*{Planning (10 minutes)}
+In small groups, begin a discussion,
+the discussion may include:
+
+\begin{enumerate}
+    \item What are the key requirements introduced by the quality scenarios?
+    \item What strategies can you implement to support these scenarios?
+    \item What AWS resources would prove helpful?
+    \item What are the likely bottlenecks?
+\end{enumerate}
+
+\subsection*{Design (20 minutes)}
+
+In your group, design an appropriate system.
+You need to consider the flow of an API request through your system,
+use the API specification to ensure all use cases have been considered.
+
+\subsection*{Presentation (15 minutes)}
+
+In the remaining time,
+each group should present their proposed design.
+This is an opportunity for discussion amoungst the class to point out limitations of the proposed system designs.
+
+\section{Quality Scenarios}\label{sec:scenarios}
+
+\paragraph{Small concert}
+As TicketOverflow is starting out,
+it will need to scale to the size of a small concert.
+Playhouse at QPAC is one of the first venues to sign up for the service.
+Their customers purchase tickets in advance over a longer period of time.
+
+\paragraph{Pre-sale for Hamilton}
+Hamilton is now showing at the Lyric Theatre at QPAC and the pre-sale tickets are released for a limited time.
+The tickets are in high demand, and there are a large number of customers trying to purchase tickets at the same time.
+
+\paragraph{General sale for Hamilton}
+The general sale for Hamilton has started, and there is a surge of customers trying to purchase tickets at the same time.
+This leads to a high traffic volume on the website, which puts a strain on TicketOverflow.
+
+\paragraph{Seating plan launch}
+The frontend team at TicketOverflow have developed a new ticket purchasing interface that shows users the seating plan before they purchase.
+A large concert is being used to trial this new feature.
+You need to ensure that the rendering of the seating plan does not interfere with the high volume of associated ticket purchases.
+
+\paragraph{Evening shows at QPAC}
+All QPAC venues are now supported in TicketOverflow.
+Each evening there are multiple concerts that run concurrently.
+TicketOverflow must be able to handle a steady stream of parallel purchases, ticket generation, and seating plan generation.
+
+\paragraph{Priority tickets}
+Tickets recently went on sale for a large concert in four months time.
+Some of the ticket purchasers are downloading their tickets in advance.
+Meanwhile an evening show for a smaller concert is starting in a few minutes.
+The evening show attendees should be able to download their tickets without being impacted by the later concert.
+
+\paragraph{Copyright infringement}
+Due to a copyright notice, ``Elsa on Ice'', has to be renamed to ``Bob on Ice''.
+Unfortunately, this is a last minute name change while many users are logging in to generate their tickets.
+Your system must ensure that they are not shown incorrect tickets and gracefully handles re-generation of tickets.
+
+You are not required to queue up re-printing all the tickets that have already been printed.
+As indicated in the API specification for the update concert endpoint
+(\link{\texttt{/concerts/{id} PUT}}{https://csse6400.uqcloud.net/assessment/ticketoverflow/\#api-Concert-be}),
+``any existing tickets that have been generated need to be removed.''
+This means that, for the concert which is updated, all tickets that have a \texttt{PRINTED}
+status must have that status changed to \texttt{NOT\_PRINTED}.
+You need to ensure that tickets with a \texttt{PENDING} status cannot print tickets with outdated information.
+It is the client's responsibility to determine that the ticket status has changed and to re-print the ticket.
+Your system has to manage the load.
+
+\paragraph{Taylor Swift tour}
+Taylor Swift has chosen TicketOverflow for the release of her Eras Tour.
+It is estimated that there will be about 2.8 million purchases during this time.
+Your service should do its best to remain responsive during the launch of the tour.
+
+\end{document}
