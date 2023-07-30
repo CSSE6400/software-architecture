@@ -82,34 +82,30 @@ these techniques are the load balancer&#8217;s routing algorithm.
 that are not listed.
 </p><!--l. 52--><p class="indent" >
       </p><dl class="description"><dt class="description">
-      <!--l. 53--><p class="noindent" >
 <span 
-class="Cabin-Bold-tlf-t1-x-x-120">Round Robin</span> </p></dt><dd 
+class="Cabin-Bold-tlf-t1-x-x-120">Round Robin</span> </dt><dd 
 class="description">
       <!--l. 53--><p class="noindent" >allocates requests to the next available server regardless of where the last request was sent. It is
       simple, and in practice, works effectively.
                                                                                                     
                                                                                                     
       </p></dd><dt class="description">
-      <!--l. 55--><p class="noindent" >
 <span 
-class="Cabin-Bold-tlf-t1-x-x-120">Least Connections</span> </p></dt><dd 
+class="Cabin-Bold-tlf-t1-x-x-120">Least Connections</span> </dt><dd 
 class="description">
       <!--l. 55--><p class="noindent" >sends  the  next  request  to  the  node  with  the  fewest  current  connections.  The  load  balancer  is
       responsible for tracking how many connections exist to each node.
       </p></dd><dt class="description">
-      <!--l. 57--><p class="noindent" >
 <span 
-class="Cabin-Bold-tlf-t1-x-x-120">Weighted Least Connections</span> </p></dt><dd 
+class="Cabin-Bold-tlf-t1-x-x-120">Weighted Least Connections</span> </dt><dd 
 class="description">
       <!--l. 57--><p class="noindent" >sends the next request to the node with the least weighted connections. This is similar to the above
       least connections method, however, each node has an associated weight. This allows certain nodes
       to be preferred over others. This is useful if we have an inequal distribution of compute power. We
       would want to give smaller nodes a reduced load in comparison to other more powerful nodes.
       </p></dd><dt class="description">
-      <!--l. 61--><p class="noindent" >
 <span 
-class="Cabin-Bold-tlf-t1-x-x-120">Consistent Hashing</span> </p></dt><dd 
+class="Cabin-Bold-tlf-t1-x-x-120">Consistent Hashing</span> </dt><dd 
 class="description">
       <!--l. 61--><p class="noindent" >In some cases we may want a user to consistently be routed to a specific node. This is useful for
       multiple transactions that need to be done in a consistent order or if the data is stored/cached on
@@ -143,12 +139,12 @@ of the time. However, the health check was too weak. When
 <li 
   class="enumerate" id="x1-5004x2">
       <!--l. 81--><p class="noindent" >the storage running the service disappeared; but
-                                                                                                    
-                                                                                                    
       </p></li>
 <li 
   class="enumerate" id="x1-5006x3">
       <!--l. 82--><p class="noindent" >the service was still running in memory.</p></li></ol>
+                                                                                                    
+                                                                                                    
 <!--l. 85--><p class="indent" >   The health check passed, but in reality, the service was talking to dead nodes, causing upstream services to
 have intermittent failures.
 </p>
@@ -178,9 +174,8 @@ application is able to connect to it.
 packet. We will cover two types of load balancers provided by AWS:
 </p><!--l. 106--><p class="indent" >
       </p><dl class="description"><dt class="description">
-      <!--l. 107--><p class="noindent" >
 <span 
-class="Cabin-Bold-tlf-t1-x-x-120">Application Load Balancer</span> </p></dt><dd 
+class="Cabin-Bold-tlf-t1-x-x-120">Application Load Balancer</span> </dt><dd 
 class="description">
       <!--l. 107--><p class="noindent" >is an OSI layer 7<span class="footnote-mark"><a 
 href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
@@ -188,47 +183,43 @@ href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a
       load balancer which routes traffic based on the request&#8217;s content. This is useful for services using
       HTTP, HTTPS, or any other supported protocol.
       </p></dd><dt class="description">
-      <!--l. 111--><p class="noindent" >
 <span 
-class="Cabin-Bold-tlf-t1-x-x-120">Network Load Balancer</span> </p></dt><dd 
+class="Cabin-Bold-tlf-t1-x-x-120">Network Load Balancer</span> </dt><dd 
 class="description">
       <!--l. 111--><p class="noindent" >is an OSI layer 4<span class="footnote-mark"><a 
 href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
  id="x1-8003f2"></a>
       load balancer which routes traffic based on the source and destination IP addresses and ports. This
       is useful for services that are using TCP or UDP.</p></dd></dl>
-                                                                                                    
-                                                                                                    
 <!--l. 117--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.2    </span> <a 
  id="x1-90003.2"></a>AWS Load Balancer Design</h4>
+                                                                                                    
+                                                                                                    
 <!--l. 119--><p class="noindent" >An AWS Elastic<span class="footnote-mark"><a 
 href="#fn3x0" id="fn3x0-bk"><sup class="textsuperscript">3</sup></a></span><a 
  id="x1-9001f3"></a>
 Load Balancer has three distinct components.
 </p><!--l. 121--><p class="indent" >
       </p><dl class="description"><dt class="description">
-      <!--l. 122--><p class="noindent" >
 <span 
-class="Cabin-Bold-tlf-t1-x-x-120">Listeners</span> </p></dt><dd 
+class="Cabin-Bold-tlf-t1-x-x-120">Listeners</span> </dt><dd 
 class="description">
       <!--l. 122--><p class="noindent" >allows traffic to enter the Elastic Load Balancer. Each listener has a port (e.g. <span 
 class="ectt-1200">port 80</span>) and a protocol
       (e.g. <span 
 class="ectt-1200">HTTP</span>) associated with it.
       </p></dd><dt class="description">
-      <!--l. 124--><p class="noindent" >
 <span 
-class="Cabin-Bold-tlf-t1-x-x-120">Target Groups</span> </p></dt><dd 
+class="Cabin-Bold-tlf-t1-x-x-120">Target Groups</span> </dt><dd 
 class="description">
       <!--l. 124--><p class="noindent" >are groups of nodes which the load balancer can route to. Each target group has a protocol and a
       port associated with it, allowing us (the programmer) to switch ports on the way through the load
       balancer. This is useful if the targets are using a different port to the ports we want to expose.
       </p></dd><dt class="description">
-      <!--l. 127--><p class="noindent" >
 <span 
-class="Cabin-Bold-tlf-t1-x-x-120">Load Balancer</span> </p></dt><dd 
+class="Cabin-Bold-tlf-t1-x-x-120">Load Balancer</span> </dt><dd 
 class="description">
       <!--l. 127--><p class="noindent" >is the actual load balancer that routes the traffic to the target groups based on rules that we setup.
       The load balancer has a DNS name that we can use to route traffic to it. The load balancer also has
