@@ -51,61 +51,82 @@ The successful completion of the project will result in three deliverables, name
 Your software deliverable must include all supporting software (e.g. test suites or utilities) that are developed to support the delivered software.
 
 \section{Introduction}
-eBay\texttrademark wishes to provide a more dynamic shopping experience.
+TradeOverflow wishes to provide a more dynamic shopping experience than traditional auction sites.
 Rather than items being listed for auction over a period of time, with a fixed end date,
-the new sales model will be a trading platform.
-The system will scan all items that are listed for auction on the site.
+the sales model will be a trading platform.
+TradeOverflow will scan all items that are listed for sale on the site.
 It will aggregate all items of the same type.
 (e.g. It will find all copies of the Dune Ultra HD Bluray that are for sale, and aggregate them into a single trading set.)
 
 Once items have been aggregated into a trading set, the system will provide a dynamic trading platform for the item.
 It is designed to promote quick sales.
-Sellers set their minimum sales price.
-Buyers set their maximum purchase price.
+Sellers list items for sale, where they set their minimum sales price.
+Buyers make a purchase offer for an item, where they set their maximum purchase price.
 The system continuously matches sellers and buyers.
-The strategy is as follows.
+The trading strategy is as follows.
 \begin{enumerate}
-	\item All buyers whose maximum purchase price is the same become a purchasing group.
-	\item All sellers whose minimum sales price is the same become a selling group.
+	\item All purchase offers whose maximum purchase price is the same become a purchasing group.
+	\item All sales listings, within a single trading set, whose minimum sales price is the same become a selling group.
 	\item The purchasing group with the highest maximum purchase price becomes the active purchasing group.
 	\item The selling group whose minimum sales price is closest to, but not more than, the active purchasing group's maximum purchase price becomes the active sales group.
 \end{enumerate}
-If the active purchasing group wants to purchase more items than are available in the active sales group, then the following sales strategy is followed.
-\begin{enumerate}
+If the active purchasing group wants to purchase more items than are available in the active sales group, then the following trading strategy is followed.
+\begin{enumerate}[resume]
 	\item All items in the active sales group are sold for their minimum sales price.
-	\item The items are sold in the order that the oldest purchase offer at the purchasing group's maximum purchase price completes its purchase first.
+	\item The items are sold in the order that the oldest purchase offer in the active purchasing group completes its purchase first.
 	\item The selling group with the next closest minimum sales price that is less than the active purchasing groups' maximum purchase price becomes the active sales group.
 	\item The items in this new active sales group are sold to the remaining members of the active purchasing group at the same price as items from the previous active sales group.
 	\item If all items available in the new active sales group are sold, and there are still members in the active purchasing group who have not purchased an item, the process of establishing a new active sales group is repeated. This continues until either all members of the active purchasing group purchase an item, or there are no more selling groups with items whose minimum purchase price is less than or equal to the maximum purchase prices of the active purchasing group.
 	\item If there are still purchasing groups who have not purchased items, the process repeats from step 3.
 \end{enumerate}
-If the active purchasing group wants to purchase fewer, or the same number of, items than are available in the active sales group, then the following sales strategy is followed.
+If the active purchasing group wants to purchase fewer, or the same number of, items than are available in the active sales group, then the following trading strategy is followed.
 \begin{enumerate}
+	\setcounter{enumi}{4}
 	\item The items in the active sales group are sold for the active purchasing group's maximum purchase price.
-	\item The items are sold in the order that the oldest item listing at the selling group's minimum sales price is sold first.
+	\item The items are sold in the order that the oldest listing in the active selling group is sold first.
+	\item Once all the members of the active purchasing group have purchased an item, the process repeats from step 3.
 \end{enumerate}
 
-The system guarantees that if the item sells, sellers will get at least their minimum sales price.
-The system also guarantees that if they purchase an item, that buyers will pay no more than their maximum purchase price.
+The system needs to accommodate sellers adding new listings of an item for sale at any time.
+This means that as items are listed for sale, they need to be added to the appropriate trading set and selling group.
+Sellers may change the minimum sales price for which their item is listed at any time, if it has not yet been sold.
+This requires their listing be moved to a different selling group.
+
+The system also needs to accommodate members offering to purchase an item at any time.
+This means that when a member submits an offer to purchase an item, it needs to be added to the appropriate purchasing group.
+Purchasers may change the maximum purchase price in their offer to purchase an item at any time,
+if the purchase has not yet been completed.
+This requires their purchase offer be moved to a different purchasing group.
+
+The system must guarantee that if an item sells, sellers will get at least their minimum sales price.
+The system must also guarantee that, if they purchase an item, buyers will pay no more than their maximum purchase price.
 If there is high demand for their item, sellers should get a higher sales price.
 If there are many copies of an item for sale, buyers should get a lower purchase price.
 
 
-You are to design the architecture for 
+\section{Design}
+You are to design the architecture for the TradeOverflow system so that it can achieve the following key non-functional requirements. Your architecture needs to be designed so that it can be implemented using AWS services.
+\begin{description}
+    \item[Availability] The system must allow members to add listings or make purchase offers at any time. The system must complete trades whenever there are offers that match to available listings. The system must achieve four nines availability, that is the system must be down for less than one hour per year.
+    \item[Scalability] The system must scale to meet demand. The system is expected to have peaks and troughs in trading activity. It needs to scale economically to accommodate the load. For example, popular sales periods, like Cyber Monday, may have millions of trades per hour. Whereas, other times may only have hundreds of trades per hour.
+    \item[Maintainability] TradeOverflow is an ambitious company and intends to make continuous improvements to the system. The architecture and design must allow new features to be added to the system, or changes to be made to existing features, while the system is running and meets the availability and scalability non-functional requirements.
+\end{description}
 
+Your architecture is to be described through a complete set of C4 diagrams with supporting commentary.
+Your C4 diagrams need to show which AWS services are being used to deliver each part of your architecture
+(e.g. via the \link{Structurizr AWS theme}{https://structurizr.com/help/themes}).
+The C4 diagrams should go down to the code level.
+Appropriate code level diagrams to use are C4 dynamic diagrams, and/or UML class diagrams and sequence diagrams.
+You do not need to provide code level diagrams for the entire system,
+but you do need to provide code level diagrams that demonstrate how the key features of the system will be implemented.
+These key features are:
+\begin{itemize}
+	\item Adding new item listings to a trading set and selling group.
+	\item Performing the trading strategy of when the active purchasing group wants to purchase more items than are available in the active sales group.
+	\item A seller changing the minimum sales price for a listing that has not yet been sold.
+\end{itemize}
 
-\section{Software}
-You need to implement a software system that delivers a \link{Minimum Viable Product (MVP)}{https://www.agilealliance.org/glossary/mvp/}.
-The MVP needs to implement a usable core of the system's functionality,
-which demonstrates that the architecture could deliver the full system functionality.
-The MVP also needs to allow the software architecture to be tested to determine if it can deliver the project's important quality attributes.
-
-You may renegotiate the scope of the system during the project,
-if you determine that certain aspects of the original scope are not feasible within the project time constraints.
-The earlier you do this, the less it will impact on your final result.
-You will not explicitly lose marks for renegotiating scope, unless the revised scope limits your ability to adequately test important quality attributes.
-But, late changes to scope are likely to have a flow-on effect that could reduce the quality of your final deliverables.
-This means that you should attempt to implement some of the riskier parts of the project early.
+You should make use of an appropriate architectural view that allows you to demonstrate how the architecture achieves the non-functional requirements described above.
 
 
 \section{Evaluation}
