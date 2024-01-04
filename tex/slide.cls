@@ -251,6 +251,10 @@
   \vfill
   \fontsize{40}{20}\selectfont\color{primary}\textit{\S\hspace{0.5em}\insertsectionhead}\par%
   \vfill
+  \ifdefined\sectimage
+    \includegraphics[width=4cm]{\sectimage}
+    \let\sectimage\undefined
+  \fi
   \end{frame}
 }
 
