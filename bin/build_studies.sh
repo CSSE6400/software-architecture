@@ -2,11 +2,11 @@
 
 REPO_ROOT=$(git rev-parse --show-toplevel)
 
-DIST_DIR="${REPO_ROOT}/dist/tutorials"
+DIST_DIR="${REPO_ROOT}/dist/studies"
 mkdir -p "${REPO_ROOT}/dist"
 mkdir -p "${DIST_DIR}"
 
-for folder in ${REPO_ROOT}/tutorials/*; do
+for folder in ${REPO_ROOT}/studies/*; do
     echo $folder
     if [[ -f "${folder}/latexmkrc" ]]; then
         pushd $folder;
