@@ -58,9 +58,10 @@ The following constraints apply to the implementation of your assignment solutio
 
 \subsection{SpamHammer}
 
+% Change to be only Dr. Richardson's tool and similarity.
 A collection of scanners have been provided to you by the company's security team. A suite of these tools are developed by Mr. Hughes which use common metrics to know if an email is bad but are not always accurate. One of these tools is developed by Dr. Richardson who is an AI and Linguistic expert and is 100 percent accurate but is very slow. Unfortunately, because the company wants to aim for a low false positive rate the CEO wants both accuracy and speed. You will have to work around this bottleneck in the design and development of your parts of the system.
 
-\warning{You are not allowed to reimplement or modify these tools.}
+\warning{You are not allowed to reimplement or modify this tool.}
 
 Your service must utilise the \texttt{spamhammer} command line tool provided for this assignment. You may not make any modifications to this tool. The compiled binaries are available in the tool's GitHub repository: \url{https://github.com/CSSE6400/spamhammer}
 
@@ -96,10 +97,38 @@ For example, you may not deploy a third-party product like MongoDB Atlas on AWS 
 You may \textbf{not} deploy machine learning or GPU backed services.
 
 \section{Submission}
-Your solution must committed to the GitHub repository specified in Section \ref{sec:github}.
-Committing to this repository will be disabled after \textbf{16:00 (AEST) on 3\textsuperscript{rd} May 2024} and the contents of the repository at this time will be taken as your submission.
-The repository \textbf{must} contain everything required to successfully deploy your application.
-You must include all of the following in the repository:
+This assignment has three submissions.
+
+\begin{enumerate}
+  \item March 19 -- API Functionality
+  \item April 12 -- Deployed to Cloud
+  \item May 3 -- Scalable Application
+\end{enumerate}
+All submissions are due at 15:00 on the specified date.
+
+Your solution for each submission must committed to the GitHub repository specified in Section \ref{sec:github}.
+Whatever is in the main branch of your repository at each submission deadline will be checked out and assessed.
+If you have an extension, then the main branch of your repository will be checked out based on your extended deadline.
+Extension requests \textbf{must} be made prior to the submission deadline via \link{my.UQ}{https://my.uq.edu.au/}.
+If you intend to make a late submission, you \textbf{must} inform the course coordinator by email prior to the submission deadline.
+You \textbf{must} then inform the course coordinator by email of the date of your late submission.
+Late penalties will be applied, as described in the course profile.
+
+\textbf{\underline{Note:}} Experience has shown that the large majority of students who make a late submission,
+lose more marks from the late penalty than they gain from any improvements they make to their solution.
+We strongly encourage you to submit your work on-time.
+
+Your repository \textbf{must} contain everything required to successfully deploy your application.
+The first submission must include the following in your repository:
+\begin{itemize}
+  \item Docker container of your implementation of the service API, including the source code and a mechanism to build and run the service.%
+  \footnote{If you use external libraries, ensure that you pin the versions to avoid external changes breaking your application.}
+\end{itemize}
+We will run your Docker container to test the functionality of your API.
+
+\begin{samepage}
+\noindent
+The second and third submissions must include all of the following in your repository:
 \begin{itemize}
   \item Your implementation of the service API, including the source code and a mechanism to build the service.%
   \footnote{If you use external libraries, ensure that you pin the versions to avoid external changes breaking your application.}
@@ -107,8 +136,11 @@ You must include all of the following in the repository:
   \item A \texttt{deploy.sh} script that can use your Terraform code to deploy your application.
     This script can perform other tasks as required.
 \end{itemize}
+\end{samepage}
 
-When deploying your application to mark, we will follow reproducible steps, outlined below. You may re-create the process yourself.
+\noindent
+When deploying your second and third submissions to mark, we will follow reproducible steps, outlined below.
+You may re-create the process yourself.
 
 \begin{enumerate}
   \item Your Git repository will be checked out locally.
@@ -119,6 +151,7 @@ When deploying your application to mark, we will follow reproducible steps, outl
   \item We will run automated functionality and load-testing on the URL provided in the \texttt{api.txt} file.
 \end{enumerate}
 
+\noindent
 \textbf{Important Note: Ensure your service does not exceed the resource limits of AWS Learner Labs. For example, AWS will deactivate your account if more than fifteen EC2 instances are running.}
 
 \subsection{GitHub Repository}\label{sec:github}
@@ -172,15 +205,14 @@ Your assignment submission will be assessed on its ability to support the specif
 
 Partial marks are available for both types of tests, i.e. if some functionality is implemented you can receive marks for that functionality, or if your service can handle 80\% of the scenario during quality testing you will receive marks for that. Deployment is marked in its entirety.
 
-\subsection{Functionality}
+\subsection{API Functionality} % Pesistence: Does not need to be "truly" persistent.
 40\% of the total marks for the assignment are for correctly implementing the API specification, irrespective of whether it is able to cope with high loads. A suite of automated API tests will assess the correctness of your implementation, via a sequence of API calls. The API test suite will be made available before the functionality due date.
 
-\subsection{Deployment}
-25\% of the total marks for the assignment are for deploying a correctly implemented service to AWS irrespective of whether it is able to cope with high loads. The deployment will be assessed by running a script that deploys your service to AWS that then runs a suite of automated API tests to access the correctness of your implementation. The script will be provided to you before the deployment checkpoint due date with the API test suite.
+\subsection{Deployed to Cloud} % Persistence working correctly in the cloud.
+25\% of the total marks for the assignment are for deploying a correctly implemented service to AWS irrespective of whether it is able to cope with high loads. The deployment will be assessed by running a script that deploys your service to AWS that then runs a suite of automated API tests to assess the correctness of your implementation. The script will be provided to you before the deployment checkpoint due date with the API test suite.
 
-\subsection{Quality Scenarios}\label{sec:scenarios}
+\subsection{Scalable Application}\label{sec:scenarios} % Can it scale!
 The remaining 35\% of the marks will be derived from how well your service handles various scenarios. These scenarios will require you to consider how your application performs under load. Examples of possible scenarios are described below. These are not descriptions of specific tests that will be run, rather they are examples of the types of tests that will be run.
-
 
 \paragraph{Steady Stream}
 Steady receipt of email messages at a rate of \emph{N} per minute, evenly spread across all accounts. Approximately 20\% of the messages are `bad'.
@@ -191,11 +223,16 @@ Steady receipt of email messages at a rate of \emph{N} per minute, evenly spread
 \paragraph{Peaks and Troughs}
 Periods of receipt of a high volume of email messages, followed by periods of low volume.
 
-\paragraph{Targeted Attack}
-One account receives a high percentage of `bad' email message. Other accounts receive a normal percentage of `bad' email messages.
-
-\paragraph{Email Overflow}
-There is a high volume of receipt of email messages, but only approximately 20\% of the messages are `bad'.
+\paragraph{High Value Customer}
+The Department of Defence (DoD) has adopted SpamOverflow.
+They are a high value customer and you must ensure that their requests are handled quickly.
+All other customers have a service level agreement (SLA) that guarantees a certain level of responsiveness.
+You cannot ignore their requests to only prioritise the DoD's requests.
+% Original Text: One client receives a high percentage of `bad' email message. Other accounts receive a normal percentage of `bad' email messages.
+% Account could be company/customer.
+% Equal response for all?
+% High Value customer prioritised?
+% High volume of email from a selected customer, not so much high percentage of 'bad' messages.
 
 \paragraph{Leaked Directory}
 A bad actor has managed to get the email addresses of all employees of <Large Company>. They have sent a phishing email to all of the users advertising a pay raise with a link to a fake login page. The email is sent to all 10,000 employees at the same time.
@@ -203,6 +240,7 @@ A bad actor has managed to get the email addresses of all employees of <Large Co
 \paragraph{Personalised Attack}
 A bad actor has trained an AI model using social media profiles of targeted victims.
 They can generate personalised phishing email messages based on personal information.
+As the messages are personalised, they can be of greatly different lengths and contain different content.
 These messages can only be identified by Dr. Richardson's tool.
 They have sent these phishing messages to 2,000 users at the same time.
 
