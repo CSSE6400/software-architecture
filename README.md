@@ -13,13 +13,18 @@ This repository hosts the course material for the [Software Architecture course 
 
 ## Folder Structure
 
-* `assessments`: Specification sheets for each of the courses assessment items.
+* `assessment`: Specification sheets for each of the courses assessment items.
 * `bin`: Scripts for building course content.
-* `dist`: Empty directory used as the output for the build scripts.
+* `concepts`: Very early start on a concept map of the course content.
+* `dist`: Empty directory used as output for the build scripts.
+* `examples`: Example assignment exercise. Primarily used to hold examples or ideas that could be added to other course content.
 * `notes`: Lecture notes for the course content.
 * `practicals`: Guides for each of the structured practical sessions.
 * `public`: The public facing website in static HTML form. This directory becomes the root when the site is published.
 * `references`: A collection of bibtex references used in the course.
+* `shared`: Resources shared across multiple latex files.
+* `slides`: Lecture slides for the course content.
+* `studies`: Case studies used as tutorial exercises.
 * `tex`: Shared latex items.
 * `workdir`: Empty directory used for temporary storage by the build scripts.
 
