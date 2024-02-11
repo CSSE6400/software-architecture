@@ -8,12 +8,13 @@
 \usepackage{xltabular}
 \usepackage{pdflscape}
 \usepackage{enumitem}
+\usepackage{xcolor}
 
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 % RUBRIC
 
 \title{SpamOverflow}
-\author{Evan Hughes}
+\author{Evan Hughes, Brae Webb and Richard Thomas}
 \date{Semester 1, 2024}
 
 \begin{document}
@@ -26,9 +27,9 @@ i.e. a scalable application.
 You are to deloy an API for scanning and filtering spam/malicious emails.
 Specially your application needs to support:
 \begin{itemize}
-    \item Scanning an email via an API request.
-    \item Providing access via a specified REST API, e.g. for use by front-end interfaces.
-    \item Remaining responsive to the user while scanning emails.
+    \item Scan an email via an API request.
+    \item Provide access to a specified REST API, e.g. for use by front-end interfaces and internal teams.
+    \item Remain responsive while scanning emails.
 \end{itemize}
 
 Your service will be deployed to AWS and will undergo automated correctness and load-testing to ensure it meets the requirements.
@@ -37,21 +38,23 @@ Your service will be deployed to AWS and will undergo automated correctness and 
 ....
 
 \paragraph{Task}
-For this assignment, you are working for SpamOverflow, a new competitor in the email security space. SpamOverflow uses a microservices based architecture to implement their new platform. The CEO saw on your resume that you took Software Architecture and has assigned you to design and implement the service. This service must be scalable to cope with a large influx of emails that occur over the day.
+For this assignment, you are working for SpamOverflow, a new competitor in the email security space. SpamOverflow uses a microservices based architecture to implement their new malicious email filtering platform. The CEO saw on your resume that you took Software Architecture and has assigned you to design and implement a service. This service must be scalable to cope with the large influx of emails that your company anticipates.
 
 \paragraph{Requirements}
-Some email filtering software can be in the flow of traffic or it can be used to scan emails that have already arrived. SpamOverflow has decided to implement a service that does not impede the flow of traffic and gets a API call at receipt of an email. The service then pulls the email from the users inbox as fast as it can to stop the user from seeing the email or clicking any links.
+Some email filtering software filter email as it arrives or after. SpamOverflow will implement a service that does not impede the flow of traffic (i.e. does not prevent the email arriving) and gets a API call at receipt of an email. The service then pulls the email from the users inbox as fast as it can to prevent the user from seeing the email or clicking any links.
 
-Mail providers like Microsoft and Google only send a single API request for each email received, so for optimal performance this service needs to be able to handle a large number of requests in a short period of time to not miss any emails.
+Commercial Mail providers send a API request for each email received, so for optimal performance this service needs to be able to handle a large number of requests in a short period of time to not miss any emails.
 
 Since these emails can be dangerous, the service must be able to report that it is bad or good in a timely manner. Though genuine emails that are incorrectly marked as dangerous should be returned to the user as quickly as possible.
 
-Persistence is an important characteristic of the platform. Customers will want to do reports and analyse why emails were flagged and naturally will be upset if the system loses it because a server crashed. Upon receiving an email scan request, the system must guarantee that the data has been saved to persistent storage before returning a success response.
+Persistence is an important characteristic of the platform. Customers will want to analyse why emails were flagged after the fact. Upon receiving an email scan request and after filtering, the system must guarantee that the data has been saved to persistent storage before returning a success response.
 
 \section{Interface}
 As you are operating in a microservices context, other service providers have been given an API specification for your service. They have been developing their services based on this specification so you must match it exactly.
 
-The interface specification is available to all service owners online: \url{https://csse6400.uqcloud.net/assessment/spamoverflow}
+The interface specification is available to all service owners online: 
+
+\url{https://csse6400.uqcloud.net/assessment/spamoverflow}
 
 \section{Implementation}
 The following constraints apply to the implementation of your assignment solution.
@@ -59,26 +62,27 @@ The following constraints apply to the implementation of your assignment solutio
 \subsection{SpamHammer}
 
 % Change to be only Dr. Richardson's tool and similarity.
-A collection of scanners have been provided to you by the company's security team. A suite of these tools are developed by Mr. Hughes which use common metrics to know if an email is bad but are not always accurate. One of these tools is developed by Dr. Richardson who is an AI and Linguistic expert and is 100 percent accurate but is very slow. Unfortunately, because the company wants to aim for a low false positive rate the CEO wants both accuracy and speed. You will have to work around this bottleneck in the design and development of your parts of the system.
+
+You have been provided with a command line tool called \texttt{spamhammer} that can be used to scan emails for malicious content. This tool is developed by Dr. Richardson who is an AI and Linguistic expert, but the tool has varying performance roughly related to the length of the content. You will have to work around this bottleneck in the design and development of your parts of the system.
+
+Your service must utilise the \texttt{spamhammer} command line tool provided for this assignment. The compiled binaries are available in the tool's GitHub repository: \url{https://github.com/CSSE6400/spamhammer}
 
 \warning{You are not allowed to reimplement or modify this tool.}
 
-Your service must utilise the \texttt{spamhammer} command line tool provided for this assignment. You may not make any modifications to this tool. The compiled binaries are available in the tool's GitHub repository: \url{https://github.com/CSSE6400/spamhammer}
-
-This tool is not as magical as it sounds, in the API you will notice a field that must be included that makes it all the way to the scanner but is not part of the email text. This is a setting which decides what each scanner is going to return ( either a 0 or 1 ) and contains the information if the email is actually good or bad. Demonstrations are provided in the repository to show how to use the tool to generate your own examples.
+This tool is not as magical as it sounds, in the API you will notice a header that must be included that makes it all the way to the scanner but is not part of the email text. This is a setting which decides whether the email is malicious. Demonstrations are provided in the repository to show how to use the tool to generate your own examples. You must not use this header to simplify the task of scanning the email.
 
 \subsection{Similarity}
 
 Dr. Richardson has also provided some advice to help you with filtering through the emails and has suggested that you use a similarity metric to compare the emails to a database of known bad emails. The doctor explains it as ``many of the emails we have seen with our first customers have the same content and structure it is just that the link or `Dear <name>' is slightly different''.
 
-With this knowledge you have found a common method of getting the difference between documents called the Cosine Similarity which is explained in some videos available on YouTube.
+With this knowledge you have found a common method of getting the difference between documents called the Cosine Similarity which is explained in these videos.
 
 \begin{itemize}
   \item \url{https://www.youtube.com/watch?v=e9U0QAFbfLI}
   \item \url{https://www.youtube.com/watch?v=Dd16LVt5ct4}
 \end{itemize}
 
-\info{Dr. Richardson emphasises that the similarity metric is not a replacement for the scanners and is an optional way to improve the efficiency of the system.}
+\info{Dr. Richardson emphasises that the similarity metric is not a replacement for the scanner and is an optional way to improve the efficiency of the system.}
 
 \subsection{AWS Services}
 Please make note of the \link{AWS services}
@@ -100,9 +104,9 @@ You may \textbf{not} deploy machine learning or GPU backed services.
 This assignment has three submissions.
 
 \begin{enumerate}
-  \item March 19 -- API Functionality
-  \item April 12 -- Deployed to Cloud
-  \item May 3 -- Scalable Application
+  \item March 19$^{th}$ -- API Functionality
+  \item April 12$^{th}$ -- Deployed to Cloud
+  \item May 3$^{rd}$ -- Scalable Application
 \end{enumerate}
 All submissions are due at 15:00 on the specified date.
 
@@ -147,7 +151,7 @@ You may re-create the process yourself.
   \item AWS credentials will be copied into your repository in the top-level directory,
   in a file called \texttt{credentials}.
   \item The script \texttt{deploy.sh} in the top-level of the repository will be run.
-  \item The \texttt{deploy.sh} script \textbf{must} create a file named \texttt{api.txt} which contains the URL at which your API is deployed, e.g. \texttt{http://my-lb.com/}
+  \item The \texttt{deploy.sh} script \textbf{must} create a file named \texttt{api.txt} which contains the URL at which your API is deployed, e.g. \texttt{http://my-api.com/} or \texttt{http://123.456.789.012/}.
   \item We will run automated functionality and load-testing on the URL provided in the \texttt{api.txt} file.
 \end{enumerate}
 
@@ -165,11 +169,6 @@ Associating your GitHub username with another student's ID, or getting someone e
 If for some reason you have accidentally associated your GitHub username with the wrong student ID, contact the course staff as soon as possible.
 
 \subsection{Tips}
-
-\paragraph{If something goes wrong}
-Ideally, your infrastructure will be deployed successfully but this could go wrong for any number of unforeseen reasons. If your deployment is automatically detected to have an issue then a redeployment will be attempted. If this fails then it will be up to the discretion of the course coordinator on how to proceed.
-
-The assessment is split into multiple checkpoints to help ensure that you are on the right track and that your deployment functions.
 
 \paragraph{Terraform plan/apply hanging}
 If your \texttt{terraform plan} or \texttt{terraform apply} command hangs without any output, check your AWS credentials. Using credentials of an expired learner lab session will cause Terraform to hang.
@@ -202,8 +201,6 @@ Note that the Docker socket of the host has been mounted. This enables running \
 
 \section{Criteria}
 Your assignment submission will be assessed on its ability to support the specified use cases. Testing is divided into functionality testing, deployment and quality testing. Functionality testing is to ensure that your backend software and API meet the MVP requirements by satisfying the API specification without any excessive load. Deployment is to ensure that this MVP can then be hosted in the target cloud provider. Quality testing is based upon several likely use case scenarios. The scenarios create different scaling requirements.
-
-Partial marks are available for both types of tests, i.e. if some functionality is implemented you can receive marks for that functionality, or if your service can handle 80\% of the scenario during quality testing you will receive marks for that. Deployment is marked in its entirety.
 
 \subsection{API Functionality} % Pesistence: Does not need to be "truly" persistent.
 40\% of the total marks for the assignment are for correctly implementing the API specification, irrespective of whether it is able to cope with high loads. A suite of automated API tests will assess the correctness of your implementation, via a sequence of API calls. The API test suite will be made available before the functionality due date.
@@ -245,13 +242,11 @@ These messages can only be identified by Dr. Richardson's tool.
 They have sent these phishing messages to 2,000 users at the same time.
 
 \subsection{Marking}
-Functionality accounts for 40\% of the marks for the assignment. This is split as 25\% for correct implementation of the provided API, and 15\% for correct generation of tickets and seating plans. The simple queries in the API are worth much less of the mark compared to the API operations that require processing of data.
-
-Functionality marks are based on correct implementation of the functionality, which is primarily assessed by the automated functionality tests.
-
-Persistence is a core functional requirement of the system. If your implementation does not save all new email scans to persistent storage, your grade for the assignment will be capped at 4.
+Persistence is a core functional requirement of the system. If your implementation does not save email scans to persistent storage, your grade for the assignment will be capped at 4.
 
 Your persistence mechanism must be robust, so that it can cope with catastrophic failure of the system. If all running instances of your services are terminated, the system must be able to restart and guarantee that it has not lost any data about emails for which it returned a success response to the caller. There will not be a test that explicitly kills all services and restarts the system. This will be assessed based on the services you use and how your implementation invokes those services. If you do not store data to a persistent data store, or you return a success response before the data has been saved, are the criteria that determine whether you have successfully implemented persistence.
+
+Functionality of your service is worth 40\% of the marks for the assignment. This is based on the successful implementation of the API specification given and the ability to use the given tool in your implementation.
 
 Deploying your service is worth 25\% of the marks for the assignment. This is based on the successful deployment, using Terraform, of your service to AWS and the ability to access the service via the API. Your service must be fully functional while deployed so the functionality tests can be run which determines the marks for deployment.
 
