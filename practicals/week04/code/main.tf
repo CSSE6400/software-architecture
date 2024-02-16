@@ -2,25 +2,27 @@ terraform {
     required_providers {
         aws = {
             source  = "hashicorp/aws"
-            version = "~> 3.0"
+            version = "~> 5.0"
         }
     }
 }
 
 provider "aws" {
     region = "us-east-1"
-    shared_credentials_file = "./credentials"
+    shared_credentials_file = ["./credentials"]
 }
 
 resource "aws_instance" "hextris-server" {
-  ami           = "ami-005f9685cb30f234b"
+  ami           = "ami-0e731c8a588258d0d"
   instance_type = "t2.micro"
-  user_data = file("${path.module}/deploy.sh")
-  security_groups = [aws_security_group.hextris-server.name]
+  key_name      = "vockey"
 
   tags = {
     Name = "hextris"
   }
+
+  user_data = file("${path.module}/deploy.sh")
+  security_groups = [aws_security_group.hextris-server.name]
 }
 
 resource "aws_security_group" "hextris-server" {
