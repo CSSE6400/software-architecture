@@ -517,55 +517,67 @@ Feel free to implement the practicals and your assignments in any language you f
 If you are on Windows, we recommend using a Unix based environment, such as WSL2 or a virtual machine running Ubuntu.
 }
 
-\info{
-  You will require an installation of Python 3 and pip to be able to complete this practical. Install these tools now before continuing.
-  If you are unable to install these tools, you should be able to use GitHub Codespaces to complete the practical.
-}
-
 \teacher{
   Let the students setup their initial python environment. It has been some time since these students would have used Python so they might have to do a full install including installing pip. Some common issues that come up are:
 
   \begin{itemize}
     \item Pip is not installed.
-    \item PipEnv is installed via apt instead of through pip. This one is hard to tell without having some intution. Look for being able to uninstall pipenv via pip and its still runnable or by doing an apt list-installed. Fix is to remove pipenv via apt and reinstall via pip.
-    \item PipEnv can take a significant amount of time on a fresh WSL2 for some reason. Unknown if theres a real fix for this or if its an ongoing issue.
+    \item The guides below try to follow a safe approach but some students may have components installed globally.
   \end{itemize}
+
+  The Pipx is nesscary for the course to be compatible with Python3.12+ installs which the latest ubuntu and mac versions are using.
 }
 
-We will be using \texttt{pipenv} to manage the Python libraries we need for this project.
+Since Python3.12 now requires virtual environments to be used we will start by installing pipx to help manage the python environment, followed by poetry to manage our application dependencies.
+
+For mac and linux users you can install pipx via your package manager:
 
 \begin{code}[language=bash,numbers=none]{}
-  >> python3 -m pip install pipenv
+  >> brew install pipx
+  >> pipx ensurepath
+\end{code}
+
+or 
+
+\begin{code}[language=bash,numbers=none]{}
+  >> apt install pipx // apt or dnf depending on distro
+  >> pipx ensurepath 
+\end{code}
+
+Once pipx is installed we can install poetry safely without affecting our system python environment.
+
+\begin{code}[language=bash,numbers=none]{}
+  >> pipx install poetry
 \end{code}
 
 Navigate to your cloned practical respository in a terminal and start your project by creating the Python environment using the following:
 
 \begin{code}[language=bash,numbers=none]{}
-  >> pipenv --python 3
+  >> poetry init
 \end{code}
 
-\warning{Depending on your system you may have to use \texttt{python3 pipenv --python 3} instead of \texttt{pipenv --python 3}}
+This will give you a few prompts which for our purposes you can just stick with the default values.
+After this process is completed you will have a \texttt{pyproject.toml} file in your repository.
+The \texttt{pyproject.toml} is where we will specify the libraries we need for our project.
 
-This will create a \texttt{Pipfile} and a \texttt{Pipfile.lock} file.
-The \texttt{Pipfile} is where we will specify the libraries we need for our project.
-The \texttt{Pipfile.lock} is where pipenv will store the versions of the libraries we have installed.
-We will use the \texttt{Pipfile} to install the libraries we need for the API.
-
-\begin{code}{Pipfile}
-  [[source]]
-  name = "pypi"
-  url = "https://pypi.org/simple"
-  verify_ssl = true
-
-  [dev-packages]
-
-  [packages]
-
-  [requires]
-  python_version = "3.10"
+\begin{code}{pyproject.toml}
+  [tool.poetry]
+  name = "practical01"
+  version = "0.1.0"
+  description = ""
+  authors = ["Evan Hughes <uqehugh3@uq.edu.au>"]
+  readme = "README.md"
+  
+  [tool.poetry.dependencies]
+  python = "^3.8"
+  
+  
+  [build-system]
+  requires = ["poetry-core"]
+  build-backend = "poetry.core.masonry.api"
 \end{code}
 
-\info{Your Python version may be different, this is fine as long as it is Python 3. For our automated tests we would like you to change the version number from the \texttt{Pipfile} so that it is \texttt{python\_version = "3"}}
+\info{Your Python version may be different, this is fine as long as it is Python 3. For our automated tests we would like you to change the version number from the \texttt{pyproject} so that it is \texttt{python = "\^3.8"}. If you are running a version of python lower than this then please consider upgrading as it is end-of-life.}
 
 \teacher{
   Try to get the students to do the above otherwise you will be answering questions about it towards the end when the tests dont run.
@@ -574,10 +586,10 @@ We will use the \texttt{Pipfile} to install the libraries we need for the API.
 Next we are going to add Flask as a dependency to our project. This library is a small web server wrapper that will allow us to quickly build our todo application. To add a dependency to our project, we can run the following command:
 
 \begin{code}[language=bash,numbers=none]{}
-  >>  pipenv install flask
+  >> poetry add flask
 \end{code}
 
-You will see it has made some changes to our \texttt{Pipfile} and \texttt{Pipfile.lock} files.
+You will see it has made some changes to our \texttt{pyproject} and a \texttt{poetry.lock} is created.
 
 \subsubsection{Initialising with Flask}
 
@@ -606,7 +618,7 @@ We have created a basic Flask app but how do we run it?
 When using pipenv we need to run it in the following way:
 
 \begin{code}[language=bash,numbers=none]{}
-  >> pipenv run flask --app todo run
+  >> poetry run flask --app todo run
 \end{code}
 
 This command runs the \texttt{flask --app todo run} command inside the pipenv environment with our dependencies installed.
@@ -643,7 +655,7 @@ The above has made an endpoint within our API under the \texttt{/api/v1} prefix 
 Now when we run the app we should see the following:
 
 \begin{code}[language=bash,numbers=none]{}
-  >> pipenv run flask --app todo run -p 6400
+  >> poetry run flask --app todo run -p 6400
 
   * Serving Flask app 'todo'
   * Debug mode: off
@@ -667,8 +679,8 @@ If you run into any issues, make sure your files are in the following structure 
 \begin{code}[language=bash,numbers=none]{}
   .
   |-- README.md
-  |-- Pipfile
-  |-- Pipfile.lock
+  |-- pyproject
+  |-- poetry.lock
   |-- todo
       |-- __init__.py
       |-- views
