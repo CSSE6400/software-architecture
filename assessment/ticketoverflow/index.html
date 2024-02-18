@@ -853,6 +853,123 @@ ul.nav-tabs {
   <script>
     // Script section to load models into a JS Var
     var defs = {}
+    defs["_customers__customer_id__reports_actors_get_200_response"] = {
+  "type" : "object",
+  "properties" : {
+    "total" : {
+      "minimum" : 0,
+      "type" : "integer",
+      "description" : "The number of entries in the list."
+    },
+    "data" : {
+      "type" : "array",
+      "description" : "The list of actors with atleast 1 malicious email.",
+      "items" : {
+        "$ref" : "#/components/schemas/_customers__customer_id__reports_actors_get_200_response_data_inner"
+      }
+    }
+  },
+  "example" : {
+    "total" : 1,
+    "data" : [ {
+      "id" : "no-reply@uq.edu.au",
+      "count" : 256
+    } ]
+  }
+};
+    defs["_customers__customer_id__reports_actors_get_200_response_data_inner"] = {
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string",
+      "description" : "Email address of the sender of malicious email."
+    },
+    "count" : {
+      "minimum" : 1,
+      "type" : "integer",
+      "description" : "The number of times this actor has been seen."
+    }
+  }
+};
+    defs["_customers__customer_id__reports_domains_get_200_response"] = {
+  "type" : "object",
+  "properties" : {
+    "total" : {
+      "minimum" : 0,
+      "type" : "integer",
+      "description" : "The number of entries in the list."
+    },
+    "data" : {
+      "type" : "array",
+      "description" : "The list of domains which were contained in suspicious emails.",
+      "items" : {
+        "$ref" : "#/components/schemas/_customers__customer_id__reports_domains_get_200_response_data_inner"
+      }
+    }
+  },
+  "example" : {
+    "total" : 1,
+    "data" : [ {
+      "id" : "uq.edu.au",
+      "count" : 16
+    }, {
+      "id" : "uq.mu",
+      "count" : 5
+    } ]
+  }
+};
+    defs["_customers__customer_id__reports_domains_get_200_response_data_inner"] = {
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string",
+      "description" : "The domain found in a suspicious email."
+    },
+    "count" : {
+      "minimum" : 1,
+      "type" : "integer",
+      "description" : "The number of times this domain has been seen."
+    }
+  }
+};
+    defs["_customers__customer_id__reports_recipients_get_200_response"] = {
+  "type" : "object",
+  "properties" : {
+    "total" : {
+      "minimum" : 0,
+      "type" : "integer",
+      "description" : "The number of entries in the list."
+    },
+    "data" : {
+      "type" : "array",
+      "description" : "The list of recipients with atleast 1 malicious email.",
+      "items" : {
+        "$ref" : "#/components/schemas/_customers__customer_id__reports_recipients_get_200_response_data_inner"
+      }
+    }
+  },
+  "example" : {
+    "total" : 1,
+    "data" : [ {
+      "id" : "no-reply@uq.edu.au",
+      "count" : 256
+    } ]
+  }
+};
+    defs["_customers__customer_id__reports_recipients_get_200_response_data_inner"] = {
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "string",
+      "description" : "Email address of the recipient of malicious email."
+    },
+    "count" : {
+      "minimum" : 1,
+      "type" : "integer",
+      "description" : "The number of times this recipient has been seen."
+    }
+  }
+};
     defs["Email"] = {
   "type" : "object",
   "properties" : {
@@ -866,42 +983,6 @@ ul.nav-tabs {
   }
 };
     defs["EmailPost"] = {
-  "type" : "object",
-  "properties" : {
-    "id" : {
-      "type" : "string",
-      "description" : "Unique identifier."
-    }
-  },
-  "example" : {
-    "id" : "e571964f-f2b7-4200-9fb0-2af749092fa1"
-  }
-};
-    defs["ReportActors"] = {
-  "type" : "object",
-  "properties" : {
-    "id" : {
-      "type" : "string",
-      "description" : "Unique identifier."
-    }
-  },
-  "example" : {
-    "id" : "e571964f-f2b7-4200-9fb0-2af749092fa1"
-  }
-};
-    defs["ReportLinks"] = {
-  "type" : "object",
-  "properties" : {
-    "id" : {
-      "type" : "string",
-      "description" : "Unique identifier."
-    }
-  },
-  "example" : {
-    "id" : "e571964f-f2b7-4200-9fb0-2af749092fa1"
-  }
-};
-    defs["ReportRecipients"] = {
   "type" : "object",
   "properties" : {
     "id" : {
@@ -935,20 +1016,20 @@ ul.nav-tabs {
                     <li data-group="Email" data-name="customersCustomerIdEmailsGet" class="">
                       <a href="#api-Email-customersCustomerIdEmailsGet"><span style="float:right;text-transform:uppercase">get</span>/customers/{customer_id}/emails</a>
                     </li>
+                    <li data-group="Email" data-name="customersCustomerIdEmailsIdGet" class="">
+                      <a href="#api-Email-customersCustomerIdEmailsIdGet"><span style="float:right;text-transform:uppercase">get</span>/customers/{customer_id}/emails/{id}</a>
+                    </li>
                     <li data-group="Email" data-name="customersCustomerIdEmailsPost" class="">
                       <a href="#api-Email-customersCustomerIdEmailsPost"><span style="float:right;text-transform:uppercase">post</span>/customers/{customer_id}/emails</a>
                     </li>
-                    <li data-group="Email" data-name="customersIdEmailsIdGet" class="">
-                      <a href="#api-Email-customersIdEmailsIdGet"><span style="float:right;text-transform:uppercase">get</span>/customers/{id}/emails/{id}</a>
+                    <li data-group="Email" data-name="customersCustomerIdReportsActorsGet" class="">
+                      <a href="#api-Email-customersCustomerIdReportsActorsGet"><span style="float:right;text-transform:uppercase">get</span>/customers/{customer_id}/reports/actors</a>
                     </li>
-                    <li data-group="Email" data-name="customersIdReportsActorsGet" class="">
-                      <a href="#api-Email-customersIdReportsActorsGet"><span style="float:right;text-transform:uppercase">get</span>/customers/{id}/reports/actors</a>
+                    <li data-group="Email" data-name="customersCustomerIdReportsDomainsGet" class="">
+                      <a href="#api-Email-customersCustomerIdReportsDomainsGet"><span style="float:right;text-transform:uppercase">get</span>/customers/{customer_id}/reports/domains</a>
                     </li>
-                    <li data-group="Email" data-name="customersIdReportsDomainsGet" class="">
-                      <a href="#api-Email-customersIdReportsDomainsGet"><span style="float:right;text-transform:uppercase">get</span>/customers/{id}/reports/domains</a>
-                    </li>
-                    <li data-group="Email" data-name="customersIdReportsRecipientsGet" class="">
-                      <a href="#api-Email-customersIdReportsRecipientsGet"><span style="float:right;text-transform:uppercase">get</span>/customers/{id}/reports/recipients</a>
+                    <li data-group="Email" data-name="customersCustomerIdReportsRecipientsGet" class="">
+                      <a href="#api-Email-customersCustomerIdReportsRecipientsGet"><span style="float:right;text-transform:uppercase">get</span>/customers/{customer_id}/reports/recipients</a>
                     </li>
                     <li data-group="Email" data-name="healthGet" class="">
                       <a href="#api-Email-healthGet"><span style="float:right;text-transform:uppercase">get</span>/health</a>
@@ -993,7 +1074,7 @@ ul.nav-tabs {
                         <h3>Curl Request Example</h3>
                         <pre class="prettyprint"><code class="language-bsh">curl -X GET \
  -H "Accept: application/json" \
- "http://email.api.spamoverflow.com/api/v1/customers/{customer_id}/emails?limit=20&offset=0&start=2024-02-21T13:10:05Z&end=2024-02-21T14:10:05Z&from=no-reply@uq.edu.au&to=support@uq.edu.au"
+ "http://email.api.spamoverflow.com/api/v1/customers/{customer_id}/emails?limit=20&offset=0&start=2024-02-21T13:10:05Z&end=2024-02-21T14:10:05Z&from=no-reply@uq.edu.au&to=support@uq.edu.au&state=scanned&only_malicious=true"
 </code></pre>
 
                           <h2 class="methodsubtabletitle">Path parameters</h2>
@@ -1177,6 +1258,50 @@ Parsing of emails to remove &#39;+&#39; aliases is not supported and will be tre
 </td>
 </tr>
 
+                                <tr><td style="width:150px;">state</td>
+<td>
+
+
+    <div id="d2e199_customersCustomerIdEmailsGet_state">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+                    <div class="inner description marked">
+Only return emails with this state.
+The state should be one of &#39;pending&#39;, &#39;scanned&#39;, &#39;failed&#39;.
+
+                    </div>
+            </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                                <tr><td style="width:150px;">only_malicious</td>
+<td>
+
+
+    <div id="d2e199_customersCustomerIdEmailsGet_onlyMalicious">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    Boolean
+                </span>
+
+                    <div class="inner description marked">
+Only return emails that have been flagged as malicious.
+This will ignore the state parameter and treat it as if it was &#39;scanned&#39;.
+
+                    </div>
+            </div>
+        </div>
+    </div>
+</td>
+</tr>
+
                             </table>
 
                           <h2>Responses</h2>
@@ -1256,7 +1381,10 @@ Parsing of emails to remove &#39;+&#39; aliases is not supported and will be tre
                             <h3 id="examples-Email-customersCustomerIdEmailsGet-title-400"></h3>
                             <p id="examples-Email-customersCustomerIdEmailsGet-description-400" class="marked"></p>
                             <script>
-                              var responseEmail400_description = `Invalid customer_id or query parameters.`;
+                              var responseEmail400_description = `Invalid customer_id or query parameters.
+
+Return value is not specified but should describe the error.
+`;
                               var responseEmail400_description_break = responseEmail400_description.indexOf('\n');
                               if (responseEmail400_description_break == -1) {
                                 $("#examples-Email-customersCustomerIdEmailsGet-title-400").text("Status Code: 400 - " + responseEmail400_description);
@@ -1279,8 +1407,7 @@ Parsing of emails to remove &#39;+&#39; aliases is not supported and will be tre
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "Invalid customer_id or query parameters.",
-  "content" : { }
+  "description" : "Invalid customer_id or query parameters.\n\nReturn value is not specified but should describe the error.\n"
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
                                         if (!schema) {
@@ -1335,8 +1462,7 @@ Parsing of emails to remove &#39;+&#39; aliases is not supported and will be tre
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "Customer does not exist or no emails have been submitted for this customer (before filters applied).",
-  "content" : { }
+  "description" : "Customer does not exist or no emails have been submitted for this customer (before filters applied)."
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
                                         if (!schema) {
@@ -1362,6 +1488,390 @@ Parsing of emails to remove &#39;+&#39; aliases is not supported and will be tre
                                     </script>
                                   </div>
                                   <input id='responses-Email-customersCustomerIdEmailsGet-404-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+                            
+                            <h3 id="examples-Email-customersCustomerIdEmailsGet-title-500"></h3>
+                            <p id="examples-Email-customersCustomerIdEmailsGet-description-500" class="marked"></p>
+                            <script>
+                              var responseEmail500_description = `An unknown error occurred trying to process the request.
+
+Return value is not specified but should describe the error.
+`;
+                              var responseEmail500_description_break = responseEmail500_description.indexOf('\n');
+                              if (responseEmail500_description_break == -1) {
+                                $("#examples-Email-customersCustomerIdEmailsGet-title-500").text("Status Code: 500 - " + responseEmail500_description);
+                              } else {
+                                $("#examples-Email-customersCustomerIdEmailsGet-title-500").text("Status Code: 500 - " + responseEmail500_description.substring(0, responseEmail500_description_break));
+                                $("#examples-Email-customersCustomerIdEmailsGet-description-500").html(responseEmail500_description.substring(responseEmail500_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Email-customersCustomerIdEmailsGet-500" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Email-customersCustomerIdEmailsGet-500-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Email-customersCustomerIdEmailsGet-500-schema">
+                                  <div id="responses-Email-customersCustomerIdEmailsGet-schema-500" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "An unknown error occurred trying to process the request.\n\nReturn value is not specified but should describe the error.\n"
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Email-customersCustomerIdEmailsGet-500-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Email-customersCustomerIdEmailsGet-schema-500');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Email-customersCustomerIdEmailsGet-500-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+                            
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Email-customersCustomerIdEmailsIdGet">
+                      <article id="api-Email-customersCustomerIdEmailsIdGet-0" data-group="User" data-name="customersCustomerIdEmailsIdGet" data-version="0">
+                        <div class="pull-left">
+                          <!-- <h1>customersCustomerIdEmailsIdGet</h1> -->
+                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/customers/{customer_id}/emails/{id}</span></code></pre></h1>
+                          <p>Get information for a particular email.</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked">Returns a representation of an email for a customer with the status of the scan and its result. 
+</p>
+                        <p></p>
+                        <br />
+
+                        <h3>Curl Request Example</h3>
+                        <pre class="prettyprint"><code class="language-bsh">curl -X GET \
+ -H "Accept: application/json" \
+ "http://email.api.spamoverflow.com/api/v1/customers/{customer_id}/emails/{id}"
+</code></pre>
+
+                          <h2 class="methodsubtabletitle">Path parameters</h2>
+                          <table id="methodsubtable">
+                              <tr>
+                                <th width="150px">Name</th>
+                                <th>Description</th>
+                              </tr>
+                                <tr><td style="width:150px;">customer_id*</td>
+<td>
+
+
+    <div id="d2e199_customersCustomerIdEmailsIdGet_customerId">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+                    <div class="inner description marked">
+The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+                    </div>
+            </div>
+                <div class="inner required">
+                    Required
+                </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                                <tr><td style="width:150px;">id*</td>
+<td>
+
+
+    <div id="d2e199_customersCustomerIdEmailsIdGet_id">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+                    <div class="inner description marked">
+The email identifier that was returned when the request was created.
+                    </div>
+            </div>
+                <div class="inner required">
+                    Required
+                </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                          </table>
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3 id="examples-Email-customersCustomerIdEmailsIdGet-title-200"></h3>
+                            <p id="examples-Email-customersCustomerIdEmailsIdGet-description-200" class="marked"></p>
+                            <script>
+                              var responseEmail200_description = `Information about the requested ticket.`;
+                              var responseEmail200_description_break = responseEmail200_description.indexOf('\n');
+                              if (responseEmail200_description_break == -1) {
+                                $("#examples-Email-customersCustomerIdEmailsIdGet-title-200").text("Status Code: 200 - " + responseEmail200_description);
+                              } else {
+                                $("#examples-Email-customersCustomerIdEmailsIdGet-title-200").text("Status Code: 200 - " + responseEmail200_description.substring(0, responseEmail200_description_break));
+                                $("#examples-Email-customersCustomerIdEmailsIdGet-description-200").html(responseEmail200_description.substring(responseEmail200_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Email-customersCustomerIdEmailsIdGet-200" class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-Email-customersCustomerIdEmailsIdGet-200-schema">Schema</a>
+                                </li>
+
+
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Email-customersCustomerIdEmailsIdGet-200-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Email-customersCustomerIdEmailsIdGet-200-schema">
+                                  <div id="responses-Email-customersCustomerIdEmailsIdGet-schema-200" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Information about the requested ticket.",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/Email"
+      }
+    }
+  }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Email-customersCustomerIdEmailsIdGet-200-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Email-customersCustomerIdEmailsIdGet-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Email-customersCustomerIdEmailsIdGet-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                                <div class="tab-pane" id="examples-Email-customersCustomerIdEmailsIdGet-200-example">
+                                  <pre class="prettyprint"><code class="json"></code></pre>
+                                </div>
+                            </div>
+                            
+                            <h3 id="examples-Email-customersCustomerIdEmailsIdGet-title-400"></h3>
+                            <p id="examples-Email-customersCustomerIdEmailsIdGet-description-400" class="marked"></p>
+                            <script>
+                              var responseEmail400_description = `Body parameter was malformed or invalid.
+
+Return value is not specified but should describe the error.
+`;
+                              var responseEmail400_description_break = responseEmail400_description.indexOf('\n');
+                              if (responseEmail400_description_break == -1) {
+                                $("#examples-Email-customersCustomerIdEmailsIdGet-title-400").text("Status Code: 400 - " + responseEmail400_description);
+                              } else {
+                                $("#examples-Email-customersCustomerIdEmailsIdGet-title-400").text("Status Code: 400 - " + responseEmail400_description.substring(0, responseEmail400_description_break));
+                                $("#examples-Email-customersCustomerIdEmailsIdGet-description-400").html(responseEmail400_description.substring(responseEmail400_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Email-customersCustomerIdEmailsIdGet-400" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Email-customersCustomerIdEmailsIdGet-400-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Email-customersCustomerIdEmailsIdGet-400-schema">
+                                  <div id="responses-Email-customersCustomerIdEmailsIdGet-schema-400" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Body parameter was malformed or invalid.\n\nReturn value is not specified but should describe the error.\n",
+  "content" : { }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Email-customersCustomerIdEmailsIdGet-400-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Email-customersCustomerIdEmailsIdGet-schema-400');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Email-customersCustomerIdEmailsIdGet-400-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+                            
+                            <h3 id="examples-Email-customersCustomerIdEmailsIdGet-title-404"></h3>
+                            <p id="examples-Email-customersCustomerIdEmailsIdGet-description-404" class="marked"></p>
+                            <script>
+                              var responseEmail404_description = `The email for the customer does not exist. If a customer does not exist for the given customer_id then the response will be a 404.`;
+                              var responseEmail404_description_break = responseEmail404_description.indexOf('\n');
+                              if (responseEmail404_description_break == -1) {
+                                $("#examples-Email-customersCustomerIdEmailsIdGet-title-404").text("Status Code: 404 - " + responseEmail404_description);
+                              } else {
+                                $("#examples-Email-customersCustomerIdEmailsIdGet-title-404").text("Status Code: 404 - " + responseEmail404_description.substring(0, responseEmail404_description_break));
+                                $("#examples-Email-customersCustomerIdEmailsIdGet-description-404").html(responseEmail404_description.substring(responseEmail404_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Email-customersCustomerIdEmailsIdGet-404" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Email-customersCustomerIdEmailsIdGet-404-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Email-customersCustomerIdEmailsIdGet-404-schema">
+                                  <div id="responses-Email-customersCustomerIdEmailsIdGet-schema-404" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "The email for the customer does not exist. If a customer does not exist for the given customer_id then the response will be a 404.",
+  "content" : { }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Email-customersCustomerIdEmailsIdGet-404-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Email-customersCustomerIdEmailsIdGet-schema-404');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Email-customersCustomerIdEmailsIdGet-404-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+                            
+                            <h3 id="examples-Email-customersCustomerIdEmailsIdGet-title-500"></h3>
+                            <p id="examples-Email-customersCustomerIdEmailsIdGet-description-500" class="marked"></p>
+                            <script>
+                              var responseEmail500_description = `An unknown error occurred trying to process the request.
+
+Return value is not specified but should describe the error.
+`;
+                              var responseEmail500_description_break = responseEmail500_description.indexOf('\n');
+                              if (responseEmail500_description_break == -1) {
+                                $("#examples-Email-customersCustomerIdEmailsIdGet-title-500").text("Status Code: 500 - " + responseEmail500_description);
+                              } else {
+                                $("#examples-Email-customersCustomerIdEmailsIdGet-title-500").text("Status Code: 500 - " + responseEmail500_description.substring(0, responseEmail500_description_break));
+                                $("#examples-Email-customersCustomerIdEmailsIdGet-description-500").html(responseEmail500_description.substring(responseEmail500_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Email-customersCustomerIdEmailsIdGet-500" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Email-customersCustomerIdEmailsIdGet-500-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Email-customersCustomerIdEmailsIdGet-500-schema">
+                                  <div id="responses-Email-customersCustomerIdEmailsIdGet-schema-500" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "An unknown error occurred trying to process the request.\n\nReturn value is not specified but should describe the error.\n"
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Email-customersCustomerIdEmailsIdGet-500-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Email-customersCustomerIdEmailsIdGet-schema-500');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Email-customersCustomerIdEmailsIdGet-500-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
                             
@@ -1478,7 +1988,7 @@ $(document).ready(function() {
                             <h3 id="examples-Email-customersCustomerIdEmailsPost-title-201"></h3>
                             <p id="examples-Email-customersCustomerIdEmailsPost-description-201" class="marked"></p>
                             <script>
-                              var responseEmail201_description = `The ticket has been successfully created.`;
+                              var responseEmail201_description = `The Email scan request has been successfully created.`;
                               var responseEmail201_description_break = responseEmail201_description.indexOf('\n');
                               if (responseEmail201_description_break == -1) {
                                 $("#examples-Email-customersCustomerIdEmailsPost-title-201").text("Status Code: 201 - " + responseEmail201_description);
@@ -1506,7 +2016,7 @@ $(document).ready(function() {
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "The ticket has been successfully created.",
+  "description" : "The Email scan request has been successfully created.",
   "content" : {
     "application/json" : {
       "schema" : {
@@ -1549,7 +2059,6 @@ $(document).ready(function() {
                             <p id="examples-Email-customersCustomerIdEmailsPost-description-400" class="marked"></p>
                             <script>
                               var responseEmail400_description = `Body parameter was malformed or invalid.
-This includes passing concerts or users that do not exist.
 
 Return value is not specified but should describe the error.
 `;
@@ -1575,7 +2084,7 @@ Return value is not specified but should describe the error.
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "Body parameter was malformed or invalid.\nThis includes passing concerts or users that do not exist.\n\nReturn value is not specified but should describe the error.\n",
+  "description" : "Body parameter was malformed or invalid.\n\nReturn value is not specified but should describe the error.\n",
   "content" : { }
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
@@ -1605,67 +2114,13 @@ Return value is not specified but should describe the error.
                                 </div>
                             </div>
                             
-                            <h3 id="examples-Email-customersCustomerIdEmailsPost-title-422"></h3>
-                            <p id="examples-Email-customersCustomerIdEmailsPost-description-422" class="marked"></p>
-                            <script>
-                              var responseEmail422_description = `Ticket purchase failed as no tickets were available (i.e. the concert has sold out).`;
-                              var responseEmail422_description_break = responseEmail422_description.indexOf('\n');
-                              if (responseEmail422_description_break == -1) {
-                                $("#examples-Email-customersCustomerIdEmailsPost-title-422").text("Status Code: 422 - " + responseEmail422_description);
-                              } else {
-                                $("#examples-Email-customersCustomerIdEmailsPost-title-422").text("Status Code: 422 - " + responseEmail422_description.substring(0, responseEmail422_description_break));
-                                $("#examples-Email-customersCustomerIdEmailsPost-description-422").html(responseEmail422_description.substring(responseEmail422_description_break));
-                              }
-                            </script>
-
-
-                            <ul id="responses-detail-Email-customersCustomerIdEmailsPost-422" class="nav nav-tabs nav-tabs-examples" >
-
-
-                            </ul>
-
-
-                            <div class="tab-content" id="responses-Email-customersCustomerIdEmailsPost-422-wrapper" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-Email-customersCustomerIdEmailsPost-422-schema">
-                                  <div id="responses-Email-customersCustomerIdEmailsPost-schema-422" class="exampleStyle">
-                                    <script>
-                                      $(document).ready(function() {
-                                        var schemaWrapper = {
-  "description" : "Ticket purchase failed as no tickets were available (i.e. the concert has sold out).",
-  "content" : { }
-};
-                                        var schema = findNode('schema',schemaWrapper).schema;
-                                        if (!schema) {
-                                          schema = schemaWrapper.schema;
-                                        }
-                                        if (schema.$ref != null) {
-                                          schema = defsParser.$refs.get(schema.$ref);
-                                        } else if (schema.items != null && schema.items.$ref != null) {
-                                            schema.items = defsParser.$refs.get(schema.items.$ref);
-                                        } else {
-                                          schemaWrapper.definitions = Object.assign({}, defs);
-                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
-                                            console.log(err);
-                                          });
-                                        }
-
-                                        var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-Email-customersCustomerIdEmailsPost-422-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-Email-customersCustomerIdEmailsPost-schema-422');
-                                        result.empty();
-                                        result.append(view.render());
-                                      });
-                                    </script>
-                                  </div>
-                                  <input id='responses-Email-customersCustomerIdEmailsPost-422-schema-data' type='hidden' value=''></input>
-                                </div>
-                            </div>
-                            
                             <h3 id="examples-Email-customersCustomerIdEmailsPost-title-500"></h3>
                             <p id="examples-Email-customersCustomerIdEmailsPost-description-500" class="marked"></p>
                             <script>
                               var responseEmail500_description = `An unknown error occurred trying to process the request.
-Return value is not specified but should attempt to describe the error.`;
+
+Return value is not specified but should describe the error.
+`;
                               var responseEmail500_description_break = responseEmail500_description.indexOf('\n');
                               if (responseEmail500_description_break == -1) {
                                 $("#examples-Email-customersCustomerIdEmailsPost-title-500").text("Status Code: 500 - " + responseEmail500_description);
@@ -1688,8 +2143,7 @@ Return value is not specified but should attempt to describe the error.`;
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "An unknown error occurred trying to process the request.\nReturn value is not specified but should attempt to describe the error.",
-  "content" : { }
+  "description" : "An unknown error occurred trying to process the request.\n\nReturn value is not specified but should describe the error.\n"
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
                                         if (!schema) {
@@ -1721,12 +2175,12 @@ Return value is not specified but should attempt to describe the error.`;
                         </article>
                       </div>
                       <hr>
-                    <div id="api-Email-customersIdEmailsIdGet">
-                      <article id="api-Email-customersIdEmailsIdGet-0" data-group="User" data-name="customersIdEmailsIdGet" data-version="0">
+                    <div id="api-Email-customersCustomerIdReportsActorsGet">
+                      <article id="api-Email-customersCustomerIdReportsActorsGet-0" data-group="User" data-name="customersCustomerIdReportsActorsGet" data-version="0">
                         <div class="pull-left">
-                          <!-- <h1>customersIdEmailsIdGet</h1> -->
-                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/customers/{id}/emails/{id}</span></code></pre></h1>
-                          <p>Get information for a particular ticket.</p>
+                          <!-- <h1>customersCustomerIdReportsActorsGet</h1> -->
+                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/customers/{customer_id}/reports/actors</span></code></pre></h1>
+                          <p>Get malicious senders of emails.</p>
                         </div>
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
@@ -1738,7 +2192,7 @@ Return value is not specified but should attempt to describe the error.`;
                         <h3>Curl Request Example</h3>
                         <pre class="prettyprint"><code class="language-bsh">curl -X GET \
  -H "Accept: application/json" \
- "http://email.api.spamoverflow.com/api/v1/customers/{id}/emails/{id}"
+ "http://email.api.spamoverflow.com/api/v1/customers/{customer_id}/reports/actors"
 </code></pre>
 
                           <h2 class="methodsubtabletitle">Path parameters</h2>
@@ -1747,11 +2201,11 @@ Return value is not specified but should attempt to describe the error.`;
                                 <th width="150px">Name</th>
                                 <th>Description</th>
                               </tr>
-                                <tr><td style="width:150px;">id*</td>
+                                <tr><td style="width:150px;">customer_id*</td>
 <td>
 
 
-    <div id="d2e199_customersIdEmailsIdGet_id">
+    <div id="d2e199_customersCustomerIdReportsActorsGet_customerId">
         <div class="json-schema-view">
             <div class="primitive">
                 <span class="type">
@@ -1759,7 +2213,7 @@ Return value is not specified but should attempt to describe the error.`;
                 </span>
 
                     <div class="inner description marked">
-The ticket identifier.
+The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
                     </div>
             </div>
                 <div class="inner required">
@@ -1777,23 +2231,23 @@ The ticket identifier.
 
 
                           <h2>Responses</h2>
-                            <h3 id="examples-Email-customersIdEmailsIdGet-title-200"></h3>
-                            <p id="examples-Email-customersIdEmailsIdGet-description-200" class="marked"></p>
+                            <h3 id="examples-Email-customersCustomerIdReportsActorsGet-title-200"></h3>
+                            <p id="examples-Email-customersCustomerIdReportsActorsGet-description-200" class="marked"></p>
                             <script>
-                              var responseEmail200_description = `Information about the requested ticket.`;
+                              var responseEmail200_description = `List of all senders/actors that have atleast 1 email thats flagged as malicious.`;
                               var responseEmail200_description_break = responseEmail200_description.indexOf('\n');
                               if (responseEmail200_description_break == -1) {
-                                $("#examples-Email-customersIdEmailsIdGet-title-200").text("Status Code: 200 - " + responseEmail200_description);
+                                $("#examples-Email-customersCustomerIdReportsActorsGet-title-200").text("Status Code: 200 - " + responseEmail200_description);
                               } else {
-                                $("#examples-Email-customersIdEmailsIdGet-title-200").text("Status Code: 200 - " + responseEmail200_description.substring(0, responseEmail200_description_break));
-                                $("#examples-Email-customersIdEmailsIdGet-description-200").html(responseEmail200_description.substring(responseEmail200_description_break));
+                                $("#examples-Email-customersCustomerIdReportsActorsGet-title-200").text("Status Code: 200 - " + responseEmail200_description.substring(0, responseEmail200_description_break));
+                                $("#examples-Email-customersCustomerIdReportsActorsGet-description-200").html(responseEmail200_description.substring(responseEmail200_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-Email-customersIdEmailsIdGet-200" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-Email-customersCustomerIdReportsActorsGet-200" class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
-                                  <a data-toggle="tab" href="#responses-Email-customersIdEmailsIdGet-200-schema">Schema</a>
+                                  <a data-toggle="tab" href="#responses-Email-customersCustomerIdReportsActorsGet-200-schema">Schema</a>
                                 </li>
 
 
@@ -1802,17 +2256,17 @@ The ticket identifier.
                             </ul>
 
 
-                            <div class="tab-content" id="responses-Email-customersIdEmailsIdGet-200-wrapper" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-Email-customersIdEmailsIdGet-200-schema">
-                                  <div id="responses-Email-customersIdEmailsIdGet-schema-200" class="exampleStyle">
+                            <div class="tab-content" id="responses-Email-customersCustomerIdReportsActorsGet-200-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Email-customersCustomerIdReportsActorsGet-200-schema">
+                                  <div id="responses-Email-customersCustomerIdReportsActorsGet-schema-200" class="exampleStyle">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "Information about the requested ticket.",
+  "description" : "List of all senders/actors that have atleast 1 email thats flagged as malicious.",
   "content" : {
     "application/json" : {
       "schema" : {
-        "$ref" : "#/components/schemas/Email"
+        "$ref" : "#/components/schemas/_customers__customer_id__reports_actors_get_200_response"
       }
     }
   }
@@ -1833,47 +2287,47 @@ The ticket identifier.
                                         }
 
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-Email-customersIdEmailsIdGet-200-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-Email-customersIdEmailsIdGet-schema-200');
+                                        $('#responses-Email-customersCustomerIdReportsActorsGet-200-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Email-customersCustomerIdReportsActorsGet-schema-200');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-Email-customersIdEmailsIdGet-200-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-Email-customersCustomerIdReportsActorsGet-200-schema-data' type='hidden' value=''></input>
                                 </div>
-                                <div class="tab-pane" id="examples-Email-customersIdEmailsIdGet-200-example">
+                                <div class="tab-pane" id="examples-Email-customersCustomerIdReportsActorsGet-200-example">
                                   <pre class="prettyprint"><code class="json"></code></pre>
                                 </div>
                             </div>
                             
-                            <h3 id="examples-Email-customersIdEmailsIdGet-title-404"></h3>
-                            <p id="examples-Email-customersIdEmailsIdGet-description-404" class="marked"></p>
+                            <h3 id="examples-Email-customersCustomerIdReportsActorsGet-title-404"></h3>
+                            <p id="examples-Email-customersCustomerIdReportsActorsGet-description-404" class="marked"></p>
                             <script>
-                              var responseEmail404_description = `The ticket does not exist.`;
+                              var responseEmail404_description = `The customer does not exist.`;
                               var responseEmail404_description_break = responseEmail404_description.indexOf('\n');
                               if (responseEmail404_description_break == -1) {
-                                $("#examples-Email-customersIdEmailsIdGet-title-404").text("Status Code: 404 - " + responseEmail404_description);
+                                $("#examples-Email-customersCustomerIdReportsActorsGet-title-404").text("Status Code: 404 - " + responseEmail404_description);
                               } else {
-                                $("#examples-Email-customersIdEmailsIdGet-title-404").text("Status Code: 404 - " + responseEmail404_description.substring(0, responseEmail404_description_break));
-                                $("#examples-Email-customersIdEmailsIdGet-description-404").html(responseEmail404_description.substring(responseEmail404_description_break));
+                                $("#examples-Email-customersCustomerIdReportsActorsGet-title-404").text("Status Code: 404 - " + responseEmail404_description.substring(0, responseEmail404_description_break));
+                                $("#examples-Email-customersCustomerIdReportsActorsGet-description-404").html(responseEmail404_description.substring(responseEmail404_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-Email-customersIdEmailsIdGet-404" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-Email-customersCustomerIdReportsActorsGet-404" class="nav nav-tabs nav-tabs-examples" >
 
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-Email-customersIdEmailsIdGet-404-wrapper" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-Email-customersIdEmailsIdGet-404-schema">
-                                  <div id="responses-Email-customersIdEmailsIdGet-schema-404" class="exampleStyle">
+                            <div class="tab-content" id="responses-Email-customersCustomerIdReportsActorsGet-404-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Email-customersCustomerIdReportsActorsGet-404-schema">
+                                  <div id="responses-Email-customersCustomerIdReportsActorsGet-schema-404" class="exampleStyle">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "The ticket does not exist.",
+  "description" : "The customer does not exist.",
   "content" : { }
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
@@ -1892,26 +2346,26 @@ The ticket identifier.
                                         }
 
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-Email-customersIdEmailsIdGet-404-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-Email-customersIdEmailsIdGet-schema-404');
+                                        $('#responses-Email-customersCustomerIdReportsActorsGet-404-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Email-customersCustomerIdReportsActorsGet-schema-404');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-Email-customersIdEmailsIdGet-404-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-Email-customersCustomerIdReportsActorsGet-404-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
                             
                         </article>
                       </div>
                       <hr>
-                    <div id="api-Email-customersIdReportsActorsGet">
-                      <article id="api-Email-customersIdReportsActorsGet-0" data-group="User" data-name="customersIdReportsActorsGet" data-version="0">
+                    <div id="api-Email-customersCustomerIdReportsDomainsGet">
+                      <article id="api-Email-customersCustomerIdReportsDomainsGet-0" data-group="User" data-name="customersCustomerIdReportsDomainsGet" data-version="0">
                         <div class="pull-left">
-                          <!-- <h1>customersIdReportsActorsGet</h1> -->
-                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/customers/{id}/reports/actors</span></code></pre></h1>
-                          <p>Get the printed ticket if it exists.</p>
+                          <!-- <h1>customersCustomerIdReportsDomainsGet</h1> -->
+                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/customers/{customer_id}/reports/domains</span></code></pre></h1>
+                          <p>Get the domains that appeared in malicious emails.</p>
                         </div>
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
@@ -1922,8 +2376,8 @@ The ticket identifier.
 
                         <h3>Curl Request Example</h3>
                         <pre class="prettyprint"><code class="language-bsh">curl -X GET \
- -H "Accept: image/svg+xml" \
- "http://email.api.spamoverflow.com/api/v1/customers/{id}/reports/actors"
+ -H "Accept: application/json" \
+ "http://email.api.spamoverflow.com/api/v1/customers/{customer_id}/reports/domains"
 </code></pre>
 
                           <h2 class="methodsubtabletitle">Path parameters</h2>
@@ -1932,11 +2386,11 @@ The ticket identifier.
                                 <th width="150px">Name</th>
                                 <th>Description</th>
                               </tr>
-                                <tr><td style="width:150px;">id*</td>
+                                <tr><td style="width:150px;">customer_id*</td>
 <td>
 
 
-    <div id="d2e199_customersIdReportsActorsGet_id">
+    <div id="d2e199_customersCustomerIdReportsDomainsGet_customerId">
         <div class="json-schema-view">
             <div class="primitive">
                 <span class="type">
@@ -1944,7 +2398,7 @@ The ticket identifier.
                 </span>
 
                     <div class="inner description marked">
-The ticket identifier.
+The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
                     </div>
             </div>
                 <div class="inner required">
@@ -1962,46 +2416,42 @@ The ticket identifier.
 
 
                           <h2>Responses</h2>
-                            <h3 id="examples-Email-customersIdReportsActorsGet-title-200"></h3>
-                            <p id="examples-Email-customersIdReportsActorsGet-description-200" class="marked"></p>
+                            <h3 id="examples-Email-customersCustomerIdReportsDomainsGet-title-200"></h3>
+                            <p id="examples-Email-customersCustomerIdReportsDomainsGet-description-200" class="marked"></p>
                             <script>
-                              var responseEmail200_description = `The printed ticket SVG.`;
+                              var responseEmail200_description = `A report consisting of the link domains found in malicious emails for the given customer.`;
                               var responseEmail200_description_break = responseEmail200_description.indexOf('\n');
                               if (responseEmail200_description_break == -1) {
-                                $("#examples-Email-customersIdReportsActorsGet-title-200").text("Status Code: 200 - " + responseEmail200_description);
+                                $("#examples-Email-customersCustomerIdReportsDomainsGet-title-200").text("Status Code: 200 - " + responseEmail200_description);
                               } else {
-                                $("#examples-Email-customersIdReportsActorsGet-title-200").text("Status Code: 200 - " + responseEmail200_description.substring(0, responseEmail200_description_break));
-                                $("#examples-Email-customersIdReportsActorsGet-description-200").html(responseEmail200_description.substring(responseEmail200_description_break));
+                                $("#examples-Email-customersCustomerIdReportsDomainsGet-title-200").text("Status Code: 200 - " + responseEmail200_description.substring(0, responseEmail200_description_break));
+                                $("#examples-Email-customersCustomerIdReportsDomainsGet-description-200").html(responseEmail200_description.substring(responseEmail200_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-Email-customersIdReportsActorsGet-200" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-Email-customersCustomerIdReportsDomainsGet-200" class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
-                                  <a data-toggle="tab" href="#responses-Email-customersIdReportsActorsGet-200-schema">Schema</a>
+                                  <a data-toggle="tab" href="#responses-Email-customersCustomerIdReportsDomainsGet-200-schema">Schema</a>
                                 </li>
 
-                                  <li class="">
-                                    <a data-toggle="tab" href="#examples-Email-customersIdReportsActorsGet-200-example">Response Body Example</a>
-                                  </li>
 
 
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-Email-customersIdReportsActorsGet-200-wrapper" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-Email-customersIdReportsActorsGet-200-schema">
-                                  <div id="responses-Email-customersIdReportsActorsGet-schema-200" class="exampleStyle">
+                            <div class="tab-content" id="responses-Email-customersCustomerIdReportsDomainsGet-200-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Email-customersCustomerIdReportsDomainsGet-200-schema">
+                                  <div id="responses-Email-customersCustomerIdReportsDomainsGet-schema-200" class="exampleStyle">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "The printed ticket SVG.",
+  "description" : "A report consisting of the link domains found in malicious emails for the given customer.",
   "content" : {
-    "image/svg+xml" : {
+    "application/json" : {
       "schema" : {
-        "type" : "string",
-        "example" : "<?xml version=\"1.0\"?>\n<!-- Generated by SVGo -->\n<svg width=\"1200\" height=\"518\"\n     xmlns=\"http://www.w3.org/2000/svg\"\n     xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n<desc>12345678-1234-1234-1234-123456789012</desc>\n<rect x=\"0\" y=\"0\" width=\"1200\" height=\"518\" style=\"fill:rgb(255,255,255)\" />\n<rect x=\"0\" y=\"0\" width=\"200\" height=\"518\" style=\"fill:rgb(92,158,173)\" />\n<rect x=\"200\" y=\"0\" width=\"20\" height=\"518\" style=\"fill:rgb(50,98,115)\" />\n<circle cx=\"210\" cy=\"100\" r=\"50\" style=\"fill:rgb(50,98,115)\" />\n<text x=\"300\" y=\"100\" style=\"text-anchor:left;font-size:36px;fill:black\" >Phantom of the Opera</text>\n<text x=\"300\" y=\"150\" style=\"text-anchor:left;font-size:24px;fill:black\" >2023-06-07</text>\n<text x=\"300\" y=\"200\" style=\"text-anchor:left;font-size:24px;fill:black\" >Sydney Opera House</text>\n<text x=\"300\" y=\"250\" style=\"text-anchor:left;font-size:24px;fill:black\" >12345678-1234-1234-1234-123456789012</text>\n<line x1=\"300\" y1=\"300\" x2=\"900\" y2=\"300\" style=\"stroke:rgb(0,0,0);stroke-width:2\" />\n<text x=\"300\" y=\"350\" style=\"text-anchor:left;font-size:24px;fill:black\" >Evan Hughes</text>\n<text x=\"300\" y=\"400\" style=\"text-anchor:left;font-size:24px;fill:black\" >example@uq.edu.au</text>\n<text x=\"300\" y=\"450\" style=\"text-anchor:left;font-size:24px;fill:black\" >12345678-1234-1234-1234-123456789012</text>\n<rect x=\"1190\" y=\"0\" width=\"10\" height=\"518\" style=\"fill:rgb(255,215,0)\" />\n<rect x=\"1000\" y=\"80\" width=\"150\" height=\"1\" style=\"fill:rgb(0,0,0)\" />\n...\n</svg>\n"
+        "$ref" : "#/components/schemas/_customers__customer_id__reports_domains_get_200_response"
       }
     }
   }
@@ -2022,69 +2472,47 @@ The ticket identifier.
                                         }
 
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-Email-customersIdReportsActorsGet-200-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-Email-customersIdReportsActorsGet-schema-200');
+                                        $('#responses-Email-customersCustomerIdReportsDomainsGet-200-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Email-customersCustomerIdReportsDomainsGet-schema-200');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-Email-customersIdReportsActorsGet-200-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-Email-customersCustomerIdReportsDomainsGet-200-schema-data' type='hidden' value=''></input>
                                 </div>
-                                <div class="tab-pane" id="examples-Email-customersIdReportsActorsGet-200-example">
-                                  <pre class="prettyprint"><code class="json">&lt;?xml version&#x3D;&quot;1.0&quot;?&gt;
-&lt;!-- Generated by SVGo --&gt;
-&lt;svg width&#x3D;&quot;1200&quot; height&#x3D;&quot;518&quot;
-     xmlns&#x3D;&quot;http://www.w3.org/2000/svg&quot;
-     xmlns:xlink&#x3D;&quot;http://www.w3.org/1999/xlink&quot;&gt;
-&lt;desc&gt;12345678-1234-1234-1234-123456789012&lt;/desc&gt;
-&lt;rect x&#x3D;&quot;0&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;1200&quot; height&#x3D;&quot;518&quot; style&#x3D;&quot;fill:rgb(255,255,255)&quot; /&gt;
-&lt;rect x&#x3D;&quot;0&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;200&quot; height&#x3D;&quot;518&quot; style&#x3D;&quot;fill:rgb(92,158,173)&quot; /&gt;
-&lt;rect x&#x3D;&quot;200&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;20&quot; height&#x3D;&quot;518&quot; style&#x3D;&quot;fill:rgb(50,98,115)&quot; /&gt;
-&lt;circle cx&#x3D;&quot;210&quot; cy&#x3D;&quot;100&quot; r&#x3D;&quot;50&quot; style&#x3D;&quot;fill:rgb(50,98,115)&quot; /&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;100&quot; style&#x3D;&quot;text-anchor:left;font-size:36px;fill:black&quot; &gt;Phantom of the Opera&lt;/text&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;150&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;2023-06-07&lt;/text&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;200&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;Sydney Opera House&lt;/text&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;250&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;12345678-1234-1234-1234-123456789012&lt;/text&gt;
-&lt;line x1&#x3D;&quot;300&quot; y1&#x3D;&quot;300&quot; x2&#x3D;&quot;900&quot; y2&#x3D;&quot;300&quot; style&#x3D;&quot;stroke:rgb(0,0,0);stroke-width:2&quot; /&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;350&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;Evan Hughes&lt;/text&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;400&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;example@uq.edu.au&lt;/text&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;450&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;12345678-1234-1234-1234-123456789012&lt;/text&gt;
-&lt;rect x&#x3D;&quot;1190&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;10&quot; height&#x3D;&quot;518&quot; style&#x3D;&quot;fill:rgb(255,215,0)&quot; /&gt;
-&lt;rect x&#x3D;&quot;1000&quot; y&#x3D;&quot;80&quot; width&#x3D;&quot;150&quot; height&#x3D;&quot;1&quot; style&#x3D;&quot;fill:rgb(0,0,0)&quot; /&gt;
-...
-&lt;/svg&gt;
-</code></pre>
+                                <div class="tab-pane" id="examples-Email-customersCustomerIdReportsDomainsGet-200-example">
+                                  <pre class="prettyprint"><code class="json"></code></pre>
                                 </div>
                             </div>
                             
-                            <h3 id="examples-Email-customersIdReportsActorsGet-title-404"></h3>
-                            <p id="examples-Email-customersIdReportsActorsGet-description-404" class="marked"></p>
+                            <h3 id="examples-Email-customersCustomerIdReportsDomainsGet-title-404"></h3>
+                            <p id="examples-Email-customersCustomerIdReportsDomainsGet-description-404" class="marked"></p>
                             <script>
-                              var responseEmail404_description = `The ticket does not exist or has not been printed yet.`;
+                              var responseEmail404_description = `The customer does not exist.`;
                               var responseEmail404_description_break = responseEmail404_description.indexOf('\n');
                               if (responseEmail404_description_break == -1) {
-                                $("#examples-Email-customersIdReportsActorsGet-title-404").text("Status Code: 404 - " + responseEmail404_description);
+                                $("#examples-Email-customersCustomerIdReportsDomainsGet-title-404").text("Status Code: 404 - " + responseEmail404_description);
                               } else {
-                                $("#examples-Email-customersIdReportsActorsGet-title-404").text("Status Code: 404 - " + responseEmail404_description.substring(0, responseEmail404_description_break));
-                                $("#examples-Email-customersIdReportsActorsGet-description-404").html(responseEmail404_description.substring(responseEmail404_description_break));
+                                $("#examples-Email-customersCustomerIdReportsDomainsGet-title-404").text("Status Code: 404 - " + responseEmail404_description.substring(0, responseEmail404_description_break));
+                                $("#examples-Email-customersCustomerIdReportsDomainsGet-description-404").html(responseEmail404_description.substring(responseEmail404_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-Email-customersIdReportsActorsGet-404" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-Email-customersCustomerIdReportsDomainsGet-404" class="nav nav-tabs nav-tabs-examples" >
 
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-Email-customersIdReportsActorsGet-404-wrapper" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-Email-customersIdReportsActorsGet-404-schema">
-                                  <div id="responses-Email-customersIdReportsActorsGet-schema-404" class="exampleStyle">
+                            <div class="tab-content" id="responses-Email-customersCustomerIdReportsDomainsGet-404-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Email-customersCustomerIdReportsDomainsGet-404-schema">
+                                  <div id="responses-Email-customersCustomerIdReportsDomainsGet-schema-404" class="exampleStyle">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "The ticket does not exist or has not been printed yet.",
+  "description" : "The customer does not exist.",
   "content" : { }
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
@@ -2103,26 +2531,26 @@ The ticket identifier.
                                         }
 
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-Email-customersIdReportsActorsGet-404-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-Email-customersIdReportsActorsGet-schema-404');
+                                        $('#responses-Email-customersCustomerIdReportsDomainsGet-404-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Email-customersCustomerIdReportsDomainsGet-schema-404');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-Email-customersIdReportsActorsGet-404-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-Email-customersCustomerIdReportsDomainsGet-404-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
                             
                         </article>
                       </div>
                       <hr>
-                    <div id="api-Email-customersIdReportsDomainsGet">
-                      <article id="api-Email-customersIdReportsDomainsGet-0" data-group="User" data-name="customersIdReportsDomainsGet" data-version="0">
+                    <div id="api-Email-customersCustomerIdReportsRecipientsGet">
+                      <article id="api-Email-customersCustomerIdReportsRecipientsGet-0" data-group="User" data-name="customersCustomerIdReportsRecipientsGet" data-version="0">
                         <div class="pull-left">
-                          <!-- <h1>customersIdReportsDomainsGet</h1> -->
-                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/customers/{id}/reports/domains</span></code></pre></h1>
-                          <p>Get the printed ticket if it exists.</p>
+                          <!-- <h1>customersCustomerIdReportsRecipientsGet</h1> -->
+                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/customers/{customer_id}/reports/recipients</span></code></pre></h1>
+                          <p>Get users who have received malicious emails.</p>
                         </div>
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
@@ -2133,8 +2561,8 @@ The ticket identifier.
 
                         <h3>Curl Request Example</h3>
                         <pre class="prettyprint"><code class="language-bsh">curl -X GET \
- -H "Accept: image/svg+xml" \
- "http://email.api.spamoverflow.com/api/v1/customers/{id}/reports/domains"
+ -H "Accept: application/json" \
+ "http://email.api.spamoverflow.com/api/v1/customers/{customer_id}/reports/recipients"
 </code></pre>
 
                           <h2 class="methodsubtabletitle">Path parameters</h2>
@@ -2143,11 +2571,11 @@ The ticket identifier.
                                 <th width="150px">Name</th>
                                 <th>Description</th>
                               </tr>
-                                <tr><td style="width:150px;">id*</td>
+                                <tr><td style="width:150px;">customer_id*</td>
 <td>
 
 
-    <div id="d2e199_customersIdReportsDomainsGet_id">
+    <div id="d2e199_customersCustomerIdReportsRecipientsGet_customerId">
         <div class="json-schema-view">
             <div class="primitive">
                 <span class="type">
@@ -2155,7 +2583,7 @@ The ticket identifier.
                 </span>
 
                     <div class="inner description marked">
-The ticket identifier.
+The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
                     </div>
             </div>
                 <div class="inner required">
@@ -2173,46 +2601,42 @@ The ticket identifier.
 
 
                           <h2>Responses</h2>
-                            <h3 id="examples-Email-customersIdReportsDomainsGet-title-200"></h3>
-                            <p id="examples-Email-customersIdReportsDomainsGet-description-200" class="marked"></p>
+                            <h3 id="examples-Email-customersCustomerIdReportsRecipientsGet-title-200"></h3>
+                            <p id="examples-Email-customersCustomerIdReportsRecipientsGet-description-200" class="marked"></p>
                             <script>
                               var responseEmail200_description = `The printed ticket SVG.`;
                               var responseEmail200_description_break = responseEmail200_description.indexOf('\n');
                               if (responseEmail200_description_break == -1) {
-                                $("#examples-Email-customersIdReportsDomainsGet-title-200").text("Status Code: 200 - " + responseEmail200_description);
+                                $("#examples-Email-customersCustomerIdReportsRecipientsGet-title-200").text("Status Code: 200 - " + responseEmail200_description);
                               } else {
-                                $("#examples-Email-customersIdReportsDomainsGet-title-200").text("Status Code: 200 - " + responseEmail200_description.substring(0, responseEmail200_description_break));
-                                $("#examples-Email-customersIdReportsDomainsGet-description-200").html(responseEmail200_description.substring(responseEmail200_description_break));
+                                $("#examples-Email-customersCustomerIdReportsRecipientsGet-title-200").text("Status Code: 200 - " + responseEmail200_description.substring(0, responseEmail200_description_break));
+                                $("#examples-Email-customersCustomerIdReportsRecipientsGet-description-200").html(responseEmail200_description.substring(responseEmail200_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-Email-customersIdReportsDomainsGet-200" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-Email-customersCustomerIdReportsRecipientsGet-200" class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
-                                  <a data-toggle="tab" href="#responses-Email-customersIdReportsDomainsGet-200-schema">Schema</a>
+                                  <a data-toggle="tab" href="#responses-Email-customersCustomerIdReportsRecipientsGet-200-schema">Schema</a>
                                 </li>
 
-                                  <li class="">
-                                    <a data-toggle="tab" href="#examples-Email-customersIdReportsDomainsGet-200-example">Response Body Example</a>
-                                  </li>
 
 
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-Email-customersIdReportsDomainsGet-200-wrapper" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-Email-customersIdReportsDomainsGet-200-schema">
-                                  <div id="responses-Email-customersIdReportsDomainsGet-schema-200" class="exampleStyle">
+                            <div class="tab-content" id="responses-Email-customersCustomerIdReportsRecipientsGet-200-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Email-customersCustomerIdReportsRecipientsGet-200-schema">
+                                  <div id="responses-Email-customersCustomerIdReportsRecipientsGet-schema-200" class="exampleStyle">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
   "description" : "The printed ticket SVG.",
   "content" : {
-    "image/svg+xml" : {
+    "application/json" : {
       "schema" : {
-        "type" : "string",
-        "example" : "<?xml version=\"1.0\"?>\n<!-- Generated by SVGo -->\n<svg width=\"1200\" height=\"518\"\n     xmlns=\"http://www.w3.org/2000/svg\"\n     xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n<desc>12345678-1234-1234-1234-123456789012</desc>\n<rect x=\"0\" y=\"0\" width=\"1200\" height=\"518\" style=\"fill:rgb(255,255,255)\" />\n<rect x=\"0\" y=\"0\" width=\"200\" height=\"518\" style=\"fill:rgb(92,158,173)\" />\n<rect x=\"200\" y=\"0\" width=\"20\" height=\"518\" style=\"fill:rgb(50,98,115)\" />\n<circle cx=\"210\" cy=\"100\" r=\"50\" style=\"fill:rgb(50,98,115)\" />\n<text x=\"300\" y=\"100\" style=\"text-anchor:left;font-size:36px;fill:black\" >Phantom of the Opera</text>\n<text x=\"300\" y=\"150\" style=\"text-anchor:left;font-size:24px;fill:black\" >2023-06-07</text>\n<text x=\"300\" y=\"200\" style=\"text-anchor:left;font-size:24px;fill:black\" >Sydney Opera House</text>\n<text x=\"300\" y=\"250\" style=\"text-anchor:left;font-size:24px;fill:black\" >12345678-1234-1234-1234-123456789012</text>\n<line x1=\"300\" y1=\"300\" x2=\"900\" y2=\"300\" style=\"stroke:rgb(0,0,0);stroke-width:2\" />\n<text x=\"300\" y=\"350\" style=\"text-anchor:left;font-size:24px;fill:black\" >Evan Hughes</text>\n<text x=\"300\" y=\"400\" style=\"text-anchor:left;font-size:24px;fill:black\" >example@uq.edu.au</text>\n<text x=\"300\" y=\"450\" style=\"text-anchor:left;font-size:24px;fill:black\" >12345678-1234-1234-1234-123456789012</text>\n<rect x=\"1190\" y=\"0\" width=\"10\" height=\"518\" style=\"fill:rgb(255,215,0)\" />\n<rect x=\"1000\" y=\"80\" width=\"150\" height=\"1\" style=\"fill:rgb(0,0,0)\" />\n...\n</svg>\n"
+        "$ref" : "#/components/schemas/_customers__customer_id__reports_recipients_get_200_response"
       }
     }
   }
@@ -2233,69 +2657,47 @@ The ticket identifier.
                                         }
 
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-Email-customersIdReportsDomainsGet-200-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-Email-customersIdReportsDomainsGet-schema-200');
+                                        $('#responses-Email-customersCustomerIdReportsRecipientsGet-200-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Email-customersCustomerIdReportsRecipientsGet-schema-200');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-Email-customersIdReportsDomainsGet-200-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-Email-customersCustomerIdReportsRecipientsGet-200-schema-data' type='hidden' value=''></input>
                                 </div>
-                                <div class="tab-pane" id="examples-Email-customersIdReportsDomainsGet-200-example">
-                                  <pre class="prettyprint"><code class="json">&lt;?xml version&#x3D;&quot;1.0&quot;?&gt;
-&lt;!-- Generated by SVGo --&gt;
-&lt;svg width&#x3D;&quot;1200&quot; height&#x3D;&quot;518&quot;
-     xmlns&#x3D;&quot;http://www.w3.org/2000/svg&quot;
-     xmlns:xlink&#x3D;&quot;http://www.w3.org/1999/xlink&quot;&gt;
-&lt;desc&gt;12345678-1234-1234-1234-123456789012&lt;/desc&gt;
-&lt;rect x&#x3D;&quot;0&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;1200&quot; height&#x3D;&quot;518&quot; style&#x3D;&quot;fill:rgb(255,255,255)&quot; /&gt;
-&lt;rect x&#x3D;&quot;0&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;200&quot; height&#x3D;&quot;518&quot; style&#x3D;&quot;fill:rgb(92,158,173)&quot; /&gt;
-&lt;rect x&#x3D;&quot;200&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;20&quot; height&#x3D;&quot;518&quot; style&#x3D;&quot;fill:rgb(50,98,115)&quot; /&gt;
-&lt;circle cx&#x3D;&quot;210&quot; cy&#x3D;&quot;100&quot; r&#x3D;&quot;50&quot; style&#x3D;&quot;fill:rgb(50,98,115)&quot; /&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;100&quot; style&#x3D;&quot;text-anchor:left;font-size:36px;fill:black&quot; &gt;Phantom of the Opera&lt;/text&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;150&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;2023-06-07&lt;/text&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;200&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;Sydney Opera House&lt;/text&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;250&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;12345678-1234-1234-1234-123456789012&lt;/text&gt;
-&lt;line x1&#x3D;&quot;300&quot; y1&#x3D;&quot;300&quot; x2&#x3D;&quot;900&quot; y2&#x3D;&quot;300&quot; style&#x3D;&quot;stroke:rgb(0,0,0);stroke-width:2&quot; /&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;350&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;Evan Hughes&lt;/text&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;400&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;example@uq.edu.au&lt;/text&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;450&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;12345678-1234-1234-1234-123456789012&lt;/text&gt;
-&lt;rect x&#x3D;&quot;1190&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;10&quot; height&#x3D;&quot;518&quot; style&#x3D;&quot;fill:rgb(255,215,0)&quot; /&gt;
-&lt;rect x&#x3D;&quot;1000&quot; y&#x3D;&quot;80&quot; width&#x3D;&quot;150&quot; height&#x3D;&quot;1&quot; style&#x3D;&quot;fill:rgb(0,0,0)&quot; /&gt;
-...
-&lt;/svg&gt;
-</code></pre>
+                                <div class="tab-pane" id="examples-Email-customersCustomerIdReportsRecipientsGet-200-example">
+                                  <pre class="prettyprint"><code class="json"></code></pre>
                                 </div>
                             </div>
                             
-                            <h3 id="examples-Email-customersIdReportsDomainsGet-title-404"></h3>
-                            <p id="examples-Email-customersIdReportsDomainsGet-description-404" class="marked"></p>
+                            <h3 id="examples-Email-customersCustomerIdReportsRecipientsGet-title-404"></h3>
+                            <p id="examples-Email-customersCustomerIdReportsRecipientsGet-description-404" class="marked"></p>
                             <script>
-                              var responseEmail404_description = `The ticket does not exist or has not been printed yet.`;
+                              var responseEmail404_description = `The customer does not exist.`;
                               var responseEmail404_description_break = responseEmail404_description.indexOf('\n');
                               if (responseEmail404_description_break == -1) {
-                                $("#examples-Email-customersIdReportsDomainsGet-title-404").text("Status Code: 404 - " + responseEmail404_description);
+                                $("#examples-Email-customersCustomerIdReportsRecipientsGet-title-404").text("Status Code: 404 - " + responseEmail404_description);
                               } else {
-                                $("#examples-Email-customersIdReportsDomainsGet-title-404").text("Status Code: 404 - " + responseEmail404_description.substring(0, responseEmail404_description_break));
-                                $("#examples-Email-customersIdReportsDomainsGet-description-404").html(responseEmail404_description.substring(responseEmail404_description_break));
+                                $("#examples-Email-customersCustomerIdReportsRecipientsGet-title-404").text("Status Code: 404 - " + responseEmail404_description.substring(0, responseEmail404_description_break));
+                                $("#examples-Email-customersCustomerIdReportsRecipientsGet-description-404").html(responseEmail404_description.substring(responseEmail404_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-Email-customersIdReportsDomainsGet-404" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-Email-customersCustomerIdReportsRecipientsGet-404" class="nav nav-tabs nav-tabs-examples" >
 
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-Email-customersIdReportsDomainsGet-404-wrapper" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-Email-customersIdReportsDomainsGet-404-schema">
-                                  <div id="responses-Email-customersIdReportsDomainsGet-schema-404" class="exampleStyle">
+                            <div class="tab-content" id="responses-Email-customersCustomerIdReportsRecipientsGet-404-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Email-customersCustomerIdReportsRecipientsGet-404-schema">
+                                  <div id="responses-Email-customersCustomerIdReportsRecipientsGet-schema-404" class="exampleStyle">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "The ticket does not exist or has not been printed yet.",
+  "description" : "The customer does not exist.",
   "content" : { }
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
@@ -2314,225 +2716,14 @@ The ticket identifier.
                                         }
 
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-Email-customersIdReportsDomainsGet-404-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-Email-customersIdReportsDomainsGet-schema-404');
+                                        $('#responses-Email-customersCustomerIdReportsRecipientsGet-404-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Email-customersCustomerIdReportsRecipientsGet-schema-404');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-Email-customersIdReportsDomainsGet-404-schema-data' type='hidden' value=''></input>
-                                </div>
-                            </div>
-                            
-                        </article>
-                      </div>
-                      <hr>
-                    <div id="api-Email-customersIdReportsRecipientsGet">
-                      <article id="api-Email-customersIdReportsRecipientsGet-0" data-group="User" data-name="customersIdReportsRecipientsGet" data-version="0">
-                        <div class="pull-left">
-                          <!-- <h1>customersIdReportsRecipientsGet</h1> -->
-                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/customers/{id}/reports/recipients</span></code></pre></h1>
-                          <p>Get the printed ticket if it exists.</p>
-                        </div>
-                        <div class="pull-right"></div>
-                        <div class="clearfix"></div>
-                        <p></p>
-                        <p class="marked"></p>
-                        <p></p>
-                        <br />
-
-                        <h3>Curl Request Example</h3>
-                        <pre class="prettyprint"><code class="language-bsh">curl -X GET \
- -H "Accept: image/svg+xml" \
- "http://email.api.spamoverflow.com/api/v1/customers/{id}/reports/recipients"
-</code></pre>
-
-                          <h2 class="methodsubtabletitle">Path parameters</h2>
-                          <table id="methodsubtable">
-                              <tr>
-                                <th width="150px">Name</th>
-                                <th>Description</th>
-                              </tr>
-                                <tr><td style="width:150px;">id*</td>
-<td>
-
-
-    <div id="d2e199_customersIdReportsRecipientsGet_id">
-        <div class="json-schema-view">
-            <div class="primitive">
-                <span class="type">
-                    String
-                </span>
-
-                    <div class="inner description marked">
-The ticket identifier.
-                    </div>
-            </div>
-                <div class="inner required">
-                    Required
-                </div>
-        </div>
-    </div>
-</td>
-</tr>
-
-                          </table>
-
-
-
-
-
-                          <h2>Responses</h2>
-                            <h3 id="examples-Email-customersIdReportsRecipientsGet-title-200"></h3>
-                            <p id="examples-Email-customersIdReportsRecipientsGet-description-200" class="marked"></p>
-                            <script>
-                              var responseEmail200_description = `The printed ticket SVG.`;
-                              var responseEmail200_description_break = responseEmail200_description.indexOf('\n');
-                              if (responseEmail200_description_break == -1) {
-                                $("#examples-Email-customersIdReportsRecipientsGet-title-200").text("Status Code: 200 - " + responseEmail200_description);
-                              } else {
-                                $("#examples-Email-customersIdReportsRecipientsGet-title-200").text("Status Code: 200 - " + responseEmail200_description.substring(0, responseEmail200_description_break));
-                                $("#examples-Email-customersIdReportsRecipientsGet-description-200").html(responseEmail200_description.substring(responseEmail200_description_break));
-                              }
-                            </script>
-
-
-                            <ul id="responses-detail-Email-customersIdReportsRecipientsGet-200" class="nav nav-tabs nav-tabs-examples" >
-                                <li class="active">
-                                  <a data-toggle="tab" href="#responses-Email-customersIdReportsRecipientsGet-200-schema">Schema</a>
-                                </li>
-
-                                  <li class="">
-                                    <a data-toggle="tab" href="#examples-Email-customersIdReportsRecipientsGet-200-example">Response Body Example</a>
-                                  </li>
-
-
-
-                            </ul>
-
-
-                            <div class="tab-content" id="responses-Email-customersIdReportsRecipientsGet-200-wrapper" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-Email-customersIdReportsRecipientsGet-200-schema">
-                                  <div id="responses-Email-customersIdReportsRecipientsGet-schema-200" class="exampleStyle">
-                                    <script>
-                                      $(document).ready(function() {
-                                        var schemaWrapper = {
-  "description" : "The printed ticket SVG.",
-  "content" : {
-    "image/svg+xml" : {
-      "schema" : {
-        "type" : "string",
-        "example" : "<?xml version=\"1.0\"?>\n<!-- Generated by SVGo -->\n<svg width=\"1200\" height=\"518\"\n     xmlns=\"http://www.w3.org/2000/svg\"\n     xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n<desc>12345678-1234-1234-1234-123456789012</desc>\n<rect x=\"0\" y=\"0\" width=\"1200\" height=\"518\" style=\"fill:rgb(255,255,255)\" />\n<rect x=\"0\" y=\"0\" width=\"200\" height=\"518\" style=\"fill:rgb(92,158,173)\" />\n<rect x=\"200\" y=\"0\" width=\"20\" height=\"518\" style=\"fill:rgb(50,98,115)\" />\n<circle cx=\"210\" cy=\"100\" r=\"50\" style=\"fill:rgb(50,98,115)\" />\n<text x=\"300\" y=\"100\" style=\"text-anchor:left;font-size:36px;fill:black\" >Phantom of the Opera</text>\n<text x=\"300\" y=\"150\" style=\"text-anchor:left;font-size:24px;fill:black\" >2023-06-07</text>\n<text x=\"300\" y=\"200\" style=\"text-anchor:left;font-size:24px;fill:black\" >Sydney Opera House</text>\n<text x=\"300\" y=\"250\" style=\"text-anchor:left;font-size:24px;fill:black\" >12345678-1234-1234-1234-123456789012</text>\n<line x1=\"300\" y1=\"300\" x2=\"900\" y2=\"300\" style=\"stroke:rgb(0,0,0);stroke-width:2\" />\n<text x=\"300\" y=\"350\" style=\"text-anchor:left;font-size:24px;fill:black\" >Evan Hughes</text>\n<text x=\"300\" y=\"400\" style=\"text-anchor:left;font-size:24px;fill:black\" >example@uq.edu.au</text>\n<text x=\"300\" y=\"450\" style=\"text-anchor:left;font-size:24px;fill:black\" >12345678-1234-1234-1234-123456789012</text>\n<rect x=\"1190\" y=\"0\" width=\"10\" height=\"518\" style=\"fill:rgb(255,215,0)\" />\n<rect x=\"1000\" y=\"80\" width=\"150\" height=\"1\" style=\"fill:rgb(0,0,0)\" />\n...\n</svg>\n"
-      }
-    }
-  }
-};
-                                        var schema = findNode('schema',schemaWrapper).schema;
-                                        if (!schema) {
-                                          schema = schemaWrapper.schema;
-                                        }
-                                        if (schema.$ref != null) {
-                                          schema = defsParser.$refs.get(schema.$ref);
-                                        } else if (schema.items != null && schema.items.$ref != null) {
-                                            schema.items = defsParser.$refs.get(schema.items.$ref);
-                                        } else {
-                                          schemaWrapper.definitions = Object.assign({}, defs);
-                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
-                                            console.log(err);
-                                          });
-                                        }
-
-                                        var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-Email-customersIdReportsRecipientsGet-200-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-Email-customersIdReportsRecipientsGet-schema-200');
-                                        result.empty();
-                                        result.append(view.render());
-                                      });
-                                    </script>
-                                  </div>
-                                  <input id='responses-Email-customersIdReportsRecipientsGet-200-schema-data' type='hidden' value=''></input>
-                                </div>
-                                <div class="tab-pane" id="examples-Email-customersIdReportsRecipientsGet-200-example">
-                                  <pre class="prettyprint"><code class="json">&lt;?xml version&#x3D;&quot;1.0&quot;?&gt;
-&lt;!-- Generated by SVGo --&gt;
-&lt;svg width&#x3D;&quot;1200&quot; height&#x3D;&quot;518&quot;
-     xmlns&#x3D;&quot;http://www.w3.org/2000/svg&quot;
-     xmlns:xlink&#x3D;&quot;http://www.w3.org/1999/xlink&quot;&gt;
-&lt;desc&gt;12345678-1234-1234-1234-123456789012&lt;/desc&gt;
-&lt;rect x&#x3D;&quot;0&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;1200&quot; height&#x3D;&quot;518&quot; style&#x3D;&quot;fill:rgb(255,255,255)&quot; /&gt;
-&lt;rect x&#x3D;&quot;0&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;200&quot; height&#x3D;&quot;518&quot; style&#x3D;&quot;fill:rgb(92,158,173)&quot; /&gt;
-&lt;rect x&#x3D;&quot;200&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;20&quot; height&#x3D;&quot;518&quot; style&#x3D;&quot;fill:rgb(50,98,115)&quot; /&gt;
-&lt;circle cx&#x3D;&quot;210&quot; cy&#x3D;&quot;100&quot; r&#x3D;&quot;50&quot; style&#x3D;&quot;fill:rgb(50,98,115)&quot; /&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;100&quot; style&#x3D;&quot;text-anchor:left;font-size:36px;fill:black&quot; &gt;Phantom of the Opera&lt;/text&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;150&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;2023-06-07&lt;/text&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;200&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;Sydney Opera House&lt;/text&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;250&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;12345678-1234-1234-1234-123456789012&lt;/text&gt;
-&lt;line x1&#x3D;&quot;300&quot; y1&#x3D;&quot;300&quot; x2&#x3D;&quot;900&quot; y2&#x3D;&quot;300&quot; style&#x3D;&quot;stroke:rgb(0,0,0);stroke-width:2&quot; /&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;350&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;Evan Hughes&lt;/text&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;400&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;example@uq.edu.au&lt;/text&gt;
-&lt;text x&#x3D;&quot;300&quot; y&#x3D;&quot;450&quot; style&#x3D;&quot;text-anchor:left;font-size:24px;fill:black&quot; &gt;12345678-1234-1234-1234-123456789012&lt;/text&gt;
-&lt;rect x&#x3D;&quot;1190&quot; y&#x3D;&quot;0&quot; width&#x3D;&quot;10&quot; height&#x3D;&quot;518&quot; style&#x3D;&quot;fill:rgb(255,215,0)&quot; /&gt;
-&lt;rect x&#x3D;&quot;1000&quot; y&#x3D;&quot;80&quot; width&#x3D;&quot;150&quot; height&#x3D;&quot;1&quot; style&#x3D;&quot;fill:rgb(0,0,0)&quot; /&gt;
-...
-&lt;/svg&gt;
-</code></pre>
-                                </div>
-                            </div>
-                            
-                            <h3 id="examples-Email-customersIdReportsRecipientsGet-title-404"></h3>
-                            <p id="examples-Email-customersIdReportsRecipientsGet-description-404" class="marked"></p>
-                            <script>
-                              var responseEmail404_description = `The ticket does not exist or has not been printed yet.`;
-                              var responseEmail404_description_break = responseEmail404_description.indexOf('\n');
-                              if (responseEmail404_description_break == -1) {
-                                $("#examples-Email-customersIdReportsRecipientsGet-title-404").text("Status Code: 404 - " + responseEmail404_description);
-                              } else {
-                                $("#examples-Email-customersIdReportsRecipientsGet-title-404").text("Status Code: 404 - " + responseEmail404_description.substring(0, responseEmail404_description_break));
-                                $("#examples-Email-customersIdReportsRecipientsGet-description-404").html(responseEmail404_description.substring(responseEmail404_description_break));
-                              }
-                            </script>
-
-
-                            <ul id="responses-detail-Email-customersIdReportsRecipientsGet-404" class="nav nav-tabs nav-tabs-examples" >
-
-
-                            </ul>
-
-
-                            <div class="tab-content" id="responses-Email-customersIdReportsRecipientsGet-404-wrapper" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-Email-customersIdReportsRecipientsGet-404-schema">
-                                  <div id="responses-Email-customersIdReportsRecipientsGet-schema-404" class="exampleStyle">
-                                    <script>
-                                      $(document).ready(function() {
-                                        var schemaWrapper = {
-  "description" : "The ticket does not exist or has not been printed yet.",
-  "content" : { }
-};
-                                        var schema = findNode('schema',schemaWrapper).schema;
-                                        if (!schema) {
-                                          schema = schemaWrapper.schema;
-                                        }
-                                        if (schema.$ref != null) {
-                                          schema = defsParser.$refs.get(schema.$ref);
-                                        } else if (schema.items != null && schema.items.$ref != null) {
-                                            schema.items = defsParser.$refs.get(schema.items.$ref);
-                                        } else {
-                                          schemaWrapper.definitions = Object.assign({}, defs);
-                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
-                                            console.log(err);
-                                          });
-                                        }
-
-                                        var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-Email-customersIdReportsRecipientsGet-404-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-Email-customersIdReportsRecipientsGet-schema-404');
-                                        result.empty();
-                                        result.append(view.render());
-                                      });
-                                    </script>
-                                  </div>
-                                  <input id='responses-Email-customersIdReportsRecipientsGet-404-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-Email-customersCustomerIdReportsRecipientsGet-404-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
                             
