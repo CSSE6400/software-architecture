@@ -276,7 +276,7 @@ paths:
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+        description: The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4. todo(eh) does the uuidv4 requirement mean 
         required: true
         schema:
           type: string
@@ -290,8 +290,8 @@ paths:
                 example:
                   total: 1
                   data:
-                    - id: "no-reply@uq.edu.au"
-                      count: 256
+                    - id: "support@uq.edu.au"
+                      count: 10000
                 properties:
                   total:
                     type: integer
@@ -365,17 +365,68 @@ components:
   schemas:
     Email:
       type: object
-      example:
-        id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
       properties:
         id:
           type: string
           description: Unique identifier.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the email was submitted.
+          example: 2024-02-21T13:10:05Z
+        contents:
+          type: object
+          description: The contents of the email.
+          properties:
+            to:
+              type: string
+              format: email
+              description: The email address the email was sent to.
+              example: "no-reply@uq.edu.au"
+            from:
+              type: string
+              format: email
+              description: The email address the email was sent from.
+              example: "support@uq.edu.au"
+            subject:
+              type: string
+              description: The subject of the email.
+              example: "Important information about your account."
+            body:
+              type: string
+              description: The body of the email.
+              example: "Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au) to reset your password."
+        status:
+          type: string
+          enum:
+            - pending
+            - scanned
+            - failed
+          description: The status of the email scan.
+          default: "pending"
+          example: "scanned"
+        malicious:
+          type: boolean
+          description: Whether the email was flagged as malicious.
+        
     EmailPost:
       type: object
-      example:
-        id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
       properties:
-        id:
+        to:
           type: string
-          description: Unique identifier.
+          format: email
+          description: The email address the email was sent to.
+          example: "no-reply@uq.edu.au"
+        from:
+          type: string
+          format: email
+          description: The email address the email was sent from.
+          example: "support@uq.edu.au"
+        subject:
+          type: string
+          description: The subject of the email.
+          example: "Important information about your account."
+        body:
+          type: string
+          description: The body of the email.
+          example: "Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au) to reset your password."
