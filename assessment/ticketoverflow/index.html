@@ -951,8 +951,8 @@ ul.nav-tabs {
   "example" : {
     "total" : 1,
     "data" : [ {
-      "id" : "no-reply@uq.edu.au",
-      "count" : 256
+      "id" : "support@uq.edu.au",
+      "count" : 10000
     } ]
   }
 };
@@ -976,22 +976,82 @@ ul.nav-tabs {
     "id" : {
       "type" : "string",
       "description" : "Unique identifier."
+    },
+    "created_at" : {
+      "type" : "string",
+      "description" : "The date and time the email was submitted.",
+      "format" : "date-time",
+      "example" : "2024-02-21T13:10:05Z"
+    },
+    "contents" : {
+      "$ref" : "#/components/schemas/Email_contents"
+    },
+    "status" : {
+      "type" : "string",
+      "description" : "The status of the email scan.",
+      "example" : "scanned",
+      "default" : "pending",
+      "enum" : [ "pending", "scanned", "failed" ]
+    },
+    "malicious" : {
+      "type" : "boolean",
+      "description" : "Whether the email was flagged as malicious."
+    }
+  }
+};
+    defs["Email_contents"] = {
+  "type" : "object",
+  "properties" : {
+    "to" : {
+      "type" : "string",
+      "description" : "The email address the email was sent to.",
+      "format" : "email",
+      "example" : "no-reply@uq.edu.au"
+    },
+    "from" : {
+      "type" : "string",
+      "description" : "The email address the email was sent from.",
+      "format" : "email",
+      "example" : "support@uq.edu.au"
+    },
+    "subject" : {
+      "type" : "string",
+      "description" : "The subject of the email.",
+      "example" : "Important information about your account."
+    },
+    "body" : {
+      "type" : "string",
+      "description" : "The body of the email.",
+      "example" : "Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au) to reset your password."
     }
   },
-  "example" : {
-    "id" : "e571964f-f2b7-4200-9fb0-2af749092fa1"
-  }
+  "description" : "The contents of the email."
 };
     defs["EmailPost"] = {
   "type" : "object",
   "properties" : {
-    "id" : {
+    "to" : {
       "type" : "string",
-      "description" : "Unique identifier."
+      "description" : "The email address the email was sent to.",
+      "format" : "email",
+      "example" : "no-reply@uq.edu.au"
+    },
+    "from" : {
+      "type" : "string",
+      "description" : "The email address the email was sent from.",
+      "format" : "email",
+      "example" : "support@uq.edu.au"
+    },
+    "subject" : {
+      "type" : "string",
+      "description" : "The subject of the email.",
+      "example" : "Important information about your account."
+    },
+    "body" : {
+      "type" : "string",
+      "description" : "The body of the email.",
+      "example" : "Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au) to reset your password."
     }
-  },
-  "example" : {
-    "id" : "e571964f-f2b7-4200-9fb0-2af749092fa1"
   }
 };
 
@@ -1899,7 +1959,10 @@ Return value is not specified but should describe the error.
  -H "Content-Type: application/json" \
  "http://email.api.spamoverflow.com/api/v1/customers/{customer_id}/emails" \
  -d '{
-  &quot;id&quot; : &quot;e571964f-f2b7-4200-9fb0-2af749092fa1&quot;
+  &quot;subject&quot; : &quot;Important information about your account.&quot;,
+  &quot;from&quot; : &quot;support@uq.edu.au&quot;,
+  &quot;to&quot; : &quot;no-reply@uq.edu.au&quot;,
+  &quot;body&quot; : &quot;Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au) to reset your password.&quot;
 }'
 </code></pre>
 
@@ -2583,7 +2646,7 @@ The customer identifier which is a unique UUID. This identifier is kept unique u
                 </span>
 
                     <div class="inner description marked">
-The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4. todo(eh) does the uuidv4 requirement mean
                     </div>
             </div>
                 <div class="inner required">
