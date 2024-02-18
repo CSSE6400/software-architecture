@@ -102,6 +102,27 @@ paths:
           type: string
           format: email
           example: 'support@uq.edu.au'
+      - name: state
+        in: query
+        description: |
+          Only return emails with this state.
+          The state should be one of 'pending', 'scanned', 'failed'.
+        schema:
+          type: string
+          enum:
+            - pending
+            - scanning
+            - scanned
+            - failed
+        example: 'scanned'
+      - name: only_malicious
+        in: query
+        description: |
+          Only return emails that have been flagged as malicious.
+          This will ignore the state parameter and treat it as if it was 'scanned'.
+        schema:
+          type: boolean
+          example: true
       responses:
         200:
           description: List of all emails, with the filters applied.
@@ -112,11 +133,17 @@ paths:
                 items:
                   $ref: '#/components/schemas/Email'
         400:
-          description: Invalid customer_id or query parameters.
-          content: {}
+          description: |
+            Invalid customer_id or query parameters.
+
+            Return value is not specified but should describe the error.
         404:
           description: Customer does not exist or no emails have been submitted for this customer (before filters applied).
-          content: {}
+        500:
+          description: |
+            An unknown error occurred trying to process the request.
+
+            Return value is not specified but should describe the error.
     post:
       tags:
       - email
@@ -138,7 +165,7 @@ paths:
         required: true
       responses:
         201:
-          description: The ticket has been successfully created.
+          description: The Email scan request has been successfully created.
           content:
             application/json:
               schema:
@@ -146,28 +173,32 @@ paths:
         400:
           description: |
             Body parameter was malformed or invalid.
-            This includes passing concerts or users that do not exist.
 
             Return value is not specified but should describe the error.
           content: {}
-        422:
-          description: Ticket purchase failed as no tickets were available (i.e. the concert has sold out).
-          content: {}
         500:
-          description: An unknown error occurred trying to process the request.
+          description: |
+            An unknown error occurred trying to process the request.
 
-            Return value is not specified but should attempt to describe the error.
-          content: {}
+            Return value is not specified but should describe the error.
       x-codegen-request-body-name: body
-  /customers/{id}/emails/{id}:
+  /customers/{customer_id}/emails/{id}:
     get:
       tags:
       - email
-      summary: Get information for a particular ticket.
+      summary: Get information for a particular email.
+      description: |
+        Returns a representation of an email for a customer with the status of the scan and its result. 
       parameters:
+      - name: customer_id
+        in: path
+        description: The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+        required: true
+        schema:
+          type: string
       - name: id
         in: path
-        description: The ticket identifier.
+        description: The email identifier that was returned when the request was created.
         required: true
         schema:
           type: string
@@ -178,18 +209,74 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Email'
-        404:
-          description: The ticket does not exist.
+        400:
+          description: |
+            Body parameter was malformed or invalid.
+
+            Return value is not specified but should describe the error.
           content: {}
-  /customers/{id}/reports/actors:
+        404:
+          description: The email for the customer does not exist. If a customer does not exist for the given customer_id then the response will be a 404.
+          content: {}
+        500:
+          description: |
+            An unknown error occurred trying to process the request.
+
+            Return value is not specified but should describe the error.
+  /customers/{customer_id}/reports/actors:
     get:
       tags:
       - email
-      summary: Get the printed ticket if it exists.
+      summary: Get malicious senders of emails.
       parameters:
-      - name: id
+      - name: customer_id
         in: path
-        description: The ticket identifier.
+        description: The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: List of all senders/actors that have atleast 1 email thats flagged as malicious.
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  total: 1
+                  data:
+                    - id: "no-reply@uq.edu.au"
+                      count: 256
+                properties:
+                  total:
+                    type: integer
+                    description: The number of entries in the list.
+                    minimum: 0
+                  data:
+                    type: array
+                    description: The list of actors with atleast 1 malicious email.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Email address of the sender of malicious email.
+                        count:
+                          type: integer
+                          description: The number of times this actor has been seen.
+                          minimum: 1
+        404:
+          description: The customer does not exist.
+          content: {}
+  /customers/{customer_id}/reports/recipients:
+    get:
+      tags:
+      - email
+      summary: Get users who have received malicious emails.
+      parameters:
+      - name: customer_id
+        in: path
+        description: The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4. todo(eh) does the uuidv4 requirement mean 
         required: true
         schema:
           type: string
@@ -197,168 +284,149 @@ paths:
         200:
           description: The printed ticket SVG.
           content:
-            image/svg+xml:
+            application/json:
               schema:
-                type: string
-                example: |
-                  <?xml version="1.0"?>
-                  <!-- Generated by SVGo -->
-                  <svg width="1200" height="518"
-                       xmlns="http://www.w3.org/2000/svg"
-                       xmlns:xlink="http://www.w3.org/1999/xlink">
-                  <desc>12345678-1234-1234-1234-123456789012</desc>
-                  <rect x="0" y="0" width="1200" height="518" style="fill:rgb(255,255,255)" />
-                  <rect x="0" y="0" width="200" height="518" style="fill:rgb(92,158,173)" />
-                  <rect x="200" y="0" width="20" height="518" style="fill:rgb(50,98,115)" />
-                  <circle cx="210" cy="100" r="50" style="fill:rgb(50,98,115)" />
-                  <text x="300" y="100" style="text-anchor:left;font-size:36px;fill:black" >Phantom of the Opera</text>
-                  <text x="300" y="150" style="text-anchor:left;font-size:24px;fill:black" >2023-06-07</text>
-                  <text x="300" y="200" style="text-anchor:left;font-size:24px;fill:black" >Sydney Opera House</text>
-                  <text x="300" y="250" style="text-anchor:left;font-size:24px;fill:black" >12345678-1234-1234-1234-123456789012</text>
-                  <line x1="300" y1="300" x2="900" y2="300" style="stroke:rgb(0,0,0);stroke-width:2" />
-                  <text x="300" y="350" style="text-anchor:left;font-size:24px;fill:black" >Evan Hughes</text>
-                  <text x="300" y="400" style="text-anchor:left;font-size:24px;fill:black" >example@uq.edu.au</text>
-                  <text x="300" y="450" style="text-anchor:left;font-size:24px;fill:black" >12345678-1234-1234-1234-123456789012</text>
-                  <rect x="1190" y="0" width="10" height="518" style="fill:rgb(255,215,0)" />
-                  <rect x="1000" y="80" width="150" height="1" style="fill:rgb(0,0,0)" />
-                  ...
-                  </svg>
-
+                type: object
+                example:
+                  total: 1
+                  data:
+                    - id: "support@uq.edu.au"
+                      count: 10000
+                properties:
+                  total:
+                    type: integer
+                    description: The number of entries in the list.
+                    minimum: 0
+                  data:
+                    type: array
+                    description: The list of recipients with atleast 1 malicious email.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Email address of the recipient of malicious email.
+                        count:
+                          type: integer
+                          description: The number of times this recipient has been seen.
+                          minimum: 1
         404:
-          description: The ticket does not exist or has not been printed yet.
+          description: The customer does not exist.
           content: {}
-  /customers/{id}/reports/recipients:
+  /customers/{customer_id}/reports/domains:
     get:
       tags:
       - email
-      summary: Get the printed ticket if it exists.
+      summary: Get the domains that appeared in malicious emails.
       parameters:
-      - name: id
+      - name: customer_id
         in: path
-        description: The ticket identifier.
+        description: The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
         required: true
         schema:
           type: string
       responses:
         200:
-          description: The printed ticket SVG.
+          description: A report consisting of the link domains found in malicious emails for the given customer.
           content:
-            image/svg+xml:
+            application/json:
               schema:
-                type: string
-                example: |
-                  <?xml version="1.0"?>
-                  <!-- Generated by SVGo -->
-                  <svg width="1200" height="518"
-                       xmlns="http://www.w3.org/2000/svg"
-                       xmlns:xlink="http://www.w3.org/1999/xlink">
-                  <desc>12345678-1234-1234-1234-123456789012</desc>
-                  <rect x="0" y="0" width="1200" height="518" style="fill:rgb(255,255,255)" />
-                  <rect x="0" y="0" width="200" height="518" style="fill:rgb(92,158,173)" />
-                  <rect x="200" y="0" width="20" height="518" style="fill:rgb(50,98,115)" />
-                  <circle cx="210" cy="100" r="50" style="fill:rgb(50,98,115)" />
-                  <text x="300" y="100" style="text-anchor:left;font-size:36px;fill:black" >Phantom of the Opera</text>
-                  <text x="300" y="150" style="text-anchor:left;font-size:24px;fill:black" >2023-06-07</text>
-                  <text x="300" y="200" style="text-anchor:left;font-size:24px;fill:black" >Sydney Opera House</text>
-                  <text x="300" y="250" style="text-anchor:left;font-size:24px;fill:black" >12345678-1234-1234-1234-123456789012</text>
-                  <line x1="300" y1="300" x2="900" y2="300" style="stroke:rgb(0,0,0);stroke-width:2" />
-                  <text x="300" y="350" style="text-anchor:left;font-size:24px;fill:black" >Evan Hughes</text>
-                  <text x="300" y="400" style="text-anchor:left;font-size:24px;fill:black" >example@uq.edu.au</text>
-                  <text x="300" y="450" style="text-anchor:left;font-size:24px;fill:black" >12345678-1234-1234-1234-123456789012</text>
-                  <rect x="1190" y="0" width="10" height="518" style="fill:rgb(255,215,0)" />
-                  <rect x="1000" y="80" width="150" height="1" style="fill:rgb(0,0,0)" />
-                  ...
-                  </svg>
-
+                type: object
+                example:
+                  total: 1
+                  data:
+                    - id: "uq.edu.au"
+                      count: 16
+                    - id: "uq.mu"
+                      count: 5
+                properties:
+                  total:
+                    type: integer
+                    description: The number of entries in the list.
+                    minimum: 0
+                  data:
+                    type: array
+                    description: The list of domains which were contained in suspicious emails.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: The domain found in a suspicious email.
+                        count:
+                          type: integer
+                          description: The number of times this domain has been seen.
+                          minimum: 1
         404:
-          description: The ticket does not exist or has not been printed yet.
-          content: {}
-  /customers/{id}/reports/domains:
-    get:
-      tags:
-      - email
-      summary: Get the printed ticket if it exists.
-      parameters:
-      - name: id
-        in: path
-        description: The ticket identifier.
-        required: true
-        schema:
-          type: string
-      responses:
-        200:
-          description: The printed ticket SVG.
-          content:
-            image/svg+xml:
-              schema:
-                type: string
-                example: |
-                  <?xml version="1.0"?>
-                  <!-- Generated by SVGo -->
-                  <svg width="1200" height="518"
-                       xmlns="http://www.w3.org/2000/svg"
-                       xmlns:xlink="http://www.w3.org/1999/xlink">
-                  <desc>12345678-1234-1234-1234-123456789012</desc>
-                  <rect x="0" y="0" width="1200" height="518" style="fill:rgb(255,255,255)" />
-                  <rect x="0" y="0" width="200" height="518" style="fill:rgb(92,158,173)" />
-                  <rect x="200" y="0" width="20" height="518" style="fill:rgb(50,98,115)" />
-                  <circle cx="210" cy="100" r="50" style="fill:rgb(50,98,115)" />
-                  <text x="300" y="100" style="text-anchor:left;font-size:36px;fill:black" >Phantom of the Opera</text>
-                  <text x="300" y="150" style="text-anchor:left;font-size:24px;fill:black" >2023-06-07</text>
-                  <text x="300" y="200" style="text-anchor:left;font-size:24px;fill:black" >Sydney Opera House</text>
-                  <text x="300" y="250" style="text-anchor:left;font-size:24px;fill:black" >12345678-1234-1234-1234-123456789012</text>
-                  <line x1="300" y1="300" x2="900" y2="300" style="stroke:rgb(0,0,0);stroke-width:2" />
-                  <text x="300" y="350" style="text-anchor:left;font-size:24px;fill:black" >Evan Hughes</text>
-                  <text x="300" y="400" style="text-anchor:left;font-size:24px;fill:black" >example@uq.edu.au</text>
-                  <text x="300" y="450" style="text-anchor:left;font-size:24px;fill:black" >12345678-1234-1234-1234-123456789012</text>
-                  <rect x="1190" y="0" width="10" height="518" style="fill:rgb(255,215,0)" />
-                  <rect x="1000" y="80" width="150" height="1" style="fill:rgb(0,0,0)" />
-                  ...
-                  </svg>
-
-        404:
-          description: The ticket does not exist or has not been printed yet.
+          description: The customer does not exist.
           content: {}
  
 components:
   schemas:
-    ReportActors:
-      type: object
-      example:
-        id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
-      properties:
-        id:
-          type: string
-          description: Unique identifier.
-    ReportRecipients:
-      type: object
-      example:
-        id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
-      properties:
-        id:
-          type: string
-          description: Unique identifier.
-    ReportLinks:
-      type: object
-      example:
-        id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
-      properties:
-        id:
-          type: string
-          description: Unique identifier.
     Email:
       type: object
-      example:
-        id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
       properties:
         id:
           type: string
           description: Unique identifier.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the email was submitted.
+          example: 2024-02-21T13:10:05Z
+        contents:
+          type: object
+          description: The contents of the email.
+          properties:
+            to:
+              type: string
+              format: email
+              description: The email address the email was sent to.
+              example: "no-reply@uq.edu.au"
+            from:
+              type: string
+              format: email
+              description: The email address the email was sent from.
+              example: "support@uq.edu.au"
+            subject:
+              type: string
+              description: The subject of the email.
+              example: "Important information about your account."
+            body:
+              type: string
+              description: The body of the email.
+              example: "Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au) to reset your password."
+        status:
+          type: string
+          enum:
+            - pending
+            - scanned
+            - failed
+          description: The status of the email scan.
+          default: "pending"
+          example: "scanned"
+        malicious:
+          type: boolean
+          description: Whether the email was flagged as malicious.
+        
     EmailPost:
       type: object
-      example:
-        id: "e571964f-f2b7-4200-9fb0-2af749092fa1"
       properties:
-        id:
+        to:
           type: string
-          description: Unique identifier.
+          format: email
+          description: The email address the email was sent to.
+          example: "no-reply@uq.edu.au"
+        from:
+          type: string
+          format: email
+          description: The email address the email was sent from.
+          example: "support@uq.edu.au"
+        subject:
+          type: string
+          description: The subject of the email.
+          example: "Important information about your account."
+        body:
+          type: string
+          description: The body of the email.
+          example: "Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au) to reset your password."
