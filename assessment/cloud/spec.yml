@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
   title: SpamOverflow
   description: |
@@ -7,7 +7,7 @@ info:
     name: CSSE6400
     url: https://csse6400.uqcloud.net
     email: noreply@uq.edu.au
-  version: 0.1.0
+  version: 1.0.0
 servers:
 - url: http://email.api.spamoverflow.com/api/v1
 tags:
@@ -36,29 +36,86 @@ paths:
         503:
           description: Service is not healthy.
           content: {}
-  /customers/{id}/emails:
+  /customers/{customer_id}/emails:
     get:
       tags:
       - email
       summary: List all submitted emails for a given customer.
       parameters:
-      - name: user_id
-        in: query
-        description: Filter only the tickets purchased by the given user. This is an optional query parameter.
+      - name: customer_id
+        in: path
+        description: The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+        required: true
         schema:
           type: string
-        example: "e571964f-f2b7-4200-9fb0-2af749092fa1"
+      - name: limit
+        in: query
+        description: Returns only this many results, 0 < limit <= 1000.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 1000
+          default: 100
+        example: 20
+      - name: offset
+        in: query
+        description: Skip this many results before returning, 0 <= offset.
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+        example: 0
+      - name: start
+        in: query
+        description: |
+          Only return emails submitted after from this date.
+          The date should be in RFC3339 format.
+        schema:
+          type: string
+          format: date-time
+          example: 2024-02-21T13:10:05Z
+      - name: end
+        in: query
+        description: |
+          Only return emails submitted before this date.
+          The date should be in RFC3339 format.
+        schema:
+          type: string
+          format: date-time
+          example: 2024-02-21T14:10:05Z
+      - name: from
+        in: query
+        description: |
+          Only return emails submitted from this email address.
+          The email address should be in the format of user@domain.
+        schema:
+          type: string
+          format: email
+          example: 'no-reply@uq.edu.au'
+      - name: to
+        in: query
+        description: |
+          Only return emails submitted to this email address.
+          The email address should be in the format of user@domain.
+          Parsing of emails to remove '+' aliases is not supported and will be treated as a different email address.
+        schema:
+          type: string
+          format: email
+          example: 'support@uq.edu.au'
       responses:
         200:
-          description: List of all emails, as per request.
+          description: List of all emails, with the filters applied.
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Email'
+        400:
+          description: Invalid customer_id or query parameters.
+          content: {}
         404:
-          description: Invalid customer id.
+          description: Customer does not exist or no emails have been submitted for this customer (before filters applied).
           content: {}
     post:
       tags:
@@ -66,8 +123,13 @@ paths:
       summary: Post a new email scan request.
       description: |
         If the customer account does not exist, it will be created.
-
-        Emails should have an initial status of PENDING for the status field.
+      parameters:
+      - name: customer_id
+        in: path
+        description: The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+        required: true
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
