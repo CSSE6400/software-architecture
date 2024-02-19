@@ -27,11 +27,7 @@ on AWS infrastructure using a hosted database and a single server website.
 Specifically, this week you need to:
 \begin{itemize}
     \item Deploy an AWS Relational Database Service (RDS) using Terraform.
-    \item Deploy the TaskOverflow container on AWS infrastructure using either:
-    \begin{description}
-    \item [Path A] An EC2 instance running the container.
-    \item [Path B] An ECS cluster with the container.
-    \end{description}
+    \item Deploy the TaskOverflow container on AWS infrastructure using an ECS cluster.
 \end{itemize}
 
 \section{Terraform in AWS Learner Labs}
@@ -316,17 +312,12 @@ Variables in Terraform can be populated via two mechanisms,
 they can be in a variables block which can be overridden,
 or they can be in a locals block which can be used to store values that are used in multiple places.
 
-For the next step you must choose a path to follow,
-either EC2 or ECS,
-if you have trouble with one path you can always switch to the other.
-When switching you should destroy the resources you have created before starting the new path.
-
-We recommend that you start with the ECS path as it is the more modern way of deploying containers and is the path that we will be suggesting for the future but all tasks are also doable using EC2.
+Now we will use ECS to deploy a containerised version of our application.
 
 \subsection{[Path A] EC2}
 
 \aside{
-This is not the recommended path but is provided for those who would like to use EC2 instead of ECS.
+In 2024 we have removed the EC2 pathway from this practical but we have left the deployment diagram to allow comparisons to ECS.
 Please skip to Section \ref{pathb} for the ECS approach.
 }
 
@@ -334,103 +325,6 @@ Please skip to Section \ref{pathb} for the ECS approach.
   \includegraphics[width=\textwidth]{diagrams/ec2deployment}
 \end{figure}
 
-Congratulations! You have chosen to go down the EC2 path which builds on what we experienced in the week 4 practical.
-To deploy our application we first need to get the EC2 instance running and install Docker on the instance.
-We can do this by using the following Terraform code:
-
-\begin{code}[language=terraform,numbers=none]{main.tf}
-resource "aws_instance" "taskoverflow_instance" {
-    ami           = "ami-005f9685cb30f234b" # Amazon Linux 2
-    instance_type = "t2.micro"
-    key_name      = "vockey" # allows SSH into the instance using the preconfigured key
-    
-    user_data_replace_on_change = true # changing user_data will force recreate
-    user_data                   = <<-EOT
-#!/bin/bash
-yum update -y
-    EOT
-  
-    security_groups = [aws_security_group.taskoverflow_instance.name] # firewall for the instance
-
-    tags = {
-        Name = "taskoverflow_instance"
-    }
-}
-\end{code}
-
-Compared to the last time we used EC2 instances we have moved the \texttt{user\_data} from a file to being defined in-line and we have made sure to provide the \texttt{key\_name} in case we want to SSH into the deployed instance.
-
-If we ran \texttt{terraform apply} now, our instance would not do anything interesting.
-We need the \texttt{user\_data} to install Docker and start our TaskOverflow image.
-For this, we will need to make the following adjustments to the \texttt{user\_data} field:
-
-\warning{
-The \texttt{<<-EOT} line cannot have a trailing space.
-Ensure that one has not been erroneously inserted.
-}
-
-\begin{code}[language=terraform,numbers=none]{main.tf}
-  user_data = <<-EOT
-#!/bin/bash
-yum update -y
-yum install -y docker
-service docker start
-systemctl enable docker
-usermod -a -G docker ec2-user 
-docker run --restart always -e SQLALCHEMY_DATABASE_URI=postgresql://${local.database_username}:${local.database_password}@${aws_db_instance.taskoverflow_database.address}:${aws_db_instance.taskoverflow_database.port}/${aws_db_instance.taskoverflow_database.db_name} -p 6400:6400 ${local.image}
-  EOT
-\end{code}
-
-The first lines install Docker and start the Docker service and allow the ec2-user to be able to run Docker commands.
-The last line is where the magic happens by running the container via the Docker CLI.
-To get a refresher about the Docker CLI please see the Containers lecture \cite{container-slides} and the \link{Docker documentation}{https://docs.docker.com/}. 
-
-\aside{
-The \texttt{-{}-restart always} flag tells docker to restart the container if it crashes or is stopped.
-This is useful for our application as it may take a while for the database to be provisioned and we do not want to have to manually restart the container once the database is ready.
-}
-
-Now that our instance is ready to go we just need to make sure that it is accessible from the internet.
-We can do this by creating a security group that allows traffic on port 6400 and attaching it to our instance.
-
-\begin{code}[language=terraform,numbers=none]{main.tf}
-resource "aws_security_group" "taskoverflow_instance" {
-    name = "taskoverflow_instance"
-    description = "TaskOverflow Security Group"
-  
-    ingress {
-      from_port = 6400
-      to_port = 6400
-      protocol = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-  
-    ingress {
-      from_port = 22
-      to_port = 22
-      protocol = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-  
-    egress {
-      from_port = 0
-      to_port = 0
-      protocol = "-1"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-}
-\end{code}
-
-Now we can run \texttt{terraform init} and \texttt{terraform apply} to deploy our application.
-Once this is done we can visit the public IP of our instance on port 6400 to see our application running.
-
-\begin{code}[language=terraform,numbers=none]{main.tf}
-output "url" {
-    value = "http://${aws_instance.taskoverflow_instance.public_ip}:6400/"
-}
-\end{code}
-
-You should be presented with a very lightweight todo application called TaskOverflow.
 
 \subsection{[Path B] ECS}
 \label{pathb}
