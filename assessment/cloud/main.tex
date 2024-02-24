@@ -40,7 +40,6 @@ Specially your application needs to support:
 Your service will be deployed to AWS and will undergo automated correctness and load-testing to ensure it meets the requirements.
 
 \section{Introduction}
-....
 
 \paragraph{Task}
 For this assignment, you are working for SpamOverflow, a new competitor in the email security space. SpamOverflow uses a microservices based architecture to implement their new malicious email filtering platform. The CEO saw on your resume that you are taking Software Architecture and has assigned you to design and implement a service. This service must be scalable to cope with the anticipated large influx of emails.
@@ -86,6 +85,8 @@ With this knowledge you have found a common method of getting the difference bet
   \item \url{https://www.youtube.com/watch?v=e9U0QAFbfLI}
   \item \url{https://www.youtube.com/watch?v=Dd16LVt5ct4}
 \end{itemize}
+
+For the purposes of the assignment you may build up a database of known bad emails during the operation of your API. You must only use the body of the email content to compare simularity.
 
 \info{Dr. Richardson emphasises that the similarity metric is not a replacement for the scanner and is an optional way to improve the efficiency of the system.}
 
@@ -143,8 +144,9 @@ Extension requests \textbf{must} be made \emph{prior} to the submission deadline
 Your repository \textbf{must} contain everything required to successfully deploy your application.
 The first submission must include the following in your repository:
 \begin{itemize}
-  \item Docker container of your implementation of the service API, including the source code and a mechanism to build and run the service.%
+  \item Docker container (Dockerfile) of your implementation of the service API, including the source code and a mechanism to build and run the service.%
   \footnote{If you use external libraries, ensure that you pin the versions to avoid external changes breaking your application.}
+  \item You container will be launched with port 8080 being passed from the container to the testing environment and your service must be available at \texttt{http://localhost:8080/}.
 \end{itemize}
 We will run your Docker container to test the functionality of your API.
 
@@ -203,6 +205,8 @@ In this course, you have been shown how to use Docker containers to deploy on EC
 You can reproduce our process for deploying your application using our \link{Docker image}{https://ghcr.io/CSSE6400/csse6400-cloud-testing}:
 \codefile[language=docker]{Dockerfile}{deployment/Dockerfile}
 
+\todo{Update container to latest terraform}
+
 Our steps for deploying your infrastructure using this container are as follows.
 \texttt{\$REPO} is the name of your repository, and
 \texttt{\$CREDENTIALS} is the path where we will store your AWS credentials.
@@ -254,11 +258,6 @@ The Department of Defence (DoD) has adopted SpamOverflow.
 They are a high value customer and you must ensure that their requests are handled quickly.
 All other customers have a service level agreement (SLA) that guarantees a certain level of responsiveness.
 You cannot ignore their requests to only prioritise the DoD's requests.
-% Original Text: One client receives a high percentage of `bad' email message. Other accounts receive a normal percentage of `bad' email messages.
-% Account could be company/customer.
-% Equal response for all?
-% High Value customer prioritised?
-% High volume of email from a selected customer, not so much high percentage of 'bad' messages.
 
 \paragraph{Leaked Directory}
 A bad actor has managed to get the email addresses of all employees of <Large Company>.
