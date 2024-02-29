@@ -996,6 +996,9 @@ ul.nav-tabs {
     "malicious" : {
       "type" : "boolean",
       "description" : "Whether the email was flagged as malicious."
+    },
+    "metadata" : {
+      "$ref" : "#/components/schemas/Email_metadata"
     }
   }
 };
@@ -1027,30 +1030,24 @@ ul.nav-tabs {
   },
   "description" : "The contents of the email."
 };
+    defs["Email_metadata"] = {
+  "type" : "object",
+  "properties" : {
+    "spamhammer" : {
+      "type" : "string",
+      "description" : "SpamHammer metadata for this email.",
+      "example" : "1|14"
+    }
+  }
+};
     defs["EmailPost"] = {
   "type" : "object",
   "properties" : {
-    "to" : {
-      "type" : "string",
-      "description" : "The email address the email was sent to.",
-      "format" : "email",
-      "example" : "no-reply@uq.edu.au"
+    "metadata" : {
+      "$ref" : "#/components/schemas/Email_metadata"
     },
-    "from" : {
-      "type" : "string",
-      "description" : "The email address the email was sent from.",
-      "format" : "email",
-      "example" : "support@uq.edu.au"
-    },
-    "subject" : {
-      "type" : "string",
-      "description" : "The subject of the email.",
-      "example" : "Important information about your account."
-    },
-    "body" : {
-      "type" : "string",
-      "description" : "The body of the email.",
-      "example" : "Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au) to reset your password."
+    "contents" : {
+      "$ref" : "#/components/schemas/Email_contents"
     }
   }
 };
@@ -1959,10 +1956,15 @@ Return value is not specified but should describe the error.
  -H "Content-Type: application/json" \
  "http://email.api.spamoverflow.com/api/v1/customers/{customer_id}/emails" \
  -d '{
-  &quot;subject&quot; : &quot;Important information about your account.&quot;,
-  &quot;from&quot; : &quot;support@uq.edu.au&quot;,
-  &quot;to&quot; : &quot;no-reply@uq.edu.au&quot;,
-  &quot;body&quot; : &quot;Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au) to reset your password.&quot;
+  &quot;metadata&quot; : {
+    &quot;spamhammer&quot; : &quot;1|14&quot;
+  },
+  &quot;contents&quot; : {
+    &quot;subject&quot; : &quot;Important information about your account.&quot;,
+    &quot;from&quot; : &quot;support@uq.edu.au&quot;,
+    &quot;to&quot; : &quot;no-reply@uq.edu.au&quot;,
+    &quot;body&quot; : &quot;Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au) to reset your password.&quot;
+  }
 }'
 </code></pre>
 
