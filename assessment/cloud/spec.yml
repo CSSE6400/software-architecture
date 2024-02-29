@@ -44,7 +44,7 @@ paths:
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+        description: The customer identifier is a UUIDv4.
         required: true
         schema:
           type: string
@@ -137,8 +137,6 @@ paths:
             Invalid customer_id or query parameters.
 
             Return value is not specified but should describe the error.
-        404:
-          description: Customer does not exist or no emails have been submitted for this customer (before filters applied).
         500:
           description: |
             An unknown error occurred trying to process the request.
@@ -153,7 +151,7 @@ paths:
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+        description: The customer identifier is a UUIDv4 where the first 4 characters represent the customer type. Customers with 1111####-####-####-####-############ are to be treated as high priority while all other valid UUIDv4's will be treated as standard priority.
         required: true
         schema:
           type: string
@@ -192,7 +190,7 @@ paths:
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+        description: The customer identifier is a UUIDv4.
         required: true
         schema:
           type: string
@@ -231,7 +229,7 @@ paths:
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+        description: The customer identifier is a UUIDv4.
         required: true
         schema:
           type: string
@@ -243,11 +241,17 @@ paths:
               schema:
                 type: object
                 example:
+                  generated_at: "2024-02-21T13:10:05Z"
                   total: 1
                   data:
                     - id: "no-reply@uq.edu.au"
                       count: 256
                 properties:
+                  generated_at:
+                    type: string
+                    format: date-time
+                    description: The date and time the report was generated in RFC3339. If the report is being made live then this should be the current date and time.
+                    example: 2024-02-21T13:10:05Z
                   total:
                     type: integer
                     description: The number of entries in the list.
@@ -265,9 +269,11 @@ paths:
                           type: integer
                           description: The number of times this actor has been seen.
                           minimum: 1
-        404:
-          description: The customer does not exist.
-          content: {}
+        500:
+          description: |
+            An unknown error occurred trying to process the request.
+
+            Return value is not specified but should describe the error.
   /customers/{customer_id}/reports/recipients:
     get:
       tags:
@@ -276,7 +282,7 @@ paths:
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4. todo(eh) does the uuidv4 requirement mean 
+        description: The customer identifier is a UUIDv4. 
         required: true
         schema:
           type: string
@@ -288,11 +294,17 @@ paths:
               schema:
                 type: object
                 example:
+                  generated_at: "2024-02-21T13:10:05Z"
                   total: 1
                   data:
                     - id: "support@uq.edu.au"
                       count: 10000
                 properties:
+                  generated_at:
+                    type: string
+                    format: date-time
+                    description: The date and time the report was generated in RFC3339. If the report is being made live then this should be the current date and time.
+                    example: 2024-02-21T13:10:05Z
                   total:
                     type: integer
                     description: The number of entries in the list.
@@ -310,9 +322,11 @@ paths:
                           type: integer
                           description: The number of malicious emails identified as being received by this recipient.
                           minimum: 1
-        404:
-          description: The customer does not exist.
-          content: {}
+        500:
+          description: |
+            An unknown error occurred trying to process the request.
+
+            Return value is not specified but should describe the error.
   /customers/{customer_id}/reports/domains:
     get:
       tags:
@@ -321,7 +335,7 @@ paths:
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+        description: The customer identifier is a UUIDv4.
         required: true
         schema:
           type: string
@@ -333,6 +347,7 @@ paths:
               schema:
                 type: object
                 example:
+                  generated_at: "2024-02-21T13:10:05Z"
                   total: 1
                   data:
                     - id: "uq.edu.au"
@@ -340,6 +355,11 @@ paths:
                     - id: "uq.mu"
                       count: 5
                 properties:
+                  generated_at:
+                    type: string
+                    format: date-time
+                    description: The date and time the report was generated in RFC3339. If the report is being made live then this should be the current date and time.
+                    example: 2024-02-21T13:10:05Z
                   total:
                     type: integer
                     description: The number of entries in the list.
@@ -357,9 +377,11 @@ paths:
                           type: integer
                           description: The number of times this domain has been seen.
                           minimum: 1
-        404:
-          description: The customer does not exist.
-          content: {}
+        500:
+          description: |
+            An unknown error occurred trying to process the request.
+
+            Return value is not specified but should describe the error.
  
 components:
   schemas:
@@ -373,6 +395,11 @@ components:
           type: string
           format: date-time
           description: The date and time the email was submitted.
+          example: 2024-02-21T13:10:05Z
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the email was updated including its creation.
           example: 2024-02-21T13:10:05Z
         contents:
           type: object
@@ -392,10 +419,6 @@ components:
               type: string
               description: The subject of the email.
               example: "Important information about your account."
-            body:
-              type: string
-              description: The body of the email.
-              example: "Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au) to reset your password."
         status:
           type: string
           enum:
@@ -408,6 +431,12 @@ components:
         malicious:
           type: boolean
           description: Whether the email was flagged as malicious.
+        domains:
+          type: array
+          description: The domains of links found within the email body.
+          items:
+            type: string
+            example: "scam-check.uq.edu.au"
         metadata:
           type: object
           properties:
@@ -447,4 +476,4 @@ components:
             body:
               type: string
               description: The body of the email.
-              example: "Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au) to reset your password."
+              example: "Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au?userId=uqehugh3) to reset your password."
