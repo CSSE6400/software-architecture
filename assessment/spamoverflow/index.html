@@ -856,6 +856,12 @@ ul.nav-tabs {
     defs["_customers__customer_id__reports_actors_get_200_response"] = {
   "type" : "object",
   "properties" : {
+    "generated_at" : {
+      "type" : "string",
+      "description" : "The date and time the report was generated in RFC3339. If the report is being made live then this should be the current date and time.",
+      "format" : "date-time",
+      "example" : "2024-02-21T13:10:05Z"
+    },
     "total" : {
       "minimum" : 0,
       "type" : "integer",
@@ -870,6 +876,7 @@ ul.nav-tabs {
     }
   },
   "example" : {
+    "generated_at" : "2024-02-21T13:10:05Z",
     "total" : 1,
     "data" : [ {
       "id" : "no-reply@uq.edu.au",
@@ -894,6 +901,12 @@ ul.nav-tabs {
     defs["_customers__customer_id__reports_domains_get_200_response"] = {
   "type" : "object",
   "properties" : {
+    "generated_at" : {
+      "type" : "string",
+      "description" : "The date and time the report was generated in RFC3339. If the report is being made live then this should be the current date and time.",
+      "format" : "date-time",
+      "example" : "2024-02-21T13:10:05Z"
+    },
     "total" : {
       "minimum" : 0,
       "type" : "integer",
@@ -908,6 +921,7 @@ ul.nav-tabs {
     }
   },
   "example" : {
+    "generated_at" : "2024-02-21T13:10:05Z",
     "total" : 1,
     "data" : [ {
       "id" : "uq.edu.au",
@@ -935,6 +949,12 @@ ul.nav-tabs {
     defs["_customers__customer_id__reports_recipients_get_200_response"] = {
   "type" : "object",
   "properties" : {
+    "generated_at" : {
+      "type" : "string",
+      "description" : "The date and time the report was generated in RFC3339. If the report is being made live then this should be the current date and time.",
+      "format" : "date-time",
+      "example" : "2024-02-21T13:10:05Z"
+    },
     "total" : {
       "minimum" : 0,
       "type" : "integer",
@@ -949,6 +969,7 @@ ul.nav-tabs {
     }
   },
   "example" : {
+    "generated_at" : "2024-02-21T13:10:05Z",
     "total" : 1,
     "data" : [ {
       "id" : "support@uq.edu.au",
@@ -983,6 +1004,12 @@ ul.nav-tabs {
       "format" : "date-time",
       "example" : "2024-02-21T13:10:05Z"
     },
+    "updated_at" : {
+      "type" : "string",
+      "description" : "The date and time the email was updated including its creation.",
+      "format" : "date-time",
+      "example" : "2024-02-21T13:10:05Z"
+    },
     "contents" : {
       "$ref" : "#/components/schemas/Email_contents"
     },
@@ -996,6 +1023,14 @@ ul.nav-tabs {
     "malicious" : {
       "type" : "boolean",
       "description" : "Whether the email was flagged as malicious."
+    },
+    "domains" : {
+      "type" : "array",
+      "description" : "The domains of links found within the email body.",
+      "items" : {
+        "type" : "string",
+        "example" : "scam-check.uq.edu.au"
+      }
     },
     "metadata" : {
       "$ref" : "#/components/schemas/Email_metadata"
@@ -1021,11 +1056,6 @@ ul.nav-tabs {
       "type" : "string",
       "description" : "The subject of the email.",
       "example" : "Important information about your account."
-    },
-    "body" : {
-      "type" : "string",
-      "description" : "The body of the email.",
-      "example" : "Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au) to reset your password."
     }
   },
   "description" : "The contents of the email."
@@ -1047,9 +1077,37 @@ ul.nav-tabs {
       "$ref" : "#/components/schemas/Email_metadata"
     },
     "contents" : {
-      "$ref" : "#/components/schemas/Email_contents"
+      "$ref" : "#/components/schemas/EmailPost_contents"
     }
   }
+};
+    defs["EmailPost_contents"] = {
+  "type" : "object",
+  "properties" : {
+    "to" : {
+      "type" : "string",
+      "description" : "The email address the email was sent to.",
+      "format" : "email",
+      "example" : "no-reply@uq.edu.au"
+    },
+    "from" : {
+      "type" : "string",
+      "description" : "The email address the email was sent from.",
+      "format" : "email",
+      "example" : "support@uq.edu.au"
+    },
+    "subject" : {
+      "type" : "string",
+      "description" : "The subject of the email.",
+      "example" : "Important information about your account."
+    },
+    "body" : {
+      "type" : "string",
+      "description" : "The body of the email.",
+      "example" : "Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au?userId=uqehugh3) to reset your password."
+    }
+  },
+  "description" : "The contents of the email."
 };
 
     var errs = {};
@@ -1152,7 +1210,7 @@ ul.nav-tabs {
                 </span>
 
                     <div class="inner description marked">
-The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+The customer identifier is a UUIDv4.
                     </div>
             </div>
                 <div class="inner required">
@@ -1493,61 +1551,6 @@ Return value is not specified but should describe the error.
                                 </div>
                             </div>
                             
-                            <h3 id="examples-Email-customersCustomerIdEmailsGet-title-404"></h3>
-                            <p id="examples-Email-customersCustomerIdEmailsGet-description-404" class="marked"></p>
-                            <script>
-                              var responseEmail404_description = `Customer does not exist or no emails have been submitted for this customer (before filters applied).`;
-                              var responseEmail404_description_break = responseEmail404_description.indexOf('\n');
-                              if (responseEmail404_description_break == -1) {
-                                $("#examples-Email-customersCustomerIdEmailsGet-title-404").text("Status Code: 404 - " + responseEmail404_description);
-                              } else {
-                                $("#examples-Email-customersCustomerIdEmailsGet-title-404").text("Status Code: 404 - " + responseEmail404_description.substring(0, responseEmail404_description_break));
-                                $("#examples-Email-customersCustomerIdEmailsGet-description-404").html(responseEmail404_description.substring(responseEmail404_description_break));
-                              }
-                            </script>
-
-
-                            <ul id="responses-detail-Email-customersCustomerIdEmailsGet-404" class="nav nav-tabs nav-tabs-examples" >
-
-
-                            </ul>
-
-
-                            <div class="tab-content" id="responses-Email-customersCustomerIdEmailsGet-404-wrapper" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-Email-customersCustomerIdEmailsGet-404-schema">
-                                  <div id="responses-Email-customersCustomerIdEmailsGet-schema-404" class="exampleStyle">
-                                    <script>
-                                      $(document).ready(function() {
-                                        var schemaWrapper = {
-  "description" : "Customer does not exist or no emails have been submitted for this customer (before filters applied)."
-};
-                                        var schema = findNode('schema',schemaWrapper).schema;
-                                        if (!schema) {
-                                          schema = schemaWrapper.schema;
-                                        }
-                                        if (schema.$ref != null) {
-                                          schema = defsParser.$refs.get(schema.$ref);
-                                        } else if (schema.items != null && schema.items.$ref != null) {
-                                            schema.items = defsParser.$refs.get(schema.items.$ref);
-                                        } else {
-                                          schemaWrapper.definitions = Object.assign({}, defs);
-                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
-                                            console.log(err);
-                                          });
-                                        }
-
-                                        var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-Email-customersCustomerIdEmailsGet-404-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-Email-customersCustomerIdEmailsGet-schema-404');
-                                        result.empty();
-                                        result.append(view.render());
-                                      });
-                                    </script>
-                                  </div>
-                                  <input id='responses-Email-customersCustomerIdEmailsGet-404-schema-data' type='hidden' value=''></input>
-                                </div>
-                            </div>
-                            
                             <h3 id="examples-Email-customersCustomerIdEmailsGet-title-500"></h3>
                             <p id="examples-Email-customersCustomerIdEmailsGet-description-500" class="marked"></p>
                             <script>
@@ -1648,7 +1651,7 @@ Return value is not specified but should describe the error.
                 </span>
 
                     <div class="inner description marked">
-The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+The customer identifier is a UUIDv4.
                     </div>
             </div>
                 <div class="inner required">
@@ -1963,7 +1966,7 @@ Return value is not specified but should describe the error.
     &quot;subject&quot; : &quot;Important information about your account.&quot;,
     &quot;from&quot; : &quot;support@uq.edu.au&quot;,
     &quot;to&quot; : &quot;no-reply@uq.edu.au&quot;,
-    &quot;body&quot; : &quot;Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au) to reset your password.&quot;
+    &quot;body&quot; : &quot;Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au?userId&#x3D;uqehugh3) to reset your password.&quot;
   }
 }'
 </code></pre>
@@ -1986,7 +1989,7 @@ Return value is not specified but should describe the error.
                 </span>
 
                     <div class="inner description marked">
-The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+The customer identifier is a UUIDv4 where the first 4 characters represent the customer type. Customers with 1111####-####-####-####-############ are to be treated as high priority while all other valid UUIDv4&#39;s will be treated as standard priority.
                     </div>
             </div>
                 <div class="inner required">
@@ -2278,7 +2281,7 @@ Return value is not specified but should describe the error.
                 </span>
 
                     <div class="inner description marked">
-The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+The customer identifier is a UUIDv4.
                     </div>
             </div>
                 <div class="inner required">
@@ -2366,34 +2369,36 @@ The customer identifier which is a unique UUID. This identifier is kept unique u
                                 </div>
                             </div>
                             
-                            <h3 id="examples-Email-customersCustomerIdReportsActorsGet-title-404"></h3>
-                            <p id="examples-Email-customersCustomerIdReportsActorsGet-description-404" class="marked"></p>
+                            <h3 id="examples-Email-customersCustomerIdReportsActorsGet-title-500"></h3>
+                            <p id="examples-Email-customersCustomerIdReportsActorsGet-description-500" class="marked"></p>
                             <script>
-                              var responseEmail404_description = `The customer does not exist.`;
-                              var responseEmail404_description_break = responseEmail404_description.indexOf('\n');
-                              if (responseEmail404_description_break == -1) {
-                                $("#examples-Email-customersCustomerIdReportsActorsGet-title-404").text("Status Code: 404 - " + responseEmail404_description);
+                              var responseEmail500_description = `An unknown error occurred trying to process the request.
+
+Return value is not specified but should describe the error.
+`;
+                              var responseEmail500_description_break = responseEmail500_description.indexOf('\n');
+                              if (responseEmail500_description_break == -1) {
+                                $("#examples-Email-customersCustomerIdReportsActorsGet-title-500").text("Status Code: 500 - " + responseEmail500_description);
                               } else {
-                                $("#examples-Email-customersCustomerIdReportsActorsGet-title-404").text("Status Code: 404 - " + responseEmail404_description.substring(0, responseEmail404_description_break));
-                                $("#examples-Email-customersCustomerIdReportsActorsGet-description-404").html(responseEmail404_description.substring(responseEmail404_description_break));
+                                $("#examples-Email-customersCustomerIdReportsActorsGet-title-500").text("Status Code: 500 - " + responseEmail500_description.substring(0, responseEmail500_description_break));
+                                $("#examples-Email-customersCustomerIdReportsActorsGet-description-500").html(responseEmail500_description.substring(responseEmail500_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-Email-customersCustomerIdReportsActorsGet-404" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-Email-customersCustomerIdReportsActorsGet-500" class="nav nav-tabs nav-tabs-examples" >
 
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-Email-customersCustomerIdReportsActorsGet-404-wrapper" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-Email-customersCustomerIdReportsActorsGet-404-schema">
-                                  <div id="responses-Email-customersCustomerIdReportsActorsGet-schema-404" class="exampleStyle">
+                            <div class="tab-content" id="responses-Email-customersCustomerIdReportsActorsGet-500-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Email-customersCustomerIdReportsActorsGet-500-schema">
+                                  <div id="responses-Email-customersCustomerIdReportsActorsGet-schema-500" class="exampleStyle">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "The customer does not exist.",
-  "content" : { }
+  "description" : "An unknown error occurred trying to process the request.\n\nReturn value is not specified but should describe the error.\n"
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
                                         if (!schema) {
@@ -2411,14 +2416,14 @@ The customer identifier which is a unique UUID. This identifier is kept unique u
                                         }
 
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-Email-customersCustomerIdReportsActorsGet-404-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-Email-customersCustomerIdReportsActorsGet-schema-404');
+                                        $('#responses-Email-customersCustomerIdReportsActorsGet-500-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Email-customersCustomerIdReportsActorsGet-schema-500');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-Email-customersCustomerIdReportsActorsGet-404-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-Email-customersCustomerIdReportsActorsGet-500-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
                             
@@ -2463,7 +2468,7 @@ The customer identifier which is a unique UUID. This identifier is kept unique u
                 </span>
 
                     <div class="inner description marked">
-The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4.
+The customer identifier is a UUIDv4.
                     </div>
             </div>
                 <div class="inner required">
@@ -2551,34 +2556,36 @@ The customer identifier which is a unique UUID. This identifier is kept unique u
                                 </div>
                             </div>
                             
-                            <h3 id="examples-Email-customersCustomerIdReportsDomainsGet-title-404"></h3>
-                            <p id="examples-Email-customersCustomerIdReportsDomainsGet-description-404" class="marked"></p>
+                            <h3 id="examples-Email-customersCustomerIdReportsDomainsGet-title-500"></h3>
+                            <p id="examples-Email-customersCustomerIdReportsDomainsGet-description-500" class="marked"></p>
                             <script>
-                              var responseEmail404_description = `The customer does not exist.`;
-                              var responseEmail404_description_break = responseEmail404_description.indexOf('\n');
-                              if (responseEmail404_description_break == -1) {
-                                $("#examples-Email-customersCustomerIdReportsDomainsGet-title-404").text("Status Code: 404 - " + responseEmail404_description);
+                              var responseEmail500_description = `An unknown error occurred trying to process the request.
+
+Return value is not specified but should describe the error.
+`;
+                              var responseEmail500_description_break = responseEmail500_description.indexOf('\n');
+                              if (responseEmail500_description_break == -1) {
+                                $("#examples-Email-customersCustomerIdReportsDomainsGet-title-500").text("Status Code: 500 - " + responseEmail500_description);
                               } else {
-                                $("#examples-Email-customersCustomerIdReportsDomainsGet-title-404").text("Status Code: 404 - " + responseEmail404_description.substring(0, responseEmail404_description_break));
-                                $("#examples-Email-customersCustomerIdReportsDomainsGet-description-404").html(responseEmail404_description.substring(responseEmail404_description_break));
+                                $("#examples-Email-customersCustomerIdReportsDomainsGet-title-500").text("Status Code: 500 - " + responseEmail500_description.substring(0, responseEmail500_description_break));
+                                $("#examples-Email-customersCustomerIdReportsDomainsGet-description-500").html(responseEmail500_description.substring(responseEmail500_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-Email-customersCustomerIdReportsDomainsGet-404" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-Email-customersCustomerIdReportsDomainsGet-500" class="nav nav-tabs nav-tabs-examples" >
 
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-Email-customersCustomerIdReportsDomainsGet-404-wrapper" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-Email-customersCustomerIdReportsDomainsGet-404-schema">
-                                  <div id="responses-Email-customersCustomerIdReportsDomainsGet-schema-404" class="exampleStyle">
+                            <div class="tab-content" id="responses-Email-customersCustomerIdReportsDomainsGet-500-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Email-customersCustomerIdReportsDomainsGet-500-schema">
+                                  <div id="responses-Email-customersCustomerIdReportsDomainsGet-schema-500" class="exampleStyle">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "The customer does not exist.",
-  "content" : { }
+  "description" : "An unknown error occurred trying to process the request.\n\nReturn value is not specified but should describe the error.\n"
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
                                         if (!schema) {
@@ -2596,14 +2603,14 @@ The customer identifier which is a unique UUID. This identifier is kept unique u
                                         }
 
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-Email-customersCustomerIdReportsDomainsGet-404-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-Email-customersCustomerIdReportsDomainsGet-schema-404');
+                                        $('#responses-Email-customersCustomerIdReportsDomainsGet-500-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Email-customersCustomerIdReportsDomainsGet-schema-500');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-Email-customersCustomerIdReportsDomainsGet-404-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-Email-customersCustomerIdReportsDomainsGet-500-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
                             
@@ -2648,7 +2655,7 @@ The customer identifier which is a unique UUID. This identifier is kept unique u
                 </span>
 
                     <div class="inner description marked">
-The customer identifier which is a unique UUID. This identifier is kept unique upstream of this API. The customer_id must be a UUIDv4. todo(eh) does the uuidv4 requirement mean
+The customer identifier is a UUIDv4.
                     </div>
             </div>
                 <div class="inner required">
@@ -2736,34 +2743,36 @@ The customer identifier which is a unique UUID. This identifier is kept unique u
                                 </div>
                             </div>
                             
-                            <h3 id="examples-Email-customersCustomerIdReportsRecipientsGet-title-404"></h3>
-                            <p id="examples-Email-customersCustomerIdReportsRecipientsGet-description-404" class="marked"></p>
+                            <h3 id="examples-Email-customersCustomerIdReportsRecipientsGet-title-500"></h3>
+                            <p id="examples-Email-customersCustomerIdReportsRecipientsGet-description-500" class="marked"></p>
                             <script>
-                              var responseEmail404_description = `The customer does not exist.`;
-                              var responseEmail404_description_break = responseEmail404_description.indexOf('\n');
-                              if (responseEmail404_description_break == -1) {
-                                $("#examples-Email-customersCustomerIdReportsRecipientsGet-title-404").text("Status Code: 404 - " + responseEmail404_description);
+                              var responseEmail500_description = `An unknown error occurred trying to process the request.
+
+Return value is not specified but should describe the error.
+`;
+                              var responseEmail500_description_break = responseEmail500_description.indexOf('\n');
+                              if (responseEmail500_description_break == -1) {
+                                $("#examples-Email-customersCustomerIdReportsRecipientsGet-title-500").text("Status Code: 500 - " + responseEmail500_description);
                               } else {
-                                $("#examples-Email-customersCustomerIdReportsRecipientsGet-title-404").text("Status Code: 404 - " + responseEmail404_description.substring(0, responseEmail404_description_break));
-                                $("#examples-Email-customersCustomerIdReportsRecipientsGet-description-404").html(responseEmail404_description.substring(responseEmail404_description_break));
+                                $("#examples-Email-customersCustomerIdReportsRecipientsGet-title-500").text("Status Code: 500 - " + responseEmail500_description.substring(0, responseEmail500_description_break));
+                                $("#examples-Email-customersCustomerIdReportsRecipientsGet-description-500").html(responseEmail500_description.substring(responseEmail500_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-Email-customersCustomerIdReportsRecipientsGet-404" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-Email-customersCustomerIdReportsRecipientsGet-500" class="nav nav-tabs nav-tabs-examples" >
 
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-Email-customersCustomerIdReportsRecipientsGet-404-wrapper" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-Email-customersCustomerIdReportsRecipientsGet-404-schema">
-                                  <div id="responses-Email-customersCustomerIdReportsRecipientsGet-schema-404" class="exampleStyle">
+                            <div class="tab-content" id="responses-Email-customersCustomerIdReportsRecipientsGet-500-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Email-customersCustomerIdReportsRecipientsGet-500-schema">
+                                  <div id="responses-Email-customersCustomerIdReportsRecipientsGet-schema-500" class="exampleStyle">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "The customer does not exist.",
-  "content" : { }
+  "description" : "An unknown error occurred trying to process the request.\n\nReturn value is not specified but should describe the error.\n"
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
                                         if (!schema) {
@@ -2781,14 +2790,14 @@ The customer identifier which is a unique UUID. This identifier is kept unique u
                                         }
 
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-Email-customersCustomerIdReportsRecipientsGet-404-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-Email-customersCustomerIdReportsRecipientsGet-schema-404');
+                                        $('#responses-Email-customersCustomerIdReportsRecipientsGet-500-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Email-customersCustomerIdReportsRecipientsGet-schema-500');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-Email-customersCustomerIdReportsRecipientsGet-404-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-Email-customersCustomerIdReportsRecipientsGet-500-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
                             
