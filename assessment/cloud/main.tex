@@ -73,11 +73,11 @@ Your service must utilise the \texttt{spamhammer} command line tool provided for
 
 \warning{You are not allowed to reimplement or modify this tool.}
 
-This tool is not as magical as it sounds. For the purposes of this assignment, in the API specification you will notice a header that must be included that makes it all the way to the scanner but is not part of the email text. This is a setting which decides whether the email is malicious. Demonstrations are provided in the repository to show how to use the tool to generate your own examples. You must not use this header to simplify the task of scanning the email.
+This tool is not as magical as it sounds. For the purposes of this assignment, in the API specification you will notice the metadata->spamhammer field in the POST body. This is a setting which decides whether the email is malicious and how long processing should take. Demonstrations are provided in the repository to show how to use the tool to generate your own examples. You must not use this field to simplify the task of scanning the email.
 
 \subsection{Similarity}
 
-Dr. Richardson has also provided some advice to help you with filtering through the emails and has suggested that you use a similarity metric to compare the emails to a database of known bad emails. The doctor explains it as ``many of the emails we have seen with our first customers have the same content and structure it is just that the link or `Dear <name>' is slightly different''.
+Dr. Richardson has also provided some advice to help you with filtering through the emails and has suggested that you use a similarity metric to compare the body of emails to previously known bad emails. The doctor explains it as ``many of the emails we have seen with our first customers have the same content and structure it is just that the link or `Dear <name>' is slightly different''.
 
 With this knowledge you have found a common method of getting the difference between documents called the Cosine Similarity which is explained in these videos.
 
@@ -146,9 +146,9 @@ The first submission must include the following in your repository:
 \begin{itemize}
   \item Docker container (Dockerfile) of your implementation of the service API, including the source code and a mechanism to build and run the service.%
   \footnote{If you use external libraries, ensure that you pin the versions to avoid external changes breaking your application.}
-  \item You container will be launched with port 8080 being passed from the container to the testing environment and your service must be available at \texttt{http://localhost:8080/}.
+  \item A \texttt{local.sh} script that can be used to build and run your service locally. Where your container will be launched with port 8080 being passed from the container to the testing environment and your service must be available at \texttt{http://localhost:8080/}.
 \end{itemize}
-We will run your Docker container to test the functionality of your API.
+We will run a suite of tests against your API on this endpoint.
 
 \begin{samepage}
 \noindent
@@ -205,8 +205,6 @@ In this course, you have been shown how to use Docker containers to deploy on EC
 You can reproduce our process for deploying your application using our \link{Docker image}{https://ghcr.io/CSSE6400/csse6400-cloud-testing}:
 \codefile[language=docker]{Dockerfile}{deployment/Dockerfile}
 
-\todo{Update container to latest terraform}
-
 Our steps for deploying your infrastructure using this container are as follows.
 \texttt{\$REPO} is the name of your repository, and
 \texttt{\$CREDENTIALS} is the path where we will store your AWS credentials.
@@ -229,12 +227,11 @@ Quality testing is based upon several likely use case scenarios.
 The scenarios create different scaling requirements.
 
 \subsection{API Functionality} % Pesistence: Does not need to be "truly" persistent.
-40\% of the total marks for the assignment are for correctly implementing the API specification, irrespective of whether it is able to cope with high loads. A suite of automated API tests will assess the correctness of your implementation, via a sequence of API calls. The API test suite will be made available before the functionality due date.
+40\% of the total marks for the assignment are for correctly implementing the API specification, irrespective of whether it is able to cope with high loads. A suite of automated API tests will assess the correctness of your implementation, via a sequence of API calls.
 
 \subsection{Deployed to Cloud} % Persistence working correctly in the cloud.
 25\% of the total marks for the assignment are for deploying a correctly implemented service to AWS irrespective of whether it is able to cope with high loads.
 The deployment will be assessed by running a script that deploys your service to AWS and then runs a suite of automated API tests to assess the correctness of your implementation.
-The script will be provided to you before the deployment checkpoint due date with the API test suite.
 
 \subsection{Scalable Application}\label{sec:scenarios} % Can it scale!
 The remaining 35\% of the marks will be derived from how well your service handles various scenarios.
@@ -284,7 +281,7 @@ Scaling your application to successfully handle the usage scenarios accounts for
 
 The scenarios will evaluate whether your service is being wasteful in resource usage. The amount of resources deployed in your AWS account will be monitored to ensure that your service implements a scaling up emph{and} scaling down procedure.
 
-All stages of the assessment will be marked using automation and a subset of the tests will be released. These tests may consume a \textbf{\emph{significant}} portion of your AWS credit. You are advised to be prudent in how many times you execute these tests. The tests for Functionality and Deployment will be released in their entirety for the checkpoints but the tests for Quality Scenarios will only be released at the Course Coordinators discretion or after the due date.
+All stages of the assessment will be marked using automation and a subset of the tests will be released. These tests may consume a \textbf{\emph{significant}} portion of your AWS credit. You are advised to be prudent in how many times you execute these tests. The amount of tests to be released at the Course Coordinators discretion.
 
 Please refer to the marking criteria at the end of this document.
 
