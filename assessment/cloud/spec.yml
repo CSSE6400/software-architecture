@@ -2,7 +2,9 @@ openapi: 3.0.3
 info:
   title: SpamOverflow
   description: |
-    An API service that 
+    An API service for scanning malicious emails and providing reports on malicious actors, their targets and link domains that are used.
+
+    Notes: It is common for users to have email aliases, for example example@uq.edu.au could have an alias of example+csse6400@uq.edu.au. For the purposes of this assignment we will treat these as seperate email addresses and not the same.
   contact:
     name: CSSE6400
     url: https://csse6400.uqcloud.net
@@ -41,6 +43,10 @@ paths:
       tags:
       - email
       summary: List all submitted emails for a given customer.
+      description: |
+        Returns a list of all emails submitted for the given customer id with the optional filters applied. The limit and offset parameters are used for stepping through blocks of emails / paging through the results. If the offset is greater than the amount of entries that exist then an empty array should be returned.
+
+        All other parameters are used to filter the results and should be applied before the limit and offset parameters. e.g. if 300 emails exists and 200 are labeled as malicious then a request of limit=100 and only_malicious=true should return 100 emails. If the limit is set to 100, offset=200 then the response should be 0 emails (an empty array).
       parameters:
       - name: customer_id
         in: path
@@ -97,7 +103,6 @@ paths:
         description: |
           Only return emails submitted to this email address.
           The email address should be in the format of user@domain.
-          Parsing of emails to remove '+' aliases is not supported and will be treated as a different email address.
         schema:
           type: string
           format: email
@@ -111,7 +116,6 @@ paths:
           type: string
           enum:
             - pending
-            - scanning
             - scanned
             - failed
         example: 'scanned'
@@ -119,7 +123,6 @@ paths:
         in: query
         description: |
           Only return emails that have been flagged as malicious.
-          This will ignore the state parameter and treat it as if it was 'scanned'.
         schema:
           type: boolean
           example: true
@@ -147,7 +150,7 @@ paths:
       - email
       summary: Post a new email scan request.
       description: |
-        If the customer account does not exist, it will be created.
+        If the customer account does not exist, it will be created. The customers ID identifies if the request must have a high priority or not, see the description in the parameters section.
       parameters:
       - name: customer_id
         in: path
@@ -170,7 +173,7 @@ paths:
                 $ref: '#/components/schemas/Email'
         400:
           description: |
-            Body parameter was malformed or invalid.
+            Body/Path parameter was malformed or invalid.
 
             Return value is not specified but should describe the error.
           content: {}
@@ -209,7 +212,7 @@ paths:
                 $ref: '#/components/schemas/Email'
         400:
           description: |
-            Body parameter was malformed or invalid.
+            Body/Path parameter was malformed or invalid.
 
             Return value is not specified but should describe the error.
           content: {}
@@ -226,6 +229,8 @@ paths:
       tags:
       - email
       summary: Get malicious senders of emails.
+      description: |
+        Returns a list of all senders/actors that have atleast 1 email thats flagged as malicious. This report should be kept up to date with a maximum of 5 minutes delay.
       parameters:
       - name: customer_id
         in: path
@@ -279,6 +284,8 @@ paths:
       tags:
       - email
       summary: Get users who have received malicious emails.
+      description: |
+        Returns a list of all recipients who have atleast 1 email thats flagged as malicious. This report should be kept up to date with a maximum of 5 minutes delay.
       parameters:
       - name: customer_id
         in: path
@@ -332,6 +339,8 @@ paths:
       tags:
       - email
       summary: Get the domains that appeared in malicious emails.
+      description: |
+        Returns a report consisting of the link domains found in malicious emails for the given customer. This report should be kept up to date with a maximum of 5 minutes delay.
       parameters:
       - name: customer_id
         in: path
