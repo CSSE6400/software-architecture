@@ -1165,7 +1165,9 @@ ul.nav-tabs {
               <div class="app-desc">Version: 1.0.0</div>
             <hr>
             <div id="app-description" class="app-desc">
-                An API service that
+                <p>An API service for scanning malicious emails and providing reports on malicious actors, their targets and link domains that are used.</p>
+<p>Notes: It is common for users to have email aliases, for example example@uq.edu.au could have an alias of example+csse6400@uq.edu.au. For the purposes of this assignment we will treat these as seperate email addresses and not the same.</p>
+
             </div>
           </div>
         </div>
@@ -1182,7 +1184,10 @@ ul.nav-tabs {
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked"></p>
+                        <p class="marked">Returns a list of all emails submitted for the given customer id with the optional filters applied. The limit and offset parameters are used for stepping through blocks of emails / paging through the results. If the offset is greater than the amount of entries that exist then an empty array should be returned.
+
+All other parameters are used to filter the results and should be applied before the limit and offset parameters. e.g. if 300 emails exists and 200 are labeled as malicious then a request of limit&#x3D;100 and only_malicious&#x3D;true should return 100 emails. If the limit is set to 100, offset&#x3D;200 then the response should be 0 emails (an empty array).
+</p>
                         <p></p>
                         <br />
 
@@ -1364,7 +1369,6 @@ The email address should be in the format of user@domain.
                     <div class="inner description marked">
 Only return emails submitted to this email address.
 The email address should be in the format of user@domain.
-Parsing of emails to remove &#39;+&#39; aliases is not supported and will be treated as a different email address.
 
                     </div>
             </div>
@@ -1408,7 +1412,6 @@ The state should be one of &#39;pending&#39;, &#39;scanned&#39;, &#39;failed&#39
 
                     <div class="inner description marked">
 Only return emails that have been flagged as malicious.
-This will ignore the state parameter and treat it as if it was &#39;scanned&#39;.
 
                     </div>
             </div>
@@ -1765,7 +1768,7 @@ The email identifier that was returned when the request was created.
                             <h3 id="examples-Email-customersCustomerIdEmailsIdGet-title-400"></h3>
                             <p id="examples-Email-customersCustomerIdEmailsIdGet-description-400" class="marked"></p>
                             <script>
-                              var responseEmail400_description = `Body parameter was malformed or invalid.
+                              var responseEmail400_description = `Body/Path parameter was malformed or invalid.
 
 Return value is not specified but should describe the error.
 `;
@@ -1791,7 +1794,7 @@ Return value is not specified but should describe the error.
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "Body parameter was malformed or invalid.\n\nReturn value is not specified but should describe the error.\n",
+  "description" : "Body/Path parameter was malformed or invalid.\n\nReturn value is not specified but should describe the error.\n",
   "content" : { }
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
@@ -1948,7 +1951,7 @@ Return value is not specified but should describe the error.
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked">If the customer account does not exist, it will be created.
+                        <p class="marked">If the customer account does not exist, it will be created. The customers ID identifies if the request must have a high priority or not, see the description in the parameters section.
 </p>
                         <p></p>
                         <br />
@@ -2126,7 +2129,7 @@ $(document).ready(function() {
                             <h3 id="examples-Email-customersCustomerIdEmailsPost-title-400"></h3>
                             <p id="examples-Email-customersCustomerIdEmailsPost-description-400" class="marked"></p>
                             <script>
-                              var responseEmail400_description = `Body parameter was malformed or invalid.
+                              var responseEmail400_description = `Body/Path parameter was malformed or invalid.
 
 Return value is not specified but should describe the error.
 `;
@@ -2152,7 +2155,7 @@ Return value is not specified but should describe the error.
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "Body parameter was malformed or invalid.\n\nReturn value is not specified but should describe the error.\n",
+  "description" : "Body/Path parameter was malformed or invalid.\n\nReturn value is not specified but should describe the error.\n",
   "content" : { }
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
@@ -2253,7 +2256,8 @@ Return value is not specified but should describe the error.
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked"></p>
+                        <p class="marked">Returns a list of all senders/actors that have atleast 1 email thats flagged as malicious. This report should be kept up to date with a maximum of 5 minutes delay.
+</p>
                         <p></p>
                         <br />
 
@@ -2440,7 +2444,8 @@ Return value is not specified but should describe the error.
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked"></p>
+                        <p class="marked">Returns a report consisting of the link domains found in malicious emails for the given customer. This report should be kept up to date with a maximum of 5 minutes delay.
+</p>
                         <p></p>
                         <br />
 
@@ -2627,7 +2632,8 @@ Return value is not specified but should describe the error.
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked"></p>
+                        <p class="marked">Returns a list of all recipients who have atleast 1 email thats flagged as malicious. This report should be kept up to date with a maximum of 5 minutes delay.
+</p>
                         <p></p>
                         <br />
 
