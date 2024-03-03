@@ -23,7 +23,7 @@
 \input{copyright-footer}
 \maketitle
 
-\warning{This document is a draft and is subject to change.}
+%\warning{This document is a draft and is subject to change.}
 
 \section*{Summary}
 In this assignment, you will demonstrate your ability to \textsl{design},
@@ -32,29 +32,38 @@ i.e. a scalable application.
 You are to deloy an API for scanning and filtering spam/malicious emails.
 Specially your application needs to support:
 \begin{itemize}
-    \item Scan an email via an API request.
-    \item Provide access to a specified REST API, e.g. for use by front-end interfaces and internal teams.
-    \item Remain responsive while scanning emails.
+    \item Scanning an email via an API request.
+    \item Providing access to a specified REST API, e.g. for use by front-end interfaces and internal teams.
+    \item Remaining responsive while scanning emails.
 \end{itemize}
 
+\noindent
 Your service will be deployed to AWS and will undergo automated correctness and load-testing to ensure it meets the requirements.
 
 \section{Introduction}
 
-\paragraph{Task}
+%\paragraph{Task}
 For this assignment, you are working for SpamOverflow, a new competitor in the email security space. SpamOverflow uses a microservices based architecture to implement their new malicious email filtering platform. The CEO saw on your resume that you are taking Software Architecture and has assigned you to design and implement a service. This service must be scalable to cope with the anticipated large influx of emails.
 
 \paragraph{Requirements}
-Email filtering software can filter email as it arrives or after. SpamOverflow will implement a service that does not impede the flow of traffic (i.e. does not prevent the email arriving) and gets a API call at receipt of an email. The service then pulls the email from the users inbox as fast as it can to prevent the user from seeing the email or clicking any links.
+Email filtering software can filter email as it arrives or after.
+SpamOverflow will implement a service that does not impede the flow of traffic (i.e. does not prevent the email arriving).
+It will receive an API call when the mail server receives an email message.
+The service then pulls the email from the user's inbox as fast as it can to prevent the user from seeing the malicious email or clicking any links.
 
-Commercial email providers send an API request for each email received, so for optimal performance this service needs to be able to handle a large number of requests in a short period of time to not miss any emails.
+Commercial email providers send an API request for each email received.
+For optimal performance this service needs to be able to handle a large number of requests in a short period of time, so as to not miss any emails.
 
-Since these emails can be dangerous, the service must be able to report that it is bad or good in a timely manner. Though genuine emails that are incorrectly marked as dangerous should be returned to the user as quickly as possible.
+Since these emails can be dangerous, the service must be able to report that it is bad or good in a timely manner.
+Though genuine emails that are incorrectly marked as dangerous should be returned to the user as quickly as possible.
 
-Persistence is an important characteristic of the platform. Customers will want to analyse why emails were flagged after the fact. Upon receiving an email scan request and after filtering, the system must guarantee that the data has been saved to persistent storage before returning a success response.
+Persistence is an important characteristic of the platform.
+Customers will want to analyse why emails were flagged after the fact.
+Upon receiving an email scan request, and after filtering, the system must guarantee that the data has been saved to persistent storage before returning a success response.
 
 \section{Interface}
-As you are operating in a microservices context, other service providers have been given an API specification for your service. They have been developing their services based on this specification so you must match it exactly.
+As you are operating in a microservices context, other service providers have been given an API specification for your service.
+They have been developing their services based on this specification so you must match it \emph{exactly}.
 
 The interface specification is available to all service owners online: 
 
@@ -67,26 +76,37 @@ The following constraints apply to the implementation of your assignment solutio
 
 % Change to be only Dr. Richardson's tool and similarity.
 
-You have been provided with a command line tool called \texttt{spamhammer} that can be used to scan emails for malicious content. This tool is developed by Dr. Richardson who is an AI and Linguistic expert, but the tool has varying performance roughly related to the length of the content. You will have to work around this bottleneck in the design and development of your parts of the system.
+You have been provided with a command line tool called \texttt{spamhammer} that can be used to scan emails for malicious content.
+This tool is developed by Dr. Richardson who is an AI and linguistic expert.
+The tool has varying performance, roughly related to the length of the content.
+You will have to work around this bottleneck in the design and development of your parts of the system.
 
-Your service must utilise the \texttt{spamhammer} command line tool provided for this assignment. The compiled binaries are available in the tool's GitHub repository: \url{https://github.com/CSSE6400/spamhammer}.
+Your service \textbf{must} utilise the \texttt{spamhammer} command line tool provided for this assignment.
+The compiled binaries are available in the tool's GitHub repository: \url{https://github.com/CSSE6400/spamhammer}.
 
-\warning{You are not allowed to reimplement or modify this tool.}
+\warning{You are \textbf{not} allowed to reimplement or modify this tool.}
 
-This tool is not as magical as it sounds. For the purposes of this assignment, in the API specification you will notice the metadata->spamhammer field in the POST body. This is a setting which decides whether the email is malicious and how long processing should take. Demonstrations are provided in the repository to show how to use the tool to generate your own examples. You must not use this field to simplify the task of scanning the email.
+This tool is not as magical as it sounds.
+For the purposes of this assignment, in the API specification you will notice the metadata->spamhammer field in the POST body.
+This is a setting which decides whether the email is malicious and how long processing should take.
+Demonstrations are provided in the repository to show how to use the tool to generate your own examples.
+You \textbf{must} not use this field to simplify the task of scanning the email.
 
 \subsection{Similarity}
 
-Dr. Richardson has also provided some advice to help you with filtering through the emails and has suggested that you use a similarity metric to compare the body of emails to previously known bad emails. The doctor explains it as ``many of the emails we have seen with our first customers have the same content and structure it is just that the link or `Dear <name>' is slightly different''.
+Dr. Richardson has also provided some advice to help you with filtering through the emails.
+She has suggested that you use a similarity metric to compare the body of emails to previously known bad emails.
+The doctor explains it as ``many of the emails we have seen with our first customers have the same content and structure it is just that the link or `Dear <name>' is slightly different''.
 
-With this knowledge you have found a common method of getting the difference between documents called the Cosine Similarity which is explained in these videos.
+With this knowledge you have found a common method of getting the difference between documents called the 
+\link{Cosine Similarity}{https://www.learndatasci.com/glossary/cosine-similarity/} which is explained in these videos.
 
 \begin{itemize}
   \item \url{https://www.youtube.com/watch?v=e9U0QAFbfLI}
   \item \url{https://www.youtube.com/watch?v=Dd16LVt5ct4}
 \end{itemize}
 
-For the purposes of the assignment you may build up a database of known bad emails during the operation of your API. You must only use the body of the email content to compare simularity.
+For the purposes of the assignment you may build up a database of known bad emails during the operation of your API. You must only use the body of the email content to compare similarity.
 
 \info{Dr. Richardson emphasises that the similarity metric is not a replacement for the scanner and is an optional way to improve the efficiency of the system.}
 
@@ -94,14 +114,14 @@ For the purposes of the assignment you may build up a database of known bad emai
 Please make note of the \link{AWS services}
 {https://labs.vocareum.com/web/2460291/1564816.0/ASNLIB/public/docs/lang/en-us/README.html\#services}
 that you can use in the AWS Learner Lab, and the limitations that are placed on the usage of these services.
-To view this page you need to be logged in to your AWS learner lab environment and have a lab open.
+To view this page you need to be logged in to your AWS Learner Lab environment and have a lab open.
 
 \subsection{External Services}
 You may \textbf{not} use services or products from outside of the AWS Learner Lab environment.
 For example, you may not host instances of the \texttt{spamhammer} command line tool on another cloud platform
 (e.g. Google Cloud).
 
-You may \textbf{not} use services or products that run on AWS infrastructure external to your learner lab environment.
+You may \textbf{not} use services or products that run on AWS infrastructure external to your Learner Lab environment.
 For example, you may not deploy a third-party product like MongoDB Atlas on AWS and then use it from your service.
 
 You may \textbf{not} deploy machine learning or GPU backed services.
@@ -142,23 +162,26 @@ If a misconduct case is raised about your submission, a history of regular progr
 Extension requests \textbf{must} be made \emph{prior} to the submission deadline via \link{my.UQ}{https://my.uq.edu.au/}.
 
 Your repository \textbf{must} contain everything required to successfully deploy your application.
-The first submission must include the following in your repository:
+
+\begin{samepage}
+\subsection{API Functionality Submission}
+Your first submission \textbf{must} include the following in your repository:
 \begin{itemize}
   \item Docker container (Dockerfile) of your implementation of the service API, including the source code and a mechanism to build and run the service.%
   \footnote{If you use external libraries, ensure that you pin the versions to avoid external changes breaking your application.}
   \item A \texttt{local.sh} script that can be used to build and run your service locally. Where your container will be launched with port 8080 being passed from the container to the testing environment and your service must be available at \texttt{http://localhost:8080/}.
 \end{itemize}
 We will run a suite of tests against your API on this endpoint.
+\end{samepage}
 
 \begin{samepage}
-\noindent
+\subsection{Deployed to Cloud \& Scalabiliity Submissions}
 The second and third submissions must include all of the following in your repository:
 \begin{itemize}
   \item Your implementation of the service API, including the source code and a mechanism to build the service.%
   \footnote{If you use external libraries, ensure that you pin the versions to avoid external changes breaking your application.}
   \item Terraform code that can provision your service in a fresh AWS environment.
-  \item A \texttt{deploy.sh} script that can use your Terraform code to deploy your application.
-    This script can perform other tasks as required.
+  \item A \texttt{deploy.sh} script that can use your Terraform code to deploy your application. This script \textbf{must} be in the top-level of your repository. This script may perform other tasks as required.
 \end{itemize}
 \end{samepage}
 
@@ -194,8 +217,12 @@ If for some reason you have accidentally associated your GitHub username with th
 If your \texttt{terraform plan} or \texttt{terraform apply} command hangs without any output, check your AWS credentials. Using credentials of an expired Learner Lab session will cause Terraform to hang.
 
 \paragraph{Fresh AWS Learner Lab}
-Your AWS Learner Lab can be reset using the reset button in the Learner Lab toolbar.
+Your AWS Learner Lab can be reset using the reset button in the toolbar.
+
+\noindent
 \includegraphics[width=\textwidth]{images/reset-button.png}
+
+\noindent
 To ensure that you are not accidentally depending on anything specific to your Learner Lab environment, we recommend that you reset your lab prior to final submission. Note that resetting the lab can take a considerable amount of time, in the order of hours. You should do this at \textit{least} 4 to 6 hours before the submission deadline. Please do not wait to the last minute.
 
 \paragraph{Deploying with Docker}
@@ -279,18 +306,41 @@ Deploying your service is worth 25\% of the marks for the assignment. This is ba
 
 Scaling your application to successfully handle the usage scenarios accounts for the other 35\% of the marks. The scenarios described in section \ref{sec:scenarios} provide guidance as to the type of scalability issues your system is expected to handle. They are not literal descriptions of the exact loads that will be used. Tests related to scenarios that involve more complex behaviour will have higher weight than other tests.
 
-The scenarios will evaluate whether your service is being wasteful in resource usage. The amount of resources deployed in your AWS account will be monitored to ensure that your service implements a scaling up emph{and} scaling down procedure.
+The scenarios will evaluate whether your service is being wasteful in resource usage. The amount of resources deployed in your AWS account will be monitored to ensure that your service implements a scaling up \emph{and} scaling down procedure.
 
-All stages of the assessment will be marked using automation and a subset of the tests will be released. These tests may consume a \textbf{\emph{significant}} portion of your AWS credit. You are advised to be prudent in how many times you execute these tests. The amount of tests to be released at the Course Coordinators discretion.
+All stages of the assessment will be marked using automation and a subset of the tests will be released. These tests may consume a \textbf{\emph{significant}} portion of your AWS credit. You are advised to be prudent in how many times you execute these tests. The amount of tests to be released is at the Course Coordinator's discretion.
 
 Please refer to the marking criteria at the end of this document.
 
+\subsubsection{Grade Improvement}\label{sec:improve}
+Improving your application's functionality in a later submission will be used to improve the grade you received for an earlier submission.
+
+\paragraph{Stage 1 Improvement}
+If your stage 1 submission (API Functionality) performs poorly, you may improve your grade for this stage in a later stage.
+This will occur if your deployed stage 2 or 3 submission passes more of the functionality tests than your stage 1 submission.
+This new result will be used to recalculate your grade for stage 1.
+(We will \textbf{not} rerun the local functionality tests in stages 2 or 3. We will \textbf{only} test your deployed application.)
+
+\paragraph{Stage 2 Improvement}
+Similarly, if your deployed stage 3 submission passes more of the functionality tests than your stage 2 submission, this result will be used to recalculate your grade for stage 2.
+
+\paragraph{Late Penalties}
+If an earlier submission was late, the same late penalty will be applied to your improved grade.
+(e.g. If your stage 1 submission was 3 hours late, and in stage 2 your submission's functionality improved from a grade of 4 to a grade of 6,
+your grade for stage 1 would be increased to a 5 after the one grade point per 24 hours penalty was applied.)
+
 \section{Academic Integrity}
-As this is a higher-level course, you are expected to be familiar with the importance of academic integrity in general, and the details of UQ's rules. If you need a reminder, review the \link{Academic Integrity Modules} {https://web.library.uq.edu.au/library-services/it/learnuq-blackboard-help/academic-integrity-modules}. Submissions will be checked to ensure that the work submitted is not plagiarised or of no academic merit.
+As this is a higher-level course, you are expected to be familiar with the importance of academic integrity in general, and the details of UQ's rules.
+If you need a reminder, review the \link{Academic Integrity Modules} {https://web.library.uq.edu.au/library-services/it/learnuq-blackboard-help/academic-integrity-modules}.
+Submissions will be checked to ensure that the work submitted is not plagiarised or of no academic merit.
 
-This is an \textit{individual} assignment. You may \textbf{not} discuss details of approaches to solve the problem with other students in the course. All code that you submit \textbf{must} be your own work. You may \textbf{not} directly copy code that you have found on-line to solve parts of the assignment. If you find ideas from on-line sources (e.g. Stack Overflow), you must \link{cite and reference}{https://web.library.uq.edu.au/node/4221/2} these sources. Use the \link{IEEE referencing style}{https://libraryguides.vu.edu.au/ieeereferencing/gettingstarted} for citations and references. Citations should be included in a comment at the location where the idea is used in your code. All references for citations \textbf{must} be included in a file called \texttt{refs.txt}. This file should be in the root directory of your project.
+This is an \textit{individual} assignment. You may \textbf{not} discuss details of approaches to solve the problem with other students in the course.
+The Grade Improvement rule (section \ref{sec:improve}) means that you may \textbf{not} discuss details of any earlier submission stage with other students
+until \textbf{two weeks} \textit{after} the final submission date of May 3$^{rd}$ (i.e. \textbf{May 20$^{th}$}).
 
-You may use generative AI tools (e.g. copilot) to assist you in writing code to implement your solutions. You may also use generative AI tools to help you test your implementations. You \textbf{must} include, in the root directory of your project, a file called \texttt{AI.md} that indicates the generative AI tools that you used, how you used them, and the extent of their use. (e.g. All code was written by providing copilot with class descriptions and then revising the generated code.)
+All code that you submit \textbf{must} be your own work. You may \textbf{not} directly copy code that you have found on-line to solve parts of the assignment. If you find ideas from on-line sources (e.g. Stack Overflow), you must \link{cite and reference}{https://web.library.uq.edu.au/node/4221/2} these sources. Use the \link{IEEE referencing style}{https://libraryguides.vu.edu.au/ieeereferencing/gettingstarted} for citations and references. Citations should be included in a comment at the location where the idea is used in your code. All references for citations \textbf{must} be included in a file called \texttt{refs.txt}. This file must be in the top-level of your repository.
+
+You may use generative AI tools (e.g. Copilot) to assist you in writing code to implement your solutions. You may also use generative AI tools to help you test your implementations. You \textbf{must} include, in the top-level of your repository, a file called \texttt{AI.md} that indicates the generative AI tools that you used, how you used them, and the extent of their use. (e.g. All code was written by providing copilot with class descriptions and then revising the generated code.)
 
 Uncited or unreferenced material, or unacknowledged use of generative AI tools, will be treated as not being your own work. Significant amounts of cited or acknowledged work from other sources will be considered to be of no academic merit.
 
