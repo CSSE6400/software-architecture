@@ -45,12 +45,14 @@ paths:
       summary: List all submitted emails for a given customer.
       description: |
         Returns a list of all emails submitted for the given customer id with the optional filters applied. The limit and offset parameters are used for stepping through blocks of emails / paging through the results. If the offset is greater than the amount of entries that exist then an empty array should be returned.
+        
+        If there are no emails associated with the given customer id, an empty array should be returned.
 
         All other parameters are used to filter the results and should be applied before the limit and offset parameters. e.g. if 300 emails exists and 200 are labelled as malicious then a request of limit=100 and only_malicious=true should return 100 emails. If limit=100, only_malicious=true, and offset=200 then the response should be 0 emails (an empty array).
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier is a UUIDv4.
+        description: The customer identifier is a <a href="https://datatracker.ietf.org/doc/html/rfc4122">UUIDv4</a>.
         required: true
         schema:
           type: string
@@ -75,7 +77,7 @@ paths:
         in: query
         description: |
           Only return emails submitted from this date.
-          The date should be in RFC3339 format.
+          The date should be in <a href="https://datatracker.ietf.org/doc/html/rfc3339">RFC3339</a> format.
         schema:
           type: string
           format: date-time
@@ -84,7 +86,7 @@ paths:
         in: query
         description: |
           Only return emails submitted before this date.
-          The date should be in RFC3339 format.
+          The date should be in <a href="https://datatracker.ietf.org/doc/html/rfc3339">RFC3339</a> format.
         schema:
           type: string
           format: date-time
@@ -150,11 +152,11 @@ paths:
       - email
       summary: Post a new email scan request.
       description: |
-        If the customer account does not exist, it will be created. The customers ID identifies if the request must have a high priority or not, see the description in the parameters section.
+        If the customer account does not exist, it will be created. The customer's ID identifies if the request must have a high priority or not, see the description in the parameters section.
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier is a UUIDv4 where the first 4 characters represent the customer type. Customers with 1111####-####-####-####-############ are to be treated as high priority while all other valid UUIDv4's will be treated as standard priority.
+        description: The customer identifier is a <a href="https://datatracker.ietf.org/doc/html/rfc4122">UUIDv4</a> where the first 4 characters represent the customer type. Customers with 1111####-####-####-####-############ are to be treated as high priority while all other valid <a href="https://datatracker.ietf.org/doc/html/rfc4122">UUIDv4</a>'s are to be treated as standard priority.
         required: true
         schema:
           type: string
@@ -193,7 +195,7 @@ paths:
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier is a UUIDv4.
+        description: The customer identifier is a <a href="https://datatracker.ietf.org/doc/html/rfc4122">UUIDv4</a>.
         required: true
         schema:
           type: string
@@ -205,7 +207,7 @@ paths:
           type: string
       responses:
         200:
-          description: Information about the requested ticket.
+          description: Information about the requested email message.
           content:
             application/json:
               schema:
@@ -217,7 +219,10 @@ paths:
             Return value is not specified but should describe the error.
           content: {}
         404:
-          description: The email for the customer does not exist. If a customer does not exist for the given customer_id then the response will be a 404.
+          description: |
+            The requested email for the customer does not exist. If a customer does not exist for the given customer_id then the response will be a 404.
+
+            Return value is not specified but should describe the error.
           content: {}
         500:
           description: |
@@ -230,17 +235,17 @@ paths:
       - email
       summary: Get malicious senders of emails.
       description: |
-        Returns a list of all senders/actors that have atleast 1 email thats flagged as malicious. This report should be kept up to date with a maximum of 5 minutes delay.
+        Returns a list of all senders/actors identified as sending at least one email that is flagged as malicious. This report should be kept up-to-date with a maximum of five minutes delay.
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier is a UUIDv4.
+        description: The customer identifier is a <a href="https://datatracker.ietf.org/doc/html/rfc4122">UUIDv4</a>.
         required: true
         schema:
           type: string
       responses:
         200:
-          description: List of all senders/actors that have atleast 1 email thats flagged as malicious.
+          description: List of all senders/actors identified as sending at least one email that is flagged as malicious.
           content:
             application/json:
               schema:
@@ -255,7 +260,7 @@ paths:
                   generated_at:
                     type: string
                     format: date-time
-                    description: The date and time the report was generated in RFC3339. If the report is being made live then this should be the current date and time.
+                    description: The date and time the report was generated in <a href="https://datatracker.ietf.org/doc/html/rfc3339">RFC3339</a> format. If the report is being made live then this should be the current date and time.
                     example: 2024-02-21T13:10:05Z
                   total:
                     type: integer
@@ -263,7 +268,7 @@ paths:
                     minimum: 0
                   data:
                     type: array
-                    description: The list of actors with atleast 1 malicious email.
+                    description: The list of actors identified as sending at least one malicious email.
                     items:
                       type: object
                       properties:
@@ -272,7 +277,7 @@ paths:
                           description: Email address of the sender of malicious email.
                         count:
                           type: integer
-                          description: The number of times this actor has been seen.
+                          description: The number of email messages, which have been identified as malicious, that this actor has sent.
                           minimum: 1
         500:
           description: |
@@ -285,11 +290,11 @@ paths:
       - email
       summary: Get users who have received malicious emails.
       description: |
-        Returns a list of all recipients who have atleast 1 email thats flagged as malicious. This report should be kept up to date with a maximum of 5 minutes delay.
+        Returns a list of all recipients who have received at least one email message that is identified as malicious. This report should be kept up-to-date with a maximum of five minutes delay.
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier is a UUIDv4. 
+        description: The customer identifier is a <a href="https://datatracker.ietf.org/doc/html/rfc4122">UUIDv4</a>. 
         required: true
         schema:
           type: string
@@ -310,7 +315,7 @@ paths:
                   generated_at:
                     type: string
                     format: date-time
-                    description: The date and time the report was generated in RFC3339. If the report is being made live then this should be the current date and time.
+                    description: The date and time the report was generated in <a href="https://datatracker.ietf.org/doc/html/rfc3339">RFC3339</a> format. If the report is being made live then this should be the current date and time.
                     example: 2024-02-21T13:10:05Z
                   total:
                     type: integer
@@ -318,13 +323,13 @@ paths:
                     minimum: 0
                   data:
                     type: array
-                    description: The list of recipients with at least 1 malicious email.
+                    description: The list of recipients who have received at least one email message that is identified as malicious.
                     items:
                       type: object
                       properties:
                         id:
                           type: string
-                          description: Email address of the recipient of malicious email.
+                          description: Email address of the recipient of the malicious email.
                         count:
                           type: integer
                           description: The number of malicious emails identified as being received by this recipient.
@@ -340,17 +345,17 @@ paths:
       - email
       summary: Get the domains that appeared in malicious emails.
       description: |
-        Returns a report consisting of the link domains found in malicious emails for the given customer. This report should be kept up to date with a maximum of 5 minutes delay.
+        Returns a report consisting of the link domains found in malicious emails for the given customer. This report should be kept up-to-date with a maximum of five minutes delay.
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier is a UUIDv4.
+        description: The customer identifier is a <a href="https://datatracker.ietf.org/doc/html/rfc4122">UUIDv4</a>.
         required: true
         schema:
           type: string
       responses:
         200:
-          description: A report consisting of the link domains found in malicious emails for the given customer.
+          description: A report consisting of the link domains found in email messages that were identified as being malicious, for the given customer.
           content:
             application/json:
               schema:
@@ -367,7 +372,7 @@ paths:
                   generated_at:
                     type: string
                     format: date-time
-                    description: The date and time the report was generated in RFC3339. If the report is being made live then this should be the current date and time.
+                    description: The date and time the report was generated in <a href="https://datatracker.ietf.org/doc/html/rfc3339">RFC3339</a> format. If the report is being made live then this should be the current date and time.
                     example: 2024-02-21T13:10:05Z
                   total:
                     type: integer
@@ -375,16 +380,16 @@ paths:
                     minimum: 0
                   data:
                     type: array
-                    description: The list of domains which were contained in suspicious emails.
+                    description: The list of domains which were contained in email messages that were identified as being malicious.
                     items:
                       type: object
                       properties:
                         id:
                           type: string
-                          description: The domain found in a suspicious email.
+                          description: The domain found in at least one email message that was identified as being malicious.
                         count:
                           type: integer
-                          description: The number of times this domain has been seen.
+                          description: The number of times this domain has been seen in email messages that were identified as being malicious.
                           minimum: 1
         500:
           description: |
@@ -399,7 +404,7 @@ components:
       properties:
         id:
           type: string
-          description: Unique identifier.
+          description: The email message's unique identifier. This is generated by the email scanning service.
         created_at:
           type: string
           format: date-time
@@ -471,12 +476,12 @@ components:
             to:
               type: string
               format: email
-              description: The email address the email was sent to.
+              description: The email address <strong>to</strong> which the email was sent.
               example: "no-reply@uq.edu.au"
             from:
               type: string
               format: email
-              description: The email address the email was sent from.
+              description: The email address <strong>from</strong> which the email was sent.
               example: "support@uq.edu.au"
             subject:
               type: string
