@@ -3,7 +3,7 @@
 \usepackage{languages}
 
 \title{Getting Started with the Cloud}
-\author{Brae Webb \& Richard Thomas}
+\author{Brae Webb \& Richard Thomas \& Evan Hughes}
 
 \date{\week[practical]{4}}
 \begin{document}
@@ -352,11 +352,19 @@ terraform {
 provider "aws" {
     region = "us-east-1"
     shared_credentials_files = ["./credentials"]
+    default_tags {
+        tags = {
+            Environment = "Dev"
+            Course      = "CSSE6400"
+            StudentID   = "<Your Student ID>"
+        }
+  }
 }
 \end{code}
 
 The \texttt{terraform} block specifies the required external dependencies, here we need to use the AWS provider above version 5.0.
 The \texttt{provider} block configures the AWS provider, instructing it which region to use and how to authenticate (using the credentials file we created).
+We also include some \texttt{tags} to add to any resource made by this provider, these are useful for keeping track of resources in the console.
 
 \item We need to initialise Terraform which will download the required dependencies.
     This is done with the \texttt{terraform init} command.
@@ -386,7 +394,7 @@ Add the following basic resource to \texttt{main.tf}:
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
 resource "aws_instance" "hextris-server" {
-    ami           = "ami-005f9685cb30f234b"
+    ami           = "ami-0e731c8a588258d0d"
     instance_type = "t2.micro"
     key_name      = "vockey"
     
@@ -411,7 +419,7 @@ Terraform will perform the following actions:
 
   # aws_instance.hextris-server will be created
   + resource "aws_instance" "hextris-server" {
-      + ami                                  = "ami-005f9685cb30f234b"
+      + ami                                  = "ami-0e731c8a588258d0d"
       (omitted)
       + instance_type                        = "t2.micro"
       (omitted)
@@ -632,6 +640,62 @@ please try to do so.
 If you are repeatedly not passing the practicals,
 we may reach out to ensure that you are not being left behind in the content.
 
+\section{Extension}
+
+\info{This section is for students who have completed the practical and want to extend their knowledge.}
+
+Since CSSE6400 has to run this practical every year sometimes the AMI that we were using is out of date or doesnt exist anymore. For this practicle we could instead query amazon for the latest AMI and use that in our terraform.
+
+To do this we introduce a new data source, \texttt{aws\_ami}. Data sources fetch or query data from the provider rather than creating something.
+
+Add the following to your \texttt{main.tf} file:
+
+\begin{code}[language=terraform,numbers=none]{}
+data "aws_ami" "latest" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023*"]
+  }
+
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+}
+\end{code}
+
+This data source will find the latest Amazon Linux 2023 AMI for 64bit which our EC2 is running on.
+
+To use the data source we need to change the \texttt{ami} attribute of the \texttt{aws\_instance} resource to use the data source. This is done as so:
+
+\begin{code}[language=terraform,numbers=none]{}
+resource "aws_instance" "hextris-server" {
+  ami           = data.aws_ami.latest.id
+  instance_type = "t2.micro"
+  key_name      = "vockey"
+  security_groups = [aws_security_group.hextris-server.name]
+  user_data = file("./serve-hextris.sh")
+
+  tags = {
+    Name = "hextris"
+  }
+}
+\end{code}
+
+And now if we run terraform plan we will see that it wants to destory and recreate the EC2 instance. This is because the AMI has changed since this prac was first updated for this year!.
 
 \bibliographystyle{ieeetr}
 \bibliography{regions,hextris,ours,books}
