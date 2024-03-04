@@ -2,7 +2,9 @@ openapi: 3.0.3
 info:
   title: SpamOverflow
   description: |
-    An API service that 
+    An API service for scanning malicious emails and providing reports on malicious actors, their targets, and link domains that are used.
+
+    Notes: It is common for users to have email aliases, e.g. example@uq.edu.au could have an alias of example+csse6400@uq.edu.au. For the purposes of this assignment we will treat these as separate email addresses and not the same.
   contact:
     name: CSSE6400
     url: https://csse6400.uqcloud.net
@@ -41,6 +43,12 @@ paths:
       tags:
       - email
       summary: List all submitted emails for a given customer.
+      description: |
+        Returns a list of all emails submitted for the given customer id with the optional filters applied. The limit and offset parameters are used for stepping through blocks of emails / paging through the results. If the offset is greater than the amount of entries that exist then an empty array should be returned.
+        
+        If there are no emails associated with the given customer id, an empty array should be returned.
+
+        All other parameters are used to filter the results and should be applied before the limit and offset parameters. e.g. if 300 emails exists and 200 are labelled as malicious then a request of limit=100 and only_malicious=true should return 100 emails. If limit=100, only_malicious=true, and offset=200 then the response should be 0 emails (an empty array).
       parameters:
       - name: customer_id
         in: path
@@ -97,7 +105,6 @@ paths:
         description: |
           Only return emails submitted to this email address.
           The email address should be in the format of user@domain.
-          Parsing of emails to remove '+' aliases is not supported and will be treated as a different email address.
         schema:
           type: string
           format: email
@@ -111,7 +118,6 @@ paths:
           type: string
           enum:
             - pending
-            - scanning
             - scanned
             - failed
         example: 'scanned'
@@ -119,7 +125,6 @@ paths:
         in: query
         description: |
           Only return emails that have been flagged as malicious.
-          This will ignore the state parameter and treat it as if it was 'scanned'.
         schema:
           type: boolean
           example: true
@@ -147,11 +152,11 @@ paths:
       - email
       summary: Post a new email scan request.
       description: |
-        If the customer account does not exist, it will be created.
+        If the customer account does not exist, it will be created. The customer's ID identifies if the request must have a high priority or not, see the description in the parameters section.
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier is a UUIDv4 where the first 4 characters represent the customer type. Customers with 1111####-####-####-####-############ are to be treated as high priority while all other valid UUIDv4's will be treated as standard priority.
+        description: The customer identifier is a UUIDv4 where the first 4 characters represent the customer type. Customers with 1111####-####-####-####-############ are to be treated as high priority while all other valid UUIDv4's are to be treated as standard priority.
         required: true
         schema:
           type: string
@@ -170,7 +175,7 @@ paths:
                 $ref: '#/components/schemas/Email'
         400:
           description: |
-            Body parameter was malformed or invalid.
+            Body/Path parameter was malformed or invalid.
 
             Return value is not specified but should describe the error.
           content: {}
@@ -202,19 +207,22 @@ paths:
           type: string
       responses:
         200:
-          description: Information about the requested ticket.
+          description: Information about the requested email message.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Email'
         400:
           description: |
-            Body parameter was malformed or invalid.
+            Body/Path parameter was malformed or invalid.
 
             Return value is not specified but should describe the error.
           content: {}
         404:
-          description: The email for the customer does not exist. If a customer does not exist for the given customer_id then the response will be a 404.
+          description: |
+            The requested email for the customer does not exist. If a customer does not exist for the given customer_id then the response will be a 404.
+
+            Return value is not specified but should describe the error.
           content: {}
         500:
           description: |
@@ -226,6 +234,8 @@ paths:
       tags:
       - email
       summary: Get malicious senders of emails.
+      description: |
+        Returns a list of all senders/actors identified as sending at least one email that is flagged as malicious. This report should be kept up-to-date with a maximum of five minutes delay.
       parameters:
       - name: customer_id
         in: path
@@ -235,7 +245,7 @@ paths:
           type: string
       responses:
         200:
-          description: List of all senders/actors that have atleast 1 email thats flagged as malicious.
+          description: List of all senders/actors identified as sending at least one email that is flagged as malicious.
           content:
             application/json:
               schema:
@@ -250,7 +260,7 @@ paths:
                   generated_at:
                     type: string
                     format: date-time
-                    description: The date and time the report was generated in RFC3339. If the report is being made live then this should be the current date and time.
+                    description: The date and time the report was generated in RFC3339 format. If the report is being made live then this should be the current date and time.
                     example: 2024-02-21T13:10:05Z
                   total:
                     type: integer
@@ -258,7 +268,7 @@ paths:
                     minimum: 0
                   data:
                     type: array
-                    description: The list of actors with atleast 1 malicious email.
+                    description: The list of actors identified as sending at least one malicious email.
                     items:
                       type: object
                       properties:
@@ -267,7 +277,7 @@ paths:
                           description: Email address of the sender of malicious email.
                         count:
                           type: integer
-                          description: The number of times this actor has been seen.
+                          description: The number of email messages, which have been identified as malicious, that this actor has sent.
                           minimum: 1
         500:
           description: |
@@ -279,6 +289,8 @@ paths:
       tags:
       - email
       summary: Get users who have received malicious emails.
+      description: |
+        Returns a list of all recipients who have received at least one email message that is identified as malicious. This report should be kept up-to-date with a maximum of five minutes delay.
       parameters:
       - name: customer_id
         in: path
@@ -303,7 +315,7 @@ paths:
                   generated_at:
                     type: string
                     format: date-time
-                    description: The date and time the report was generated in RFC3339. If the report is being made live then this should be the current date and time.
+                    description: The date and time the report was generated in RFC3339 format. If the report is being made live then this should be the current date and time.
                     example: 2024-02-21T13:10:05Z
                   total:
                     type: integer
@@ -311,13 +323,13 @@ paths:
                     minimum: 0
                   data:
                     type: array
-                    description: The list of recipients with at least 1 malicious email.
+                    description: The list of recipients who have received at least one email message that is identified as malicious.
                     items:
                       type: object
                       properties:
                         id:
                           type: string
-                          description: Email address of the recipient of malicious email.
+                          description: Email address of the recipient of the malicious email.
                         count:
                           type: integer
                           description: The number of malicious emails identified as being received by this recipient.
@@ -332,6 +344,8 @@ paths:
       tags:
       - email
       summary: Get the domains that appeared in malicious emails.
+      description: |
+        Returns a report consisting of the link domains found in malicious emails for the given customer. This report should be kept up-to-date with a maximum of five minutes delay.
       parameters:
       - name: customer_id
         in: path
@@ -341,7 +355,7 @@ paths:
           type: string
       responses:
         200:
-          description: A report consisting of the link domains found in malicious emails for the given customer.
+          description: A report consisting of the link domains found in email messages that were identified as being malicious, for the given customer.
           content:
             application/json:
               schema:
@@ -358,7 +372,7 @@ paths:
                   generated_at:
                     type: string
                     format: date-time
-                    description: The date and time the report was generated in RFC3339. If the report is being made live then this should be the current date and time.
+                    description: The date and time the report was generated in RFC3339 format. If the report is being made live then this should be the current date and time.
                     example: 2024-02-21T13:10:05Z
                   total:
                     type: integer
@@ -366,16 +380,16 @@ paths:
                     minimum: 0
                   data:
                     type: array
-                    description: The list of domains which were contained in suspicious emails.
+                    description: The list of domains which were contained in email messages that were identified as being malicious.
                     items:
                       type: object
                       properties:
                         id:
                           type: string
-                          description: The domain found in a suspicious email.
+                          description: The domain found in at least one email message that was identified as being malicious.
                         count:
                           type: integer
-                          description: The number of times this domain has been seen.
+                          description: The number of times this domain has been seen in email messages that were identified as being malicious.
                           minimum: 1
         500:
           description: |
@@ -390,7 +404,7 @@ components:
       properties:
         id:
           type: string
-          description: Unique identifier.
+          description: The email message's unique identifier. This is generated by the email scanning service when the scan request is submitted.
         created_at:
           type: string
           format: date-time
@@ -408,12 +422,12 @@ components:
             to:
               type: string
               format: email
-              description: The email address the email was sent to.
+              description: The email address <strong>to</strong> which the email was sent.
               example: "no-reply@uq.edu.au"
             from:
               type: string
               format: email
-              description: The email address the email was sent from.
+              description: The email address <strong>from</strong> which the email was sent.
               example: "support@uq.edu.au"
             subject:
               type: string
@@ -462,12 +476,12 @@ components:
             to:
               type: string
               format: email
-              description: The email address the email was sent to.
+              description: The email address <strong>to</strong> which the email was sent.
               example: "no-reply@uq.edu.au"
             from:
               type: string
               format: email
-              description: The email address the email was sent from.
+              description: The email address <strong>from</strong> which the email was sent.
               example: "support@uq.edu.au"
             subject:
               type: string
@@ -476,4 +490,4 @@ components:
             body:
               type: string
               description: The body of the email.
-              example: "Dear customer,\nwe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au?userId=uqehugh3) to reset your password."
+              example: "Dear customer,\nWe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au?userId=uqehugh3) to reset your password."
