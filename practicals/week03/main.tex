@@ -476,22 +476,22 @@ RUN apt-get update && apt-get install -y python3 python3-pip postgresql-client l
 \end{code}
 
 The above image is what your local environment may have been like when you started the course.
-To follow the same setup as we have had in the practicals let's install pipenv.
+To follow the same setup as we have had in the practicals let's install poetry.
 We can do this by adding the following line to our Dockerfile:
 
 \begin{code}[language=docker,numbers=none]{}
-# Install pipenv
+# Install poetry
 RUN pip3 install poetry
 \end{code}
 
 Let's now change our working directory to \texttt{/app} and copy our \texttt{Pipfile} and \texttt{Pipfile.lock} into the container.
-We can then install our dependencies using pipenv.
+We can then install our dependencies using poetry.
 
 \begin{code}[language=docker,numbers=none]{}
 # Setting the working directory
 WORKDIR /app
 
-# Install pipenv dependencies
+# Install poetry dependencies
 COPY pyproject.toml ./
 RUN poetry install --no-root
 \end{code}
@@ -519,11 +519,11 @@ We should now have a complete Dockerfile, as shown below:
   FROM ubuntu:22.04
   # Installing dependencies for running a python application
   RUN apt-get update && apt-get install -y python3 python3-pip postgresql-client libpq-dev
-  # Install pipenv
+  # Install poetry
   RUN pip3 install poetry
   # Setting the working directory
   WORKDIR /app
-  # Install pipenv dependencies
+  # Install poetry dependencies
   COPY pyproject.toml ./
   RUN poetry install --no-root
   # Copying our application into the container
@@ -675,11 +675,11 @@ Earlier we mentioned that you can use language specific base images for your app
 
 \begin{code}[language=docker,numbers=none]{}
 FROM python:3.10
-# Install pipenv
+# Install poetry
 RUN pip3 install poetry
 # Setting the working directory
 WORKDIR /app
-# Install pipenv dependencies
+# Install poetry dependencies
 COPY pyproject.toml ./
 RUN poetry install --no-root
 # Copying our application into the container
