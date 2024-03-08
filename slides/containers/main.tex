@@ -1,7 +1,7 @@
 \documentclass{slide}
 % \usepackage{pgfpages}
 
-% \setbeameroption{show notes on second screen}
+%\setbeameroption{show notes on second screen}
 
 \usepackage{tikz}
 \usetikzlibrary{backgrounds}
@@ -89,7 +89,7 @@ print(sum(int(x) for x in duplicated_max))
 /usr/bin/env: 'python3': No such file or directory
     \end{code}
     \pause
-    No Python interpretter installed,
+    No Python interpreter installed,
     have to install Python and all it's dependencies.
 \end{frame}
 
@@ -193,12 +193,18 @@ ModuleNotFoundError: No module named 'numpy'
     \begin{code}[numbers=none]{}
 > mkdir ./jail
 > cd jail
+> chroot . /bin/ls
+chroot: failed to run command '/bin/ls': No such file or directory
 > mkdir bin
 > cp /bin/ls bin
 > chroot . /bin/ls
 chroot: failed to run command '/bin/ls': No such file or directory
     \end{code}
 \end{frame}
+\note[itemize]{
+    \item First chroot -- Doesn't exist from our new root.
+    \item Second chroot -- Exists but it can't find files on which ls depends.
+}
 
 \begin{frame}[fragile]{Exploring \highlight{chroot}}
     \vspace{-0.5em}
@@ -228,6 +234,11 @@ bin  lib  lib64
 ls
     \end{code}
 \end{frame}
+\note[itemize]{
+    \item ldd -- Lists dependencies
+    \item cp -- Copy dependencies
+    \item ls -- Show that these are now within our directory.
+}
 
 \begin{frame}[fragile]{Chroot Limitations}
     {\LARGE
@@ -242,6 +253,11 @@ ls
     \end{itemize}
     }
 \end{frame}
+\note[itemize]{
+    \item Can now run chroot . /bin/ls -- Everything is available from new root.
+    \item Second chroot -- Shows that it considers our directory to be the root.
+    \item Third chroot -- Shows we can't go to a parent directory.
+}
 
 
 \begin{frame}{1992}
@@ -251,10 +267,10 @@ ls
     \href{https://www.bell-labs.com/institute/blog/plan-9-bell-labs-cyberspace/}{
     \includegraphics[width=\textwidth]{images/plan9}
 }
-\note{
-Image shows members of the Bell Labs Computing Techniques Research Department, which developed Plan 9:
-(foreground, from left) Dennis Ritchie, Dave Presotto, Rob Pike,
-(background, from left) Tom Killian, Allen Eisdorfer, Tom Duff, Phil Winterbottom, Jim McKie, Howard Trickey and Sean Dorward.
+\note[itemize]{
+    \item Image shows members of the Bell Labs Computing Techniques Research Department, which developed Plan 9:
+    \item (foreground, from left) Dennis Ritchie, Dave Presotto, Rob Pike,
+    \item (background, from left) Tom Killian, Allen Eisdorfer, Tom Duff, Phil Winterbottom, Jim McKie, Howard Trickey and Sean Dorward.
 }
     \end{center}
     \end{column}
@@ -271,8 +287,8 @@ Image shows members of the Bell Labs Computing Techniques Research Department, w
 
 \point[Layered filesystem]{
     \begin{itemize}
-        \item Projection on \highlight{read}.
-        \item Copy on \highlight{write}.
+        \item Projection on \highlight{read}
+        \item Copy on \highlight{write}
     \end{itemize}
 }
 
@@ -300,6 +316,13 @@ Image shows members of the Bell Labs Computing Techniques Research Department, w
 passwords.txt help.md diary.md
 \end{code}
 \end{frame}
+\note[itemize]{
+    \item Two layers, and a projection giving us the perspective of a single merged layer.
+    \item Lower layer is \textbf{\textit{read}} only.
+}
+\note{
+    
+}
 
 \begin{frame}[fragile]{Copy on \highlight{write}}
 \begin{code}[numbers=none]{}
@@ -326,6 +349,11 @@ passwords.txt help.md diary.md
    \end{tikzpicture}
     \end{center}
 \end{frame}
+\note[itemize]{
+    \item Two layers:
+    \item ~~Write to `passwords.txt' in the upper layer.
+    \item ~~Leave `passwords.txt' in the lower layer unchanged.
+}
 
 \point[demo]{Exploring a \highlight{layered filesystem}}
 
@@ -401,8 +429,7 @@ password1234
     \end{column}
     \end{columns}
 \end{frame}
-
-\note{First to utilize namespaces, didn't require linux patches}
+\note{First to utilize namespaces, didn't require Linux patches}
 
 \begin{frame}{2013}
     \begin{columns}
@@ -439,13 +466,11 @@ password1234
 \definition{Container Image}{
     A set of files that can be used to \highlight{create a container}.
 }
-
 \note{
-    The mount point for starting containers.
-
-    In Docker and rkt the image is just a collection of layers.
-    i.e. lower, and upper, repeatedly stacked ontop of themselves.
-    In LTX it is just one layer.
+    The mount point for starting containers.\\
+    In Docker and rkt the image is just a collection of layers.\\
+    i.e. lower, and upper, repeatedly stacked on top of themselves.\\
+    In LXC it is just one layer.
 }
 
 \begin{frame}[fragile]{Container Image}
@@ -480,7 +505,7 @@ bin   dev  home  lib64  mnt  proc  run   srv
     \begin{itemize}
         \item Docker
         \item rkt
-        \item LCX
+        \item LXC
         \item runC
         \item Containerd
         \item CRI-O
@@ -489,34 +514,39 @@ bin   dev  home  lib64  mnt  proc  run   srv
 }
 
 \point[Creating a container image]{
+    \vspace{3mm}
     To create a container image,
     we need to \highlight{create a collection of image layers}.
 
+    \vspace{3mm}
     Fortunately, this is no longer a manual process...
     \pause
     
-    Instead we use \highlight{build file}, or image blueprints.
+    \vspace{3mm}
+    Instead we use a \highlight{build file}, or image blueprints.
 }
 
 \definition{Build File}{
-    A file of the \highlight{instructions} for \highlight{creating a container image}.
+    File containing the \highlight{instructions} for \highlight{creating a container image}.
 }
 
 \begin{frame}[fragile]{Build File}
-    \begin{code}[language=docker]{Dockerfile}
+\begin{code}[language=docker]{Dockerfile}
 FROM ubuntu
 RUN apt-get update 
 RUN apt-get install -y cowsay
 CMD ["/usr/games/cowsay", "Hello World"]
-    \end{code}
-    \pause
-    \begin{code}[numbers=none]{}
+\end{code}
+
+\pause
+\begin{code}[numbers=none]{}
 > docker build -t cowsay .
-    \end{code}
-    \pause
-    \begin{code}[numbers=none]{}
+\end{code}
+
+\pause
+\begin{code}[numbers=none]{}
 > docker run cowsay
-    \end{code}
+\end{code}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -725,9 +755,10 @@ CMD ["/usr/games/cowsay", "Hello World"]
 }
 
 \point[Combined Use Cases]{
-    \Large
+%    \Large
     Often virtual machines and containers are \highlight{combined}.
 
+    \vspace{1em}
     e.g. If you deploy containers on Google Kubernetes Engine, the containers run inside of virtual machines on Google's hardware.
 }
 
