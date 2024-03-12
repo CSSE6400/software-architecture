@@ -2,9 +2,9 @@
 
 \usepackage{changepage}
 \usepackage{tabto}
-% \usepackage{pgfpages}
+%\usepackage{pgfpages}
 
-% \setbeameroption{show notes on second screen}
+%\setbeameroption{show notes on second screen}
 
 \title{Service-Based Architecture}
 \subtitle{Software Architecture}
@@ -16,7 +16,7 @@
 \maketitle
 
 \definition{Distributed System}{A system with multiple components located on different machines that communicate and coordinate actions in order to appear as a single coherent system to the end-user.}
-\note{Introduce idea of distributed systems and then move on to service-based being an simple approach.}
+\note{Introduce idea of distributed systems and then move on to service-based being a simple approach.}
 
 \point[Quote]{A distributed system is one in which the failure of a computer you didn't even know existed can render your own computer unusable.\\
  ~~~~~ -- Leslie Lamport [Turing Award, 2013]}
@@ -60,7 +60,10 @@ Functionality is delivered through a user interface that interacts with the doma
 
 \definition{Façade Design Pattern}{Provide a simple, abstract interface to use a service domain's functionality.
 A component within the service coordinates how to deliver the requested functionality with the service's internal components.}
-\note{Summarise Façade Design Pattern and how it is used in a service-based architecture. Mention its from the GoF book.}
+\note[itemize]{
+    \item Summarise Façade Design Pattern and how it is used in a service-based architecture.
+    \item Mention its from the GoF book.
+}
 
 \definition{Independent Service Principle}{Services should be independent, with no dependencies on other services.}
 \note[itemize]{
@@ -93,7 +96,12 @@ A component within the service coordinates how to deliver the requested function
 \begin{frame}{Separate Databases}
 \end{frame}
 }
-\note{Discuss options of separate DB servers, share DBs on one server, DBs embedded in application.}
+\note[itemize]{
+    \item Discuss options of
+    \item ~~~separate DB servers,
+    \item ~~~multiple DBs on one server,
+    \item ~~~DBs embedded in application.
+}
 
 \begin{frame}{Separate UIs}
     \begin{adjustwidth}{-5mm}{-5mm}
@@ -103,7 +111,8 @@ A component within the service coordinates how to deliver the requested function
 \end{frame}
 \note[itemize]{
     \item UI Platform could be desktop, web or mobile app.
-    \item This allows multiple concurrent users, even through one user interface.
+    \item Allows multiple concurrent users, even through one user interface.
+    \item Allows separate UIs for different clients or roles.
 }
 
 \begin{frame}{Sahara: Context Diagram}
@@ -163,12 +172,13 @@ A component within the service coordinates how to deliver the requested function
     \item Review Domain Services in context of the overall system.
     \item Mobile App relationships not shown to reduce clutter.
     \item Single DB for simplicity of diagram, not good practice. Should be split.
-    \item Cart needs to be shared with Browsing \& Purchasing.
-    \item Order needs to be shared with Purchasing \& Fulfilment.
-    \item Product needs to be shared with everything except Account Management.
-    \item User needs to be shared with almost everything.
-    \item Most of these will be query only, or only locking a single row of some tables.
+    \item Cart shared with Browsing \& Purchasing.
+    \item Order shared with Purchasing \& Fulfilment.
+    \item Product shared with everything except Account Mgt.
+    \item User shared with almost everything.
+    \item Most of these will be query only, or only locking a single row.
     \item Repeat idea that Service APIs mean you may have multiple UIs (Web, Mobile, Inventory Apps).
+    \item Inventory app is example of completely separate UI delivery a different app.
 }
 
 \begin{frame}{Sahara: Product Browsing Component Diagram}
@@ -214,7 +224,7 @@ A component within the service coordinates how to deliver the requested function
 \end{frame}
 \note[itemize]{
     \item UI Platform could be desktop, web or mobile app.
-    \item This allows multiple concurrent users, even through one user interface.
+    \item Allows multiple concurrent users, even through one user interface.
 }
 
 \begin{frame}{Sahara: Concurrent Access}
@@ -250,11 +260,12 @@ A component within the service coordinates how to deliver the requested function
 \end{frame}
 
 %Failure Issues
-%Failure is the defining difference between distributed and local programming, so you have to design distributed systems with the expectation of failure. Imagine asking people, "If the probability of something happening is one in 1013, how often would it happen?" Common sense would be to answer, "Never." That is an infinitely large number in human terms. But if you ask a physicist, she would say, "All the time. In a cubic foot of air, those things happen all the time."
+%Failure is the defining difference between distributed and local programming, so you have to design distributed systems with the expectation of failure. Imagine asking people, "If the probability of something happening is one in 10^13, how often would it happen?" Common sense would be to answer, "Never." That is an infinitely large number in human terms. But if you ask a physicist, she would say, "All the time. In a cubic foot of air, those things happen all the time."
 %
 %When you design distributed systems, you have to say, "Failure happens all the time." So when you design, you design for failure. It is your number one concern. What does designing for failure mean? One classic problem is partial failure. If I send a message to you and then a network failure occurs, there are two possible outcomes. One is that the message got to you, and then the network broke, and I just didn't get the response. The other is the message never got to you because the network broke before it arrived.
 %
 %So if I never receive a response, how do I know which of those two results happened? I cannot determine that without eventually finding you. The network has to be repaired or you have to come up, because maybe what happened was not a network failure but you died. How does this change how I design things? For one thing, it puts a multiplier on the value of simplicity. The more things I can do with you, the more things I have to think about recovering from.
+% -- Ken Arnold
 % -- https://www.artima.com/articles/designing-distributed-systems
 
 \begin{frame}{API Layer}
@@ -279,17 +290,27 @@ A component within the service coordinates how to deliver the requested function
         \item Allows service discovery
         \begin{itemize}
             \Large\item Interface to register service
+            \vspace{1mm}
             \Large\item Clients can find out what services are available
         \end{itemize}
     \end{itemize}
     }
 \end{frame}
+\note[itemize]{
+    \item \textbf{Reverse proxy} hides internal network structure of architecture.
+    \item Can expose different interfaces to external \& internal systems.
+    \item Facilitates delivering the security principle of least privilege.
+    \item \textbf{Gateway} adds ``intelligence'' to the reverse proxy.
+    \item Can process requests \& responses.
+    \item Orchestrate or aggregate requests / responses to improve performance.
+    \item Translate protocols.
+}
 
 \begin{frame}{Pros \& Cons}
     \vspace{1mm}
     {\LARGE
     \begin{description}
-        \item[Simplicity] For a distributed system \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item[Simplicity] \textit{For a distributed system} \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
         \item[Modularity] Services \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
         \item[Extensibility] New services \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
         \item[Deployability] Independent services \tabto{15em}\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}

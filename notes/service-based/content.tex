@@ -10,7 +10,8 @@ Service-based architecture is one of the simpler, but still flexible, distribute
 It provides good support for delivering quality attributes of modularity, availability, deployability, and simplicity (in the context of a distributed system).
 The key characteristic of a service-based architecture is that it uses domain partitioning, and each domain becomes its own distributed service.
 This partitioning provides high-level modularisation that helps ensure the domain partitions are independent of each other.
-The distribution of domains means that multiple instances of a service can be made available through a load balancer,
+The distribution of domains means that multiple instances of a service can be made available through a 
+\link{load balancer}{https://www.cloudflare.com/en-gb/learning/performance/what-is-load-balancing/},
 providing better availability and some level of scalability.
 
 Many medium-sized bespoke systems\footnote{\emph{Bespoke systems} are custom designed and built for a single organisation.}
@@ -20,7 +21,7 @@ Product Purchasing, Product Fulfilment, Inventory Management, and Customer Accou
 Each of these could be independent distributed services that use a shared database.
 
 \vspace{2mm}
-\begin{definition}[Service-based Architecture]
+\begin{definition}[Service-Based Architecture]
     The system is partitioned into business domains that are deployed as distributed services.\\
     Functionality is delivered through a user interface that interacts with the domain services.
 \end{definition}
@@ -57,7 +58,7 @@ remote method invocation, \link{SOAP}{https://www.w3schools.com/xml/xml_soap.asp
 To reduce coupling between the user interface and the service APIs, and to provide easier extensibility, the user interface often uses a
 \link{service locator design pattern}{https://www.baeldung.com/java-service-locator-pattern} to manage access to the services%
 \footnote{Martin Fowler provides good commentary about using the service locator pattern at \url{https://martinfowler.com/articles/injection.html\#UsingAServiceLocator}.
-He expands further on some tradeoffs of the pattern than other more superficial descriptions of the pattern.}.
+He expands further on some tradeoffs of the pattern, than other more superficial descriptions of the pattern.}.
 This provides a registry of the services and the details of the API of each service.
 The user interface uses the registry to retrieve an object that communicates with a service through its API.
 This also makes it easier to add new services to the application, as the details of the new service are encapsulated in the registry.
@@ -231,7 +232,8 @@ It also shows that service APIs can be used to allow multiple user interfaces to
 
 It is possible to place an API layer between the user interface and the services,
 as shown in figure \ref{fig:api-layer}.
-The API layer is a reverse proxy or gateway that provides access to the services,
+The API layer is a \link{reverse proxy}{https://www.cloudflare.com/en-gb/learning/cdn/glossary/reverse-proxy/}
+or \link{gateway}{https://www.baeldung.com/cs/api-gateway-vs-reverse-proxy} that provides access to the services,
 while hiding details of the services.
 
 \begin{figure}[h!]
@@ -244,6 +246,11 @@ while hiding details of the services.
 If any domain services are used by external systems, a reverse proxy hides the internal network structure of your system's architecture.
 This extra layer of abstraction means that you can expose a different interface to external systems than to internal systems.
 This facilitates delivering the security principle of least privilege.
+
+A gateway adds ``intelligence'' to the reverse proxy.
+It provides similar characteristics regarding hiding the internal network structure,
+but also processes requests and responses.
+This can be translating protocols or orchestrating, or aggregating, requests or responses to improve performance.
 
 The API layer allows the implementation of \emph{cross-cutting} concerns to be separated from the user interface.
 For example security policies, user access logging, or service discovery could be implemented in the API layer.
@@ -258,7 +265,7 @@ The API layer can also perform load balancing by delegating service requests to 
 
 \section{Service Oriented Architecture}
 
-Service Oriented Architecture (SOA) is an extension of service-based architecture.
+Service Oriented Architecture \link{(SOA)}{https://www.ibm.com/topics/soa} is an extension of service-based architecture.
 In SOA, each service implements a single business process and provides one or more interfaces that allow access to its functionality.
 The primary purpose of the API layer is to provide a robust service discovery platform and to implement security policies.
 Systems are implemented by integrating a set of services to deliver the required functionality.

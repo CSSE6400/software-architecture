@@ -1,4 +1,4 @@
-workspace {
+workspace "Blackboard" "Simplified architecture of old version of Blackboard."  {
 
     model {
         student = person "UQ Student"
@@ -32,8 +32,8 @@ workspace {
         webApp -> blackboardDB "Retrieve and update course configuration"
         webApp -> fileStore "Retrieve and update course resources"
 
-        ldap -> blackboardDB "Hourly synchronize of user data"
-        sinet -> blackboardDB "At least daily synchronize of enrolment data"
+        ldap -> blackboardDB "Hourly synchronisation of user data"
+        sinet -> blackboardDB "At least daily synchronisation of enrolment data"
 
         datahub -> ldap "Populate user information"
         sinet -> datahub "Populate user enrolment information"
@@ -87,7 +87,7 @@ workspace {
 
         deployment * "UQ Infrastructure" "UQI" {
             include *
-    	}
+        }
 
         styles {
             element db {
