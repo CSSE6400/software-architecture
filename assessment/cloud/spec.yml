@@ -9,7 +9,7 @@ info:
     name: CSSE6400
     url: https://csse6400.uqcloud.net
     email: noreply@uq.edu.au
-  version: 1.0.0
+  version: 1.1.0
 servers:
 - url: http://email.api.spamoverflow.com/api/v1
 tags:
@@ -49,6 +49,8 @@ paths:
         If there are no emails associated with the given customer id, an empty array should be returned.
 
         All other parameters are used to filter the results and should be applied before the limit and offset parameters. e.g. if 300 emails exists and 200 are labelled as malicious then a request of limit=100 and only_malicious=true should return 100 emails. If limit=100, only_malicious=true, and offset=200 then the response should be 0 emails (an empty array).
+
+        The filters are additive and as such if the filter is not in the request then it should not be applied. e.g. if only_malicious=true is not in the request then all emails should be returned regardless of their malicious status. The exception to this is the limit and offset parameters which have defaults which are applied if they are not in the request.
       parameters:
       - name: customer_id
         in: path
@@ -58,7 +60,7 @@ paths:
           type: string
       - name: limit
         in: query
-        description: Returns only this many results, 0 < limit <= 1000.
+        description: Returns only this many results, 0 < limit <= 1000. Default is 100.
         schema:
           type: integer
           minimum: 1
@@ -67,7 +69,7 @@ paths:
         example: 20
       - name: offset
         in: query
-        description: Skip this many results before returning, 0 <= offset.
+        description: Skip this many results before returning, 0 <= offset. Default is 0.
         schema:
           type: integer
           minimum: 0
@@ -362,7 +364,7 @@ paths:
                 type: object
                 example:
                   generated_at: "2024-02-21T13:10:05Z"
-                  total: 1
+                  total: 2
                   data:
                     - id: "uq.edu.au"
                       count: 16
