@@ -27,7 +27,6 @@
 \begin{document}
 
 \maketitle
-
 \note{Lecture Goal: Balance a healthy love-hate relationship with distributed systems}
 
 \point[Going forward]{
@@ -44,23 +43,21 @@
 
 \point[What are the benefits?]{
     \begin{itemize}
-        \item Improved \highlight{reliability}.
-        \item Improved \highlight{scalability}.
-        \item Improved \highlight{latency}.
+        \item Improved \highlight{reliability}
+        \item Improved \highlight{scalability}
+        \item Improved \highlight{latency}
     \end{itemize}
 }
-
-\note{Some systems are inherently distribued.}
+\note{Some systems are inherently distributed.}
 
 \point[What are the drawbacks?]{
     \begin{itemize}
-        \item Increased \highlight{complexity}.
-        \item Increased \highlight{attack vector}.
-        \item Increased \highlight{latency}.
-        \item Introduce \highlight{consistency} problems.
+        \item Increased \highlight{complexity}
+        \item Increased \highlight{attack vector}
+        \item Increased \highlight{latency}
+        \item Introduce \highlight{consistency} problems
     \end{itemize}
 }
-
 \note{We'll look at a few reasons that distributed systems are \highlight{fundamentally} quite challenging}
 
 \section{Fallacies}
@@ -68,7 +65,6 @@
 \point[A \textsl{few} reasons for complexity]{
     The Fallacies of \highlight{Distributed Computing}.
 }
-
 \note{Sun Microsystems in 1994, primarily accredited to Peter Deutsch (doy-ch)}
 
 \point[Fallacy \#1]{The network is reliable.}
@@ -78,14 +74,12 @@
 \image{diagrams/SendDrop}
 
 \image{diagrams/SendDropResend}
-
 \note{Solve it by resending it}
 
 \image{diagrams/SendDropDos}
-
 \note{If the service goes down and all clients are re-trying, the service is in for a shock when it comes back, we solve this with \highlight{exponential backoff}}
 
-\begin{frame}[fragile]{Exponential backoff}
+\begin{frame}[fragile]{Exponential Backoff}
 \begin{code}[language=python,morekeywords={do}]{}
 retry = True
 do:
@@ -102,11 +96,9 @@ while (retry and retries < MAX_RETIRES)
 \image{diagrams/ReceiveDrop}
 
 \image{diagrams/ReceiveDropResend}
-
 \note{Causes duplicate actions, problem for ordering/payments}
 
 \image{diagrams/ReceiveDropToken}
-
 \note{Use tokens to prevent duplicates.}
 
 \point[Fallacy \#2]{Latency is zero.}
@@ -118,11 +110,9 @@ while (retry and retries < MAX_RETIRES)
         \item[EC2 to EC2] \only<4->{0.662ms}
     \end{description}
 }
-
 \note{Be mindful when designing distributed systems. Network call much slower then local call.}
 
 \point[Fallacy \#3]{Bandwidth is infinite.}
-
 \note{Similar to previous fallacy, be mindful, distributed calls clog up network.}
 
 \definition{Stamp Coupling}{
@@ -132,19 +122,15 @@ while (retry and retries < MAX_RETIRES)
 \point[Fallacy \#4]{The network is secure.}
 
 \image[height=1.07\textheight]{diagrams/Sahara}
-
 \note{Authentication only occurs when entering Sahara data centre}
 
 \image[height=1.1\textheight]{diagrams/NetworkInjection}
-
 \note{Bad actor gets access via one insecure node, network is compromised. Practice defence in depth.}
 
 \point[Fallacy \#5]{The topology never changes.}
-
 \note{Topology changes all the time, cloud has just made this easier. Don't rely on static IPs. Don't assume consistent latency.}
 
 \point[Fallacy \#6]{There is only one administrator.}
-
 \note{Things spontaneously break. Who can help you?}
 
 \point[Fallacy \#7]{Transport cost is zero.}
@@ -154,7 +140,6 @@ Distributed systems are \highlight{hard}.
 
 The choice to use them should be \highlight{well considered}.
 }
-
 \note{Can often introduce more problems than they solve}
 
 \point[When you need to, maybe prove it?]{
@@ -168,7 +153,7 @@ The choice to use them should be \highlight{well considered}.
 \point[Distributed Systems Series]{
     \begin{description}
         \item[Distributed I] \highlight{Reliability} and \highlight{scalability} of \highlight{stateless} systems.
-            \color{gray}{
+        \color{gray}{
         \item[Distributed II] Complexities of stateful systems.
         \item[Distributed III] Hard problems in distributed systems.}
     \end{description}
@@ -176,8 +161,8 @@ The choice to use them should be \highlight{well considered}.
 
 \point[Stateless vs. Stateful Systems]{
     \begin{description}
-        \item[Stateless] Does \highlight{not} utilize \highlight{persistent data}.
-        \item[Stateful] Does utilize \highlight{persistent data}.
+        \item[Stateless] Does \highlight{not} utilise \highlight{persistent data}.
+        \item[Stateful] Does utilise \highlight{persistent data}.
     \end{description}
 }
 
@@ -187,28 +172,26 @@ The choice to use them should be \highlight{well considered}.
 
 \definition{Fault}{Something goes wrong.}
 
-\quote[Howard and LeBlanc]{Death, taxes, and computer system failure are all inevitable to some degree.\\\highlight{Plan for the event.}}
+\quote[Howard and LeBlanc]{Death, taxes, and computer system failure are all inevitable to some degree.\\
+\vspace{1em}\highlight{Plan for the event.}}
 
 \point[Reliable software is]{Fault \highlight{tolerant}.}
-
 \note{John von Neumann built fault tolerant hardware in the 1950s.}
 
-\point[Problem]{Individual computers fail \highlight{all the time}}
-
+\point[Problem]{Individual computers fail \highlight{all the time}.}
 \note{10-50 years hard-drive lifetime. 10,000 disks will fail daily. Google last had 2.5 million servers.}
 
-\point[Solution]{Spread the risk of faults over \highlight{multiple computers}, or, \highlight{nodes}.}
+\point[Solution]{Spread the risk of faults over \highlight{multiple computers} or \highlight{nodes}.}
 
 \point[Spreading Risk]{
     \Large
     If you have software that works with \highlight{just one} computer,
     spreading the software over \highlight{two} computers \highlight{halves} the risk that your software will fail.
     \\[2em]
-    \only<2->{Adding \highlight{100} computers reduces the cuts the risk by \highlight{100}.}
+    \only<2->{Adding \highlight{100} computers reduces the risk by \highlight{100}.}
 }
 
 \image[height=1.07\textheight]{diagrams/Sahara}
-
 \note[itemize]{
     \item Why is this software somewhat reliable?
     \item Any individual service can go down and the rest still work.
@@ -225,7 +208,7 @@ The choice to use them should be \highlight{well considered}.
     \item[Capacity] Amount of instances \highlight{currently} in an auto-scaling group.
     \item[Desired Capacity] Amount of instances \highlight{we want to have} in an auto-scaling group.
     \item[Scaling Policy] How to determine the desired capacity.
-    \item[Minimum/Maximum Capacity] \highlight{Hard limits} on the minimal and maximum amount of instances.
+    \item[Minimum/Maximum Capacity] \highlight{Hard limits} on the minimum and maximum number of instances.
 \end{description}
 }
 
@@ -240,25 +223,20 @@ The choice to use them should be \highlight{well considered}.
 \point[Auto-scaling]{An example}
 
 \image[height=1.07\textheight]{diagrams/Sahara}
-
-\note{Product service keeps going down}
+\note{Product Browsing service keeps going down}
 
 \image{diagrams/ProductIsolate}
-
-\note{We might expect product service to have a much higher load than other services}
+\note{We might expect product browsing to have a much higher load than other services}
 
 \image{diagrams/ProductEC2}
 
 \image{diagrams/ProductScale}
-
 \note{Use an auto-scaling group to replicate the service}
 
 \image{diagrams/ProductScaleReal}
-
 \note{What's the problem?}
 
 \image[width=\textheight]{diagrams/ProductScaleLB}
-
 \note{Traffic was all sent through the one instance, load balancer routes to all}
 
 \image[width=\textheight]{diagrams/SaharaScaled}
@@ -271,34 +249,7 @@ The choice to use them should be \highlight{well considered}.
     \item[Scalability] \only<4->{Auto-scaling and load balancing allows \highlight{individual services to scale}. However, the \highlight{database is a bottle-neck}.}  
 \end{description}
 \end{frame}
-
 \note{\highlight{database is a bottle-neck} is foreshadowing}
-
-% \definition{Distributed Computing}{Multiple software components that are on multiple computers, but run as a single system}
-
-% \point[The Problem]{
-%     \begin{center}
-%     \begin{tikzpicture}
-%         \node[circle,draw, minimum size=1cm] (A) at  (0,0) {Distributed};
-%         \node[circle,draw, minimum size=1cm] (B) at  (8,0)  {Simplicity};
-%         \draw[<->] (A) -- (B);
-%     \end{tikzpicture}
-%     \end{center}
-% }
-
-% \point{A lot of modern software development focuses on dealing with the \highlight{complexity} of distributed systems.}
-
-% \question{What makes distributed computing complex?}
-
-% \point{
-%     \begin{itemize}
-%         \item Faults
-%         \item Asynchronous communication
-%         \item Monitoring
-%         \item And much more\dots
-%     \end{itemize}
-% }
-
 
 % \references{articles,books}
 
