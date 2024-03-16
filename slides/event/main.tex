@@ -31,9 +31,9 @@
             \Large\item Send message
             \Large\item Wait for response
             \Large\item Continue processing
-	\end{itemize}
+        \end{itemize}
         \vspace{3mm}
-        \item Asynchronous Communication ~~~~~~\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
+        \item<2-> Asynchronous Communication ~~~~~~\includegraphics[width=8mm]{../../shared/images/thumbs-up.png}
         \begin{itemize}
             \Large\item Send message
             \Large\item Continue processing
@@ -84,7 +84,7 @@
     \item Bid Processor could send back a high bid event or an async message.
 }
 
-\definition{Event Handler Cohesion Principle}{Each event handler is a simple cohesive unit that performs a single processing task.}
+\definition{Event Handler Cohesion Principle}{Each event handler is a simple cohesive unit that performs a \highlight{single} processing task.}
 
 \definition{Event Handler Independence Principle}{Event handlers should not depend on the implementation of any other event handler.}
 
@@ -108,9 +108,9 @@
         \begin{itemize}
             \Large\item Notifies event handlers of events
             \Large\item Event handlers send processing events when they finish processing
-	\end{itemize}
+        \end{itemize}
         \vspace{3mm}
-        \item[Mediator] Manages the business process
+        \item[Mediator]<2-> Manages business process
         \begin{itemize}
             \Large\item Event queue of initiating events
             \Large\item Event mediator sends processing events to event handlers
@@ -129,6 +129,10 @@
 \note[itemize]{
     \item Step through event process.
     \item Describe idea of channels.
+    \item Send final processing event, even if it is not handled.
+    \begin{itemize}
+        \item Easier to extend in the future.
+    \end{itemize}
 }
 
 \point[Event Broker Façade]{
@@ -159,26 +163,28 @@
 \end{frame}
 \note[itemize]{
     \item Step through event process.
-    \item Highlight multiple mediators as common implementation.
+    \item Multiple mediators is common -- \highlight{one} per domain.
     \item Discuss internals of mediators: event queue and event channels.
 }
+
+%TODO Add component diagram showing internals of one mediator container.
 
 \begin{frame}{Extensibility}
     \vspace{1mm}
     {\LARGE
     \begin{itemize}
         \item New behaviour for existing event
-        {\Large
+        {\vspace{1mm}\Large
         \begin{description}
             \item[Broker] Implement event handler \& register with broker
             \begin{itemize}
-                \item Existing ignored event hooks
+                \large\item Existing ignored event hooks
             \end{itemize}
             \item[Mediator] Implement event handler \& modify mediator logic
 	\end{description}
 	}
         \vspace{3mm}
-        \item New event
+        \item<2-> New event
         {\Large
         \begin{description}
             \item[Broker] Implement event \& event handler, create event channel, modify broker façade
@@ -188,6 +194,8 @@
     \end{itemize}
     }
 \end{frame}
+
+%TODO Add diagrams showing adding new event handler & adding new event to Broker topology.
 
 %\begin{frame}{Broker Topology}
 %    \begin{adjustwidth}{-10mm}{-10mm}
@@ -200,6 +208,40 @@
 %    \item Describe idea of channels.
 %}
 
+%TODO Add diagrams showing adding new event handler & adding new event to Mediator topology.
+
+%\begin{frame}{Extensibility -- Mediator}
+%    \vspace{1mm}
+%    {\LARGE
+%    \begin{itemize}
+%        \item New behaviour for existing event
+%        {\vspace{1mm}\Large
+%        \begin{description}
+%            \item[Mediator] Implement event handler \& modify mediator logic
+%        \end{description}
+%    }
+%        \vspace{3mm}
+%        \item<2-> New event
+%        {\Large
+%        \begin{description}
+%            \item[Mediator] Implement event \& event handler, modify mediator logic
+%    \end{description}
+%    }
+%    \end{itemize}
+%    }
+%\end{frame}
+%
+%\begin{frame}{Mediator Topology}
+%    \begin{adjustwidth}{-10mm}{-10mm}
+%        \centering
+%        \includegraphics[trim=195 195 195 195,clip,width=1.43\paperheight]{../../notes/event/diagrams/mediator-components.png}
+%    \end{adjustwidth}
+%\end{frame}
+%\note[itemize]{
+%    \item Step through event process.
+%    \item Highlight process control performed by mediator.
+%}
+
 \begin{frame}{Scalability}
     \vspace{1mm}
     {\LARGE
@@ -207,20 +249,20 @@
         \item Event handlers deployed independently
         \begin{itemize}
             \Large\item Scaled independently to manage load
-	\end{itemize}
+        \end{itemize}
         \vspace{3mm}
-        \item Event broker federated
+        \item<2-> Event broker federated
         \begin{itemize}
             \Large\item Distributed across multiple compute nodes
-	\end{itemize}
+        \end{itemize}
         \vspace{3mm}
-        \item Event mediators for different domains
+        \item<3-> Event mediators for different domains
         \begin{itemize}
             \Large\item Distributes loads by domain\\(e.g. browse \& search, account, \& order events)
             \begin{itemize}
-                \item Scaled independently to manage load
+                \large\item Scaled independently to manage load
             \end{itemize}
-	\end{itemize}
+        \end{itemize}
     \end{itemize}
     }
 \end{frame}
@@ -232,22 +274,22 @@
         \item Channels can be implemented as queues
         \begin{itemize}
             \Large\item FIFO behaviour
-	\end{itemize}
+        \end{itemize}
         \vspace{3mm}
-        \item Multiple front of queue pointers
+        \item<2-> Multiple front of queue pointers
         \begin{itemize}
             \Large\item For each event handler
-	\end{itemize}
+        \end{itemize}
         \vspace{3mm}
-        \item Event removed when event handlers finish
+        \item<3-> Event removed when event handlers finish
         \begin{itemize}
             \Large\item Retry if a handler fails
-	\end{itemize}
+        \end{itemize}
         \vspace{3mm}
-        \item Events persisted until removed
+        \item<4-> Events persist until removed
         \begin{itemize}
             \Large\item Recovery from broker failure
-	\end{itemize}
+        \end{itemize}
     \end{itemize}
     }
 \end{frame}
@@ -259,23 +301,24 @@
         \item Channels can be implemented as streams
         \begin{itemize}
             \Large\item Events are saved permanently
-	\end{itemize}
+        \end{itemize}
         \vspace{3mm}
-        \item Handlers notified when event added to stream
+        \item<2-> Handlers notified when event added to stream
         \begin{itemize}
             \Large\item Observer pattern
-	\end{itemize}
+        \end{itemize}
         \vspace{3mm}
-        \item Handlers process events at their own pace
+        \item<3-> Handlers process events at their own pace
         \begin{itemize}
             \Large\item Cardiac arrest alarm vs. heart rate graph
-	\end{itemize}
+        \end{itemize}
         \vspace{3mm}
-        \item Events history
+        \item<4-> Events history
         \begin{itemize}
             \Large\item Redo processing
+            \vspace{0.5mm}
             \Large\item Review processing activities
-	\end{itemize}
+        \end{itemize}
     \end{itemize}
     }
 \end{frame}
@@ -290,15 +333,15 @@
             \Large\item Easier sequencing of steps in business process
             \Large\item ``Exactly once'' semantics
             \Large\item eCommerce system
-	\end{itemize}
+        \end{itemize}
         \vspace{3mm}
-        \item Stream
+        \item<2-> Stream
         \begin{itemize}
             \Large\item Very large number of events or handlers
             \Large\item Handlers can ignore events
             \Large\item Analysis of past activity
             \Large\item Event sourcing
-	\end{itemize}
+        \end{itemize}
     \end{itemize}
     }
 \end{frame}
@@ -311,9 +354,9 @@
         \vspace{3mm}
         \item[Broker] events have occurred
         \vspace{3mm}
-        \item[Mediator] smart pipe
+        \item[Mediator]<2-> smart pipe
         \vspace{3mm}
-        \item[Mediator] events are commands to process
+        \item[Mediator]<2-> events are commands to process
     \end{description}
     }
 \end{frame}
@@ -333,7 +376,7 @@
     }
     \end{column}
     \begin{column}{0.59\textwidth}
-    {\LARGE
+    {\onslide<2->\LARGE
     \highlight{Mediator Advantages}
     \begin{itemize}
         \item Complex business process logic

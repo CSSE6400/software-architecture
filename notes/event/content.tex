@@ -38,14 +38,14 @@ This continues until the business process is completed.
 
 \filbreak
 An auction system, as shown in figure \ref{fig:auction-architecture}, could be implemented as an event-driven architecture.
-\begin{itemize}[nosep]
-    \item When a customer bids on an item, they initiate a bid \emph{event}.
-    \item Upon receiving the bid event, the event broker notifies the bid handler, which checks the bid against the current high bid and determines the new high bid.
-    \item The bid handler generates a new high bid event.
-    \item The event broker notifies the page update handler of the high bid event, which sends the new high bid to all pages displaying the item.
-    \item The bid notification handler is also notified of the high bid event and it sends an email to the bidder with the result of their bid.
-    \item And, the rebid notification handler is also notified of the high bid event.
-             If the previous high bidder is no longer the high bidder, they are sent an email asking if they would like to make another bid.
+\begin{itemize}[topsep=2pt,partopsep=1pt,itemsep=1pt,parsep=1pt]
+    \item When a customer bids on an item, they initiate a \textit{bid event}.
+    \item Upon receiving the \textit{bid event}, the event broker notifies the bid handler, which checks the bid against the current high bid and determines the new high bid.
+    \item The bid handler generates a new \textit{high bid event}.
+    \item The event broker notifies the page update handler of the \textit{high bid event}, which sends the new high bid to all pages displaying the item.
+    \item The bid notification handler is also notified of the \textit{high bid event} and it sends an email to the bidder with the result of their bid.
+    \item And, the rebid notification handler is also notified of the \textit{high bid event}.
+          If the previous high bidder is no longer the high bidder, they are sent an email asking if they would like to make another bid.
 \end{itemize}
 
 \begin{figure}[h!]
@@ -67,7 +67,7 @@ The \emph{mediator topology} is more complex but is designed to provide process 
 
 The broker topology consists of five elements.
 
-\begin{description}
+\begin{description}[topsep=6pt,partopsep=2pt,itemsep=4pt,parsep=4pt]
     \item[Initiating Event] starts the flow of events.
     \item[Event Broker] has \emph{event channels} that receive events waiting to be handled.
     \item[Event Channel] holds events waiting to be processed by an event handler.
@@ -75,7 +75,7 @@ The broker topology consists of five elements.
     \item[Processing Event] sent by an event handler when it has finished processing an event.
 \end{description}
 
-% Possibly extend the auction example to make this more concrete?
+%TODO Possibly extend the auction example to make this more concrete?
 % It will need to show events being ignored by system, and handlers not sending events at the end of processing.
 \begin{figure}[h!]
     \begin{adjustwidth}{-10mm}{-10mm}
@@ -91,7 +91,7 @@ In figure \ref{fig:broker-components}, the \emph{Client} sends the \emph{Initiat
 Upon completion of handling the \emph{Initiating Event},
 \emph{Event Handler A} sends \emph{Processing Event 1} to the appropriate channel in the event broker.
 \emph{Event Handlers B} and \emph{C} accept this processing event and perform their actions.
-When \emph{Event Handler C} finishes processing it sends \emph{Processing Event 2} to its channel.
+When \emph{Event Handler C} finishes processing, it sends \emph{Processing Event 2} to its channel.
 No event handler is designed to accept \emph{Processing Event 2}, so it is ignored.
 
 Different event channels in the event broker provide a simple mechanism to coordinate the flow of events in a business process.
@@ -107,8 +107,8 @@ or, for better abstraction and reduced coupling, the event broker may implement 
     Each event handler is a simple cohesive unit that performs a single processing task.
 \end{definition}
 
-The \emph{event handler cohesion principle} minimises the complexity of each handler,
-and improves the ability of the system to scale only the tasks that need additional computing resources.
+The \emph{event handler cohesion principle} minimises the complexity of each handler and
+improves the ability of the system to scale only the tasks that need additional computing resources.
 
 \vspace{1mm}
 \begin{definition}[Event Handler Independence Principle]\label{def:independence}
@@ -128,7 +128,7 @@ This means that new event handlers can be added to the system as it evolves.
 A new feature can be added by implementing an event handler to do something new when an event is received by the event broker.
 
 In figure \ref{fig:broker-components}, when \emph{Event Handler C} finishes processing its event it sends \emph{Processing Event 2} to the event broker.
-The diagram indicates that the system does not handle the event.
+The diagram indicates that the system does not handle this event.
 The purpose of doing this is to make it easier to extend the system.
 Currently, the system may not need to do anything when \emph{Event Handler C} finishes processing,
 but because it sends an event to indicate it has finished it means other tasks can be added to the system following \emph{Event Handler C}.
@@ -224,7 +224,7 @@ An ecommerce website is an example of the type of system suited to using queues.
 This is because there is a fixed set of rules about which event handlers process which events.
 
 Streams work well when there are multiple event handlers responding to events,
-particularly when event handlers may choose to ignore some events based on various conditions.
+particularly when event handlers may choose to ignore some events based on certain conditions.
 Streams mean that the event broker or channels do not need to be notified if an event handler wants to ignore an event.
 Because streams store events permanently, data analysis of the system's behaviour can be done by processing past events.
 Streams work well for social media platforms as monetisation of the platform depends on analysing user behaviour.
@@ -246,6 +246,7 @@ Streams have less overhead to manage their events, so can more easily cope with 
 
 Streams also enable \emph{event sourcing} as a persistence mechanism.
 Event sourcing stores every event, and its associated state, rather than storing and updating system state.
+System state at any earlier point in time can be recreated from the event history.
 This makes it easier to analyse how the system is used and what changes happen to the state over time.
 
 % Add example broker-based event-driven architecture for Sahara.
@@ -399,8 +400,7 @@ In the mediator topology, because events are commands to perform the next step i
 
 \bigskip\noindent
 \textbf{Broker Advantages}
-
-\begin{itemize}
+\begin{itemize}[topsep=8pt,partopsep=4pt,itemsep=6pt,parsep=6pt]
     \item Greater scalability because the broker just distributes event notifications and does not have state,
             it is easier to federate the broker to provide greater throughput.
     \item Greater reliability because the broker does not coordinate the business process.
@@ -410,8 +410,7 @@ In the mediator topology, because events are commands to perform the next step i
 
 \noindent
 \textbf{Mediator Advantages}
-
-\begin{itemize}
+\begin{itemize}[topsep=8pt,partopsep=4pt,itemsep=6pt,parsep=6pt]
     \item Allows for more complex business process logic and error handling.
     \item Can store process state and restart a process after recovering from an error.
 \end{itemize}
