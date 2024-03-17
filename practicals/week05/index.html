@@ -1,4 +1,4 @@
-Last Updated on 2024/02/24
+Last Updated on 2024/03/17
                                                                                                     
 
 <?xml version="1.0" encoding="iso-8859-1" ?> 
@@ -170,7 +170,7 @@ class="ectt-1200">version</span></span><span style="color:#000000"> </span><span
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">~&#x003E;</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
-class="ectt-1200">4.0</span></span><span style="color:#669900"><span 
+class="ectt-1200">5.0</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
  id="x1-2020r6"></a></span><span 
@@ -2111,10 +2111,473 @@ href="https://kubernetes.io/" >Kubernetes</a><span class="footnote-mark"><a
 href="#fn3x0" id="fn3x0-bk"><sup class="textsuperscript">3</sup></a></span><a 
  id="x1-9001f3"></a>
 as it is widely used in industry.
+</p><!--l. 536--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">6    </span> <a 
+ id="x1-100006"></a>Hosting TaskOverflow Images</h3>
+<!--l. 538--><p class="noindent" >When we last deployed a container on AWS, we used an existing hosted image. Now, we will be developing our
+own image, so we will need a mechanism to host the image. For this, we will being using an AWS ECR, Docker, and
+Terraform. AWS ECR is the Elastic Container Registry, it is a container registry like DockerHub or GitHub. We can
+use it to host our images, using the process below:
+</p><!--l. 548--><p class="indent" >
+      </p><ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x1-10002x1">
+      <!--l. 549--><p class="noindent" >Use Terraform to create an ECR repository for our image.
+      </p></li>
+<li 
+  class="enumerate" id="x1-10004x2">
+      <!--l. 550--><p class="noindent" >Use Terraform to build our Docker image.
+      </p></li>
+<li 
+  class="enumerate" id="x1-10006x3">
+      <!--l. 551--><p class="noindent" >Use Terraform to push our Docker image.</p></li></ol>
+   <div class="tcolorbox tcolorbox" id="tcolobox-7">     
+<div class="tcolorbox-title">
+<!--l. 562--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 562--><p class="noindent" >This is a non-standard process. As you may have seen in the DevOps tutorial, we would ordinarily
+like our code commits to trigger a CI/CD pipeline which builds the images.
+</p><!--l. 562--><p class="noindent" >If  you  would  like,  you  can  use  GitHub  actions  to  build  and  push  your  container  to  the  GitHub
+container registry and authenticate when you pull the image. However, using ECR simplifies the
+process, despite the oddities introduced by having a non-persistent ECR repository.  </p> 
+</div> 
+</div>
+<!--l. 564--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-11000"></a><span 
+class="Cabin-Bold-tlf-t1-x-x-120">Getting Started</span></span>
+      </p><ol  class="enumerate1" >
+<li 
+  class="enumerate" id="x1-11002x1">
+      <!--l. 567--><p class="noindent" >Using the GitHub Classroom link for this practical provided by your tutor in Slack, create a repository
+      to work within.
+                                                                                                    
+                                                                                                    
+      </p></li>
+<li 
+  class="enumerate" id="x1-11004x2">
+      <!--l. 568--><p class="noindent" >Install Terraform if not already installed, as it will be required again this week.
+      </p></li>
+<li 
+  class="enumerate" id="x1-11006x3">
+      <!--l. 569--><p class="noindent" >Start your learner lab and copy the AWS Learner Lab credentials into a credentials file in the root of
+      the repository.</p></li></ol>
+<!--l. 572--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-12000"></a><span 
+class="Cabin-Bold-tlf-t1-x-x-120">What&#8217;s New</span></span>
+   We are starting again with our todo application from roughly where we left off in the week 3
+practical. We&#8217;ve added a new directory <span 
+class="ectt-1200">todo/app </span>that has the static HTML files for the TaskOverflow
+website and added a route to serve these files. We have also created a production version of the
+server that uses gunicorn, the <span 
+class="ectt-1200">bin </span>directory is used by this image. Our original Docker image is now in
+<span 
+class="ectt-1200">Dockerfile.dev</span>.<br 
+class="newline" />
+</p><!--l. 580--><p class="indent" >   We will setup our initial Terraform configuration. Note that now we introduce a new required provider. This
+provider is for Docker.
+</p><!--l. 584--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 584--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 584--><pre class="listings" id="listing-13"><span class="label"><a 
+ id="x1-12001r1"></a></span><span style="color:#006699"><span 
+class="ectt-1200">terraform</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-12002r2"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">required_providers</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-12003r3"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">aws</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-12004r4"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">source</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">hashicorp</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-12005r5"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">version</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">~&#x003E;</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">5.0</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-12006r6"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-12007r7"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-12008r8"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">source</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">kreuzwerker</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">docker</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-12009r9"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">version</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">3.0.2</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-12010r10"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-12011r11"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-12012r12"></a></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-12013r13"></a></span> 
+<span class="label"><a 
+ id="x1-12014r14"></a></span><span style="color:#006699"><span 
+class="ectt-1200">provider</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-12015r15"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">region</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">us</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">east</span></span><span style="color:#669900"><span 
+class="ectt-1200">-1</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-12016r16"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">shared_credentials_files</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">./</span></span><span style="color:#669900"><span 
+class="ectt-1200">credentials</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span> 
+<span class="label"><a 
+ id="x1-12017r17"></a></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-12018r18"></a></span></pre>
+   </div>
+<!--l. 604--><p class="indent" >   As with our AWS provider, when we initially configure the provider, we want to authenticate so that we can
+later push to our registry using the Docker provider. We will use the <span 
+class="ectt-1200">aws_ecr_authorization_token </span>data block to
+get appropriate ECR credentials for Docker.
+</p><!--l. 609--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 609--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 609--><pre class="listings" id="listing-14"><span class="label"><a 
+ id="x1-12019r1"></a></span><span style="color:#006699"><span 
+class="ectt-1200">data</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_ecr_authorization_token</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">ecr_token</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{}</span></span> 
+<span class="label"><a 
+ id="x1-12020r2"></a></span> 
+<span class="label"><a 
+ id="x1-12021r3"></a></span><span style="color:#006699"><span 
+class="ectt-1200">provider</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">docker</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-12022r4"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">registry_auth</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-12023r5"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">address</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">data</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">aws_ecr_authorization_token</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">ecr_token</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">proxy_endpoint</span></span> 
+<span class="label"><a 
+ id="x1-12024r6"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">username</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">data</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">aws_ecr_authorization_token</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">ecr_token</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">user_name</span></span> 
+<span class="label"><a 
+ id="x1-12025r7"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">password</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">data</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">aws_ecr_authorization_token</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">ecr_token</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">password</span></span> 
+<span class="label"><a 
+ id="x1-12026r8"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-12027r9"></a></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-12028r10"></a></span></pre>
+   </div>
+<!--l. 621--><p class="indent" >   We need to use Terraform to create an ECR repository to push to.
+</p><!--l. 623--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 623--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 623--><pre class="listings" id="listing-15"><span class="label"><a 
+ id="x1-12029r1"></a></span><span style="color:#006699"><span 
+class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_ecr_repository</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-12030r2"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-12031r3"></a></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-12032r4"></a></span></pre>
+   </div>
+<!--l. 629--><p class="indent" >   The URL for containers in the ECR following the format below:
+</p><!--l. 631--><p class="indent" >   <a 
+href="{ACCOUNT_ID}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME}" class="url" ><span 
+class="ectt-1200">{ACCOUNT_ID}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME}</span></a>
+</p><!--l. 633--><p class="indent" >   Remember &#8212; to push to a container registry we need a local container whose tag matches the remote URL.
+We could then create and push the contianer locally with:
+</p>
+   <div class="framedenv" id="code-1">
+<!--l. 637--><pre class="listings" id="listing-16"><span class="label"><a 
+ id="x1-12033r1"></a></span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">build</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">t</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span><span style="color:#000000"><span 
+class="ectt-1200">ACCOUNT_ID</span></span><span style="color:#000000"><span 
+class="ectt-1200">}.</span></span><span style="color:#000000"><span 
+class="ectt-1200">dkr</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">ecr</span></span><span style="color:#000000"><span 
+class="ectt-1200">.{</span></span><span style="color:#000000"><span 
+class="ectt-1200">REGION</span></span><span style="color:#000000"><span 
+class="ectt-1200">}.</span></span><span style="color:#000000"><span 
+class="ectt-1200">amazonaws</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">com</span></span><span style="color:#000000"><span 
+class="ectt-1200">/{</span></span><span style="color:#000000"><span 
+class="ectt-1200">REPOSITORY_NAME</span></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span> 
+<span class="label"><a 
+ id="x1-12034r2"></a></span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">push</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span><span style="color:#000000"><span 
+class="ectt-1200">ACCOUNT_ID</span></span><span style="color:#000000"><span 
+class="ectt-1200">}.</span></span><span style="color:#000000"><span 
+class="ectt-1200">dkr</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">ecr</span></span><span style="color:#000000"><span 
+class="ectt-1200">.{</span></span><span style="color:#000000"><span 
+class="ectt-1200">REGION</span></span><span style="color:#000000"><span 
+class="ectt-1200">}.</span></span><span style="color:#000000"><span 
+class="ectt-1200">amazonaws</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">com</span></span><span style="color:#000000"><span 
+class="ectt-1200">/{</span></span><span style="color:#000000"><span 
+class="ectt-1200">REPOSITORY_NAME</span></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-12035r3"></a></span></pre>
+   </div>
+<!--l. 642--><p class="indent" >   However, it would be easier if we could build and push this container from within Terraform. We can use the
+Docker provider for this.
+</p><!--l. 645--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 645--><p class="indent" >   <span 
+class="ectt-1200">» cat image.tf</span> </p></div>   <div class="framedenv" id="code-1">
+                                                                                                    
+                                                                                                    
+<!--l. 645--><pre class="listings" id="listing-17"><span class="label"><a 
+ id="x1-12036r1"></a></span><span style="color:#006699"><span 
+class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">docker_image</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-12037r2"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">$</span></span><span style="color:#669900"><span 
+class="ectt-1200">{</span></span><span style="color:#669900"><span 
+class="ectt-1200">aws_ecr_repository</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">repository_url</span></span><span style="color:#669900"><span 
+class="ectt-1200">}:</span></span><span style="color:#669900"><span 
+class="ectt-1200">latest</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-12038r3"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">build</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-12039r4"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">context</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-12040r5"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-12041r6"></a></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-12042r7"></a></span> 
+<span class="label"><a 
+ id="x1-12043r8"></a></span><span style="color:#006699"><span 
+class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">docker_registry_image</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-12044r9"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">docker_image</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">name</span></span> 
+<span class="label"><a 
+ id="x1-12045r10"></a></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-12046r11"></a></span></pre>
+   </div>
+<!--l. 658--><p class="indent" >   Notice that we are able to utilize the output of the ECR repository as the URL which resolves to the correct
+URL for the image.
 </p><!--l. 1--><p class="noindent" >
 </p>
    <h3 class="likesectionHead"><a 
- id="x1-10000"></a>References</h3>
+ id="x1-13000"></a>References</h3>
 <!--l. 1--><p class="noindent" >
    </p><div class="thebibliography">
    <p class="bibitem" ><span class="biblabel">

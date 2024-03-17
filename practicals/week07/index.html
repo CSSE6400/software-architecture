@@ -1,4 +1,4 @@
-Last Updated on 2024/02/24
+Last Updated on 2024/03/17
                                                                                                     
 
 <?xml version="1.0" encoding="iso-8859-1" ?> 
@@ -895,533 +895,70 @@ class="Cabin-Bold-tlf-t1-x-x-120">Please remember to terraform destroy to delete
 </div> 
 </div>
    <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
- id="x1-130004"></a>Hosting TaskOverflow Images</h3>
-<!--l. 325--><p class="noindent" >When we last deployed a container on AWS, we used an existing hosted image. Now, we will be developing our
-own image, so we will need a mechanism to host the image. For this, we will being using an AWS ECR, Docker, and
-Terraform. AWS ECR is the Elastic Container Registry, it is a container registry like DockerHub or GitHub. We can
-use it to host our images, using the process below:
-</p><!--l. 335--><p class="indent" >
-      </p><ol  class="enumerate1" >
-<li 
-  class="enumerate" id="x1-13002x1">
-      <!--l. 336--><p class="noindent" >Use Terraform to create an ECR repository for our image.
-      </p></li>
-<li 
-  class="enumerate" id="x1-13004x2">
-      <!--l. 337--><p class="noindent" >Use Terraform to build our Docker image.
-      </p></li>
-<li 
-  class="enumerate" id="x1-13006x3">
-      <!--l. 338--><p class="noindent" >Use Terraform to push our Docker image.</p></li></ol>
-   <div class="tcolorbox tcolorbox" id="tcolobox-10">     
-<div class="tcolorbox-title">
-<!--l. 349--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 349--><p class="noindent" >This is a non-standard process. As you may have seen in the DevOps tutorial, we would ordinarily
-like our code commits to trigger a CI/CD pipeline which builds the images.
-</p><!--l. 349--><p class="noindent" >If  you  would  like,  you  can  use  GitHub  actions  to  build  and  push  your  container  to  the  GitHub
-container registry and authenticate when you pull the image. However, using ECR simplifies the
-process, despite the oddities introduced by having a non-persistent ECR repository.  </p> 
-</div> 
-</div>
-<!--l. 351--><p class="noindent" ><span class="paragraphHead"><a 
- id="x1-14000"></a><span 
-class="Cabin-Bold-tlf-t1-x-x-120">Getting Started</span></span>
-      </p><ol  class="enumerate1" >
-<li 
-  class="enumerate" id="x1-14002x1">
-      <!--l. 354--><p class="noindent" >Using the GitHub Classroom link for this practical provided by your tutor in Slack, create a repository
-      to work within.
-                                                                                                    
-                                                                                                    
-      </p></li>
-<li 
-  class="enumerate" id="x1-14004x2">
-      <!--l. 355--><p class="noindent" >Install Terraform if not already installed, as it will be required again this week.
-      </p></li>
-<li 
-  class="enumerate" id="x1-14006x3">
-      <!--l. 356--><p class="noindent" >Start your learner lab and copy the AWS Learner Lab credentials into a credentials file in the root of
-      the repository.</p></li></ol>
-<!--l. 359--><p class="noindent" ><span class="paragraphHead"><a 
- id="x1-15000"></a><span 
-class="Cabin-Bold-tlf-t1-x-x-120">What&#8217;s New</span></span>
-   We are starting again with our todo application from roughly where we left off in the week 3
-practical. We&#8217;ve added a new directory <span 
-class="ectt-1200">todo/app </span>that has the static HTML files for the TaskOverflow
-website and added a route to serve these files. We have also created a production version of the
-server that uses gunicorn, the <span 
-class="ectt-1200">bin </span>directory is used by this image. Our original Docker image is now in
-<span 
-class="ectt-1200">Dockerfile.dev</span>.<br 
-class="newline" />
-</p><!--l. 367--><p class="indent" >   We will setup our initial Terraform configuration. Note that now we introduce a new required provider. This
-provider is for Docker.
-</p><!--l. 371--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 371--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 371--><pre class="listings" id="listing-8"><span class="label"><a 
- id="x1-15001r1"></a></span><span style="color:#006699"><span 
-class="ectt-1200">terraform</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">{</span></span> 
-<span class="label"><a 
- id="x1-15002r2"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
-class="ectt-1200">required_providers</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">{</span></span> 
-<span class="label"><a 
- id="x1-15003r3"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">aws</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">{</span></span> 
-<span class="label"><a 
- id="x1-15004r4"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">source</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">hashicorp</span></span><span style="color:#669900"><span 
-class="ectt-1200">/</span></span><span style="color:#669900"><span 
-class="ectt-1200">aws</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span> 
-<span class="label"><a 
- id="x1-15005r5"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">version</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">~&#x003E;</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
-class="ectt-1200">4.0</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span> 
-<span class="label"><a 
- id="x1-15006r6"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">}</span></span> 
-<span class="label"><a 
- id="x1-15007r7"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">{</span></span> 
-<span class="label"><a 
- id="x1-15008r8"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">source</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">kreuzwerker</span></span><span style="color:#669900"><span 
-class="ectt-1200">/</span></span><span style="color:#669900"><span 
-class="ectt-1200">docker</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span> 
-<span class="label"><a 
- id="x1-15009r9"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">version</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">3.0.2</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span> 
-<span class="label"><a 
- id="x1-15010r10"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">}</span></span> 
-<span class="label"><a 
- id="x1-15011r11"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">}</span></span> 
-<span class="label"><a 
- id="x1-15012r12"></a></span><span style="color:#000000"><span 
-class="ectt-1200">}</span></span> 
-<span class="label"><a 
- id="x1-15013r13"></a></span> 
-<span class="label"><a 
- id="x1-15014r14"></a></span><span style="color:#006699"><span 
-class="ectt-1200">provider</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">aws</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">{</span></span> 
-<span class="label"><a 
- id="x1-15015r15"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">region</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">us</span></span><span style="color:#669900"><span 
-class="ectt-1200">-</span></span><span style="color:#669900"><span 
-class="ectt-1200">east</span></span><span style="color:#669900"><span 
-class="ectt-1200">-1</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span> 
-<span class="label"><a 
- id="x1-15016r16"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">shared_credentials_files</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">[</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">./</span></span><span style="color:#669900"><span 
-class="ectt-1200">credentials</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#000000"><span 
-class="ectt-1200">]</span></span> 
-<span class="label"><a 
- id="x1-15017r17"></a></span><span style="color:#000000"><span 
-class="ectt-1200">}</span></span>
- 
-<span class="label"><a 
- id="x1-15018r18"></a></span></pre>
-   </div>
-<!--l. 391--><p class="indent" >   As with our AWS provider, when we initially configure the provider, we want to authenticate so that we can
-later push to our registry using the Docker provider. We will use the <span 
-class="ectt-1200">aws_ecr_authorization_token </span>data block to
-get appropriate ECR credentials for Docker.
-</p><!--l. 396--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 396--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 396--><pre class="listings" id="listing-9"><span class="label"><a 
- id="x1-15019r1"></a></span><span style="color:#006699"><span 
-class="ectt-1200">data</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">aws_ecr_authorization_token</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">ecr_token</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">{}</span></span> 
-<span class="label"><a 
- id="x1-15020r2"></a></span> 
-<span class="label"><a 
- id="x1-15021r3"></a></span><span style="color:#006699"><span 
-class="ectt-1200">provider</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">docker</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">{</span></span> 
-<span class="label"><a 
- id="x1-15022r4"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">registry_auth</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">{</span></span> 
-<span class="label"><a 
- id="x1-15023r5"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">address</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
-class="ectt-1200">data</span></span><span style="color:#000000"><span 
-class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">aws_ecr_authorization_token</span></span><span style="color:#000000"><span 
-class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">ecr_token</span></span><span style="color:#000000"><span 
-class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">proxy_endpoint</span></span> 
-<span class="label"><a 
- id="x1-15024r6"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">username</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
-class="ectt-1200">data</span></span><span style="color:#000000"><span 
-class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">aws_ecr_authorization_token</span></span><span style="color:#000000"><span 
-class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">ecr_token</span></span><span style="color:#000000"><span 
-class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">user_name</span></span> 
-<span class="label"><a 
- id="x1-15025r7"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">password</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
-class="ectt-1200">data</span></span><span style="color:#000000"><span 
-class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">aws_ecr_authorization_token</span></span><span style="color:#000000"><span 
-class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">ecr_token</span></span><span style="color:#000000"><span 
-class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">password</span></span> 
-<span class="label"><a 
- id="x1-15026r8"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">}</span></span> 
-<span class="label"><a 
- id="x1-15027r9"></a></span><span style="color:#000000"><span 
-class="ectt-1200">}</span></span>
- 
-<span class="label"><a 
- id="x1-15028r10"></a></span></pre>
-   </div>
-<!--l. 408--><p class="indent" >   We need to use Terraform to create an ECR repository to push to.
-</p><!--l. 410--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 410--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 410--><pre class="listings" id="listing-10"><span class="label"><a 
- id="x1-15029r1"></a></span><span style="color:#006699"><span 
-class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">aws_ecr_repository</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">{</span></span> 
-<span class="label"><a 
- id="x1-15030r2"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span> 
-<span class="label"><a 
- id="x1-15031r3"></a></span><span style="color:#000000"><span 
-class="ectt-1200">}</span></span>
- 
-<span class="label"><a 
- id="x1-15032r4"></a></span></pre>
-   </div>
-<!--l. 416--><p class="indent" >   The URL for containers in the ECR following the format below:
-</p><!--l. 418--><p class="indent" >   <a 
-href="{ACCOUNT_ID}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME}" class="url" ><span 
-class="ectt-1200">{ACCOUNT_ID}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME}</span></a>
-</p><!--l. 420--><p class="indent" >   Remember &#8212; to push to a container registry we need a local container whose tag matches the remote URL.
-We could then create and push the contianer locally with:
-</p>
-   <div class="framedenv" id="code-1">
-<!--l. 424--><pre class="listings" id="listing-11"><span class="label"><a 
- id="x1-15033r1"></a></span><span style="color:#000000"><span 
-class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">build</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">-</span></span><span style="color:#000000"><span 
-class="ectt-1200">t</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">{</span></span><span style="color:#000000"><span 
-class="ectt-1200">ACCOUNT_ID</span></span><span style="color:#000000"><span 
-class="ectt-1200">}.</span></span><span style="color:#000000"><span 
-class="ectt-1200">dkr</span></span><span style="color:#000000"><span 
-class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">ecr</span></span><span style="color:#000000"><span 
-class="ectt-1200">.{</span></span><span style="color:#000000"><span 
-class="ectt-1200">REGION</span></span><span style="color:#000000"><span 
-class="ectt-1200">}.</span></span><span style="color:#000000"><span 
-class="ectt-1200">amazonaws</span></span><span style="color:#000000"><span 
-class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">com</span></span><span style="color:#000000"><span 
-class="ectt-1200">/{</span></span><span style="color:#000000"><span 
-class="ectt-1200">REPOSITORY_NAME</span></span><span style="color:#000000"><span 
-class="ectt-1200">}</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">.</span></span> 
-<span class="label"><a 
- id="x1-15034r2"></a></span><span style="color:#000000"><span 
-class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">push</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">{</span></span><span style="color:#000000"><span 
-class="ectt-1200">ACCOUNT_ID</span></span><span style="color:#000000"><span 
-class="ectt-1200">}.</span></span><span style="color:#000000"><span 
-class="ectt-1200">dkr</span></span><span style="color:#000000"><span 
-class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">ecr</span></span><span style="color:#000000"><span 
-class="ectt-1200">.{</span></span><span style="color:#000000"><span 
-class="ectt-1200">REGION</span></span><span style="color:#000000"><span 
-class="ectt-1200">}.</span></span><span style="color:#000000"><span 
-class="ectt-1200">amazonaws</span></span><span style="color:#000000"><span 
-class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">com</span></span><span style="color:#000000"><span 
-class="ectt-1200">/{</span></span><span style="color:#000000"><span 
-class="ectt-1200">REPOSITORY_NAME</span></span><span style="color:#000000"><span 
-class="ectt-1200">}</span></span>
- 
-<span class="label"><a 
- id="x1-15035r3"></a></span></pre>
-   </div>
-<!--l. 429--><p class="indent" >   However, it would be easier if we could build and push this container from within Terraform. We can use the
-Docker provider for this.
-</p><!--l. 432--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 432--><p class="indent" >   <span 
-class="ectt-1200">» cat image.tf</span> </p></div>   <div class="framedenv" id="code-1">
-                                                                                                    
-                                                                                                    
-<!--l. 432--><pre class="listings" id="listing-12"><span class="label"><a 
- id="x1-15036r1"></a></span><span style="color:#006699"><span 
-class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">docker_image</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">{</span></span> 
-<span class="label"><a 
- id="x1-15037r2"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">$</span></span><span style="color:#669900"><span 
-class="ectt-1200">{</span></span><span style="color:#669900"><span 
-class="ectt-1200">aws_ecr_repository</span></span><span style="color:#669900"><span 
-class="ectt-1200">.</span></span><span style="color:#669900"><span 
-class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
-class="ectt-1200">.</span></span><span style="color:#669900"><span 
-class="ectt-1200">repository_url</span></span><span style="color:#669900"><span 
-class="ectt-1200">}:</span></span><span style="color:#669900"><span 
-class="ectt-1200">latest</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span> 
-<span class="label"><a 
- id="x1-15038r3"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">build</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">{</span></span> 
-<span class="label"><a 
- id="x1-15039r4"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">context</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">.</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span> 
-<span class="label"><a 
- id="x1-15040r5"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">}</span></span> 
-<span class="label"><a 
- id="x1-15041r6"></a></span><span style="color:#000000"><span 
-class="ectt-1200">}</span></span> 
-<span class="label"><a 
- id="x1-15042r7"></a></span> 
-<span class="label"><a 
- id="x1-15043r8"></a></span><span style="color:#006699"><span 
-class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">docker_registry_image</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">{</span></span> 
-<span class="label"><a 
- id="x1-15044r9"></a></span><span 
-class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">docker_image</span></span><span style="color:#000000"><span 
-class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
-class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">name</span></span> 
-<span class="label"><a 
- id="x1-15045r10"></a></span><span style="color:#000000"><span 
-class="ectt-1200">}</span></span>
- 
-<span class="label"><a 
- id="x1-15046r11"></a></span></pre>
-   </div>
-<!--l. 445--><p class="indent" >   Notice that we are able to utilize the output of the ECR repository as the URL which resolves to the correct
-URL for the image.
-</p><!--l. 447--><p class="noindent" >
-</p>
-   <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
- id="x1-160005"></a>Worker Queues</h3>
-<!--l. 449--><p class="noindent" >One good use case for queues is for distributing work to scale to demand. In this exercise we encourage you
+ id="x1-130004"></a>Worker Queues</h3>
+<!--l. 325--><p class="noindent" >One good use case for queues is for distributing work to scale to demand. In this exercise we encourage you
 to have a look at these widly used libraries to see how you could integrate them into a distributed
 system.
 </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 453--><p class="noindent" >Python:  <a 
+      <!--l. 329--><p class="noindent" >Python:  <a 
 href="https://docs.celeryq.dev/en/stable/" >Celery</a>
       </p></li>
       <li class="itemize">
-      <!--l. 454--><p class="noindent" >Java:  <a 
+      <!--l. 330--><p class="noindent" >Java:  <a 
 href="https://www.rabbitmq.com/tutorials/tutorial-one-java.html" >RabbitMQ</a></p></li></ul>
-<!--l. 457--><p class="indent" >   The two above libraries are integrated into many popular application frameworks. Today we will be using the
+<!--l. 333--><p class="indent" >   The two above libraries are integrated into many popular application frameworks. Today we will be using the
 Python library Celery to create a simple worker queue for TaskOverflow.
-</p><!--l. 460--><p class="noindent" >
+</p><!--l. 336--><p class="noindent" >
 </p>
-   <h4 class="subsectionHead"><span class="titlemark">5.1    </span> <a 
- id="x1-170005.1"></a>Celery</h4>
-<!--l. 462--><p class="noindent" >Celery is a Python library which allows you to create a worker queue. It is popular and used in many large scale
+   <h4 class="subsectionHead"><span class="titlemark">4.1    </span> <a 
+ id="x1-140004.1"></a>Celery</h4>
+<!--l. 338--><p class="noindent" >Celery is a Python library which allows you to create a worker queue. It is popular and used in many large scale
 applications. It is also relatively easy to use and has comprehensive documentation.
-</p><!--l. 467--><p class="noindent" >
+</p><!--l. 343--><p class="noindent" >
 </p>
-   <h3 class="sectionHead"><span class="titlemark">6    </span> <a 
- id="x1-180006"></a>Task Calendar</h3>
-<!--l. 469--><p class="noindent" >TaskOverflow will use celery to distribute the work of generating a calendar view of tasks, as this could be a time-intensive
+   <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
+ id="x1-150005"></a>Task Calendar</h3>
+<!--l. 345--><p class="noindent" >TaskOverflow will use celery to distribute the work of generating a calendar view of tasks, as this could be a time-intensive
 task.<span class="footnote-mark"><a 
 href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
- id="x1-18001f1"></a>
+ id="x1-15001f1"></a>
 This will be done by a worker which will run in a separate container. The TaskOverflow server will place job
 requests on the Celery queue. The worker will pick-up jobs and generate the calendar. The webserver can then
 serve the calendar to the user.
-</p><!--l. 477--><p class="indent" >   Calendar generation occurs asynchronously with this architecture. The user will not have to wait for the
+                                                                                                    
+                                                                                                    
+</p><!--l. 353--><p class="indent" >   Calendar generation occurs asynchronously with this architecture. The user will not have to wait for the
 calendar view to be generated and the webserver can handle other requests.
-                                                                                                    
-                                                                                                    
-</p><!--l. 480--><p class="noindent" >
+</p><!--l. 356--><p class="noindent" >
 </p>
-   <h4 class="subsectionHead"><span class="titlemark">6.1    </span> <a 
- id="x1-190006.1"></a>API Extension</h4>
-<!--l. 483--><p class="noindent" >We will extend our existing API with the following endpoints.
-</p><!--l. 485--><p class="indent" >
+   <h4 class="subsectionHead"><span class="titlemark">5.1    </span> <a 
+ id="x1-160005.1"></a>API Extension</h4>
+<!--l. 359--><p class="noindent" >We will extend our existing API with the following endpoints.
+</p><!--l. 361--><p class="indent" >
       </p><dl class="description"><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">POST /todos/ical</span> </dt><dd 
 class="description">
-      <!--l. 486--><p class="noindent" >Create an asynchronous calendar generation job.<span class="footnote-mark"><a 
+      <!--l. 362--><p class="noindent" >Create an asynchronous calendar generation job.<span class="footnote-mark"><a 
 href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
- id="x1-19001f2"></a>
+ id="x1-16001f2"></a>
       </p></dd><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">GET /todos/ical/{task_id}/status</span> </dt><dd 
 class="description">
-      <!--l. 487--><p class="noindent" >Check the status of the generation job.
+      <!--l. 363--><p class="noindent" >Check the status of the generation job.
       </p></dd><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">GET /todos/ical/{task_id}/result</span> </dt><dd 
 class="description">
-      <!--l. 488--><p class="noindent" >Download the generated iCal file when it is ready.</p></dd></dl>
-<!--l. 491--><p class="indent" >   An example interaction with the API might look like:
+      <!--l. 364--><p class="noindent" >Download the generated iCal file when it is ready.</p></dd></dl>
+<!--l. 367--><p class="indent" >   An example interaction with the API might look like:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 493--><pre class="listings" id="listing-13"><span class="label"><a 
- id="x1-19003r1"></a></span><span style="color:#000000"><span 
+<!--l. 369--><pre class="listings" id="listing-8"><span class="label"><a 
+ id="x1-16003r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">curl</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">-</span></span><span style="color:#000000"><span 
@@ -1439,10 +976,10 @@ class="ectt-1200">todos</span></span><span style="color:#000000"><span
 class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">ical</span></span> 
 <span class="label"><a 
- id="x1-19004r2"></a></span><span style="color:#000000"><span 
+ id="x1-16004r2"></a></span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-19005r3"></a></span><span 
+ id="x1-16005r3"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">task_id</span></span><span style="color:#669900"><span 
@@ -1462,7 +999,7 @@ class="ectt-1200">f2b8110988</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-19006r4"></a></span><span 
+ id="x1-16006r4"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">task_url</span></span><span style="color:#669900"><span 
@@ -1494,10 +1031,10 @@ class="ectt-1200">/</span></span><span style="color:#669900"><span
 class="ectt-1200">status</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-19007r5"></a></span><span style="color:#000000"><span 
+ id="x1-16007r5"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-19008r6"></a></span><span style="color:#000000"><span 
+ id="x1-16008r6"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">curl</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">-</span></span><span style="color:#000000"><span 
@@ -1527,10 +1064,10 @@ class="ectt-1200">f2b8110988</span></span><span style="color:#000000"><span
 class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">status</span></span> 
 <span class="label"><a 
- id="x1-19009r7"></a></span><span style="color:#000000"><span 
+ id="x1-16009r7"></a></span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-19010r8"></a></span><span 
+ id="x1-16010r8"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">result_url</span></span><span style="color:#669900"><span 
@@ -1563,7 +1100,7 @@ class="ectt-1200">result</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-19011r9"></a></span><span 
+ id="x1-16011r9"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">task_id</span></span><span style="color:#669900"><span 
@@ -1583,7 +1120,7 @@ class="ectt-1200">f2b8110988</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-19012r10"></a></span><span 
+ id="x1-16012r10"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">task_status</span></span><span style="color:#669900"><span 
@@ -1593,10 +1130,10 @@ class="ectt-1200">"</span></span><span style="color:#669900"><span
 class="ectt-1200">PENDING</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-19013r11"></a></span><span style="color:#000000"><span 
+ id="x1-16013r11"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-19014r12"></a></span><span style="color:#000000"><span 
+ id="x1-16014r12"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">curl</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">-</span></span><span style="color:#000000"><span 
@@ -1626,10 +1163,10 @@ class="ectt-1200">f2b8110988</span></span><span style="color:#000000"><span
 class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">status</span></span> 
 <span class="label"><a 
- id="x1-19015r13"></a></span><span style="color:#000000"><span 
+ id="x1-16015r13"></a></span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-19016r14"></a></span><span 
+ id="x1-16016r14"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">result_url</span></span><span style="color:#669900"><span 
@@ -1662,7 +1199,7 @@ class="ectt-1200">result</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-19017r15"></a></span><span 
+ id="x1-16017r15"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">task_id</span></span><span style="color:#669900"><span 
@@ -1682,7 +1219,7 @@ class="ectt-1200">f2b8110988</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-19018r16"></a></span><span 
+ id="x1-16018r16"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">task_status</span></span><span style="color:#669900"><span 
@@ -1692,10 +1229,10 @@ class="ectt-1200">"</span></span><span style="color:#669900"><span
 class="ectt-1200">SUCCESS</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-19019r17"></a></span><span style="color:#000000"><span 
+ id="x1-16019r17"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-19020r18"></a></span><span style="color:#000000"><span 
+ id="x1-16020r18"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">curl</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">-</span></span><span style="color:#000000"><span 
@@ -1725,16 +1262,16 @@ class="ectt-1200">f2b8110988</span></span><span style="color:#000000"><span
 class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">result</span></span> 
 <span class="label"><a 
- id="x1-19021r19"></a></span><span style="color:#000000"><span 
+ id="x1-16021r19"></a></span><span style="color:#000000"><span 
 class="ectt-1200">BEGIN</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
 class="ectt-1200">VCALENDAR</span></span> 
 <span class="label"><a 
- id="x1-19022r20"></a></span><span style="color:#000000"><span 
+ id="x1-16022r20"></a></span><span style="color:#000000"><span 
 class="ectt-1200">VERSION</span></span><span style="color:#000000"><span 
 class="ectt-1200">:2.0</span></span> 
 <span class="label"><a 
- id="x1-19023r21"></a></span><span style="color:#000000"><span 
+ id="x1-16023r21"></a></span><span style="color:#000000"><span 
 class="ectt-1200">PRODID</span></span><span style="color:#000000"><span 
 class="ectt-1200">:-//</span></span><span style="color:#000000"><span 
 class="ectt-1200">Taskoverflow</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1745,27 +1282,27 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">dk</span></span><span style="color:#000000"><span 
 class="ectt-1200">//</span></span> 
 <span class="label"><a 
- id="x1-19024r22"></a></span><span style="color:#000000"><span 
+ id="x1-16024r22"></a></span><span style="color:#000000"><span 
 class="ectt-1200">BEGIN</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
 class="ectt-1200">VEVENT</span></span> 
 <span class="label"><a 
- id="x1-19025r23"></a></span><span style="color:#000000"><span 
+ id="x1-16025r23"></a></span><span style="color:#000000"><span 
 class="ectt-1200">SUMMARY</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
 class="ectt-1200">Project</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Proposal</span></span> 
 <span class="label"><a 
- id="x1-19026r24"></a></span><span style="color:#000000"><span 
+ id="x1-16026r24"></a></span><span style="color:#000000"><span 
 class="ectt-1200">DTSTART</span></span><span style="color:#000000"><span 
 class="ectt-1200">:20230403</span></span><span style="color:#000000"><span 
 class="ectt-1200">T140000</span></span> 
 <span class="label"><a 
- id="x1-19027r25"></a></span><span style="color:#000000"><span 
+ id="x1-16027r25"></a></span><span style="color:#000000"><span 
 class="ectt-1200">UID</span></span><span style="color:#000000"><span 
 class="ectt-1200">:1</span></span> 
 <span class="label"><a 
- id="x1-19028r26"></a></span><span style="color:#000000"><span 
+ id="x1-16028r26"></a></span><span style="color:#000000"><span 
 class="ectt-1200">DESCRIPTION</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
 class="ectt-1200">CSSE6400</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1773,24 +1310,24 @@ class="ectt-1200">Project</span></span><span style="color:#000000"> </span><span
 class="ectt-1200">Proposal</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Due</span></span> 
 <span class="label"><a 
- id="x1-19029r27"></a></span><span style="color:#000000"><span 
+ id="x1-16029r27"></a></span><span style="color:#000000"><span 
 class="ectt-1200">END</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
 class="ectt-1200">VEVENT</span></span> 
 <span class="label"><a 
- id="x1-19030r28"></a></span><span style="color:#000000"><span 
+ id="x1-16030r28"></a></span><span style="color:#000000"><span 
 class="ectt-1200">END</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
 class="ectt-1200">VCALENDAR</span></span>
  
 <span class="label"><a 
- id="x1-19031r29"></a></span></pre>
+ id="x1-16031r29"></a></span></pre>
    </div>
-<!--l. 524--><p class="indent" >   We will stub out the implementation of these endpoints.
-</p><!--l. 526--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 526--><p class="indent" >   <span 
-class="ectt-1200">» cat todo/views/routes.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 526--><pre class="listings" id="listing-14"><span class="label"><a 
- id="x1-19032r1"></a></span><span style="color:#000000"><span 
+<!--l. 400--><p class="indent" >   We will stub out the implementation of these endpoints.
+</p><!--l. 402--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 402--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/views/routes.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 402--><pre class="listings" id="listing-9"><span class="label"><a 
+ id="x1-16032r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">@api</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">route</span></span><span style="color:#000000"><span 
@@ -1809,21 +1346,21 @@ class="ectt-1200">POST</span></span><span style="color:#669900"><span
 class="tctt-1200">'</span></span><span style="color:#000000"><span 
 class="ectt-1200">])</span></span> 
 <span class="label"><a 
- id="x1-19033r2"></a></span><span style="color:#006699"><span 
+ id="x1-16033r2"></a></span><span style="color:#006699"><span 
 class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">create_ical</span></span><span style="color:#000000"><span 
 class="ectt-1200">()</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-19034r3"></a></span><span 
+ id="x1-16034r3"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">pass</span></span> 
 <span class="label"><a 
- id="x1-19035r4"></a></span> 
+ id="x1-16035r4"></a></span> 
 <span class="label"><a 
- id="x1-19036r5"></a></span><span style="color:#000000"><span 
+ id="x1-16036r5"></a></span><span style="color:#000000"><span 
 class="ectt-1200">@api</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">route</span></span><span style="color:#000000"><span 
@@ -1846,7 +1383,7 @@ class="ectt-1200">GET</span></span><span style="color:#669900"><span
 class="tctt-1200">'</span></span><span style="color:#000000"><span 
 class="ectt-1200">])</span></span> 
 <span class="label"><a 
- id="x1-19037r6"></a></span><span style="color:#006699"><span 
+ id="x1-16037r6"></a></span><span style="color:#006699"><span 
 class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">get_task</span></span><span style="color:#000000"><span 
 class="ectt-1200">(</span></span><span style="color:#000000"><span 
@@ -1854,15 +1391,15 @@ class="ectt-1200">task_id</span></span><span style="color:#000000"><span
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-19038r7"></a></span><span 
+ id="x1-16038r7"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">pass</span></span> 
 <span class="label"><a 
- id="x1-19039r8"></a></span> 
+ id="x1-16039r8"></a></span> 
 <span class="label"><a 
- id="x1-19040r9"></a></span><span style="color:#000000"><span 
+ id="x1-16040r9"></a></span><span style="color:#000000"><span 
 class="ectt-1200">@api</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">route</span></span><span style="color:#000000"><span 
@@ -1885,7 +1422,7 @@ class="ectt-1200">GET</span></span><span style="color:#669900"><span
 class="tctt-1200">'</span></span><span style="color:#000000"><span 
 class="ectt-1200">])</span></span> 
 <span class="label"><a 
- id="x1-19041r10"></a></span><span style="color:#006699"><span 
+ id="x1-16041r10"></a></span><span style="color:#006699"><span 
 class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">get_calendar</span></span><span style="color:#000000"><span 
 class="ectt-1200">(</span></span><span style="color:#000000"><span 
@@ -1893,32 +1430,32 @@ class="ectt-1200">task_id</span></span><span style="color:#000000"><span
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-19042r11"></a></span><span 
+ id="x1-16042r11"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">pass</span></span>
  
 <span class="label"><a 
- id="x1-19043r12"></a></span></pre>
+ id="x1-16043r12"></a></span></pre>
    </div>
-<!--l. 540--><p class="noindent" >
+<!--l. 416--><p class="noindent" >
 </p>
-   <h4 class="subsectionHead"><span class="titlemark">6.2    </span> <a 
- id="x1-200006.2"></a>Queue and Workers</h4>
-<!--l. 542--><p class="noindent" >Next we will modify our <span 
+   <h4 class="subsectionHead"><span class="titlemark">5.2    </span> <a 
+ id="x1-170005.2"></a>Queue and Workers</h4>
+<!--l. 418--><p class="noindent" >Next we will modify our <span 
 class="ectt-1200">docker-compose.yml </span>to include a local queuing service called Redis. We will later use
 AWS SQS but as Celery supports multiple queues, we can use this to make the local development
 easier.
-</p><!--l. 546--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 546--><p class="indent" >   <span 
-class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 546--><pre class="listings" id="listing-15"><span class="label"><a 
- id="x1-20001r1"></a></span><span 
+</p><!--l. 422--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 422--><p class="indent" >   <span 
+class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 422--><pre class="listings" id="listing-10"><span class="label"><a 
+ id="x1-17001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">redis</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-20002r2"></a></span><span 
+ id="x1-17002r2"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1928,7 +1465,7 @@ class="ectt-1200">redis</span></span><span style="color:#000000"><span
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
 class="ectt-1200">latest</span></span> 
 <span class="label"><a 
- id="x1-20003r3"></a></span><span 
+ id="x1-17003r3"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1936,14 +1473,14 @@ class="ectt-1200">restart</span></span><span style="color:#000000"><span
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">always</span></span> 
 <span class="label"><a 
- id="x1-20004r4"></a></span><span 
+ id="x1-17004r4"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">ports</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-20005r5"></a></span><span 
+ id="x1-17005r5"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1952,29 +1489,29 @@ class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style
 class="ectt-1200">"6379:6379"</span></span>
  
 <span class="label"><a 
- id="x1-20006r6"></a></span></pre>
+ id="x1-17006r6"></a></span></pre>
    </div>
-<!--l. 554--><p class="indent" >   Now we have a queue, we will create the worker that accepts jobs from the queue. We will create this worker in
+<!--l. 430--><p class="indent" >   Now we have a queue, we will create the worker that accepts jobs from the queue. We will create this worker in
 <span 
 class="ectt-1200">todo/tasks/ical.py</span>.
-</p><!--l. 558--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 558--><p class="indent" >   <span 
-class="ectt-1200">» cat todo/tasks/ical.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 558--><pre class="listings" id="listing-16"><span class="label"><a 
- id="x1-20007r1"></a></span><span style="color:#006699"><span 
+</p><!--l. 434--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 434--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/tasks/ical.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 434--><pre class="listings" id="listing-11"><span class="label"><a 
+ id="x1-17007r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">os</span></span> 
 <span class="label"><a 
- id="x1-20008r2"></a></span> 
+ id="x1-17008r2"></a></span> 
 <span class="label"><a 
- id="x1-20009r3"></a></span><span style="color:#006699"><span 
+ id="x1-17009r3"></a></span><span style="color:#006699"><span 
 class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">celery</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Celery</span></span> 
 <span class="label"><a 
- id="x1-20010r4"></a></span> 
+ id="x1-17010r4"></a></span> 
 <span class="label"><a 
- id="x1-20011r5"></a></span><span style="color:#000000"><span 
+ id="x1-17011r5"></a></span><span style="color:#000000"><span 
 class="ectt-1200">celery</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Celery</span></span><span style="color:#000000"><span 
@@ -1982,7 +1519,7 @@ class="ectt-1200">(</span></span><span style="color:#000000"><span
 class="ectt-1200">__name__</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-20012r6"></a></span><span style="color:#000000"><span 
+ id="x1-17012r6"></a></span><span style="color:#000000"><span 
 class="ectt-1200">celery</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">conf</span></span><span style="color:#000000"><span 
@@ -2000,7 +1537,7 @@ class="ectt-1200">CELERY_BROKER_URL</span></span><span style="color:#669900"><sp
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-20013r7"></a></span><span style="color:#000000"><span 
+ id="x1-17013r7"></a></span><span style="color:#000000"><span 
 class="ectt-1200">celery</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">conf</span></span><span style="color:#000000"><span 
@@ -2018,7 +1555,7 @@ class="ectt-1200">CELERY_RESULT_BACKEND</span></span><span style="color:#669900"
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-20014r8"></a></span><span style="color:#000000"><span 
+ id="x1-17014r8"></a></span><span style="color:#000000"><span 
 class="ectt-1200">celery</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">conf</span></span><span style="color:#000000"><span 
@@ -2040,9 +1577,9 @@ class="ectt-1200">ical</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-20015r9"></a></span> 
+ id="x1-17015r9"></a></span> 
 <span class="label"><a 
- id="x1-20016r10"></a></span><span style="color:#000000"><span 
+ id="x1-17016r10"></a></span><span style="color:#000000"><span 
 class="ectt-1200">@celery</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">task</span></span><span style="color:#000000"><span 
@@ -2054,7 +1591,7 @@ class="ectt-1200">ical</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-20017r11"></a></span><span style="color:#006699"><span 
+ id="x1-17017r11"></a></span><span style="color:#006699"><span 
 class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">create_ical</span></span><span style="color:#000000"><span 
 class="ectt-1200">(</span></span><span style="color:#000000"><span 
@@ -2062,7 +1599,7 @@ class="ectt-1200">tasks</span></span><span style="color:#000000"><span
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-20018r12"></a></span><span 
+ id="x1-17018r12"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
@@ -2073,22 +1610,22 @@ class="ectt-1200">World</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span>
  
 <span class="label"><a 
- id="x1-20019r13"></a></span></pre>
+ id="x1-17019r13"></a></span></pre>
+                                                                                                    
+                                                                                                    
    </div>
-<!--l. 573--><p class="indent" >   Note that we are getting a URL from the environment variables: <span 
+<!--l. 449--><p class="indent" >   Note that we are getting a URL from the environment variables: <span 
 class="ectt-1200">CELERY_BROKER_URL </span>and
 <span 
 class="ectt-1200">CELERY_RESULT_BACKEND</span>. We need to remember to set these variables in whichever environment the service is
 run in.
-                                                                                                    
-                                                                                                    
-</p><!--l. 577--><p class="indent" >   We need to install Celery. We will do this in the same pipenv environment as the Flask server as we will later
+</p><!--l. 453--><p class="indent" >   We need to install Celery. We will do this in the same pipenv environment as the Flask server as we will later
 require our Flask server to use Celery to put jobs onto the task queue.
 </p>
    <div class="framedenv" id="shaded*-1">
-   <!--l. 580-->
-<pre class="lstlisting" id="listing-17"><span class="label"><a 
- id="x1-20020r1"></a></span><span style="color:#000000"><span 
+   <!--l. 456-->
+<pre class="lstlisting" id="listing-12"><span class="label"><a 
+ id="x1-17020r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">pipenv</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">install</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2101,13 +1638,13 @@ class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style
 class="ectt-1200">boto3</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 582--><p class="indent" >   The above will install the Celery core and Redis and AWS SQS drivers for communication.
-</p><!--l. 584--><p class="indent" >   We will now start our local Redis queue and our worker to ensure that they can communicate.
+<!--l. 458--><p class="indent" >   The above will install the Celery core and Redis and AWS SQS drivers for communication.
+</p><!--l. 460--><p class="indent" >   We will now start our local Redis queue and our worker to ensure that they can communicate.
 </p>
    <div class="framedenv" id="shaded*-1">
-   <!--l. 586-->
-<pre class="lstlisting" id="listing-18"><span class="label"><a 
- id="x1-20021r1"></a></span><span style="color:#000000"><span 
+   <!--l. 462-->
+<pre class="lstlisting" id="listing-13"><span class="label"><a 
+ id="x1-17021r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"><span 
 class="ectt-1200">-</span></span><span style="color:#000000"><span 
@@ -2117,8 +1654,8 @@ class="ectt-1200">redis</span></span><span
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
    <div class="framedenv" id="code-1">
-<!--l. 588--><pre class="listings" id="listing-19"><span class="label"><a 
- id="x1-20022r1"></a></span><span style="color:#000000"><span 
+<!--l. 464--><pre class="listings" id="listing-14"><span class="label"><a 
+ id="x1-17022r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
 class="ectt-1200">export</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">CELERY_BROKER_URL</span></span><span style="color:#000000"><span 
@@ -2128,7 +1665,7 @@ class="ectt-1200">://</span></span><span style="color:#000000"><span
 class="ectt-1200">localhost</span></span><span style="color:#000000"><span 
 class="ectt-1200">:6379</span></span> 
 <span class="label"><a 
- id="x1-20023r2"></a></span><span style="color:#000000"><span 
+ id="x1-17023r2"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
 class="ectt-1200">export</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">CELERY_RESULT_BACKEND</span></span><span style="color:#000000"><span 
@@ -2138,7 +1675,7 @@ class="ectt-1200">://</span></span><span style="color:#000000"><span
 class="ectt-1200">localhost</span></span><span style="color:#000000"><span 
 class="ectt-1200">:6379</span></span> 
 <span class="label"><a 
- id="x1-20024r3"></a></span><span style="color:#000000"><span 
+ id="x1-17024r3"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">pipenv</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">run</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2160,16 +1697,16 @@ class="ectt-1200">=</span></span><span style="color:#000000"><span
 class="ectt-1200">info</span></span>
  
 <span class="label"><a 
- id="x1-20025r4"></a></span></pre>
+ id="x1-17025r4"></a></span></pre>
    </div>
-<!--l. 594--><p class="indent" >   You should see something like the below. This indicates that the worker has successfully subscribed to the
+<!--l. 470--><p class="indent" >   You should see something like the below. This indicates that the worker has successfully subscribed to the
 queue and is ready to accept events.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 597--><pre class="listings" id="listing-20"><span class="label"><a 
- id="x1-20026r1"></a></span> 
+<!--l. 473--><pre class="listings" id="listing-15"><span class="label"><a 
+ id="x1-17026r1"></a></span> 
 <span class="label"><a 
- id="x1-20027r2"></a></span><span style="color:#000000"><span 
+ id="x1-17027r2"></a></span><span style="color:#000000"><span 
 class="ectt-1200">--------------</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">celery@uqbwebb2</span></span><span style="color:#000000"><span 
 class="ectt-1200">-6842</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2181,12 +1718,12 @@ class="ectt-1200">-</span></span><span style="color:#000000"><span
 class="ectt-1200">chorus</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-20028r3"></a></span><span style="color:#000000"><span 
+ id="x1-17028r3"></a></span><span style="color:#000000"><span 
 class="ectt-1200">---</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">*****</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">-----</span></span> 
 <span class="label"><a 
- id="x1-20029r4"></a></span><span style="color:#000000"><span 
+ id="x1-17029r4"></a></span><span style="color:#000000"><span 
 class="ectt-1200">--</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">*******</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">----</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2200,14 +1737,14 @@ class="ectt-1200">bit</span></span><span style="color:#000000"> </span><span sty
 class="ectt-1200">2023-04-04</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">18:51:09</span></span> 
 <span class="label"><a 
- id="x1-20030r5"></a></span><span style="color:#000000"><span 
+ id="x1-17030r5"></a></span><span style="color:#000000"><span 
 class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">***</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">---</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">---</span></span> 
 <span class="label"><a 
- id="x1-20031r6"></a></span><span style="color:#000000"><span 
+ id="x1-17031r6"></a></span><span style="color:#000000"><span 
 class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">**</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">----------</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2215,7 +1752,7 @@ class="ectt-1200">[</span></span><span style="color:#000000"><span
 class="ectt-1200">config</span></span><span style="color:#000000"><span 
 class="ectt-1200">]</span></span> 
 <span class="label"><a 
- id="x1-20032r7"></a></span><span style="color:#000000"><span 
+ id="x1-17032r7"></a></span><span style="color:#000000"><span 
 class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">**</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">----------</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2230,7 +1767,7 @@ class="ectt-1200">ical</span></span><span style="color:#000000"><span
 class="ectt-1200">:0</span></span><span style="color:#000000"><span 
 class="ectt-1200">x10432e7d0</span></span> 
 <span class="label"><a 
- id="x1-20033r8"></a></span><span style="color:#000000"><span 
+ id="x1-17033r8"></a></span><span style="color:#000000"><span 
 class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">**</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">----------</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2242,7 +1779,7 @@ class="ectt-1200">://</span></span><span style="color:#000000"><span
 class="ectt-1200">localhost</span></span><span style="color:#000000"><span 
 class="ectt-1200">:6379//</span></span> 
 <span class="label"><a 
- id="x1-20034r9"></a></span><span style="color:#000000"><span 
+ id="x1-17034r9"></a></span><span style="color:#000000"><span 
 class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">**</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">----------</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2254,7 +1791,7 @@ class="ectt-1200">://</span></span><span style="color:#000000"><span
 class="ectt-1200">localhost</span></span><span style="color:#000000"><span 
 class="ectt-1200">:6379/</span></span> 
 <span class="label"><a 
- id="x1-20035r10"></a></span><span style="color:#000000"><span 
+ id="x1-17035r10"></a></span><span style="color:#000000"><span 
 class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">***</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">---</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2268,7 +1805,7 @@ class="ectt-1200">(</span></span><span style="color:#000000"><span
 class="ectt-1200">prefork</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-20036r11"></a></span><span style="color:#000000"><span 
+ id="x1-17036r11"></a></span><span style="color:#000000"><span 
 class="ectt-1200">--</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">*******</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">----</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2289,18 +1826,18 @@ class="ectt-1200">this</span></span><span style="color:#000000"> </span><span st
 class="ectt-1200">worker</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-20037r12"></a></span><span style="color:#000000"><span 
+ id="x1-17037r12"></a></span><span style="color:#000000"><span 
 class="ectt-1200">---</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">*****</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">-----</span></span> 
 <span class="label"><a 
- id="x1-20038r13"></a></span><span style="color:#000000"><span 
+ id="x1-17038r13"></a></span><span style="color:#000000"><span 
 class="ectt-1200">--------------</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">[</span></span><span style="color:#000000"><span 
 class="ectt-1200">queues</span></span><span style="color:#000000"><span 
 class="ectt-1200">]</span></span> 
 <span class="label"><a 
- id="x1-20039r14"></a></span><span 
+ id="x1-17039r14"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2325,23 +1862,23 @@ class="ectt-1200">key</span></span><span style="color:#000000"><span
 class="ectt-1200">=</span></span><span style="color:#000000"><span 
 class="ectt-1200">celery</span></span> 
 <span class="label"><a 
- id="x1-20040r15"></a></span> 
+ id="x1-17040r15"></a></span> 
 <span class="label"><a 
- id="x1-20041r16"></a></span> 
+ id="x1-17041r16"></a></span> 
 <span class="label"><a 
- id="x1-20042r17"></a></span><span style="color:#000000"><span 
+ id="x1-17042r17"></a></span><span style="color:#000000"><span 
 class="ectt-1200">[</span></span><span style="color:#000000"><span 
 class="ectt-1200">tasks</span></span><span style="color:#000000"><span 
 class="ectt-1200">]</span></span> 
 <span class="label"><a 
- id="x1-20043r18"></a></span><span 
+ id="x1-17043r18"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">ical</span></span> 
 <span class="label"><a 
- id="x1-20044r19"></a></span> 
+ id="x1-17044r19"></a></span> 
 <span class="label"><a 
- id="x1-20045r20"></a></span><span style="color:#000000"><span 
+ id="x1-17045r20"></a></span><span style="color:#000000"><span 
 class="ectt-1200">[2023-04-04</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">18:51:10,059:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
@@ -2355,7 +1892,7 @@ class="ectt-1200">://</span></span><span style="color:#000000"><span
 class="ectt-1200">localhost</span></span><span style="color:#000000"><span 
 class="ectt-1200">:6379//</span></span> 
 <span class="label"><a 
- id="x1-20046r21"></a></span><span style="color:#000000"><span 
+ id="x1-17046r21"></a></span><span style="color:#000000"><span 
 class="ectt-1200">[2023-04-04</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">18:51:10,065:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
@@ -2368,7 +1905,7 @@ class="ectt-1200">searching</span></span><span style="color:#000000"> </span><sp
 class="ectt-1200">for</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">neighbors</span></span> 
 <span class="label"><a 
- id="x1-20047r22"></a></span><span style="color:#000000"><span 
+ id="x1-17047r22"></a></span><span style="color:#000000"><span 
 class="ectt-1200">[2023-04-04</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">18:51:11,200:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
@@ -2382,7 +1919,7 @@ class="ectt-1200">with</span></span><span style="color:#000000"> </span><span st
 class="ectt-1200">1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">nodes</span></span> 
 <span class="label"><a 
- id="x1-20048r23"></a></span><span style="color:#000000"><span 
+ id="x1-17048r23"></a></span><span style="color:#000000"><span 
 class="ectt-1200">[2023-04-04</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">18:51:11,201:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
@@ -2394,7 +1931,7 @@ class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style
 class="ectt-1200">sync</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">complete</span></span> 
 <span class="label"><a 
- id="x1-20049r24"></a></span><span style="color:#000000"><span 
+ id="x1-17049r24"></a></span><span style="color:#000000"><span 
 class="ectt-1200">[2023-04-04</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">18:51:11,240:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
@@ -2407,24 +1944,24 @@ class="ectt-1200">ready</span></span><span style="color:#000000"><span
 class="ectt-1200">.</span></span>
  
 <span class="label"><a 
- id="x1-20050r25"></a></span></pre>
+ id="x1-17050r25"></a></span></pre>
    </div>
-<!--l. 624--><p class="indent" >   Finally, we will run Celery inside a new container. For this we will modify our <span 
+<!--l. 500--><p class="indent" >   Finally, we will run Celery inside a new container. For this we will modify our <span 
 class="ectt-1200">docker-compose.yml</span>
 file.
-</p><!--l. 627--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 627--><p class="indent" >   <span 
-class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 627--><pre class="listings" id="listing-21"><span class="label"><a 
- id="x1-20051r1"></a></span><span style="color:#000000"><span 
+</p><!--l. 503--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 503--><p class="indent" >   <span 
+class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 503--><pre class="listings" id="listing-16"><span class="label"><a 
+ id="x1-17051r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">worker</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-20052r2"></a></span><span 
+ id="x1-17052r2"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">build</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-20053r3"></a></span><span 
+ id="x1-17053r3"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -2432,7 +1969,7 @@ class="ectt-1200">context</span></span><span style="color:#000000"><span
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span> 
 <span class="label"><a 
- id="x1-20054r4"></a></span><span 
+ id="x1-17054r4"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -2442,18 +1979,18 @@ class="ectt-1200">Dockerfile</span></span><span style="color:#000000"><span
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">dev</span></span> 
 <span class="label"><a 
- id="x1-20055r5"></a></span><span 
+ id="x1-17055r5"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">restart</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">always</span></span> 
 <span class="label"><a 
- id="x1-20056r6"></a></span><span 
+ id="x1-17056r6"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">environment</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-20057r7"></a></span><span 
+ id="x1-17057r7"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -2464,7 +2001,7 @@ class="ectt-1200">://</span></span><span style="color:#000000"><span
 class="ectt-1200">redis</span></span><span style="color:#000000"><span 
 class="ectt-1200">:6379</span></span> 
 <span class="label"><a 
- id="x1-20058r8"></a></span><span 
+ id="x1-17058r8"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -2475,7 +2012,7 @@ class="ectt-1200">://</span></span><span style="color:#000000"><span
 class="ectt-1200">redis</span></span><span style="color:#000000"><span 
 class="ectt-1200">:6379</span></span> 
 <span class="label"><a 
- id="x1-20059r9"></a></span><span 
+ id="x1-17059r9"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">command</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2494,28 +2031,28 @@ class="ectt-1200">=</span></span><span style="color:#000000"><span
 class="ectt-1200">info</span></span>
  
 <span class="label"><a 
- id="x1-20060r10"></a></span></pre>
+ id="x1-17060r10"></a></span></pre>
    </div>
-<!--l. 639--><p class="indent" >   Note that we are re-using the same image development image as the Flask server. This makes sense since it
+<!--l. 515--><p class="indent" >   Note that we are re-using the same image development image as the Flask server. This makes sense since it
 shares very similar dependencies. It would make sense to separate the dependencies between the two containers
 as they grow larger.
-</p><!--l. 643--><p class="indent" >   We are overriding the command to run when the container starts to use the celery command. We have also
+</p><!--l. 519--><p class="indent" >   We are overriding the command to run when the container starts to use the celery command. We have also
 remembered to set the environment variables appropriately. We have to use the domain name of the redis
 image instead of the localhost because redis is not running on our localhost. Earlier we were able to
 pretend it was because the redis port, 6379, was being forwarded from our localhost to our redis
 container.
-</p><!--l. 648--><p class="noindent" >
+                                                                                                    
+                                                                                                    
+</p><!--l. 524--><p class="noindent" >
 </p>
-   <h4 class="subsectionHead"><span class="titlemark">6.3    </span> <a 
- id="x1-210006.3"></a>Creating Tasks</h4>
-                                                                                                    
-                                                                                                    
-<!--l. 650--><p class="noindent" >We will now return to our Flask server. We can modify our new endpoints to use Celery to create tasks on the task
+   <h4 class="subsectionHead"><span class="titlemark">5.3    </span> <a 
+ id="x1-180005.3"></a>Creating Tasks</h4>
+<!--l. 526--><p class="noindent" >We will now return to our Flask server. We can modify our new endpoints to use Celery to create tasks on the task
 queue.
-</p><!--l. 653--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 653--><p class="indent" >   <span 
-class="ectt-1200">» cat todo/views/routes.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 653--><pre class="listings" id="listing-22"><span class="label"><a 
- id="x1-21001r1"></a></span><span style="color:#006699"><span 
+</p><!--l. 529--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 529--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/views/routes.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 529--><pre class="listings" id="listing-17"><span class="label"><a 
+ id="x1-18001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">celery</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
@@ -2523,7 +2060,7 @@ class="ectt-1200">result</span></span><span style="color:#000000"> </span><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">AsyncResult</span></span> 
 <span class="label"><a 
- id="x1-21002r2"></a></span><span style="color:#006699"><span 
+ id="x1-18002r2"></a></span><span style="color:#006699"><span 
 class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">todo</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
@@ -2531,14 +2068,14 @@ class="ectt-1200">tasks</span></span><span style="color:#000000"> </span><span s
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">ical</span></span> 
 <span class="label"><a 
- id="x1-21003r3"></a></span> 
+ id="x1-18003r3"></a></span> 
 <span class="label"><a 
- id="x1-21004r4"></a></span><span style="color:#000000"><span 
+ id="x1-18004r4"></a></span><span style="color:#000000"><span 
 class="ectt-1200">...</span></span> 
 <span class="label"><a 
- id="x1-21005r5"></a></span> 
+ id="x1-18005r5"></a></span> 
 <span class="label"><a 
- id="x1-21006r6"></a></span><span style="color:#000000"><span 
+ id="x1-18006r6"></a></span><span style="color:#000000"><span 
 class="ectt-1200">@api</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">route</span></span><span style="color:#000000"><span 
@@ -2557,13 +2094,13 @@ class="ectt-1200">POST</span></span><span style="color:#669900"><span
 class="tctt-1200">'</span></span><span style="color:#000000"><span 
 class="ectt-1200">])</span></span> 
 <span class="label"><a 
- id="x1-21007r7"></a></span><span style="color:#006699"><span 
+ id="x1-18007r7"></a></span><span style="color:#006699"><span 
 class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">create_ical</span></span><span style="color:#000000"><span 
 class="ectt-1200">()</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-21008r8"></a></span><span 
+ id="x1-18008r8"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -2586,7 +2123,7 @@ class="ectt-1200">.</span></span><span style="color:#006699"><span
 class="ectt-1200">all</span></span><span style="color:#000000"><span 
 class="ectt-1200">()</span></span> 
 <span class="label"><a 
- id="x1-21009r9"></a></span><span 
+ id="x1-18009r9"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -2594,7 +2131,7 @@ class="ectt-1200">todo_input</span></span><span style="color:#000000"> </span><s
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">[]</span></span> 
 <span class="label"><a 
- id="x1-21010r10"></a></span><span 
+ id="x1-18010r10"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
@@ -2604,7 +2141,7 @@ class="ectt-1200">in</span></span><span style="color:#000000"> </span><span styl
 class="ectt-1200">todos</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-21011r11"></a></span><span 
+ id="x1-18011r11"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2621,9 +2158,9 @@ class="ectt-1200">to_dict</span></span><span style="color:#000000"><span
 class="ectt-1200">()</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-21012r12"></a></span> 
+ id="x1-18012r12"></a></span> 
 <span class="label"><a 
- id="x1-21013r13"></a></span><span 
+ id="x1-18013r13"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -2638,9 +2175,9 @@ class="ectt-1200">(</span></span><span style="color:#000000"><span
 class="ectt-1200">todo_input</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-21014r14"></a></span> 
+ id="x1-18014r14"></a></span> 
 <span class="label"><a 
- id="x1-21015r15"></a></span><span 
+ id="x1-18015r15"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -2648,7 +2185,7 @@ class="ectt-1200">result</span></span><span style="color:#000000"> </span><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-21016r16"></a></span><span 
+ id="x1-18016r16"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2664,7 +2201,7 @@ class="ectt-1200">.</span></span><span style="color:#006699"><span
 class="ectt-1200">id</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-21017r17"></a></span><span 
+ id="x1-18017r17"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2697,15 +2234,15 @@ class="ectt-1200">}/</span></span><span style="color:#669900"><span
 class="ectt-1200">status</span></span><span style="color:#669900"><span 
 class="tctt-1200">'</span></span> 
 <span class="label"><a 
- id="x1-21018r18"></a></span><span 
+ id="x1-18018r18"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-21019r19"></a></span> 
+ id="x1-18019r19"></a></span> 
 <span class="label"><a 
- id="x1-21020r20"></a></span><span 
+ id="x1-18020r20"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
@@ -2717,9 +2254,9 @@ class="ectt-1200">)</span></span><span style="color:#000000"><span
 class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">202</span></span> 
 <span class="label"><a 
- id="x1-21021r21"></a></span> 
+ id="x1-18021r21"></a></span> 
 <span class="label"><a 
- id="x1-21022r22"></a></span><span style="color:#000000"><span 
+ id="x1-18022r22"></a></span><span style="color:#000000"><span 
 class="ectt-1200">@api</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">route</span></span><span style="color:#000000"><span 
@@ -2742,7 +2279,7 @@ class="ectt-1200">GET</span></span><span style="color:#669900"><span
 class="tctt-1200">'</span></span><span style="color:#000000"><span 
 class="ectt-1200">])</span></span> 
 <span class="label"><a 
- id="x1-21023r23"></a></span><span style="color:#006699"><span 
+ id="x1-18023r23"></a></span><span style="color:#006699"><span 
 class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">get_task</span></span><span style="color:#000000"><span 
 class="ectt-1200">(</span></span><span style="color:#000000"><span 
@@ -2750,7 +2287,7 @@ class="ectt-1200">task_id</span></span><span style="color:#000000"><span
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-21024r24"></a></span><span 
+ id="x1-18024r24"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -2761,7 +2298,7 @@ class="ectt-1200">(</span></span><span style="color:#000000"><span
 class="ectt-1200">task_id</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-21025r25"></a></span><span 
+ id="x1-18025r25"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -2769,7 +2306,7 @@ class="ectt-1200">result</span></span><span style="color:#000000"> </span><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-21026r26"></a></span><span 
+ id="x1-18026r26"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2783,7 +2320,7 @@ class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style
 class="ectt-1200">task_id</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-21027r27"></a></span><span 
+ id="x1-18027r27"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2799,7 +2336,7 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">status</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-21028r28"></a></span><span 
+ id="x1-18028r28"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2830,13 +2367,13 @@ class="ectt-1200">}/</span></span><span style="color:#669900"><span
 class="ectt-1200">result</span></span><span style="color:#669900"><span 
 class="tctt-1200">'</span></span> 
 <span class="label"><a 
- id="x1-21029r29"></a></span><span 
+ id="x1-18029r29"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-21030r30"></a></span><span 
+ id="x1-18030r30"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
@@ -2848,9 +2385,9 @@ class="ectt-1200">)</span></span><span style="color:#000000"><span
 class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">200</span></span> 
 <span class="label"><a 
- id="x1-21031r31"></a></span> 
+ id="x1-18031r31"></a></span> 
 <span class="label"><a 
- id="x1-21032r32"></a></span><span style="color:#000000"><span 
+ id="x1-18032r32"></a></span><span style="color:#000000"><span 
 class="ectt-1200">@api</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">route</span></span><span style="color:#000000"><span 
@@ -2873,7 +2410,7 @@ class="ectt-1200">GET</span></span><span style="color:#669900"><span
 class="tctt-1200">'</span></span><span style="color:#000000"><span 
 class="ectt-1200">])</span></span> 
 <span class="label"><a 
- id="x1-21033r33"></a></span><span style="color:#006699"><span 
+ id="x1-18033r33"></a></span><span style="color:#006699"><span 
 class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">get_calendar</span></span><span style="color:#000000"><span 
 class="ectt-1200">(</span></span><span style="color:#000000"><span 
@@ -2881,7 +2418,7 @@ class="ectt-1200">task_id</span></span><span style="color:#000000"><span
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-21034r34"></a></span><span 
+ id="x1-18034r34"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -2892,7 +2429,7 @@ class="ectt-1200">(</span></span><span style="color:#000000"><span
 class="ectt-1200">task_id</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-21035r35"></a></span><span 
+ id="x1-18035r35"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
@@ -2906,7 +2443,7 @@ class="ectt-1200">SUCCESS</span></span><span style="color:#669900"><span
 class="tctt-1200">'</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-21036r36"></a></span><span 
+ id="x1-18036r36"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2933,14 +2470,14 @@ class="ectt-1200">calendar</span></span><span style="color:#669900"><span
 class="tctt-1200">'</span></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-21037r37"></a></span><span 
+ id="x1-18037r37"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">else</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-21038r38"></a></span><span 
+ id="x1-18038r38"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2964,24 +2501,24 @@ class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style
 class="ectt-1200">404</span></span>
  
 <span class="label"><a 
- id="x1-21039r39"></a></span></pre>
+ id="x1-18039r39"></a></span></pre>
    </div>
-<!--l. 694--><p class="indent" >   The variable that we create as tasks and pass to the delay method is the JSON data that is stored with the
+<!--l. 570--><p class="indent" >   The variable that we create as tasks and pass to the delay method is the JSON data that is stored with the
 event. It is then deserialized from JSON and passed as a variable to the <span 
 class="ectt-1200">create_ical </span>function. Celery is able to
 create impressive abstractions so that message passing over a task queue looks almost like regular function
 calls.
-</p><!--l. 698--><p class="indent" >   Before we can successfully use this endpoint to get our important &#8220;Hello World&#8221; result, we will also need to
+</p><!--l. 574--><p class="indent" >   Before we can successfully use this endpoint to get our important &#8220;Hello World&#8221; result, we will also need to
 configure the server to talk to our Redis container.
-</p><!--l. 701--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 701--><p class="indent" >   <span 
-class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 701--><pre class="listings" id="listing-23"><span class="label"><a 
- id="x1-21040r1"></a></span><span 
+</p><!--l. 577--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 577--><p class="indent" >   <span 
+class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 577--><pre class="listings" id="listing-18"><span class="label"><a 
+ id="x1-18040r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">environment</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-21041r2"></a></span><span 
+ id="x1-18041r2"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -2992,7 +2529,7 @@ class="ectt-1200">://</span></span><span style="color:#000000"><span
 class="ectt-1200">redis</span></span><span style="color:#000000"><span 
 class="ectt-1200">:6379</span></span> 
 <span class="label"><a 
- id="x1-21042r3"></a></span><span 
+ id="x1-18042r3"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -3004,14 +2541,14 @@ class="ectt-1200">redis</span></span><span style="color:#000000"><span
 class="ectt-1200">:6379</span></span>
  
 <span class="label"><a 
- id="x1-21043r4"></a></span></pre>
+ id="x1-18043r4"></a></span></pre>
    </div>
-<!--l. 707--><p class="indent" >   You should now be able to start the server and worker with docker compose.
+<!--l. 583--><p class="indent" >   You should now be able to start the server and worker with docker compose.
 </p>
    <div class="framedenv" id="shaded*-1">
-   <!--l. 709-->
-<pre class="lstlisting" id="listing-24"><span class="label"><a 
- id="x1-21044r1"></a></span><span style="color:#000000"><span 
+   <!--l. 585-->
+<pre class="lstlisting" id="listing-19"><span class="label"><a 
+ id="x1-18044r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"><span 
 class="ectt-1200">-</span></span><span style="color:#000000"><span 
@@ -3019,50 +2556,50 @@ class="ectt-1200">compose</span></span><span style="color:#000000"> </span><span
 class="ectt-1200">up</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 711--><p class="indent" >   You can now send a POST request to the <span 
+<!--l. 587--><p class="indent" >   You can now send a POST request to the <span 
 class="ectt-1200">/api/v1/todos/ical </span>endpoint to start a job and follow the
 subsequent URLs to see the result of the job.
-</p><!--l. 713--><p class="noindent" >
+</p><!--l. 589--><p class="noindent" >
 </p>
-   <h4 class="subsectionHead"><span class="titlemark">6.4    </span> <a 
- id="x1-220006.4"></a>Creating the Calendar</h4>
-<!--l. 715--><p class="noindent" >Once we have confirmed that the task queue can communicate with our worker, we can return to the calendar
+   <h4 class="subsectionHead"><span class="titlemark">5.4    </span> <a 
+ id="x1-190005.4"></a>Creating the Calendar</h4>
+<!--l. 591--><p class="noindent" >Once we have confirmed that the task queue can communicate with our worker, we can return to the calendar
 generation. We will use the <span 
 class="ectt-1200">icalendar </span>library for this.
 </p>
    <div class="framedenv" id="shaded*-1">
-   <!--l. 719-->
-<pre class="lstlisting" id="listing-25"><span class="label"><a 
- id="x1-22001r1"></a></span><span style="color:#000000"><span 
+   <!--l. 595-->
+<pre class="lstlisting" id="listing-20"><span class="label"><a 
+ id="x1-19001r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">pipenv</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">install</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">icalendar</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 721--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 721--><p class="indent" >   <span 
-class="ectt-1200">» cat todo/tasks/ical.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 721--><pre class="listings" id="listing-26"><span class="label"><a 
- id="x1-22002r1"></a></span><span style="color:#006699"><span 
+<!--l. 597--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 597--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/tasks/ical.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 597--><pre class="listings" id="listing-21"><span class="label"><a 
+ id="x1-19002r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">icalendar</span></span> 
 <span class="label"><a 
- id="x1-22003r2"></a></span><span style="color:#006699"><span 
+ id="x1-19003r2"></a></span><span style="color:#006699"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">time</span></span> 
 <span class="label"><a 
- id="x1-22004r3"></a></span><span style="color:#006699"><span 
+ id="x1-19004r3"></a></span><span style="color:#006699"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">datetime</span></span> 
 <span class="label"><a 
- id="x1-22005r4"></a></span> 
+ id="x1-19005r4"></a></span> 
 <span class="label"><a 
- id="x1-22006r5"></a></span><span style="color:#000000"><span 
+ id="x1-19006r5"></a></span><span style="color:#000000"><span 
 class="ectt-1200">...</span></span> 
 <span class="label"><a 
- id="x1-22007r6"></a></span> 
+ id="x1-19007r6"></a></span> 
 <span class="label"><a 
- id="x1-22008r7"></a></span><span style="color:#006699"><span 
+ id="x1-19008r7"></a></span><span style="color:#006699"><span 
 class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">create_ical</span></span><span style="color:#000000"><span 
 class="ectt-1200">(</span></span><span style="color:#000000"><span 
@@ -3070,7 +2607,7 @@ class="ectt-1200">tasks</span></span><span style="color:#000000"><span
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-22009r8"></a></span><span 
+ id="x1-19009r8"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -3081,7 +2618,7 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">Calendar</span></span><span style="color:#000000"><span 
 class="ectt-1200">()</span></span> 
 <span class="label"><a 
- id="x1-22010r9"></a></span><span 
+ id="x1-19010r9"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -3105,7 +2642,7 @@ class="ectt-1200">//</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-22011r10"></a></span><span 
+ id="x1-19011r10"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -3122,9 +2659,9 @@ class="ectt-1200">2.0</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-22012r11"></a></span> 
+ id="x1-19012r11"></a></span> 
 <span class="label"><a 
- id="x1-22013r12"></a></span><span 
+ id="x1-19013r12"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -3133,9 +2670,9 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">sleep</span></span><span style="color:#000000"><span 
 class="ectt-1200">(50)</span></span> 
 <span class="label"><a 
- id="x1-22014r13"></a></span> 
+ id="x1-19014r13"></a></span> 
 <span class="label"><a 
- id="x1-22015r14"></a></span><span 
+ id="x1-19015r14"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
@@ -3145,7 +2682,7 @@ class="ectt-1200">in</span></span><span style="color:#000000"> </span><span styl
 class="ectt-1200">tasks</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-22016r15"></a></span><span 
+ id="x1-19016r15"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -3159,9 +2696,9 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">Event</span></span><span style="color:#000000"><span 
 class="ectt-1200">()</span></span> 
 <span class="label"><a 
- id="x1-22017r16"></a></span> 
+ id="x1-19017r16"></a></span> 
 <span class="label"><a 
- id="x1-22018r17"></a></span><span 
+ id="x1-19018r17"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -3183,7 +2720,7 @@ class="ectt-1200">id</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">])</span></span> 
 <span class="label"><a 
- id="x1-22019r18"></a></span><span 
+ id="x1-19019r18"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -3205,7 +2742,7 @@ class="ectt-1200">title</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">])</span></span> 
 <span class="label"><a 
- id="x1-22020r19"></a></span><span 
+ id="x1-19020r19"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -3227,7 +2764,7 @@ class="ectt-1200">description</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">])</span></span> 
 <span class="label"><a 
- id="x1-22021r20"></a></span><span 
+ id="x1-19021r20"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -3271,9 +2808,9 @@ class="ectt-1200">"</span></span><span style="color:#000000"><span
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-22022r21"></a></span> 
+ id="x1-19022r21"></a></span> 
 <span class="label"><a 
- id="x1-22023r22"></a></span><span 
+ id="x1-19023r22"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -3287,9 +2824,9 @@ class="ectt-1200">(</span></span><span style="color:#000000"><span
 class="ectt-1200">event</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-22024r23"></a></span> 
+ id="x1-19024r23"></a></span> 
 <span class="label"><a 
- id="x1-22025r24"></a></span><span 
+ id="x1-19025r24"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
@@ -3308,18 +2845,18 @@ class="ectt-1200">"</span></span><span style="color:#000000"><span
 class="ectt-1200">)</span></span>
  
 <span class="label"><a 
- id="x1-22026r25"></a></span></pre>
+ id="x1-19026r25"></a></span></pre>
    </div>
-<!--l. 748--><p class="indent" >   Now you should be able to test your application.
+<!--l. 624--><p class="indent" >   Now you should be able to test your application.
       </p><ol  class="enumerate1" >
+                                                                                                    
+                                                                                                    
 <li 
-  class="enumerate" id="x1-22028x1">
-      <!--l. 750--><p class="noindent" >Start it with docker-compose.  </p><div class="framedenv" id="shaded*-1">
-      <!--l. 751-->
-                                                                                                    
-                                                                                                    
-      <pre class="lstlisting" id="listing-27"><span class="label"><a 
- id="x1-22029r1"></a></span><span style="color:#000000"><span 
+  class="enumerate" id="x1-19028x1">
+      <!--l. 626--><p class="noindent" >Start it with docker-compose.  </p><div class="framedenv" id="shaded*-1">
+      <!--l. 627-->
+      <pre class="lstlisting" id="listing-22"><span class="label"><a 
+ id="x1-19029r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"><span 
 class="ectt-1200">-</span></span><span style="color:#000000"><span 
@@ -3332,25 +2869,25 @@ class="ectt-1200">&#x00A0;</span></pre>
       </div>
       </li>
 <li 
-  class="enumerate" id="x1-22031x2">
-      <!--l. 752--><p class="noindent" >Open the user interface on <a 
+  class="enumerate" id="x1-19031x2">
+      <!--l. 628--><p class="noindent" >Open the user interface on <a 
 href="http://localhost:6400" class="url" ><span 
 class="ectt-1200">http://localhost:6400</span></a> and create some tasks.
       </p></li>
 <li 
-  class="enumerate" id="x1-22033x3">
-      <!--l. 753--><p class="noindent" >Follow the cURL interaction from Section <a 
-href="#x1-190006.1">6.1<!--tex4ht:ref: sect:apiext --></a> to generate an appropriate iCal.</p></li></ol>
-<!--l. 756--><p class="noindent" >
+  class="enumerate" id="x1-19033x3">
+      <!--l. 629--><p class="noindent" >Follow the cURL interaction from Section <a 
+href="#x1-160005.1">5.1<!--tex4ht:ref: sect:apiext --></a> to generate an appropriate iCal.</p></li></ol>
+<!--l. 632--><p class="noindent" >
 </p>
-   <h3 class="sectionHead"><span class="titlemark">7    </span> <a 
- id="x1-230007"></a>Deploying with SQS</h3>
-<!--l. 758--><p class="noindent" >First we will modify our worker so that it can run locally and connect to an SQS queue. We need to create an
+   <h3 class="sectionHead"><span class="titlemark">6    </span> <a 
+ id="x1-200006"></a>Deploying with SQS</h3>
+<!--l. 634--><p class="noindent" >First we will modify our worker so that it can run locally and connect to an SQS queue. We need to create an
 appropriate SQS queue.
-</p><!--l. 761--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 761--><p class="indent" >   <span 
-class="ectt-1200">» cat sqs.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 761--><pre class="listings" id="listing-28"><span class="label"><a 
- id="x1-23001r1"></a></span><span style="color:#006699"><span 
+</p><!--l. 637--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 637--><p class="indent" >   <span 
+class="ectt-1200">» cat sqs.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 637--><pre class="listings" id="listing-23"><span class="label"><a 
+ id="x1-20001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">aws_sqs_queue</span></span><span style="color:#669900"><span 
@@ -3360,7 +2897,7 @@ class="ectt-1200">ical_queue</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-23002r2"></a></span><span 
+ id="x1-20002r2"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -3370,33 +2907,33 @@ class="ectt-1200">"</span></span><span style="color:#669900"><span
 class="ectt-1200">ical</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-23003r3"></a></span><span style="color:#000000"><span 
+ id="x1-20003r3"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-23004r4"></a></span></pre>
+ id="x1-20004r4"></a></span></pre>
    </div>
-   <div class="tcolorbox tcolorbox" id="tcolobox-11"> 
+   <div class="tcolorbox tcolorbox" id="tcolobox-10"> 
 <div class="tcolorbox-title">
-<!--l. 770--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 770--><p class="noindent" >Celery  will  automatically  create  a  queue  if  it  doesn&#8217;t  exist,  however,  we  want  to  manage  it  with
+<!--l. 646--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 646--><p class="noindent" >Celery  will  automatically  create  a  queue  if  it  doesn&#8217;t  exist,  however,  we  want  to  manage  it  with
 Terraform so it is easier to destroy.  </p> 
 </div> 
 </div>
-<!--l. 772--><p class="indent" >   Now we need to tell our worker to use our SQS queue. To do this we will use the <span 
+<!--l. 648--><p class="indent" >   Now we need to tell our worker to use our SQS queue. To do this we will use the <span 
 class="ectt-1200">sqs:// </span>broker URL. This tells
 Celery to use SQS. Celery will then attempt to find appropriate AWS credentials to use to authenticate. We could
 pass these in as environment variables. However, for convinence we will mount the <span 
 class="ectt-1200">credentials </span>file that already
 exists within our container.
-</p><!--l. 779--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 779--><p class="indent" >   <span 
-class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 779--><pre class="listings" id="listing-29"><span class="label"><a 
- id="x1-23005r1"></a></span><span style="color:#000000"><span 
+</p><!--l. 655--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 655--><p class="indent" >   <span 
+class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 655--><pre class="listings" id="listing-24"><span class="label"><a 
+ id="x1-20005r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">volumes</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-23006r2"></a></span><span 
+ id="x1-20006r2"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">./</span></span><span style="color:#000000"><span 
@@ -3406,7 +2943,7 @@ class="ectt-1200">app</span></span><span style="color:#000000"><span
 class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">todo</span></span> 
 <span class="label"><a 
- id="x1-23007r3"></a></span><span 
+ id="x1-20007r3"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">./</span></span><span style="color:#000000"><span 
@@ -3418,11 +2955,11 @@ class="ectt-1200">aws</span></span><span style="color:#000000"><span
 class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">credentials</span></span> 
 <span class="label"><a 
- id="x1-23008r4"></a></span><span style="color:#000000"><span 
+ id="x1-20008r4"></a></span><span style="color:#000000"><span 
 class="ectt-1200">environment</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-23009r5"></a></span><span 
+ id="x1-20009r5"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">CELERY_BROKER_URL</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -3430,29 +2967,32 @@ class="ectt-1200">sqs</span></span><span style="color:#000000"><span
 class="ectt-1200">://</span></span>
  
 <span class="label"><a 
- id="x1-23010r6"></a></span></pre>
+ id="x1-20010r6"></a></span></pre>
    </div>
-<!--l. 787--><p class="indent" >   Ensure that you update both the worker and the server. Note that we are using <span 
+<!--l. 663--><p class="indent" >   Ensure that you update both the worker and the server. Note that we are using <span 
 class="ectt-1200">/root </span>since the container is run
 as the root user and Celery will therefore look at <span 
 class="ectt-1200">~/.aws/credentials</span>.
-</p><!--l. 790--><p class="indent" >   We can use the SQS queue in this state to create tasks and our workers will pick it up. This is often sufficient,
+</p><!--l. 666--><p class="indent" >   We can use the SQS queue in this state to create tasks and our workers will pick it up. This is often sufficient,
 however, in our implementation we have made use of Celery&#8217;s built-in functionality to track jobs with a persistent
 data store. This is by use of the <span 
 class="ectt-1200">AsyncResult </span>class. If we tried to go to the status or result page for a task we
 submitted, we would receive an error.
-</p><!--l. 796--><p class="indent" >   To work around this issue, we will use our existing PostgreSQL database as our persistent store to track
+</p><!--l. 672--><p class="indent" >   To work around this issue, we will use our existing PostgreSQL database as our persistent store to track
 tasks.
-</p><!--l. 799--><p class="indent" >   We can update our <span 
+</p><!--l. 675--><p class="indent" >   We can update our <span 
 class="ectt-1200">docker-compose.yml </span>as below to allow Celery to use our PostgreSQL database.
-</p><!--l. 801--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 801--><p class="indent" >   <span 
-class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 801--><pre class="listings" id="listing-30"><span class="label"><a 
- id="x1-23011r1"></a></span><span style="color:#000000"><span 
+</p><!--l. 677--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 677--><p class="indent" >   <span 
+class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1">
+                                                                                                    
+                                                                                                    
+<!--l. 677--><pre class="listings" id="listing-25"><span class="label"><a 
+ id="x1-20011r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">environment</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-23012r2"></a></span><span 
+ id="x1-20012r2"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -3469,61 +3009,59 @@ class="ectt-1200">:5432/</span></span><span style="color:#000000"><span
 class="ectt-1200">todo</span></span>
  
 <span class="label"><a 
- id="x1-23013r3"></a></span></pre>
+ id="x1-20013r3"></a></span></pre>
    </div>
-<!--l. 806--><p class="indent" >   This is the same as the <span 
+<!--l. 682--><p class="indent" >   This is the same as the <span 
 class="ectt-1200">SQLALCHEMY_DATABASE_URI </span>except for <span 
 class="ectt-1200">db+ </span>at the start to help Celery identify the type
 of data store.
-                                                                                                    
-                                                                                                    
-</p><!--l. 808--><p class="noindent" >
+</p><!--l. 684--><p class="noindent" >
 </p>
-   <h3 class="sectionHead"><span class="titlemark">8    </span> <a 
- id="x1-240008"></a>Deploying with ECS</h3>
-<!--l. 810--><p class="noindent" >Now we have;
+   <h3 class="sectionHead"><span class="titlemark">7    </span> <a 
+ id="x1-210007"></a>Deploying with ECS</h3>
+<!--l. 686--><p class="noindent" >Now we have;
       </p><ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x1-24002x1">
-      <!--l. 812--><p class="noindent" >an SQS queue on AWS,
+  class="enumerate" id="x1-21002x1">
+      <!--l. 688--><p class="noindent" >an SQS queue on AWS,
       </p></li>
 <li 
-  class="enumerate" id="x1-24004x2">
-      <!--l. 813--><p class="noindent" >a worker Celery container running locally,
+  class="enumerate" id="x1-21004x2">
+      <!--l. 689--><p class="noindent" >a worker Celery container running locally,
       </p></li>
 <li 
-  class="enumerate" id="x1-24006x3">
-      <!--l. 814--><p class="noindent" >a server Flask container running locally, and
+  class="enumerate" id="x1-21006x3">
+      <!--l. 690--><p class="noindent" >a server Flask container running locally, and
       </p></li>
 <li 
-  class="enumerate" id="x1-24008x4">
-      <!--l. 815--><p class="noindent" >a PostgreSQL database running locally.</p></li></ol>
-<!--l. 818--><p class="indent" >   Earlier in the practical we showed how to host a container on ECR. In previous practicals we used a hosted
+  class="enumerate" id="x1-21008x4">
+      <!--l. 691--><p class="noindent" >a PostgreSQL database running locally.</p></li></ol>
+<!--l. 694--><p class="indent" >   Earlier in the practical we showed how to host a container on ECR. In previous practicals we used a hosted
 image to deploy containers on ECS or EC2. In previous practicals we also deployed a PostgreSQL database on
 RDS.
-</p><!--l. 822--><p class="indent" >   We would strongly encourage you to try and deploy all components of our application on AWS infrastructure.
+</p><!--l. 698--><p class="indent" >   We would strongly encourage you to try and deploy all components of our application on AWS infrastructure.
 This will be excellent practice for the cloud assignment.
 </p>
-<!--l. 825--><p class="noindent" ><span class="paragraphHead"><a 
- id="x1-25000"></a><span 
+<!--l. 701--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-22000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Hints</span></span>
       </p><ol  class="enumerate1" >
 <li 
-  class="enumerate" id="x1-25002x1">
-      <!--l. 827--><p class="noindent" >ECS/EC2 containers will automatically authenticate with your AWS account (so <span 
+  class="enumerate" id="x1-22002x1">
+      <!--l. 703--><p class="noindent" >ECS/EC2 containers will automatically authenticate with your AWS account (so <span 
 class="ectt-1200">credentials </span>isn&#8217;t
       required).
+                                                                                                    
+                                                                                                    
       </p></li>
 <li 
-  class="enumerate" id="x1-25004x2">
-      <!--l. 828--><p class="noindent" >Attempt to test each component is deployed correctly individually, e.g. deploy RDS and ensure the
+  class="enumerate" id="x1-22004x2">
+      <!--l. 704--><p class="noindent" >Attempt to test each component is deployed correctly individually, e.g. deploy RDS and ensure the
       system works, then deploy the server and ensure the system works, etc.</p></li></ol>
-                                                                                                    
-                                                                                                    
 <!--l. 1--><p class="noindent" >
 </p>
    <h3 class="likesectionHead"><a 
- id="x1-26000"></a>References</h3>
+ id="x1-23000"></a>References</h3>
 <!--l. 1--><p class="noindent" >
    </p><div class="thebibliography">
    <p class="bibitem" ><span class="biblabel">
@@ -3535,14 +3073,14 @@ class="ectt-1200">https://csse6400.uqcloud.net/handouts/event.pdf</span></a>.
 </p>
    </div>
    <div class="footnotes"><a 
- id="x1-18002x6"></a>
-<!--l. 471--><p class="indent" >       <span class="footnote-mark"><a 
+ id="x1-15002x5"></a>
+<!--l. 347--><p class="indent" >       <span class="footnote-mark"><a 
 href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span><span 
 class="Cabin-Regular-tlf-t1-">In reality it is not but this is an example of a common use case for asynchronous tasks &#8212; file generation such as PDFs or videos</span>
 <span 
 class="Cabin-Regular-tlf-t1-">which do take time.</span></p><a 
- id="x1-19002x6.1"></a>
-<!--l. 486--><p class="noindent" ><span class="footnote-mark"><a 
+ id="x1-16002x5.1"></a>
+<!--l. 362--><p class="noindent" ><span class="footnote-mark"><a 
 href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span><span 
 class="Cabin-Regular-tlf-t1-">Ideally a POST procedural endpoint should use a verb like </span><span 
 class="ectt-1000">/generate</span><span 
