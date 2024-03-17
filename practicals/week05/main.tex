@@ -60,7 +60,7 @@ terraform {
     required_providers {
         aws = {
             source  = "hashicorp/aws"
-            version = "~> 4.0"
+            version = "~> 5.0"
         }
     }
 }
@@ -532,6 +532,130 @@ This is an opportunity for you to explore the ECS interface and find the task, w
 
 This path is not described in the course yet,
 but we recommend that if you liked the course to have a look at \link{Kubernetes}{https://kubernetes.io/} as it is widely used in industry.
+
+\section{Hosting TaskOverflow Images}
+
+When we last deployed a container on AWS,
+we used an existing hosted image.
+Now, we will be developing our own image,
+so we will need a mechanism to host the image.
+For this, we will being using an AWS ECR, Docker, and Terraform.
+AWS ECR is the Elastic Container Registry,
+it is a container registry like DockerHub or GitHub.
+We can use it to host our images,
+using the process below:
+
+\begin{enumerate}
+    \item Use Terraform to create an ECR repository for our image.
+    \item Use Terraform to build our Docker image.
+    \item Use Terraform to push our Docker image.
+\end{enumerate}
+
+\info{
+This is a non-standard process.
+As you may have seen in the DevOps tutorial,
+we would ordinarily like our code commits to trigger a CI/CD pipeline which builds the images.
+
+If you would like, you can use GitHub actions to build and push your container to the GitHub container registry and authenticate when you pull the image.
+However, using ECR simplifies the process,
+despite the oddities introduced by having a non-persistent ECR repository.
+}
+
+\paragraph{Getting Started}
+
+\begin{enumerate}
+    \item Using the GitHub Classroom link for this practical provided by your tutor in Slack, create a repository to work within.
+    \item Install Terraform if not already installed, as it will be required again this week.
+    \item Start your learner lab and copy the AWS Learner Lab credentials into a credentials file in the root of the repository.
+\end{enumerate}
+
+\paragraph{What's New}
+We are starting again with our todo application from roughly where we left off in the week 3 practical.
+We've added a new directory \texttt{todo/app} that has the static HTML files for the TaskOverflow website and added a route to serve these files.
+We have also created a production version of the server that uses gunicorn,
+the \texttt{bin} directory is used by this image.
+Our original Docker image is now in \texttt{Dockerfile.dev}.\\
+
+
+We will setup our initial Terraform configuration.
+Note that now we introduce a new required provider.
+This provider is for Docker.
+
+\begin{code}[language=terraform,numbers=none]{main.tf}
+terraform {
+   required_providers {
+      aws = {
+         source = "hashicorp/aws"
+         version = "~> 5.0"
+      }
+      docker = {
+         source  = "kreuzwerker/docker"
+         version = "3.0.2"
+      }
+   }
+}
+
+provider "aws" {
+   region = "us-east-1"
+   shared_credentials_files = ["./credentials"]
+}
+\end{code}
+
+As with our AWS provider,
+when we initially configure the provider,
+we want to authenticate so that we can later push to our registry using the Docker provider.
+We will use the \texttt{aws\_ecr\_authorization\_token} data block to get appropriate ECR credentials for Docker.
+
+\begin{code}[language=terraform,numbers=none]{main.tf}
+data "aws_ecr_authorization_token" "ecr_token" {}
+
+provider "docker" {
+  registry_auth {
+    address  = data.aws_ecr_authorization_token.ecr_token.proxy_endpoint
+    username = data.aws_ecr_authorization_token.ecr_token.user_name
+    password = data.aws_ecr_authorization_token.ecr_token.password
+  }
+}
+\end{code}
+
+We need to use Terraform to create an ECR repository to push to.
+
+\begin{code}[language=terraform,numbers=none]{main.tf}
+resource "aws_ecr_repository" "taskoverflow" {
+  name = "taskoverflow"
+}
+\end{code}
+
+The URL for containers in the ECR following the format below:
+
+\url{{ACCOUNT_ID}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME}}
+
+Remember --- to push to a container registry
+we need a local container whose tag matches the remote URL.
+We could then create and push the contianer locally with:
+
+\begin{code}[language=bash,numbers=none]{}
+docker build -t {ACCOUNT_ID}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME} .
+docker push {ACCOUNT_ID}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME} 
+\end{code}
+
+However, it would be easier if we could build and push this container from within Terraform.
+We can use the Docker provider for this.
+
+\begin{code}[language=terraform,numbers=none]{image.tf}
+resource "docker_image" "taskoverflow" {
+  name         = "${aws_ecr_repository.taskoverflow.repository_url}:latest"
+  build {
+    context = "."
+  }
+}
+
+resource "docker_registry_image" "taskoverflow" {
+  name          = docker_image.taskoverflow.name
+}
+\end{code}
+
+Notice that we are able to utilize the output of the ECR repository as the URL which resolves to the correct URL for the image.
 
 \bibliographystyle{ieeetr}
 \bibliography{books,ours}
