@@ -12,7 +12,7 @@
 
 \title{Distributed Systems II}
 \subtitle{Software Architecture}
-\author{Brae Webb}
+\author{Brae Webb \& Richard Thomas}
 \date{\week{6}}
 
 % \titlegraphic {
@@ -49,15 +49,14 @@
 \includegraphics[width=0.8\textheight]{diagrams/SaharaScaled}
 \end{center}
 }
-
 \note[itemize]{
     \item We scaled a stateless service.
-    \item It was stateless as it didn't require persistent data.
+    \item It was stateless as services didn't require persistent data between requests.
+    \item Persistent state is saved in the database.
     \item This is normally easy to do.
 }
 
 \question{What is the \highlight{problem}?}
-
 \note{The database}
 
 \point[Database]{
@@ -65,17 +64,16 @@
 \includegraphics[width=\textheight]{diagrams/FocusDB}
 \end{center}
 }
-
 \note[itemize]{
-    \item The database has state, persistent data.
+    \item Database has state, persistent data.
     \item This is much harder to scale.
 }
 
 \point[Disclaimer]{This is \highlight{not} a database course.}
 
 \image{images/infs3200}
-
 \note{This is a database course.}
+
 
 %%%%%%%%%%%%%%%
 % Replication %
@@ -110,7 +108,6 @@
         \item Locate instances \highlight{closer to end-users}.
     \end{itemize}
 }
-
 \note[itemize]{
     \item Scalability
     \item Reliability
@@ -118,7 +115,6 @@
 }
 
 \question{How do we replicate our data?}
-
 \note[itemize]{
     \item Easy without updates, just copy it.
     \item Updates, or writes, must propagate changes.
@@ -127,7 +123,6 @@
 \point[First approach]{Leader-follower Replication}
 
 \image{diagrams/LeaderFollower}
-
 \note[itemize]{
     \item Leader-follower is the most common implementation.
     \item Multiple followers, only one leader.
@@ -141,7 +136,6 @@
 }
 
 \image{diagrams/LeaderFollowerSpread}
-
 \note[itemize]{
     \item Built-in to PostgreSQL, MySQL, MongoDB, RethinkDB, and Espresso.
     \item Can be added to Oracle and SQL Server.
@@ -188,22 +182,19 @@
 }
 
 \image{diagrams/ReplicationLag}
-
-\note{The time it takes for the change to the name of the product to update across all followers}
+\note{The time it takes for the change to the name of the product to update across all followers.}
 
 \image[height=\textheight]{diagrams/AsyncLag}
-
-\note{The purple part is replication lag}
+\note{The purple part is replication lag.}
 
 % \point[The time taken for replicas to update their stale data is]{Replication Lag}
 
 \point[Eventually, all replicas must become consistent]{
     The system is \highlight{eventually consistent}
 }
-
 \note[itemize]{
-    \item If writes stop for long enough
-    \item Eventually is intentionally ambiguous
+    \item If writes stop for long enough.
+    \item Eventually is intentionally \highlight{ambiguous}.
 }
 
 \point[Eventual Consistency]{Problems?}
@@ -231,10 +222,9 @@
 }
 \end{center}
 \end{frame}
-
 \note[itemize]{
     \item Read user details
-    \item Decide I don't like by name
+    \item Decide I don't like my name
     \item Update name
     \item Read user details
 }
@@ -244,8 +234,7 @@
 \definition{Read-your-writes Consistency}{
     Users always see the updates that \highlight{they have made}.
 }
-
-\note{Doesn't care what other users see}
+\note{Doesn't care what other users see.}
 
 \begin{frame}
 \begin{center}
@@ -283,11 +272,10 @@
 \definition{Monotonic Reads}{
     Once a user reads an updated value, they don't later see the old value.
 }
-
-\note{User doesn't travel back in time}
+\note{User doesn't travel back in time.}
 
 % \point{Consistent Prefix Reads}
-% \todo{Consistent Precix Example}
+% \todo{Consistent Prefix Example}
 
 \point[Summary]{
 \begin{itemize}
@@ -310,9 +298,8 @@
             giving \highlight{better fault-tolerance}.
 \end{itemize}
 }
-
 \note[itemize]{
-    \item Available via extensions in most databases, often not natively supported.
+    \item Available via extensions in most databases, often not supported natively.
     \item Best to avoid where possible.
 }
 
@@ -324,11 +311,9 @@
 % }
 
 \questionanswer{What might go wrong?}{Write conflicts}
-
 \note{Write conflicts require the conflict to be resolved.}
 
 \image{diagrams/WriteConflict}
-
 \note{-1 Pillows? How do we resolve this?}
 
 \point[Where possible]{Avoid write conflicts}
@@ -353,7 +338,6 @@
     \item[On Read] When a conflict is next read, ask for a resolution.
 \end{description} 
 }
-
 \note[itemize]{
     \item Bucardo allows a perl script for on write resolution.
     \item CouchDB prompts reads to resolve the conflict.
@@ -362,7 +346,6 @@
 % \point[Cutting Edge]{Automatic Conflict Resolution}
 
 \point[Third Approach]{Leaderless Replication}
-
 \note[itemize]{
     \item Early distributed databases were leaderless.
     \item Resurgance after Amazon created Dynamo.
@@ -371,7 +354,6 @@
 }
 
 \image{diagrams/Leaderless}
-
 \note{Reads and writes can be written to any node.}
 
 \point[How do they work?]{
@@ -381,8 +363,7 @@
 \image{diagrams/LeaderlessExampleWrite}
 
 \image{diagrams/LeaderlessExampleRead}
-
-\note{At least one of the reads has the updated value}
+\note{At least one of the reads has the updated value.}
 
 \point[How are changes propagated?]{
     \begin{itemize}[<+->]
@@ -426,8 +407,7 @@
     \item[$\textcolor{eq2}{r}$] amount of replicas to {\color{eq2}\textsl{read}} from
 \end{description}
 }
-
-\note{The nodes read from must overlap with the nodes written to}
+\note{The nodes read from must overlap with the nodes written to.}
 
 \begin{frame}
 \begin{center}
@@ -459,6 +439,7 @@
 \end{itemize}
 }
 
+
 %%%%%%%%%%%%%%%%
 % Partitioning %
 %%%%%%%%%%%%%%%%
@@ -477,13 +458,11 @@
 \definition{Partitioning}{
     Split the data of a system onto multiple nodes, these nodes are \highlight{partitions}.
 }
-
-\note{Also called shardes, regions, tablets, etc.}
+\note{Also called shards, regions, tablets, etc.}
 
 \image{diagrams/Partitioning}
-
 \note[itemize]{
-    \item Pioneered in the 1980s
+    \item Pioneered in the 1980s.
     \item Allow scalability of large data, not just large load.
     \item Partitioning is normally combined with replication.
 }
@@ -491,8 +470,7 @@
 \question{How should we decide which data is stored where?}
 
 \image[height=\textheight]{diagrams/PartitioningExample}
-
-\note{An example partitioning based on primary key, student ID}
+\note{An example partitioning based on primary key, student ID.}
 
 \questionanswer{What is the problem with this?}{
     Over time some partitions become inactive,
@@ -506,15 +484,13 @@
 }
 
 \questionanswer{Have we seen this before?}{Hashing?}
-
 \note{Hash tables hash entries to maximize the spread between buckets.}
 
 \questionanswer{What is the problem with this?}{
-    Range queries are inefficient, i.e. get all students between s4444444 and s4565656
+    Range queries are inefficient, i.e. get all students between s4444444 and s4565656.
 }
 
 \question{How do we route queries?}
-
 \note{Unlike stateless, only one node can process queries.}
 
 \point[Query-insensitive Load Balancer]{
@@ -565,7 +541,6 @@
 }
 
 %\point{Distributed state creates a lot of \highlight{complexity}}
-
 %\note{And when programmers have complexity, they create bugs}
 
 %\point[When programmers are faced with complexity]{
@@ -573,11 +548,9 @@
 %}
 
 %\point[One key database abstraction]{Transactions}
-
 %\note{Introduced by IBM System R in 1975}
 
 %\definition{Transaction}{A group of operations performed as if they were one.}
-
 %\note{What does as if it were one mean?}
 
 %\begin{frame}{ACID}
@@ -593,7 +566,6 @@
 %\point[The pushback]{
 %    NoSQL and microservice architectures pushed back against transactions.
 %}
-
 %\note[itemize]{
 %    \item Transactions were used fairly universally for a long time.
 %    \item Push back occurred when people decided they weren't scalable.
