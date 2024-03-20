@@ -1,18 +1,16 @@
 \documentclass{slide}
-\usepackage{tikz}
-
-\usetikzlibrary{arrows}
-
-\usepackage{tabto}
-
-\usepackage{languages}
 
 % \usepackage{pgfpages}
-% \setbeameroption{show notes on second screen}
+\usepackage{tabto}
+\usepackage{languages}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+
+%\setbeameroption{show notes on second screen}
 
 \title{Distributed Systems I}
 \subtitle{Software Architecture}
-\author{Brae Webb}
+\author{Brae Webb \& Richard Thomas}
 \date{\week{5}}
 
 \titlegraphic {
@@ -70,36 +68,41 @@
 \point[Fallacy \#1]{The network is reliable.}
 
 \image{diagrams/Success}
+\note{Success: Send request to add item to cart.}
 
 \image{diagrams/SendDrop}
+\note{Failure 1: Request not received by server (CartService).}
 
 \image{diagrams/SendDropResend}
-\note{Solve it by resending it}
+\note{Failure 1: \textit{Solution} resend request?}
 
 \image{diagrams/SendDropDos}
-\note{If the service goes down and all clients are re-trying, the service is in for a shock when it comes back, we solve this with \highlight{exponential backoff}}
+\note{If the service goes down and all clients are re-trying,\\ the service is in for a shock when it comes back,\\ we solve this with \highlight{exponential backoff}.}
 
 \begin{frame}[fragile]{Exponential Backoff}
 \begin{code}[language=python,morekeywords={do}]{}
-retry = True
+retries = 0
 do:
     status = service.request()
 
     if status != SUCCESS:
+        retries += 1
         wait(2 ** retries)
-    else:
-        retry = False
-while (retry and retries < MAX_RETIRES)
+while (status != SUCCESS and retries < MAX_RETRIES)
 \end{code}
 \end{frame}
 
 \image{diagrams/ReceiveDrop}
+\note{Failure 2: Response not received.}
 
 \image{diagrams/ReceiveDropResend}
-\note{Causes duplicate actions, problem for ordering/payments}
+\note[itemize]{
+\item Failure 1's \textit{solution} of resending request leads to:
+\item Duplicate actions, problem for ordering/payments.
+}
 
 \image{diagrams/ReceiveDropToken}
-\note{Use tokens to prevent duplicates.}
+\note{Solution: Use tokens to prevent duplicates.}
 
 \point[Fallacy \#2]{Latency is zero.}
 
@@ -110,10 +113,13 @@ while (retry and retries < MAX_RETIRES)
         \item[EC2 to EC2] \only<4->{0.662ms}
     \end{description}
 }
-\note{Be mindful when designing distributed systems. Network call much slower then local call.}
+\note[itemize]{
+\item Be mindful when designing distributed systems.
+\item Network call \highlight{much} slower than local call.
+}
 
 \point[Fallacy \#3]{Bandwidth is infinite.}
-\note{Similar to previous fallacy, be mindful, distributed calls clog up network.}
+\note{Similar to previous fallacy, be mindful,\\ distributed calls clog up network.}
 
 \definition{Stamp Coupling}{
     Components which share a composite data structure.
@@ -122,28 +128,46 @@ while (retry and retries < MAX_RETIRES)
 \point[Fallacy \#4]{The network is secure.}
 
 \image[height=1.07\textheight]{diagrams/Sahara}
-\note{Authentication only occurs when entering Sahara data centre}
+\note{Authentication only occurs when entering Sahara data centre.}
 
 \image[height=1.1\textheight]{diagrams/NetworkInjection}
-\note{Bad actor gets access via one insecure node, network is compromised. Practice defence in depth.}
+\note[itemize]{
+\item Bad actor gets access via one insecure node.
+\item Network is compromised.
+\item Practice defence in depth.
+}
 
 \point[Fallacy \#5]{The topology never changes.}
-\note{Topology changes all the time, cloud has just made this easier. Don't rely on static IPs. Don't assume consistent latency.}
+\note[itemize]{
+\item Topology changes all the time, cloud just makes this easier.
+\item Don't rely on static IPs.
+\item Don't assume consistent latency.
+}
 
 \point[Fallacy \#6]{There is only one administrator.}
-\note{Things spontaneously break. Who can help you?}
+\note[itemize]{
+\item Things spontaneously break.
+\item Who can help you?
+}
 
 \point[Fallacy \#7]{Transport cost is zero.}
 
 \point[Remember]{
+\vspace{1em}
 Distributed systems are \highlight{hard}.
 
+\vspace{1em}
 The choice to use them should be \highlight{well considered}.
 }
-\note{Can often introduce more problems than they solve}
+\note{Can often introduce more problems than they solve.}
 
 \point[When you need to, maybe prove it?]{
     \centering \youtubevideo{images/isabelle-thumb}{https://youtube.com/watch?v=7w4KC6i9Yac}
+}
+\note[itemize]{
+    \item Presentation: Proving correctness of distributed systems.
+    \item by Dr. Martin Kleppmann, University of Cambridge.
+    \item Using Isabelle -- See CSS research sub-group.
 }
 
 \point[Or, more realistically,]{
@@ -160,8 +184,10 @@ The choice to use them should be \highlight{well considered}.
 }
 
 \point[Stateless vs. Stateful Systems]{
+\vspace{1em}
     \begin{description}
         \item[Stateless] Does \highlight{not} utilise \highlight{persistent data}.
+        \vspace{1em}
         \item[Stateful] Does utilise \highlight{persistent data}.
     \end{description}
 }
