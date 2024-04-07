@@ -451,9 +451,9 @@ Note that we are getting a URL from the environment variables:
 We need to remember to set these variables in whichever environment the service is run in.
 
 We need to install Celery.
-We will do this in the same pipenv environment as the Flask server as we will later require our Flask server to use Celery to put jobs onto the task queue.
+We will do this in the same poetry environment as the Flask server as we will later require our Flask server to use Celery to put jobs onto the task queue.
 
-\bash{pipenv install celery redis celery\[sqs\] boto3}
+\bash{poetry add celery redis celery\[sqs\] boto3}
 
 The above will install the Celery core and Redis and AWS SQS drivers for communication.
 
@@ -464,7 +464,7 @@ We will now start our local Redis queue and our worker to ensure that they can c
 \begin{code}[language=bash,numbers=none]{}
 > export CELERY_BROKER_URL=redis://localhost:6379
 > export CELERY_RESULT_BACKEND=redis://localhost:6379
-> pipenv run python3 -m celery --app todo.tasks.ical worker --loglevel=info
+> poetry run python3 -m celery --app todo.tasks.ical worker --loglevel=info
 \end{code}
 
 You should see something like the below.
@@ -509,7 +509,7 @@ worker:
   environment:
     CELERY_BROKER_URL: redis://redis:6379
     CELERY_RESULT_BACKEND: redis://redis:6379
-  command: celery --app todo.tasks.ical worker --loglevel=info
+  command: poetry run celery --app todo.tasks.ical worker --loglevel=info
 \end{code}
 
 Note that we are re-using the same image development image as the Flask server.
@@ -592,7 +592,7 @@ Once we have confirmed that the task queue can communicate with our worker,
 we can return to the calendar generation.
 We will use the \texttt{icalendar} library for this.
 
-\bash{pipenv install icalendar}
+\bash{poetry add icalendar}
 
 \begin{code}[language=python,numbers=none]{todo/tasks/ical.py}
 import icalendar
