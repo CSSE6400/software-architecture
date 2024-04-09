@@ -1,14 +1,12 @@
 \documentclass{slide}
+
 \usepackage{tikz}
-
 \usetikzlibrary{arrows}
-
 \usepackage{tabto}
-
 \usepackage{languages}
 
 % \usepackage{pgfpages}
-% \setbeameroption{show notes on second screen}
+\setbeameroption{show notes on second screen}
 
 \title{Distributed Systems II}
 \subtitle{Software Architecture}
@@ -51,7 +49,7 @@
 }
 \note[itemize]{
     \item We scaled a stateless service.
-    \item It was stateless as services didn't require persistent data between requests.
+    \item Stateless: Services don't require persistent data \highlight{between} requests.
     \item Persistent state is saved in the database.
     \item This is normally easy to do.
 }
@@ -100,10 +98,9 @@
     Database node which stores a copy of the data.
 }
 
-
 \questionanswer{What are the advantages of \highlight{replication}?}{
     \begin{itemize}[<+(1)->]
-        \item \highlight{Scale} out our to cope with higher loads.
+        \item \highlight{Scale} our database to cope with higher loads.
         \item Provide \highlight{fault tolerance} from a single instance failure.
         \item Locate instances \highlight{closer to end-users}.
     \end{itemize}
@@ -117,21 +114,21 @@
 \question{How do we replicate our data?}
 \note[itemize]{
     \item Easy without updates, just copy it.
-    \item Updates, or writes, must propagate changes.
+    \item Updates, or writes, must \highlight{propagate} changes.
 }
 
-\point[First approach]{Leader-follower Replication}
+\point[First approach]{Leader-Follower Replication}
 
 \image{diagrams/LeaderFollower}
 \note[itemize]{
-    \item Leader-follower is the most common implementation.
-    \item Multiple followers, only one leader.
+    \item Leader-Follower is the most common implementation.
+    \item Multiple followers, only \textit{one} leader.
 }
 
 \point[Leader-based Replication]{
     \begin{description}[<+->]
-        \item[On write] Writes sent to leader, change is propagated via change stream.
-        \item[On read] Any replica can be queried. 
+        \item[On write] Writes sent to \textit{leader}, change is propagated via change stream.
+        \item[On read] Any \textit{replica} can be queried. 
     \end{description}
 }
 
@@ -141,25 +138,32 @@
     \item Can be added to Oracle and SQL Server.
 }
 
-\point[Propogating changes]{
+\point[Propagating changes]{
     \highlight{Synchronous} vs. \highlight{Asynchronous}
 }
 
 \image[height=\textheight]{diagrams/Sync}
+\note{Synchronous update.}
 
 \image[height=\textheight]{diagrams/Async}
+\note{Asynchronous update.}
 
 \image[height=\textheight]{diagrams/SyncVsAsync}
+\note[itemize]{
+    \item What could go wrong here?
+    \item \textit{Follower1} can get out of sync with \textit{Follower2}.
+    \item Following material deals with \textit{leader} or a \textit{replica} going down.
+}
 
-\point[Synchronous propagation]{
+\point[Synchronous Propagation]{
 \begin{itemize}[<+->]
     \item Writes must propagate to \highlight{all followers} before being successful.
-    \item \highlight{Any} replica goes down, \highlight{all} replicas are un-writable.
-    \item Writes must \highlight{wait} for propagation to all replicas.
+    \item \highlight{Any} replica goes down, \highlight{all} replicas are un-writeable.
+    \item Writes must \highlight{wait} for propagation to \highlight{all} replicas.
 \end{itemize}
 }
 
-\point[Asynchronous propagation]{
+\point[Asynchronous Propagation]{
 \begin{itemize}[<+->]
     \item Writes \highlight{don't} have to \highlight{wait} for propagation.
     \item If the leader goes down before propagating, the \highlight{write is lost}.
@@ -182,15 +186,13 @@
 }
 
 \image{diagrams/ReplicationLag}
-\note{The time it takes for the change to the name of the product to update across all followers.}
+\note{\textit{Replication Lag}: Time it takes for the product name change to update across \highlight{all} followers.}
 
 \image[height=\textheight]{diagrams/AsyncLag}
-\note{The purple part is replication lag.}
-
-% \point[The time taken for replicas to update their stale data is]{Replication Lag}
+\note{The purple lifeline bar is \textit{replication lag}.}
 
 \point[Eventually, all replicas must become consistent]{
-    The system is \highlight{eventually consistent}
+    The system is \highlight{eventually consistent}.
 }
 \note[itemize]{
     \item If writes stop for long enough.
@@ -230,6 +232,12 @@
 }
 
 \image{diagrams/ReadYourWritesExample}
+\note[itemize]{
+    \item Typical interaction in simple Leader-Follower replication.
+    \item Write is to \textit{leader}.
+    \item Read is from \textit{follower}.
+    \item \textit{Replication lag} means reading a field immediately after updating it \highlight{may} lead to reading \highlight{stale} data.
+}
 
 \definition{Read-your-writes Consistency}{
     Users always see the updates that \highlight{they have made}.
@@ -266,8 +274,17 @@
 }
 \end{center}
 \end{frame}
+\note[enumerate]{
+    \item Misspell a tweet.
+    \item Correct spelling, and I see my \textit{updated} tweet.
+    \item Other users may still see \textit{stale}, misspelt post.
+}
 
 \image{diagrams/MonotonicReads}
+\note[itemize]{
+    \item Go through each step in sequence.
+    \item Step 6: 3rd view post, gets \highlight{old value}.
+}
 
 \definition{Monotonic Reads}{
     Once a user reads an updated value, they don't later see the old value.
@@ -301,10 +318,10 @@
 \note[itemize]{
     \item Available via extensions in most databases, often not supported natively.
     \item Best to avoid where possible.
+    \item Example: Globally distributed data centres.
 }
 
 % \point[Multi-leader Replication]{Use Cases}
-
 % \note[itemize]{
 %     \item Multiple datacenters
 %     \item Offline writing
@@ -314,11 +331,17 @@
 \note{Write conflicts require the conflict to be resolved.}
 
 \image{diagrams/WriteConflict}
-\note{-1 Pillows? How do we resolve this?}
+\note[enumerate]{
+    \item Fulfilment centre finds faulty pillow and decreases inventory.
+    \item Customer orders 20 pillows, what they saw as the number available.
+    \item -1 Pillows?
+    \item How do we resolve this?
+}
 
 \point[Where possible]{Avoid write conflicts}
 
 \image{diagrams/AvoidWriteConflict}
+\note{Requires application to ensure all writes to a field/table/shard are via the \highlight{same} leader.}
 
 \point[Where impossible]{Convergence}
 
@@ -349,7 +372,7 @@
 \note[itemize]{
     \item Early distributed databases were leaderless.
     \item Resurgance after Amazon created Dynamo.
-    \item Dynamo is an internal service and not DynamoDB.
+    \item Dynamo is an internal service and \highlight{not} DynamoDB.
     \item Riak, Cassandra, and Voldemort are leaderless databases.
 }
 
@@ -361,20 +384,26 @@
 }
 
 \image{diagrams/LeaderlessExampleWrite}
+\note{Leaderless Write}
 
 \image{diagrams/LeaderlessExampleRead}
-\note{At least one of the reads has the updated value.}
+\note{Leaderless Read: At least one of the reads has the updated value.}
 
 \point[How are changes propagated?]{
     \begin{itemize}[<+->]
         \item Read Repair
-        \item Anti-entropy Process
+        \item Anti-Entropy Process
     \end{itemize}
+}
+\note[itemize]{
+    \item Read Repair: Client detects stale data on read and writes updated data to that replica.
+    \item Anti-Entropy Process: Background process looks for stale or missing data and updates replicas.
 }
 
 \question{How do we know it's consistent?}
 
 \image{diagrams/LeaderlessExampleBad}
+\note{Reading from a single replica means we can't know if data is stale or inconsistent.}
 
 \questionanswer{How do we know it's consistent?}{
     Quorum Reads and Writes
@@ -407,7 +436,7 @@
     \item[$\textcolor{eq2}{r}$] amount of replicas to {\color{eq2}\textsl{read}} from
 \end{description}
 }
-\note{The nodes read from must overlap with the nodes written to.}
+\note{Nodes read from must overlap with the nodes written to.}
 
 \begin{frame}
 \begin{center}
@@ -577,22 +606,28 @@
 
 \point[Summary]{
     \begin{itemize}[<+->]
+        \vspace{4mm}
         \item Replications
         \begin{itemize}
+            \Large
             \item Leader-based, multi-leader, and leaderless
             \item Eventual consistency
             \item Write conflicts
         \end{itemize}
+        \vspace{2mm}
         \item Partitioning
         \begin{itemize}
+            \Large
             \item Consistent method to pick nodes for data
             \item Avoiding skewing
         \end{itemize}
-        %\item Transactions
-        %\begin{itemize}
-        %    \item ACID properties
-        %    \item Pushback causing headaches
-        %\end{itemize}
+%        \vspace{2mm}
+%        \item Transactions
+%        \begin{itemize}
+%            \Large
+%            \item ACID properties
+%            \item Pushback causing headaches
+%        \end{itemize}
     \end{itemize}
 }
 
