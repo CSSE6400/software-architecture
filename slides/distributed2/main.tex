@@ -209,10 +209,13 @@
 {braewebb}%
 {}%
 {}%
+\note[item]<1->{Read user details.\vspace{1em}}
 
 \only<2->{
 \includegraphics[width=0.3\textwidth]{diagrams/ReadYourWrites}
 }
+\note[item]<2->{Decide I don't like my name.\vspace{1em}}
+\note[item]<2->{Update name.\vspace{1em}}
 
 \only<3->{
 \tweet%
@@ -222,20 +225,16 @@
 {}%
 {}%
 }
+\note[item]<3->{Read user details.}
+
 \end{center}
 \end{frame}
-\note[itemize]{
-    \item Read user details
-    \item Decide I don't like my name
-    \item Update name
-    \item Read user details
-}
 
 \image{diagrams/ReadYourWritesExample}
 \note[itemize]{
     \item Typical interaction in simple Leader-Follower replication.
-    \item Write is to \textit{leader}.
-    \item Read is from \textit{follower}.
+    \item Write is to \highlight{leader}.
+    \item Read is from \highlight{follower}.
     \item \textit{Replication lag} means reading a field immediately after updating it \highlight{may} lead to reading \highlight{stale} data.
 }
 
@@ -254,6 +253,7 @@
 {My fist post}%
 {}%
 }
+\note[item]<1->{Misspell a tweet.\vspace{1em}}
 
 \only<2->{
 \tweet%
@@ -263,6 +263,7 @@
 {My first post}%
 {}%
 }
+\note[item]<2->{Correct spelling, and I see my \textit{updated} tweet.\vspace{1em}}
 
 \only<3->{
 \tweet%
@@ -272,13 +273,9 @@
 {My fist post}%
 {}%
 }
+\note[item]<3->{Other users may still see \textit{stale}, misspelt post.}
 \end{center}
 \end{frame}
-\note[enumerate]{
-    \item Misspell a tweet.
-    \item Correct spelling, and I see my \textit{updated} tweet.
-    \item Other users may still see \textit{stale}, misspelt post.
-}
 
 \image{diagrams/MonotonicReads}
 \note[itemize]{
@@ -305,14 +302,20 @@
 \point[Second approach]{Multi-leader Replication}
 
 \image[height=\textheight]{diagrams/MultiLeader}
+\note[itemize]{
+    \item Application can be partitioned to perform certain types of writes to a specific leader.
+    \item Reads are from replicas, as with Leader-Follower replication.
+}
 
 \point[Why multi-leader?]{
+\vspace{1em}
 \begin{itemize}[<+->]
     \item If you have multiple leaders,
-            you can write to any,
-            allowing \highlight{writes to scale}.
+          you can write to any,
+          allowing \highlight{writes to scale}.
+          \vspace{1em}
     \item A leader going down doesn't prevent writes,
-            giving \highlight{better fault-tolerance}.
+          giving \highlight{better fault-tolerance}.
 \end{itemize}
 }
 \note[itemize]{
@@ -328,7 +331,7 @@
 % }
 
 \questionanswer{What might go wrong?}{Write conflicts}
-\note{Write conflicts require the conflict to be resolved.}
+\note{Conflict needs to be \highlight{resolved}.}
 
 \image{diagrams/WriteConflict}
 \note[enumerate]{
@@ -352,17 +355,20 @@
     \item Custom resolution logic.
 \end{itemize}
 }
+\note{Yes, this can be \highlight{challenging}.}
 
 \image[height=\textheight]{diagrams/ResolveWriteConflict}
 
 \point[Resolving Conflicts]{
+\vspace{1em}
 \begin{description}
     \item[On Write] When a conflict is first noticed, take proactive resolution action.
+    \vspace{1em}
     \item[On Read] When a conflict is next read, ask for a resolution.
 \end{description} 
 }
 \note[itemize]{
-    \item Bucardo allows a perl script for on write resolution.
+    \item Bucardo allows a perl script for on write resolution.\vspace{1em}
     \item CouchDB prompts reads to resolve the conflict.
 }
 
@@ -392,12 +398,10 @@
 \point[How are changes propagated?]{
     \begin{itemize}[<+->]
         \item Read Repair
+        \note[item]<1->{Read Repair: Client detects stale data on read and writes updated data to that replica.\vspace{1em}}
         \item Anti-Entropy Process
+        \note[item]<2>{Anti-Entropy Process: Background process looks for stale or missing data and updates replicas.}
     \end{itemize}
-}
-\note[itemize]{
-    \item Read Repair: Client detects stale data on read and writes updated data to that replica.
-    \item Anti-Entropy Process: Background process looks for stale or missing data and updates replicas.
 }
 
 \question{How do we know it's consistent?}
@@ -457,6 +461,35 @@
     \end{tikzpicture}
 \end{center}
 \end{frame}
+\note[itemize]{
+    \item Graphical representation of previous equation. \vspace{3mm}
+    \item \textcolor{eq2}{\textbf{Orange}} inner group (\highlight{reads}), overlaps with \\ 
+           \textcolor{eq1}{\textbf{Blue}} inner group (\highlight{writes}). \vspace{3mm}
+    \item Showing how reads overlap writes via a quorum.
+}
+
+\questionanswer{What about write conflicts?}{Same problem as with Multi-leader replication.}
+
+\image{diagrams/LeaderlessExampleWriteConflict1}
+\note{
+  Same scenario as before:
+  \begin{enumerate}
+    \item Customer queries how many pillows are available.
+    \item Retrieves 20.
+  \end{enumerate}
+}
+
+\image{diagrams/LeaderlessExampleWriteConflict2}
+\note{Same scenario as before:}
+\note{
+  Same scenario as before:
+  \begin{enumerate}
+    \item Fulfilment centre finds faulty pillow and decreases inventory.
+    \item Customer orders 20 pillows, what they saw as the number available.
+    \item -1 Pillows?
+    \item How do we resolve this?
+  \end{enumerate}
+}
 
 \point[Summary]{
 \begin{itemize}[<+->]

@@ -1,4 +1,4 @@
-@startuml LeaderlessExampleWrite
+@startuml LeaderlessExampleWriteConflict1
 
 left to right direction
 
@@ -34,32 +34,34 @@ UpdateElementStyle(container, $bgColor="#5388cb")
 
 hide stereotype
 
-Container(client, "Client", "")
+Container(client1, "Customer", "")
+Container(client2, "Fulfillment Centre", "")
 
 ContainerDb(db, "Replica 1", "Container: Cassandra", $tags="database")
 note right of db
   |= product_id |= name |= stock |= price |
   | 1234 | Nicholas Cage Reversable Pillow | 20 | $10.00 |
-  | 4321 | Lifelike Inflatable <color:red>Nicholas Cage</color> | 5 | $50.00 |
+  | 4321 | Lifelike Inflatable Elephant | 5 | $50.00 |
 end note
 
 ContainerDb(db2, "Replica 2", "Container: Cassandra", $tags="database")
 note right of db2
   |= product_id |= name |= stock |= price |
-  | 1234 | Nicholas Cage Reversable Pillow | 19 | $10.00 |
-  | 4321 | Lifelike Inflatable <color:red>Nicholas Cage</color> | 5 | $50.00 |
+  | 1234 | Nicholas Cage Reversable Pillow | 20 | $10.00 |
+  | 4321 | Lifelike Inflatable Elephant | 5 | $50.00 |
 end note
 
 ContainerDb(db3, "Replica 3", "Container: Cassandra", $tags="database")
 note right of db3
   |= product_id |= name |= stock |= price |
-  | 1234 | Nicholas Cage Reversable Pillow | 19 | $10.00 |
+  | 1234 | Nicholas Cage Reversable Pillow | 20 | $10.00 |
   | 4321 | Lifelike Inflatable Elephant | 5 | $50.00 |
 end note
 
-Rel_D(client, db, "Rename Inflatable", $tags="browser")
-Rel(client, db2, "Rename Inflatable", $tags="browser")
+Rel(client1, db2, "Query Product 1234", $tags="browser")
+Rel_D(client1, db, "Query Product 1234", $tags="browser")
 
 Lay_L(db2, db3)
+Lay_U(db3, client2)
 
 @enduml
