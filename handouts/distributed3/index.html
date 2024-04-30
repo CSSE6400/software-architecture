@@ -1,4 +1,4 @@
-Last Updated on 2023/04/23
+Last Updated on 2024/04/30
                                                                                                     
 
 <?xml version="1.0" encoding="iso-8859-1" ?> 
@@ -151,7 +151,7 @@ message and just return the result without processing it again. Or, if the opera
 (e.g. it is a query with no side effects), it can be processed again.
 </p><!--l. 101--><p class="indent" >   The intent is that the server&#8217;s state will be the same, regardless of whether it receives
 a message once or multiple times. This behaviour is called the  <a 
-href="https://chrisrichardson.net/post/microservices/patterns/2020/10/16/idempotent-consumer.html" >idempotent consumer
+href="https://microservices.io/post/microservices/patterns/2020/10/16/idempotent-consumer.html" >idempotent consumer
 pattern</a><span class="footnote-mark"><a 
 href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
  id="x1-4001f1"></a>.
@@ -200,57 +200,65 @@ href="#Xdata-intensive">10</a>]</span>.
 <!--l. 141--><p class="noindent" >Byzantine<span class="footnote-mark"><a 
 href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
  id="x1-6001f2"></a>
-faults are those that are caused by nodes that &#8220; lie&#8221;. Most distributed systems are implemented with the
+faults are those that are caused by nodes that &#8220;lie&#8221;. Most distributed systems are implemented with the
 assumption that nodes are &#8220;honest&#8221;. An honest node is one that provides responses which the system can assume
-are correct. Faults relate to the node not responding. A lying node is one whose response may not be correct. Two
-common scenarios of a lying node are, if it sends confirmation of receipt of a message but loses the message, or if
-it sends contradictory data to different nodes.
-</p><!--l. 151--><p class="noindent" >
+are correct. Faults relate to the node not responding. A lying node is one whose response may not be correct.
+Three common scenarios of lying nodes are: </p>
+      <ul class="itemize1">
+      <li class="itemize">
+      <!--l. 150--><p class="noindent" >Sending confirmation of receipt of a message but failing to process or losing the message.
+      </p></li>
+      <li class="itemize">
+      <!--l. 151--><p class="noindent" >Processing a message request but failing to send a response.
+      </p></li>
+      <li class="itemize">
+      <!--l. 152--><p class="noindent" >Sending contradictory results to different nodes.</p></li></ul>
+<!--l. 155--><p class="noindent" >
 </p>
    <h5 class="likesubsubsectionHead"><a 
  id="x1-7000"></a>Byzantine Generals Problem</h5>
-<!--l. 152--><p class="noindent" >The Byzantine Generals Problem <span class="cite">[<a 
+<!--l. 156--><p class="noindent" >The Byzantine Generals Problem <span class="cite">[<a 
 href="#Xbyzantine-generals">11</a>]</span> is a fictional scenario where several generals need to agree on a battle plan.
 Their armies are situated in different positions, so they can only communicate by sending messengers. These
 messengers can get delayed or lost (like packets in a network).
-</p><!--l. 156--><p class="indent" >   To complicate their decision making process, some of the generals may be traitors, though most generals are
+                                                                                                    
+                                                                                                    
+</p><!--l. 160--><p class="indent" >   To complicate their decision making process, some of the generals may be traitors, though most generals are
 loyal. Loyal generals will only send honest messages. Traitors may send dishonest messages or send messages
 disguised as coming from another general.
-</p><!--l. 161--><p class="indent" >   The problem was proposed by Leslie Lamport as an analogy of some of the extreme faults that may exist in a
+</p><!--l. 165--><p class="indent" >   The problem was proposed by Leslie Lamport as an analogy of some of the extreme faults that may exist in a
 distributed system. A Byzantine fault-tolerant system is one that continues to work correctly, even if some nodes
 are sending incorrect messages. This may be due to errors in the node itself or in the network connection.
 Data may be corrupted in storage or in transit, it may also be intercepted or spoofed by malicious
 attackers.
-</p><!--l. 166--><p class="indent" >   Most systems do not attempt to be Byzantine fault-tolerant, as the cost is often too high for the potential
+</p><!--l. 170--><p class="indent" >   Most systems do not attempt to be Byzantine fault-tolerant, as the cost is often too high for the potential
 hazard. Stakeholders need to decide if the cost is warranted for a particular system. Flight control systems need to
 be Byazntine fault-tolerant. There are enough airplanes in the air at any one time that  <a 
 href="https://www.scienceabc.com/innovation/what-are-bit-flips-and-how-are-spacecraft-protected-from-them.html" >cosmic ray bit
-                                                                                                    
-                                                                                                    
 flipping</a><span class="footnote-mark"><a 
 href="#fn3x0" id="fn3x0-bk"><sup class="textsuperscript">3</sup></a></span><a 
  id="x1-7001f3"></a>
 is guaranteed to happen. The control systems need to deal with potentially critical sensor data being corrupted.
 Blockchain protocols are designed to allow mutually distrusting parties to agree on the result of a transaction. A
 blockchain network needs to assume that a hacker could breach the network.
-</p><!--l. 176--><p class="indent" >   Not catering for Byzantine faults does not mean that a system design should assume that all messages are
+</p><!--l. 180--><p class="indent" >   Not catering for Byzantine faults does not mean that a system design should assume that all messages are
 correct. Simple error detection (e.g. checksums) should be used to catch corrupted data. Any user input should be
-sanitised before it is used as data in the system. These strategies do not handle subtler data corruption
-or persistent malicious attack, but they catch errors that should not propagate into the rest of the
+sanitised before it is used as data in the system. These strategies do not handle subtler data corruption or
+persistent malicious attack, but they catch simple errors that should not propagate into the rest of the
 system.
-</p><!--l. 183--><p class="noindent" >
+</p><!--l. 187--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
  id="x1-80003"></a>Consistency</h3>
-<!--l. 184--><p class="noindent" >Consistency is the simple idea that different parts of a system agree on the same value for a data element.
+<!--l. 188--><p class="noindent" >Consistency is the simple idea that different parts of a system agree on the same value for a data element.
 Implementing consistency is much more complex than the idea, due to many of the faults that are described in
 section <a 
 href="#x1-20002">2<!--tex4ht:ref: sec:faults --></a>.
-</p><!--l. 187--><p class="noindent" >
+</p><!--l. 191--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.1    </span> <a 
  id="x1-90003.1"></a>Eventual Consistency</h4>
-<!--l. 189--><p class="noindent" >Eventual consistency is a <span 
+<!--l. 193--><p class="noindent" >Eventual consistency is a <span 
 class="Cabin-Italic-tlf-t1-x-x-120">weak </span>guarantee. What it guarantees is that all replicated versions of the database will
 eventually have consistent values for all data they store. The issue is the time it takes to synchronise data. It
 provides no guarantee of how long until reading a specific value from all replicated databases will return the same
@@ -266,7 +274,7 @@ class="Cabin-Italic-tlf-t1-x-x-120">stale</span>) value.
  id="x1-90011"></a>
                                                                                                     
                                                                                                     
-<!--l. 197--><p class="noindent" ><img 
+<!--l. 201--><p class="noindent" ><img 
 src="diagrams/eventual-consistency-seq.png" alt="PIC"  
 width="367" height="113"  />
 <br /> </p><div class="caption" 
@@ -275,65 +283,65 @@ class="content">Eventual consistency issues.</span></div><!--tex4ht:label?: x1-9
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
-<!--l. 202--><p class="indent" >   Figure <a 
+<!--l. 206--><p class="indent" >   Figure <a 
 href="#x1-90011">1<!--tex4ht:ref: fig:eventual-consistency-seq --></a> demonstrates the synchronisation issue with an example of searching for a &#8220;Nick Cage reversable
 pillow&#8221; from the Sahara on-line store. The product database is replicated to two followers. Searches started after
 the product has been added to the store may still return that it is not available, until all replicas have been
 updated.
-</p><!--l. 208--><p class="indent" >   This leads to the potential for subtle errors in the system logic. It is difficult to think about the consequences of
+</p><!--l. 212--><p class="indent" >   This leads to the potential for subtle errors in the system logic. It is difficult to think about the consequences of
 retrieving stale data, as most programmers&#8217; intuition is based on the experience of modifying a value and always
 retrieving the new value. The system design needs to take into account that <span 
 class="Cabin-Italic-tlf-t1-x-x-120">all </span>database reads are performed
 under the assumption that the value may be stale. Testing for errors caused by data not being consistent is
 difficult, as you have to force data inconsistencies.
-</p><!--l. 214--><p class="indent" >
+</p><!--l. 218--><p class="indent" >
                                                                                                     
                                                                                                     
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.2    </span> <a 
  id="x1-100003.2"></a>Linearisability</h4>
-<!--l. 217--><p class="noindent" >Contrary to eventual consistency, linearisability is a <span 
+<!--l. 221--><p class="noindent" >Contrary to eventual consistency, linearisability is a <span 
 class="Cabin-Italic-tlf-t1-x-x-120">strong </span>guarantee. A database system that implements
 linearisability provides an abstraction layer that allows clients who use the database to work as if
 there is only a single instance of the database, regardless of how many replicas have been deployed.
 This provides a simple interaction model that corresponds to expectations from non-distributed
 systems.
-</p><!--l. 223--><p class="indent" >   Linearisability means that once a client has written data to the database, all clients who read the that data will
+</p><!--l. 227--><p class="indent" >   Linearisability means that once a client has written data to the database, all clients who read the that data will
 see the same value, regardless of the replica from which they read the data. The challenge is implementing
 linearisability.
-</p><!--l. 227--><p class="noindent" >
+</p><!--l. 231--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.1    </span> <a 
  id="x1-110003.2.1"></a>Application</h5>
-<!--l. 229--><p class="noindent" >Situations where linearisability can be useful include when uniqueness needs to be guaranteed. For example,
+<!--l. 233--><p class="noindent" >Situations where linearisability can be useful include when uniqueness needs to be guaranteed. For example,
 when a customer registers as a member of the Sahara eCommerce system, they need a unique identifier. If two
 people attempt to register at the same time and select the same user id, the system needs to be able to linearise
 the requests to return an error message to one of the users. The same issue arises in banking applications. If a
 user transfers money from their account at the same time as an automated payment occurs, the
 account debit service may need to guarantee that the account balance does not become negative. It
-needs to be able to linearise these two operations and disallow one if it would result in a negative
+needs to be able to linearise these two operations and disallow one, if it would result in a negative
 balance.
-</p><!--l. 239--><p class="indent" >   In some situations, it is acceptable to not require linearisability of operations. If two customers order the last
+</p><!--l. 243--><p class="indent" >   In some situations, it is acceptable to not require linearisability of operations. If two customers order the last
 item of a product in the Sahara eCommerce system, the stakeholders and designers may decide that they will
 allow both orders to proceed. The resolution may be that when the fulfillment service or the warehouse discover
 that the product is out of stock, they generate an event that changes one of the customers&#8217; orders to become a
 backorder.
-</p><!--l. 245--><p class="indent" >   The simplistic implementation of linearisability is to have a single database. This defeats the purpose of
+</p><!--l. 249--><p class="indent" >   The simplistic implementation of linearisability is to have a single database. This defeats the purpose of
 replicating a database to improve performance and reliability.
-</p><!--l. 248--><p class="noindent" >
+</p><!--l. 252--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.2    </span> <a 
  id="x1-120003.2.2"></a>Single-Leader Replication</h5>
-<!--l. 249--><p class="noindent" >Single-leader replication can be implemented in such a way as to provide linearisability. This is implemented by
+<!--l. 253--><p class="noindent" >Single-leader replication can be implemented in such a way as to provide linearisability. This is implemented by
 only allowing reads to be from the leader or from followers that are synchronously updated by the leader. This
 means that the replicated databases can guarantee that all reads after a write will return the current
 value.
-</p><!--l. 253--><p class="indent" >   Forcing all reads to be from the leader defeats one of the purposes of replicating a database, which is the
+</p><!--l. 257--><p class="indent" >   Forcing all reads to be from the leader defeats one of the purposes of replicating a database, which is the
 performance benefit of performing queries on followers and only using the leader for update operations.
 Synchronous updates of at least some followers defeats the performance benefit of asynchronous
 communication, but at least allows queries on followers. Either of these approaches maintain the reliability
 advantage of replicating the database.
-</p><!--l. 259--><p class="indent" >   An additional complication to implementing linearisable single-leader replication is determining which replica
+</p><!--l. 263--><p class="indent" >   An additional complication to implementing linearisable single-leader replication is determining which replica
 is the leader. A typical approach is to have a lock of some form that is acquired by the leader, and all other replicas
 are followers. Acquiring the lock itself must be a linearisable operation. If more than one replica believes it
 is the leader, it means that write behaviour cannot be linearisable. A coordination service, such as
@@ -344,48 +352,48 @@ href="#fn4x0" id="fn4x0-bk"><sup class="textsuperscript">4</sup></a></span><a
                                                                                                     
                                                                                                     
 can be used to implement distributed locks in a linearisable fashion.
-</p><!--l. 265--><p class="noindent" >
+</p><!--l. 269--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.3    </span> <a 
  id="x1-130003.2.3"></a>Multi-Leader Replication</h5>
-<!--l. 266--><p class="noindent" >Multi-leader replication cannot provide linearisability, without introducing so many constraints as to eliminate
+<!--l. 270--><p class="noindent" >Multi-leader replication cannot provide linearisability, without introducing so many constraints as to eliminate
 any benefit of using the approach in the first place. This is because multi-leader replication allows
 concurrent writes to multiple leaders, and the data is asynchronously replicated to the followers and other
 leaders.
-</p><!--l. 271--><p class="noindent" >
+</p><!--l. 275--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.4    </span> <a 
  id="x1-140003.2.4"></a>Leaderless Replication</h5>
-<!--l. 272--><p class="noindent" >It is difficult to provide linearisability with leaderless replication. Quorum reads <span class="cite">[<a 
+<!--l. 276--><p class="noindent" >It is difficult to provide linearisability with leaderless replication. Quorum reads <span class="cite">[<a 
 href="#Xdistributed2-notes">3</a>]</span> do not guarantee linearisability.
 With asynchronous communication and network delays it is possible for a write to start, but for a concurrent read
 to obtain stale data from all members of the quorum that were queried. This occurs when a read retrieves a value
 from a database that has not yet been written to, but after the write operation started and other databases were
 updated. The read obtains a consistently stale value, despite obtaining the data from a quorum of
 databases.
-</p><!--l. 280--><p class="indent" >   It is possible to provide linearisability using strict quorums with leaderless replication. This comes at the cost of
+</p><!--l. 284--><p class="indent" >   It is possible to provide linearisability using strict quorums with leaderless replication. This comes at the cost of
 performance, just as it does with single-leader replication. Writes must read the state of a quorum of databases
 and obtain a lock on the value before performing the write. This allows the write to be performed
 synchronously.
-</p><!--l. 285--><p class="indent" >   In leaderless replication, only basic read and write operations are linearisable. More sophisticated atomic
+</p><!--l. 289--><p class="indent" >   In leaderless replication, only basic read and write operations are linearisable. More sophisticated atomic
 operations or transactions require a consensus algorithm to be used to provide linearisability.
-</p><!--l. 288--><p class="noindent" >
+</p><!--l. 292--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.5    </span> <a 
  id="x1-150003.2.5"></a>Consensus Algorithms</h5>
-<!--l. 289--><p class="noindent" >Consensus algorithms, which will be described in section <a 
+<!--l. 293--><p class="noindent" >Consensus algorithms, which will be described in section <a 
 href="#x1-190004">4<!--tex4ht:ref: sec:consensus --></a>, have some similarity to single-leader replication. Their
 internal implementations prevent stale replica data or having multiple leader nodes. The previously mentioned
 coordination service, etcd, implements its own consensus algorithm, that provides a key-value store that
 guarantees linearisability.
-</p><!--l. 294--><p class="noindent" >
+</p><!--l. 298--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.6    </span> <a 
  id="x1-160003.2.6"></a>Consequences</h5>
-<!--l. 295--><p class="noindent" >Linearisability means that if some database replicas lose network connection to the rest of the system, they
+<!--l. 299--><p class="noindent" >Linearisability means that if some database replicas lose network connection to the rest of the system, they
 cannot process any requests. Writes cannot be made as they cannot be linearised. Reads connot be made as they
 may obtain stale data.
-</p><!--l. 300--><p class="indent" >   Consequently, systems, or parts of systems, that require linearisability demonstrate lower availability due to
+</p><!--l. 304--><p class="indent" >   Consequently, systems, or parts of systems, that require linearisability demonstrate lower availability due to
 potential network faults. This observation is known as the CAP theorem <span class="cite">[<a 
 href="#XBrewerE2012Ctyl">12</a>]</span>. Distributed systems can have
 <span 
@@ -399,11 +407,11 @@ CAP theorem. The prime value of the CAP theorem is how it influenced the develop
                                                                                                     
                                                                                                     
 databases.
-</p><!--l. 307--><p class="noindent" >
+</p><!--l. 311--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.3    </span> <a 
  id="x1-170003.3"></a>Causal Ordering</h4>
-<!--l. 309--><p class="noindent" >Linearisability is one approach to defining the order in which read and write operations are conceptually performed. It defines
+<!--l. 313--><p class="noindent" >Linearisability is one approach to defining the order in which read and write operations are conceptually performed. It defines
 a  <a 
 href="https://mathworld.wolfram.com/TotallyOrderedSet.html" >total order</a><span class="footnote-mark"><a 
 href="#fn5x0" id="fn5x0-bk"><sup class="textsuperscript">5</sup></a></span><a 
@@ -411,28 +419,28 @@ href="#fn5x0" id="fn5x0-bk"><sup class="textsuperscript">5</sup></a></span><a
 on the operations. This means that operations can be compared to each other to determine which should be
 considered to have occurred first. Or, from the perspective of the linearisability abstraction, there are no
 concurrent operations on the database.
-</p><!--l. 314--><p class="indent" >   Another approach to defining the order of operations is to define a <span 
+</p><!--l. 318--><p class="indent" >   Another approach to defining the order of operations is to define a <span 
 class="Cabin-Italic-tlf-t1-x-x-120">partial </span>order based on causality. That is the
 ordering is based on one operation occurring before another (i.e. they are causally related), but other
 operations may be concurrent. A Git repository&#8217;s history demonstrates causal dependencies. Within
 a single branch commits occur in sequential order. But, with multiple branches, development on
 each branch progresses in parallel with the others and commits may occur concurrently on different
 branches.
-</p><!--l. 322--><p class="indent" >   Causal ordering is not as strict as linearisability, which in turn results in less performance cost to implement
+</p><!--l. 326--><p class="indent" >   Causal ordering is not as strict as linearisability, which in turn results in less performance cost to implement
 causal ordering. The issue is to capture causal dependencies. This requires a mechanism to determine which
 operation happened before another one. The consequence is that the operations must be performed in the same
 order on all replicas. If causal ordering is not required for some operations, they may occur concurrently and it
 does not matter if they execute in a different order on a replica.
-</p><!--l. 329--><p class="indent" >   A single-leader replicated database can record an increasing sequence number with every write operation it
+</p><!--l. 333--><p class="indent" >   A single-leader replicated database can record an increasing sequence number with every write operation it
 records in its log. Followers can then read the log to execute writes in sequence number order. All followers will
 then be causally consistent with the leader. The drawback is that a single-leader cannot be scaled if asynchronous
 writes occur faster than it can process them. There is also the difficulty of handling the situation where the leader
 fails and selecting a new leader.
-</p><!--l. 335--><p class="noindent" >
+</p><!--l. 339--><p class="noindent" >
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.3.1    </span> <a 
  id="x1-180003.3.1"></a>Lamport Timestamps</h5>
-<!--l. 336--><p class="noindent" >If the system does not have a single-leader, the logical clock approach mentioned in section <a 
+<!--l. 340--><p class="noindent" >If the system does not have a single-leader, the logical clock approach mentioned in section <a 
 href="#x1-50002.2">2.2<!--tex4ht:ref: timing --></a> provides a
 mechanism to define causal ordering. This approach is called <span 
 class="Cabin-Italic-tlf-t1-x-x-120">Lamport timestamps </span><span class="cite">[<a 
@@ -455,16 +463,16 @@ own counter to the new maximum.
  id="x1-180012"></a>
                                                                                                     
                                                                                                     
-<!--l. 348--><p class="noindent" ><img 
+<!--l. 352--><p class="noindent" ><img 
 src="diagrams/lamport-timestamp-seq.png" alt="PIC"  
-width="351" height="122"  />
+width="367" height="129"  />
 <br /> </p><div class="caption" 
 ><span class="id">Figure&#x00A0;2: </span><span  
 class="content">Lamport timestamps.</span></div><!--tex4ht:label?: x1-180012 -->
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
-<!--l. 353--><p class="indent" >   In figure <a 
+<!--l. 357--><p class="indent" >   In figure <a 
 href="#x1-180012">2<!--tex4ht:ref: fig:lamport-timestamp-seq --></a>, when <span 
 class="ectt-1200">InventoryUpdater </span>sends message <span 
 class="ectt-1200">4 </span>to <span 
@@ -491,13 +499,14 @@ class="ectt-1200">1</span>, so it increases it to <span
 class="ectt-1200">4 </span>and
 returns it to <span 
 class="ectt-1200">InventoryUpdater</span>.
-</p><!--l. 362--><p class="indent" >   Lamport timestamps define causal ordering for operations, but they do not guarantee consistency when an
+</p><!--l. 366--><p class="indent" >   Lamport timestamps define causal ordering for operations, but they do not guarantee consistency when an
 operation is performed. If two orders are sent to <span 
 class="ectt-1200">ProductDB1 </span>and <span 
 class="ectt-1200">ProductDB2 </span>at the same time and there is only
-one item in stock, Lamport timestamps provide a way to decide which order occurred first, but only emphafter the
+one item in stock, Lamport timestamps provide a way to decide which order occurred first, but only <span 
+class="Cabin-Italic-tlf-t1-x-x-120">after </span>the
 orders are processed.
-</p><!--l. 366--><p class="indent" >   To enforce a constraint that would not allow two orders for the last item in stock, there needs to be a
+</p><!--l. 370--><p class="indent" >   To enforce a constraint that would not allow two orders for the last item in stock, there needs to be a
 mechanism to indicate when the order is completed. <span 
 class="Cabin-Italic-tlf-t1-x-x-120">Total order broadcast </span>is one technique that does
 this. Messages are ordered by their delivery time, not when a result is returned. So, if a message
@@ -510,7 +519,7 @@ implement total order broadcast.
 </p>
    <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
  id="x1-190004"></a>Consensus</h3>
-<!--l. 376--><p class="noindent" >In a distributed system, consensus is when a set of nodes in the system agree on some aspect of the
+<!--l. 380--><p class="noindent" >In a distributed system, consensus is when a set of nodes in the system agree on some aspect of the
 system&#8217;s state. Achieving consensus is a difficult problem, in light of the issues described in section <a 
 href="#x1-20002">2<!--tex4ht:ref: sec:faults --></a>.
 When designing a distributed system, you can take advantage of the abstraction of consensus to
@@ -518,11 +527,11 @@ ignore the faults it handles. Abstractions like consensus and transactions <span
 href="#Xdistributed2-notes">3</a>]</span> make it easier to reason
 about the behaviour of a distributed system. In this section, we will look at how consensus can be
 implemented.
-</p><!--l. 382--><p class="noindent" >
+</p><!--l. 386--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.1    </span> <a 
  id="x1-200004.1"></a>Consensus Algorithms</h4>
-<!--l. 384--><p class="noindent" >Consensus is formally described as &#8220;one or more nodes may <span 
+<!--l. 388--><p class="noindent" >Consensus is formally described as &#8220;one or more nodes may <span 
 class="Cabin-Italic-tlf-t1-x-x-120">propose </span>values, and the consensus algorithm <span 
 class="Cabin-Italic-tlf-t1-x-x-120">decides</span>
 on one of those values.&#8221; For example, if multiple customers attempt to buy the last item that is in stock, each node
@@ -530,22 +539,22 @@ handling a customer request proposes its customer as the purchaser. The consensu
 which customer becomes the purchaser. A consensus algorithm must satisfy the following properties
 <span class="cite">[<a 
 href="#Xcachin2011Distributed">14</a>]</span>.
-</p><!--l. 391--><p class="indent" >
+</p><!--l. 396--><p class="indent" >
       </p><dl class="description"><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Uniform Agreement</span> </dt><dd 
 class="description">
-      <!--l. 392--><p class="noindent" >All nodes must agree on the decision.
+      <!--l. 396--><p class="noindent" >All nodes must agree on the decision.
       </p></dd><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Integrity</span> </dt><dd 
 class="description">
-      <!--l. 393--><p class="noindent" >Nodes can only vote once.
+      <!--l. 397--><p class="noindent" >Nodes can only vote once.
       </p></dd><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Validity</span> </dt><dd 
 class="description">
-      <!--l. 394--><p class="noindent" >If the decision is the value <span 
+      <!--l. 398--><p class="noindent" >If the decision is the value <span 
 class="cmmi-12">v</span>, then <span 
 class="cmmi-12">v </span>must have been proposed by a node.
                                                                                                     
@@ -554,8 +563,8 @@ class="cmmi-12">v </span>must have been proposed by a node.
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Termination</span> </dt><dd 
 class="description">
-      <!--l. 395--><p class="noindent" >Every node that does not crash must decide on a value.</p></dd></dl>
-<!--l. 398--><p class="indent" >   Uniform agreement and integrity are the keys to consensus. All participants must agree on the same decision,
+      <!--l. 399--><p class="noindent" >Every node that does not crash must decide on a value.</p></dd></dl>
+<!--l. 402--><p class="indent" >   Uniform agreement and integrity are the keys to consensus. All participants must agree on the same decision,
 and once a participant agrees they cannot change their decision. Validity is a formal requirement to avoid
 nonsensical solutions (e.g. always agreeing to a null decision). Termination enforces fault tolerance. It requires that
 the consensus algorithm progresses towards a solution, and does not wait for permanently failed nodes. It
@@ -567,7 +576,7 @@ algorithms ensure that uniform agreement, integrity and validity are always met,
 fail. This means that even in the worst case it will not result in the consensus algorithm making an invalid
 decision, it just means that it will not be able to achieve consensus and will not be able to process
 requests.
-</p><!--l. 412--><p class="indent" >   Some commonly used consensus algorithms are Viewstamped Replication (VSR) <span class="cite">[<a 
+</p><!--l. 416--><p class="indent" >   Some commonly used consensus algorithms are Viewstamped Replication (VSR) <span class="cite">[<a 
 href="#Xvsr1988">16</a>]</span>, Paxos <span class="cite">[<a 
 href="#Xpaxos1998">17</a>]</span>, Raft <span class="cite">[<a 
 href="#Xraft2015">18</a>]</span>,
@@ -580,23 +589,23 @@ section <a
 href="#x1-170003.3">3.3<!--tex4ht:ref: sec:causal-order --></a>. It requires that messages are delivered exactly once, and in the same order, to all nodes. This provides
 a result equivalent to multiple rounds of consensus determining the order in which messages are
 sent.
-</p><!--l. 421--><p class="indent" >   Most consensus algorithms assume that there are no Byzantine faults, as described in section <a 
+</p><!--l. 425--><p class="indent" >   Most consensus algorithms assume that there are no Byzantine faults, as described in section <a 
 href="#x1-60002.3">2.3<!--tex4ht:ref: sec:byzantine --></a> (e.g. a node
 sending contradictory messages to other nodes). It is possible to implement a consensus algorithm that can
 manage Byzantine faults, as long as fewer than one-third of the nodes generate Byzantine faults <span class="cite">[<a 
 href="#Xbyzantine-tolerance-2002">20</a>]</span>. The details
 of how to do this are beyond the scope of this course.
-</p><!--l. 427--><p class="noindent" >
+</p><!--l. 431--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.2    </span> <a 
  id="x1-210004.2"></a>Distributed Transactions</h4>
-<!--l. 429--><p class="noindent" >A distributed system that needs to enforce a transaction across multiple compute nodes needs a mechanism
+<!--l. 433--><p class="noindent" >A distributed system that needs to enforce a transaction across multiple compute nodes needs a mechanism
 to gain consensus between all nodes participating in the transaction, so that it can be committed.
 This is called the <span 
 class="Cabin-Italic-tlf-t1-x-x-120">atomic commit </span>problem, based on the idea of transaction atomicity from ACID
 <span class="cite">[<a 
 href="#Xdistributed2-notes">3</a>]</span>.
-</p><!--l. 433--><p class="indent" >   In a database, a distributed transaction may happen when the database is partitioned and data in different
+</p><!--l. 437--><p class="indent" >   In a database, a distributed transaction may happen when the database is partitioned and data in different
 partitions are part of the transaction. It will also happen if the database has a secondary index on a different node
 to the primary index. Distributed transactions may also occur where events or messages are part of the
 transaction. An example of this is sending a message to a message queue, while storing data in a database. In the
@@ -605,13 +614,13 @@ and a message is placed in the notification queue to notify the customer that th
 successful. Storing the order may be a transaction in only a single database partition, but to ensure
 the notification message is only added to the queue if the order is successful requires a distributed
 transaction.
-</p><!--l. 442--><p class="noindent" >
+</p><!--l. 446--><p class="noindent" >
 </p>
                                                                                                     
                                                                                                     
    <h5 class="subsubsectionHead"><span class="titlemark">4.2.1    </span> <a 
  id="x1-220004.2.1"></a>Two-Phase Commit</h5>
-<!--l. 443--><p class="noindent" >A two-phase commit algorithm is a type of consensus algorithm that solves the atomic commit problem. As the
+<!--l. 447--><p class="noindent" >A two-phase commit algorithm is a type of consensus algorithm that solves the atomic commit problem. As the
 name implies, it splits the commit into two steps. There are better consensus algorithms, as described in section <a 
 href="#x1-190004">4<!--tex4ht:ref: sec:consensus --></a>,
 but two-phase commit is fairly simple and still commonly used. It should be noted that a two-phase
@@ -626,7 +635,7 @@ tolerant.
  id="x1-220013"></a>
                                                                                                     
                                                                                                     
-<!--l. 452--><p class="noindent" ><img 
+<!--l. 456--><p class="noindent" ><img 
 src="diagrams/2phase-commit-seq.png" alt="PIC"  
 width="351" height="24"  />
 <br /> </p><div class="caption" 
@@ -635,11 +644,11 @@ class="content">Two-phase commit.</span></div><!--tex4ht:label?: x1-220013 -->
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
-<!--l. 457--><p class="indent" >   A <span 
+<!--l. 461--><p class="indent" >   A <span 
 class="Cabin-Italic-tlf-t1-x-x-120">transaction manager </span>is introduced to coordinate the two-phase commit process. The database nodes that
 are part of the transaction are called <span 
 class="Cabin-Italic-tlf-t1-x-x-120">participants</span>.
-</p><!--l. 460--><p class="indent" >   The process starts when some part of the system (<span 
+</p><!--l. 464--><p class="indent" >   The process starts when some part of the system (<span 
 class="ectt-1200">Client </span>in figure <a 
 href="#x1-220013">3<!--tex4ht:ref: fig:2pc-seq --></a>) requests to start a distributed transaction
 and receives a unique transaction identifier (<span 
@@ -648,20 +657,20 @@ class="Cabin-Italic-tlf-t1-x-x-120">single-node </span>transactions on each,
 attaching the <span 
 class="ectt-1200">transId </span>to the transaction. The client can perform multiple reads and writes as part of the
 transaction.
-</p><!--l. 465--><p class="indent" >   When the client is ready to commit the transaction it requests the <span 
+</p><!--l. 469--><p class="indent" >   When the client is ready to commit the transaction it requests the <span 
 class="ectt-1200">TransactionManager </span>to perform the
 commit. The <span 
 class="ectt-1200">TransactionManager </span>sends a prepare message to all the participants. If a prepare message times
 out, or any participant reports a failure, the <span 
 class="ectt-1200">TransactionManager </span>sends an abort message to all participants and
 reports the failure to the client.
-</p><!--l. 470--><p class="indent" >   When a participant receives the prepare message, it confirms that it can commit the transaction, regardless of
+</p><!--l. 474--><p class="indent" >   When a participant receives the prepare message, it confirms that it can commit the transaction, regardless of
 any fault that may occur after replying to the prepare message. (i.e. The participant has saved all changes as part of
 this transaction in persistent memory.) The participant is no longer able to abort the transaction itself, it can
 only abort it now if it receives an abort message from the <span 
 class="ectt-1200">TransactionManager</span>. In effect, it is a
 pseudo-commit.
-</p><!--l. 477--><p class="indent" >   When the <span 
+</p><!--l. 481--><p class="indent" >   When the <span 
 class="ectt-1200">TransactionManager </span>receives positive responses from all participants, it saves the commit decision
 to a persistent transaction log. This means that even if the <span 
 class="ectt-1200">TransactionManager </span>fails, it can recover the decision.
@@ -669,7 +678,7 @@ This is called the <span
 class="Cabin-Italic-tlf-t1-x-x-120">commit point</span>. If the <span 
 class="ectt-1200">TransactionManager </span>decides to abort the transaction, it records the abort
 decision in the transaction log.
-</p><!--l. 484--><p class="indent" >   After the commit point has been reached, the <span 
+</p><!--l. 488--><p class="indent" >   After the commit point has been reached, the <span 
 class="ectt-1200">TransactionManager </span>sends the commit message to all
 participants. This is an irreversible decision. If the commit message fails or times out, the <span 
 class="ectt-1200">TransactionManager</span>
@@ -678,18 +687,18 @@ means that even if a participant crashes before it performs the commit, it will 
 participant restarts. That was the reason for performing a pseudo-commit at the prepare stage, if
 necessary, the participant can recover and redo all steps that are part of the transaction leading up to the
 commit.
-</p><!--l. 492--><p class="indent" >   If the <span 
+</p><!--l. 496--><p class="indent" >   If the <span 
 class="ectt-1200">TransactionManager </span>fails during the commit process, it can recover and resend the commit messages
 to any participant that had not responded before the <span 
 class="ectt-1200">TransactionManager </span>failed. If a participant had commited
 the transaction before the <span 
 class="ectt-1200">TransactionManager </span>failed, it can ignore the new commit and just report that the
 commit was successful.
-</p><!--l. 497--><p class="indent" >   Many libraries implement two-phase commit. The Open Group defined the X/Open eXtended Architecture
+</p><!--l. 501--><p class="indent" >   Many libraries implement two-phase commit. The Open Group defined the X/Open eXtended Architecture
 standard <span class="cite">[<a 
 href="#Xxa-std">21</a>]</span>, which most of these libraries follow. Many relational databases (e.g. MySQL, Postgres, Oracle, &#x2026;) and
 message queues (e.g. ActiveMQ, IBM MQ, &#x2026;) implement the standard.
-</p><!--l. 502--><p class="indent" >   A two-phase commit is called a <span 
+</p><!--l. 506--><p class="indent" >   A two-phase commit is called a <span 
 class="Cabin-Italic-tlf-t1-x-x-120">blocking </span>atomic commit, as completion of the commit can take a long time if a
 participant or the <span 
 class="ectt-1200">TransactionManager </span>fail. Even worse, if the transaction log on the <span 
@@ -698,7 +707,7 @@ participant are corrupted when they fail, this may lead to rows in the database 
 requires manual intervention to decide whether to complete the commit or roll it back, to maintain atomicity.
 Some libraries that support two-phase commit can make an automated decision in this case, but the decision will
 probably break atomicity.
-</p><!--l. 510--><p class="indent" >   Two-phase commit provides a simple abstraction that allows distributed systems to perform safe
+</p><!--l. 514--><p class="indent" >   Two-phase commit provides a simple abstraction that allows distributed systems to perform safe
 transactions. The drawback is that a blocking atomic commit is a significant performance cost. Even if the
 <span 
 class="ectt-1200">TransactionManager</span>, and no participant, fails; rows across multiple database nodes are locked until
@@ -712,29 +721,29 @@ transactions.
                                                                                                     
    <h4 class="subsectionHead"><span class="titlemark">4.3    </span> <a 
  id="x1-230004.3"></a>Leaders</h4>
-<!--l. 520--><p class="noindent" >Section <a 
+<!--l. 524--><p class="noindent" >Section <a 
 href="#x1-120003.2.2">3.2.2<!--tex4ht:ref: sec:slr --></a> mentions issues around choosing the leader for a single-leader replicated database. Some database
 systems allow the leader to be automatically elected. This allows single-leader replication to be fault tolerant as a
 new leader can be elected if the leader fails. This concept generalises to consensus algorithms, which need a
 leader to achieve consensus.
-</p><!--l. 525--><p class="indent" >   <span 
+</p><!--l. 529--><p class="indent" >   <span 
 class="Cabin-Italic-tlf-t1-x-x-120">Epoch numbers </span>are used to manage this approach. The systems guarantee that there is only one leader per
 epoch, rather than there only ever being one leader. If there is no leader, or the current leader seems to be dead, a
 vote is conducted amongst the nodes trying to achieve consensus to elect a new leader. The election increments
 the epoch number. Each leader has its epoch number. If there is a conflict between leaders (e.g. a vote was
 conducted for a new leader when the previous leader was not dead), the leader with the higher epoch number
 wins as the new leader.
-</p><!--l. 534--><p class="indent" >   Before a leader can decide on a value that has been proposed for consensus, it checks to see if there are any
+</p><!--l. 538--><p class="indent" >   Before a leader can decide on a value that has been proposed for consensus, it checks to see if there are any
 other leaders with a higher epoch number. It must obtain the results from this check from a quorum of nodes,
 otherwise the check fails.
-</p><!--l. 540--><p class="noindent" >
+</p><!--l. 544--><p class="noindent" >
 </p>
    <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
  id="x1-240005"></a>Conclusion</h3>
-<!--l. 542--><p class="noindent" >Designing reliable distributed systems is a complex, but manageable, process. These notes have introduced some
+<!--l. 546--><p class="noindent" >Designing reliable distributed systems is a complex, but manageable, process. These notes have introduced some
 of the less intuitive issues that arise in distributed systems and how to design a system to work in the presence of
 these issues.
-</p><!--l. 546--><p class="indent" >   It is possible to go a step further and prove the correctness of distributed systems. This involves creating a model of
+</p><!--l. 550--><p class="indent" >   It is possible to go a step further and prove the correctness of distributed systems. This involves creating a model of
 the system and every service in the system. Assumptions about system behaviour can be stated within the model. The
 algorithms used to implement the system can be proven to work within the system model and its assumptions.
 Of course, if the assumptions are broken, then any proofs are invalid.  <a 
@@ -915,8 +924,8 @@ class="Cabin-Italic-tlf-t1-x-x-120">MySQL Conference and Expo</span>, (Santa Cla
  id="x1-4002x2.1.1"></a>
 <!--l. 103--><p class="indent" >       <span class="footnote-mark"><a 
 href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span><a 
-href="https://chrisrichardson.net/post/microservices/patterns/2020/10/16/idempotent-consumer.html" class="url" ><span 
-class="ectt-1000">https://chrisrichardson.net/post/microservices/patterns/2020/10/16/idempotent-consumer.html</span></a></p><a 
+href="https://microservices.io/post/microservices/patterns/2020/10/16/idempotent-consumer.html" class="url" ><span 
+class="ectt-1000">https://microservices.io/post/microservices/patterns/2020/10/16/idempotent-consumer.html</span></a></p><a 
  id="x1-6002x2.3"></a>
 <!--l. 142--><p class="indent" >   <span class="footnote-mark"><a 
 href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span><span 
@@ -927,27 +936,27 @@ href="https://www.britannica.com/place/Byzantine-Empire" class="url" ><span
 class="ectt-1000">https://www.britannica.com/place/Byzantine-Empire</span></a><span 
 class="Cabin-Regular-tlf-t1-">).</span></p><a 
  id="x1-7002x"></a>
-<!--l. 170--><p class="indent" >        <span class="footnote-mark"><a 
+<!--l. 174--><p class="indent" >        <span class="footnote-mark"><a 
 href="#fn3x0-bk" id="fn3x0"><sup class="textsuperscript">3</sup></a></span><a 
 href="https://www.scienceabc.com/innovation/what-are-bit-flips-and-how-are-spacecraft-protected-from-them.html" class="url" ><span 
 class="ectt-1000">https://www.scienceabc.com/innovation/what-are-bit-flips-and-how-are-spacecraft-protected-from-them.html</span></a></p><a 
  id="x1-12002x3.2.2"></a>
-<!--l. 263--><p class="indent" >   <span class="footnote-mark"><a 
+<!--l. 267--><p class="indent" >   <span class="footnote-mark"><a 
 href="#fn4x0-bk" id="fn4x0"><sup class="textsuperscript">4</sup></a></span><a 
 href="https://etcd.io/" class="url" ><span 
 class="ectt-1000">https://etcd.io/</span></a></p><a 
  id="x1-17002x3.3"></a>
-<!--l. 310--><p class="indent" >   <span class="footnote-mark"><a 
+<!--l. 314--><p class="indent" >   <span class="footnote-mark"><a 
 href="#fn5x0-bk" id="fn5x0"><sup class="textsuperscript">5</sup></a></span><a 
 href="https://mathworld.wolfram.com/TotallyOrderedSet.html" class="url" ><span 
 class="ectt-1000">https://mathworld.wolfram.com/TotallyOrderedSet.html</span></a></p><a 
  id="x1-18003x3.3.1"></a>
-<!--l. 371--><p class="indent" >   <span class="footnote-mark"><a 
+<!--l. 375--><p class="indent" >   <span class="footnote-mark"><a 
 href="#fn6x0-bk" id="fn6x0"><sup class="textsuperscript">6</sup></a></span><a 
 href="https://etcd.io/" class="url" ><span 
 class="ectt-1000">https://etcd.io/</span></a></p><a 
  id="x1-24002x5"></a>
-<!--l. 551--><p class="indent" >   <span class="footnote-mark"><a 
+<!--l. 555--><p class="indent" >   <span class="footnote-mark"><a 
 href="#fn7x0-bk" id="fn7x0"><sup class="textsuperscript">7</sup></a></span><a 
 href="https://my.uq.edu.au/programs-courses/course.html?course_code=csse7610" class="url" ><span 
 class="ectt-1000">https://my.uq.edu.au/programs-courses/course.html?course_code=csse7610</span></a></p>                     </div>
