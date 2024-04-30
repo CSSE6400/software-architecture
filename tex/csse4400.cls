@@ -1,4 +1,5 @@
 \RequirePackage{common}
+\RequirePackage{enumitem}
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{csse4400}[2022/01/01 \thecourse]

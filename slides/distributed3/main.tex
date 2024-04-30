@@ -52,7 +52,7 @@ CSSE6400}
     \item Exponential backoff with jitter
     \item How long to wait to restart?
     \item Too long reduces responsiveness.
-    \item Unacknowledged messages need to be sent to other nodes -- reducing performance.
+    \item Unacknowledged messages need to be sent to other nodes \\-- reducing performance.
     \item Too short may prematurely declare nodes dead.
     \item May lead to contention -- two nodes processing the same request.
     \item May lead to cascading failure -- load is sent to other nodes, slowing them down so they are then declared dead \dots.
@@ -97,7 +97,7 @@ CSSE6400}
 \note{Link analogy to Byzantine faults}
 
 \definition{Byzantine Faults}{
-    Nodes in a distributed system may `lie' --- send faulty or corrupted messages or responses.
+    Nodes in a distributed system may `lie'. \\--- Send faulty or corrupted messages or responses.
 }
 \note[itemize]{
     \item A message that causes the receiver to fail.
@@ -370,9 +370,11 @@ blocking issue.
             \Large\item Transient failures also added
             \Large\item Use a previous strategy to deal with poison messages
             \Large\item System must not require strict ordering of messages
+            \vspace{4pt}
             \Large\item Suitable when message processing speed is very important
             \begin{itemize}
                 \large\item Main queue is never blocked
+                \vspace{2pt}
                 \large\item Receivers need to process from two message queues
             \end{itemize}
         \end{itemize}
@@ -389,7 +391,7 @@ blocking issue.
 }
 \note[itemize]{
     \item Implementation is challenging with multiple producers and/or consumers.
-    \item It must be the last message received by all consumers.
+    \item It must be the last message received by \textit{all} consumers.
 }
 
 \questionanswer{How to order asynchronous messages?}{
@@ -432,6 +434,7 @@ blocking issue.
 }
 
 \point[Linearisability]{
+\vspace{3mm}
 \begin{itemize}
     \item<1-> Once value is written, all reads see same value
     \begin{itemize}
@@ -445,6 +448,7 @@ blocking issue.
     \end{itemize}
         	\note<2>{SLR -- defeats most performance benefits.\\Maintains reliability benefits.}
     \item<3-> Multi-leader replication can't be linearised
+    \vspace{1mm}
     \item<4-> Leaderless replication
     \begin{itemize}
         \LARGE\item<4-> Lock value on quorum before writing
@@ -454,6 +458,7 @@ blocking issue.
 }
 
 \point[Causal Order]{
+\vspace{\53mm}
 \begin{itemize}
     \item<1-> Order is based on causality
     \begin{itemize}
@@ -478,7 +483,7 @@ blocking issue.
 \end{itemize}
 }
 
-\image[trim=60 189 450 35,clip,height=\textheight]{../../notes/distributed3/diagrams/lamport-timestamp-seq.png}
+\image[trim=60 189 440 35,clip,height=\textheight]{../../notes/distributed3/diagrams/lamport-timestamp-seq.png}
 \note[itemize]{
     \item Each node has an id, \& counts number of operations.
     \item Timestamp is a tuple (\emph{counterValue}, \emph{nodeID}).
@@ -505,6 +510,7 @@ blocking issue.
 \begin{description}
     \item[Uniform Agreement] All nodes must agree on the decision
     \item[Integrity] Nodes can only vote once
+    \vspace{1mm}
     \item[Validity] Result must have been proposed by a node
     \item[Termination] Every node that doesn't crash must decide
 \end{description}
@@ -518,11 +524,13 @@ blocking issue.
 \definition{Atomic Commit}{
     All nodes participating in a distributed transaction need to form consensus to complete the transaction.
 }
-\note{Based on transaction atomicity from ACID (atomicity, consistency, isolation, durability).}
+\note{Based on transaction atomicity from ACID\\(Atomicity, Consistency, Isolation, Durability).}
 
 \point[Two-Phase Commit]{
+\vspace{3mm}
 \begin{description}
     \item[Prepare] Confirm nodes can commit transaction
+    \vspace{2mm}
     \item[Commit] Finalise commit once consensus is reached
     \begin{itemize}
         \LARGE\item Abort if consensus can't be reached
@@ -536,7 +544,7 @@ blocking issue.
     \item Prepare does all steps of a commit, aside from confirming it -- It cannot be revoked by participant
     \item Commit intent is recorded in log before sending to participants
     \item Even if a participant fails, commit can proceed when it recovers
-    \item Comment on performance costs
+    \item Comment on \highlight{performance costs}
 }
 
 \begin{frame}{Distributed Systems Timing Assumptions}
@@ -589,7 +597,7 @@ blocking issue.
         \end{itemize}
         		\note<2>{\begin{itemize}
         				 	\item Any system that allows nodes to be restarted.
-        				 	\item May lose some steps in memory for non-critical tasks.
+        				 	\item May lose some steps in memory for \highlight{non-critical} tasks.
         				 \end{itemize}
         				}
         \vspace{2mm}
@@ -617,6 +625,11 @@ blocking issue.
     \item Use environments, tools \& libraries
     \begin{itemize}
         \LARGE\item Leaverage others' experience
+    \end{itemize}
+    \vspace{4mm}
+    \item CSSE7610 Concurrency: Theory \& Practice
+    \begin{itemize}
+        \LARGE\item Prove correctness of concurrent and distributed systems
     \end{itemize}
 \end{itemize}
 }

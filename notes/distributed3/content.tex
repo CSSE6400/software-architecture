@@ -100,7 +100,7 @@ Or, if the operation will not have any adverse effect (e.g. it is a query with n
 
 The intent is that the server's state will be the same, regardless of whether it receives a message once or multiple times.
 This behaviour is called the \link{idempotent consumer pattern}
-{https://chrisrichardson.net/post/microservices/patterns/2020/10/16/idempotent-consumer.html}.
+{https://microservices.io/post/microservices/patterns/2020/10/16/idempotent-consumer.html}.
 
 \subsection{Timing Faults}\label{timing}
 We introduced the issue of write conflicts, when discussing multi-leader replication \cite{distributed2-notes}.
@@ -140,13 +140,17 @@ and suggests some solution options, with their attendant tradeoffs \cite{data-in
 
 Byzantine\footnote{Byzantine carries a connotation of being an excessively complicated, intrigue filled and corrupt environment.
 This is probably a smear of the Byzantine Empire (\url{https://www.britannica.com/place/Byzantine-Empire}).}
-faults are those that are caused by nodes that `` lie''.
+faults are those that are caused by nodes that ``lie''.
 Most distributed systems are implemented with the assumption that nodes are ``honest''.
 An honest node is one that provides responses which the system can assume are correct.
 Faults relate to the node not responding.
 A lying node is one whose response may not be correct.
-Two common scenarios of a lying node are, if it sends confirmation of receipt of a message but loses the message,
-or if it sends contradictory data to different nodes.
+Three common scenarios of lying nodes are:
+\begin{itemize}[topsep=5pt,parsep=2pt]
+    \item Sending confirmation of receipt of a message but failing to process or losing the message.
+    \item Processing a message request but failing to send a response.
+    \item Sending contradictory results to different nodes.
+\end{itemize}
 
 \subsubsection*{Byzantine Generals Problem}
 The Byzantine Generals Problem \cite{byzantine-generals} is a fictional scenario where several generals need to agree on a battle plan.
@@ -177,7 +181,7 @@ Not catering for Byzantine faults does not mean that a system design should assu
 Simple error detection (e.g. checksums) should be used to catch corrupted data.
 Any user input should be sanitised before it is used as data in the system.
 These strategies do not handle subtler data corruption or persistent malicious attack,
-but they catch errors that should not propagate into the rest of the system.
+but they catch simple errors that should not propagate into the rest of the system.
 
 
 \section{Consistency}
@@ -234,7 +238,7 @@ the system needs to be able to linearise the requests to return an error message
 The same issue arises in banking applications.
 If a user transfers money from their account at the same time as an automated payment occurs,
 the account debit service may need to guarantee that the account balance does not become negative.
-It needs to be able to linearise these two operations and disallow one if it would result in a negative balance.
+It needs to be able to linearise these two operations and disallow one, if it would result in a negative balance.
 
 In some situations, it is acceptable to not require linearisability of operations.
 If two customers order the last item of a product in the Sahara eCommerce system,
@@ -345,7 +349,7 @@ it increases its own counter to the new maximum.
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[trim=60 189 450 35,clip,width=0.67\textwidth]{diagrams/lamport-timestamp-seq.png}
+    \includegraphics[trim=60 188 440 35,clip,width=0.7\textwidth]{diagrams/lamport-timestamp-seq.png}
     \caption{Lamport timestamps.}
     \label{fig:lamport-timestamp-seq}
 \end{figure}
@@ -361,7 +365,7 @@ the message includes \texttt{InventoryUpdater}'s maximum value of \texttt{3}.
 
 Lamport timestamps define causal ordering for operations, but they do not guarantee consistency when an operation is performed.
 If two orders are sent to \texttt{ProductDB1} and \texttt{ProductDB2} at the same time and there is only one item in stock,
-Lamport timestamps provide a way to decide which order occurred first, but only emph{after} the orders are processed.
+Lamport timestamps provide a way to decide which order occurred first, but only \emph{after} the orders are processed.
 
 To enforce a constraint that would not allow two orders for the last item in stock,
 there needs to be a mechanism to indicate when the order is completed.
