@@ -4,8 +4,11 @@
 %\setbeameroption{show notes on second screen}
 
 \title{Distributed Computing III}
-\subtitle{\textit{Murphy was an optimist} \newline \newline   % O'Toole's Commentary
-CSSE6400}
+\subtitle{
+    \textit{Murphy was an optimist.}\\
+    \vspace{3mm} \hspace{2cm} \textit{--- O'Toole's Commentary}\\
+    \vspace{8mm} CSSE6400
+}
 
 \author{Richard Thomas}
 \date{\week{9}}
@@ -412,20 +415,25 @@ blocking issue.
     \item Finite precision -- two events may end up with the same timestamp, if they occur in quick succession
 }
 
+
 \section{Data Issues}
 
 \point[Consistency]{
+    \vspace{4mm}
     \begin{description}
         \item[Eventual Consistency] weak guarantee
+        \vspace{2mm}
         \item[Linearisability] strong guarantee
+        \vspace{2mm}
         \item[Causal Ordering] strong guarantee
     \end{description}
 }
 
 \point[Eventual Consistency]{
+\vspace{4mm}
 \begin{itemize}
     \item Allows stale reads
-    \vspace{3mm}
+    \vspace{5mm}
     \item May be appropriate for some systems
     \begin{itemize}
         \LARGE\item e.g. Social media updates\footnote{See \href{https://csse6400.uqcloud.net/slides/distributed2.pdf}{Distributed II slides 41 - 46}.}
@@ -439,40 +447,41 @@ blocking issue.
     \item<1-> Once value is written, all reads see same value
     \begin{itemize}
         \LARGE\item<1-> Regardless of replica read from
-    \end{itemize}
         	\note<1>{Abstraction over replicated database.\\Used when uniqueness needs to be guaranteed.}
+    \end{itemize}
+    \vspace{2mm}
     \item<2-> Single-leader replication
     \begin{itemize}
         \LARGE\item<2-> Read from leader
         \LARGE\item<2-> Read from synchronous follower
-    \end{itemize}
         	\note<2>{SLR -- defeats most performance benefits.\\Maintains reliability benefits.}
+    \end{itemize}
     \item<3-> Multi-leader replication can't be linearised
-    \vspace{1mm}
+    \vspace{2mm}
     \item<4-> Leaderless replication
     \begin{itemize}
-        \LARGE\item<4-> Lock value on quorum before writing
-    \end{itemize}
+        \LARGE\item<4-> Lock value on quorum \emph{before} writing
         	\note<4>{Leaderless -- similar performance cost to SLR.}
+    \end{itemize}
 \end{itemize}
 }
 
 \point[Causal Order]{
-\vspace{3mm}
+\vspace{4mm}
 \begin{itemize}
     \item<1-> Order is based on causality
     \begin{itemize}
         \LARGE\item<1-> What event needs to happen before another
         \LARGE\item<1-> Allows concurrent events
     \end{itemize}
-		\note<1>{
-			\begin{itemize}
-			    \item Linearisation defines a total order.
-			    \item Causal ordering defines a partial order.
-			    \item e.g. Git repo history with branching as causal order.
-			    \item Not as strict as linearisability, so less performance cost.
-		    \end{itemize}
-		}
+    \note<1>{
+		\begin{itemize}
+		    \item Linearisation defines a \highlight{total} order.
+		    \item Causal ordering defines a \highlight{partial} order.
+		    \item e.g. Git repo history with branching as \highlight{causal order}.
+		    \item Not as strict as linearisability, so less performance cost.
+	    \end{itemize}
+	}
     \vspace{3mm}
     \item<2-> Single-leader replication
     \begin{itemize}
@@ -480,6 +489,7 @@ blocking issue.
         \LARGE\item<2-> Followers read log to execute writes
     \end{itemize}
     \item<3-> Lamport timestamps
+    \note<3>{Next slide is an example of Lamport timestamps.}
 \end{itemize}
 }
 
@@ -507,6 +517,7 @@ blocking issue.
 }
 
 \point[Consensus Properties]{
+\vspace{3mm}
 \begin{description}
     \item[Uniform Agreement] All nodes must agree on the decision
     \item[Integrity] Nodes can only vote once
@@ -516,18 +527,26 @@ blocking issue.
 \end{description}
 }
 \note[itemize]{
-    \item Uniform Agreement and Integrity are key
-    \item Validity avoids nonsensical solutions (e.g. always agreeing to a null decision)
-    \item Termination enforces fault tolerance, requires progress is made towards a solution
+    \item \textit{Uniform Agreement} and \textit{Integrity} are key
+    \vspace{3mm}
+    \item \textit{Validity} avoids nonsensical solutions
+    \begin{itemize}
+        \Large\item e.g. Always agreeing to a null decision
+    \end{itemize}
+    \vspace{3mm}
+    \item \textit{Termination} enforces fault tolerance
+    \begin{itemize}
+        \Large\item Requires making progress towards a solution
+    \end{itemize}
 }
 
 \definition{Atomic Commit}{
     All nodes participating in a distributed transaction need to form consensus to complete the transaction.
 }
-\note{Based on transaction atomicity from ACID\\(Atomicity, Consistency, Isolation, Durability).}
+\note{Based on transaction atomicity from ACID\\(Atomicity, Consistency, Isolation, Durability)}
 
 \point[Two-Phase Commit]{
-\vspace{3mm}
+\vspace{4mm}
 \begin{description}
     \item[Prepare] Confirm nodes can commit transaction
     \vspace{2mm}
@@ -537,11 +556,12 @@ blocking issue.
     \end{itemize}
 \end{description}
 }
+\note{Two-Phase commit example is on next slide.}
 
 \image[trim=55 70 420 30,clip,height=\textheight]{../../notes/distributed3/diagrams/2phase-commit-seq.png}
 \note[itemize]{
     \item Transaction ID used to track writes
-    \item Prepare does all steps of a commit, aside from confirming it -- It cannot be revoked by participant
+    \item Prepare does all steps of a commit, \textit{aside} from confirming it -- It cannot be revoked by participant
     \item Commit intent is recorded in log before sending to participants
     \item Even if a participant fails, commit can proceed when it recovers
     \item Comment on \highlight{performance costs}
@@ -586,7 +606,7 @@ blocking issue.
         \begin{itemize}
             \Large\item Node fails and never restarts
         \end{itemize}
-        		\note<1>{Cloud-based system that kills crashed nodes.}
+      	\note<1>{Cloud-based system that kills crashed nodes.}
         \vspace{3mm}
         \item<2-> Crash Recovery
         \begin{itemize}
@@ -595,11 +615,11 @@ blocking issue.
                 \large\item Requires persistent memory for recovery close to prior state
             \end{itemize}
         \end{itemize}
-        		\note<2>{\begin{itemize}
-        				 	\item Any system that allows nodes to be restarted.
-        				 	\item May lose some steps in memory for \highlight{non-critical} tasks.
-        				 \end{itemize}
-        				}
+        	\note<2>{\begin{itemize}
+        			 	\item Any system that allows nodes to be restarted.
+        			 	\item May lose some steps in memory for \highlight{non-critical} tasks.
+        			 \end{itemize}
+        			}
         \vspace{2mm}
         \item<3-> Arbitrary Failure
         \begin{itemize}
@@ -608,7 +628,7 @@ blocking issue.
                 \large\item Byzantine faults
             \end{itemize}
         \end{itemize}
-        		\note<3>{Nodes may send faulty or malicious messages.}
+        	\note<3>{Nodes may send faulty, corrupt or malicious messages.}
     \end{itemize}
     }
 \end{frame}
@@ -629,7 +649,7 @@ blocking issue.
     \vspace{4mm}
     \item CSSE7610 Concurrency: Theory \& Practice
     \begin{itemize}
-        \LARGE\item Prove correctness of concurrent and distributed systems
+        \LARGE\item Prove correctness of concurrent \& distributed systems
     \end{itemize}
 \end{itemize}
 }
