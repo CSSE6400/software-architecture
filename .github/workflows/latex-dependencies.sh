@@ -1,7 +1,7 @@
 #!/bin/bash
 # Install latex dependencies
 
-tlmgr option repository ftp://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2021/tlnet-final/
+tlmgr option repository ftp://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2023/tlnet-final/
 tlmgr update --self
 tlmgr install cabin
 tlmgr install fontaxes
