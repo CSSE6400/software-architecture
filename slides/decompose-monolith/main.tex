@@ -11,7 +11,7 @@
 \date{\week{13}}
 \titlegraphic {
     \begin{tikzpicture}[overlay,remember picture]
-    \node[left=0.1cm] at (current page.-9){
+    \node[left=0.1cm] at (current page.-3){
         \includegraphics[width=7cm]{images/decomposing\_computer.png}
     };
     \end{tikzpicture}
@@ -58,27 +58,35 @@
 }
 
 \questionanswer{How do I migrate a monolith to a new architecture?}{Decompose the monolith into services.}
-\note{Implies a service-based or microservices architecture.}
+\note{Implies a service-based or micro-services architecture.}
 
 \begin{frame}{Strangler Fig Pattern}
     \vspace{1pt}
     \begin{columns}
     \column{0.65\textwidth}
       {\LARGE
-        \begin{itemize}
+        \begin{itemize}[<+(1)->]
             \item Develop API for application's UI
-            \vspace{1mm}
+            \note<2>{May already have an API if the UI is a web or mobile app.}
+            \vspace{2mm}
             \item Proxy intercepts API calls
-            \begin{itemize}
+            \begin{itemize}[<3->]
                 \Large\item Proxy directs calls to application or new services
             \end{itemize}
-            \vspace{1mm}
+            \note<3>{Initially deploy proxy and new interface into production, with only existing monolith.
+                     Test it works as expected.}
+            \vspace{2mm}
             \item Implement a service
-            \begin{itemize}
+            \begin{itemize}[<4->]
                 \Large\item Redirect calls to service
             \end{itemize}
             \item Progressively replace monolith
             \item Shadow \& Blue-Green Deployment
+            \note<6>{\begin{itemize}
+        			        \item Shadow deployment to test service with application.
+        				    \item Blue-Green deployment to switch over to using service.
+        	             \end{itemize}
+        	            }
         \end{itemize}
       }
     \column{0.35\textwidth}
@@ -86,12 +94,9 @@
         \includegraphics[height=0.9\textheight]{images/strangler-fig.jpg}
     \end{columns}
 \end{frame}
-\note[itemize]{
-    \item May already have an API if the UI is a web or mobile app.
-    \item Initially deploy proxy and new interface into production, with only existing monolith. Test it works as expected.
-    \item Shadow deployment to test service with application.
-    \item Blue-Green deployment to switch over to using service.
-}
+
+
+% TODO: Update diagrams to have API gateway and services on AWS?
 
 \begin{frame}{Monolith Deployment}
     \begin{adjustwidth}{-12mm}{-12mm}
@@ -117,87 +122,114 @@
 \begin{frame}{Decomposition Process}
 \vspace{1pt}
 {\huge
-\begin{itemize}
+\begin{itemize}[<+->]
     \item Identify bounded-contexts
     \vspace{3mm}
     \item Simple first service
-    \begin{itemize}
+    \begin{itemize}[<2->]
         \LARGE\item e.g. Authentication
     \end{itemize}
+    \note<2>{Use first service (or first few) to validate approach and deployment infrastructure.}
     \vspace{3mm}
     \item Minimise dependency from services to monolith
-    \begin{itemize}
+    \begin{itemize}[<3->]
         \LARGE\item Monolith may use services
     \end{itemize}
+    \note<3>{\begin{itemize}
+    	             \item Monolith decomposition will continue.
+                 \begin{itemize}
+    	                 \Large\item Don't want to have to refactor service once functionality is removed from monolith.
+    	                 \Large\item Don't want services to end up depending on each other.
+                 \end{itemize}
+                 \vspace{3mm}
+        	         \item Minimise changes required in monolith.
+                 \begin{itemize}
+    	                 \Large\item But expect a fair bit of work removing features from monolith.
+                 \end{itemize}
+        	     \end{itemize}
+        	    }
 \end{itemize}
 }
 \end{frame}
-\note[itemize]{
-    \item Use first service (or first few) to validate approach and deployment infrastructure.
-    \item Minimise changes required in monolith.
-}
 
 \begin{frame}{Decomposition Process}
 \vspace{1pt}
 {\huge
-\begin{itemize}
+\begin{itemize}[<+->]
     \item Reduce coupling between bounded-contexts
     \vspace{1mm}
-    \begin{itemize}
+    \begin{itemize}[<1->]
         \LARGE\item e.g. Customer account management
-        \begin{itemize}
+        \begin{itemize}[<1->]
             \Large\item Profile, Wish List, Payment Preferences -- separate services
         \end{itemize}
     \end{itemize}
+    \note<1>{Account management may be tightly coupled in monolith.\\ Separate each aspect (context), one at a time.}
     \vspace{3mm}
     \item Decouple vertically
     \vspace{1mm}
-    \begin{itemize}
+    \begin{itemize}[<2->]
         \LARGE\item Service delivers entire bounded-context
-        \begin{itemize}
+        \begin{itemize}[<2->]
             \Large\item Data is decoupled from monolith
         \end{itemize}
     \end{itemize}
+    \note<2>{\begin{itemize}
+    	             \item Do not focus only on UI or internal components.
+                 \begin{itemize}
+    	                 \Large\item Service needs to implement \textit{all} parts of the business process.
+                     \begin{itemize}
+                         \Large\item Slice of cake analogy, you want a vertical slice containing all layers,
+                                     not just the icing on top.
+                     \end{itemize}
+                 \end{itemize}
+                 \vspace{3mm}
+        	         \item Data management needs to be decentralised.
+        	     \end{itemize}
+        	    }
 \end{itemize}
 }
 \end{frame}
-\note[itemize]{
-    \item Account management may be tightly coupled in monolith. Separate each aspect (context), one at a time.
-    \item Do not focus only on UI or internal components, service needs to implement all parts of the business process.
-    \item Data management needs to be decentralised.
-}
 
 \begin{frame}{Decomposition Process}
 \vspace{1pt}
 {\huge
-\begin{itemize}
+\begin{itemize}[<+->]
     \item Focus on pain points
-    \begin{itemize}
+    \begin{itemize}[<1->]
         \LARGE\item Bottlenecks
         \LARGE\item Frequently changing behaviour
     \end{itemize}
+    \note<1>{\begin{itemize}
+    	             \item Extract services that deliver highest value.
+                 \begin{itemize}
+    	                 \Large\item What contexts may need to scale more than others?
+    	                 \Large\item What contexts change more frequently and benefit from separate deployment?
+                 \end{itemize}
+        	     \end{itemize}
+        	    }
     \vspace{3mm}
     \item Rewrite, don't reuse
-    \begin{itemize}
+    \begin{itemize}[<2->]
         \LARGE\item Redesign for new infrastructure
         \vspace{2mm}
         \LARGE\item Reuse complex logic
         \vspace{-1mm}
-        \begin{itemize}
+        \begin{itemize}[<2->]
             \Large\item e.g. Discounts based on customer loyalty and behaviour, bundle offers, \dots
         \end{itemize}
     \end{itemize}
+    \note<2>{\begin{itemize}
+    	             \item Services deliver capabilities provided by monolith.
+                 \begin{itemize}
+    	                 \Large\item Usually it is better to rewrite the capability to take advantage of new infrastructure.
+                 \end{itemize}
+    	             \item Only reuse code that has complex logic that will be difficult to duplicate and test fully.
+        	     \end{itemize}
+        	    }
 \end{itemize}
 }
 \end{frame}
-\note[itemize]{
-    \item Extract services that deliver highest value.
-    \item What contexts may need to scale more than others?
-    \item What contexts change more frequently and benefit from separate deployment?
-    \item Services deliver capabilities provided by monolith.
-    \item Most often it is better to rewrite the capability to take advantage of new infrastructure.
-    \item Only reuse code that has complex logic that will be difficult to duplicate and test fully.
-}
 
 \begin{frame}{Atomic Decomposition}
 \vspace{1pt}
@@ -216,10 +248,18 @@
 \end{itemize}
 }
 \end{frame}
-\note[itemize]{
-    \item Atomic replacement of monolith behaviour by service's behaviour.
-    \item Don't deploy production code with service behaviour left in monolith.
-            Leads to a maintenance nightmare determining where behaviour is used, or it may be used in both the monolith and service.
+\note{
+    \begin{itemize}
+        \item Atomic replacement of monolith behaviour by service's behaviour.
+        \vspace{2mm}
+        \item Don't deploy production code with service behaviour left in monolith.
+        \begin{itemize}
+            \Large\item Leads to a maintenance nightmare determining where behaviour is used.
+            \begin{itemize}
+                \Large\item May be used in both the monolith and service.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
 }
 
 \point[Stepwise Decomposition]{Replace application functionality one service at a time.}
@@ -227,12 +267,14 @@
 \definition{Macroservice}{Separate service, but may span more than one domain or share a database with the monolith or other services.}
 \note[itemize]{
     \item Similar scalability and deployment issues to a monolith, but grouped by clusters of macroservices if they share a database.
+    \vspace{2mm}
     \item Interim step to build microservices.
 }
 
 \definition{Nanoservice}{Service that depends on other services and cannot be deployed independently -- its context is too small.}
 \note[itemize]{
     \item Anti-pattern where services are too fine grained and need to be coupled to deliver business processes.
+    \vspace{2mm}
     \item Some use the term ``nanoservice'' to refer to independently deployable functions, similar to serverless architecture.
 }
 
