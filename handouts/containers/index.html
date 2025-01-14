@@ -1,0 +1,706 @@
+Last Updated on 2024/03/03
+                                                                                                    
+
+<?xml version="1.0" encoding="iso-8859-1" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+<!--http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd-->  
+<html xmlns="http://www.w3.org/1999/xhtml"  
+> 
+<head> <title>Containers</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> 
+<meta name="generator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
+<meta name="originator" content="TeX4ht (https://tug.org/tex4ht/)" /> 
+<!-- fn-in,html,htex4ht,xhtml --> 
+<meta name="src" content="main.tex" /> 
+<link rel="stylesheet" type="text/css" href="main.css" /> 
+<link rel="stylesheet" href="https://latex.now.sh/style.css"> 
+<link rel="stylesheet" href="/notes.css"> 
+<style>body {max-width: 100ch;} 
+dl dd {text-align: left}</style> 
+</head><body 
+>
+   <div class="maketitle"><a 
+ id="Q1-1-1"></a>
+_________________________________________________________________________________________________
+<h2 class="titleHead">Containers</h2>                                                                                       Software Architecture
+   <div class="date" >March 10, 2025</div>                                                                                                                                                       <div class="author" >Brae
+Webb</div>
+______________________________________________________________________________________________
+   </div>
+      I don&#8217;t care if it works on your machine! We are not shipping your machine!
+                                                                                             <!--l. 12--><p class="noindent" >&#8211;
+                                                                                          Vidiu
+                                                                                        Platon
+</p>
+   <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
+ id="x1-10001"></a>Introduction</h3>
+<!--l. 16--><p class="noindent" >As developers, we often find ourselves relying on some magical tools and technologies. Version control, operating
+systems, databases, and containers, to name a few. Containers, and specifically, Docker, are magical tools which
+have gained wide-spread industry adoption. Over the past decade Docker has enabled some fanciful architectures
+and developer workflows. Docker is the proposed solution to the age-old programmer proverb, &#8220;it works on my
+machine!&#8221;. However, before we subscribe to that belief, let&#8217;s see how Docker actually works to learn what it is, and
+what it is not.
+</p><!--l. 23--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
+ id="x1-20002"></a>History and Fundamentals</h3>
+<!--l. 24--><p class="noindent" >Relative to other tools in the magical suite, Docker is new on the scene. Docker was first made available publicly in 2013
+at PyCon.<span class="footnote-mark"><a 
+href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
+ id="x1-2001f1"></a>
+Pitched to deliver the isolation benefits of Virtual Machines (VMs) while maintaining efficient execution. Virtual machines
+themselves are a much older invention, dating back to the 1960s, around the time that UQ was having it&#8217;s first computer
+installed.<span class="footnote-mark"><a 
+href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
+ id="x1-2003f2"></a>
+The concept of a virtual machine, unlike its implementation, is straight-forward &#8212; use software to simulate
+hardware. From there, one can install an operating system on the simulated hardware and start using a completely
+isolated, completely new computer without any additional hardware. Of course, this process puts great strain on
+the real hardware and as such, VMs are deployed sparingly.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<div class="subfigure">
+<!--l. 35--><p class="noindent" ></p><!--l. 36--><p class="noindent" ><img 
+src="main0x.svg" alt="HOHGGFFAAapyuuililpprepeeeeppdresswarttSS12atvyyriiOOssensSSttgoeermmSystem  "  />
+<a 
+ id="x1-2005r1"></a></p>
+<div class="caption" ><span class="id"><span 
+class="Cabin-Regular-tlf-t1-x-x-109">(a) </span></span><span  
+class="content"><span 
+class="Cabin-Regular-tlf-t1-x-x-109">Two virtual machines running on a host</span>
+</span></div>                                             </div>                                                                                                                     <div class="subfigure">
+<!--l. 68--><p class="noindent" ></p><!--l. 69--><p class="noindent" ><img 
+src="main1x.svg" alt="HOFAFADapilpilporeepepcdrkwaS1S2eatyyrrissenttDgeeammeSmyosntem  "  />
+<a 
+ id="x1-2006r2"></a></p>
+<div class="caption" ><span class="id"><span 
+class="Cabin-Regular-tlf-t1-x-x-109">(b) </span></span><span  
+class="content"><span 
+class="Cabin-Regular-tlf-t1-x-x-109">Two containers running on a host</span>
+</span></div>                                             </div>
+<a 
+ id="x1-2007r1"></a>
+<div class="caption" ><span class="id">Figure&#x00A0;1: </span><span  
+class="content">Comparison of virtual machines and containers
+</span></div>
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 92--><p class="indent" >   Unlike virtual machines, containers do not run on virtual hardware, instead, containers run on the operating
+system of the host machine. The obvious advantage of this is containers run much more efficiently than virtual
+machines. Containers however, manage to remain isolated and it is at this point that we should explain how
+Docker actually works. Docker is built upon two individually fascinating technologies; namespaces, and layered
+filesystems.
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">2.1    </span> <a 
+ id="x1-30002.1"></a>Namespaces</h4>
+<!--l. 99--><p class="noindent" >The first technology, namespaces, is built into the Linux kernel. Linux namespaces were
+first introduced into the kernel in 2002, inspired by the concept introduced by the  <a 
+href="https://p9f.org/" >Plan
+9</a><span class="footnote-mark"><a 
+href="#fn3x0" id="fn3x0-bk"><sup class="textsuperscript">3</sup></a></span><a 
+ id="x1-3001f3"></a> operating
+system from Bell Labs in the 1980s. Namespaces enable the partitioning and thus, isolation, of various concepts
+managed and maintained by an operating system. Initially namespaces were implemented to allow isolated filesystems
+(the so-called &#8216;mount&#8217; namespace). Eventually, as namespaces were expanded to include process isolation, network
+isolation, and user isolation, the ability to mimic an entirely new isolated machine was realised; containers were
+born.<span class="footnote-mark"><a 
+href="#fn4x0" id="fn4x0-bk"><sup class="textsuperscript">4</sup></a></span><a 
+ id="x1-3003f4"></a>
+</p><!--l. 108--><p class="indent" >   Namespaces provide a mechanism to create an isolated environment within your current operating system.
+The creation of such an isolated environment with namespaces has been made quite easy &#8212; you can create
+an isolated namespace with just a series of bash commands. Niklas Dzösch&#8217;s talk &#8216;Docker without
+Docker&#8217;, uses just 84 lines of Go code (which Docker itself is written in), to create, well, Docker without
+Docker.<span class="footnote-mark"><a 
+href="#fn5x0" id="fn5x0-bk"><sup class="textsuperscript">5</sup></a></span><a 
+ id="x1-3005f5"></a>
+But namespaces are just the first technology which enables Docker. How do you pre-populate these isolated
+environments with everything you need to run a program? To see what is in the isolated environment, we would
+run <span 
+class="ectt-1200">ls </span>which, oh, requires the <span 
+class="ectt-1200">ls </span>binary. Furthermore, to even consider running a command we need a shell to
+type it in, so, oh, we should also have a <span 
+class="ectt-1200">bash </span>binary. And so on until, oh, finally, we have a Linux kernel at
+least!<span class="footnote-mark"><a 
+href="#fn6x0" id="fn6x0-bk"><sup class="textsuperscript">6</sup></a></span><a 
+ id="x1-3007f6"></a>
+</p><!--l. 119--><p class="noindent" >
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">2.2    </span> <a 
+ id="x1-40002.2"></a>Layered Filesystem</h4>
+<!--l. 120--><p class="noindent" >A core principle of Unix operating systems is that everything is a file. Naturally then, if we want to start using an
+isolated environment, all we need to do is copy in all the files which together form an operating system, right?
+Well, yes, kind of. In principle this is all you need do but this would hardly enable the popularity Docker enjoys
+today.
+</p><!--l. 126--><p class="indent" >   Say that you want to send your coworker a Docker container which has nginx (a tool for routing web traffic)
+setup in just the way you need to pass incoming traffic to various components of your application. Let&#8217;s assume
+that you have setup nginx in Ubuntu. All you would need to do is zip up all the files which compose the Ubuntu
+operating system (an impressively small 188MB), then all the files installed by nginx (about 55MB) and finally all
+the configuration files which you have modified, somewhere in the order of 1000 bytes or 1 KB. In total you
+are sending your coworker about 243MBs worth of data, less than a gigabyte, so they are not too
+upset.
+</p><!--l. 134--><p class="indent" >   Now once we have finished developing our application and we are ready to package it up and send it to the
+world. Rather than trying to support every known operating system, we bundle all our services in Docker
+containers, one for nginx, one for mysql, one for our web application, etc, etc. If your application&#8217;s containers are
+as popular as nginx, this means one <span 
+class="Cabin-Italic-tlf-t1-x-x-120">billion </span>downloads of your container. At a size of 243MBs, you
+have contributed 243 <span 
+class="Cabin-Italic-tlf-t1-x-x-120">petabytes </span>to the world&#8217;s collective bandwidth usage, and that is just your nginx
+                                                                                                    
+                                                                                                    
+container.
+</p><!--l. 140--><p class="indent" >   Docker&#8217;s success over other containerisation applications comes from the way it avoids this looming data
+disaster. A concept known as the layered, or overlayed, or the stacked filesystem solves the problem. First
+proposed in the early 1990s, layered filesystems enable layers of immutable files to be stacked below a top-level
+writable system. This has the effect of producing a seemingly mutable (or writable) filesystem while never actually
+modifying the collection of immutable files. Whenever a immutable file is &#8216;written to&#8217;, a copy of the file is made
+and all modifications are written to this file. When reading or listing files, the filesystem overlays the layers of
+immutable files together with the layer of mutable files. This gives the appearance of one homogeneous
+filesystem.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<div class="subfigure">
+<!--l. 150--><p class="noindent" ></p><!--l. 151--><p class="noindent" ><img 
+src="main2x.svg" alt="$ ls
+pdhhpaieeasallssryppsw..m.mwomeeordrddss..ttxxtt help.me diary.md  "  />
+<a 
+ id="x1-4001r1"></a></p>
+<div class="caption" ><span class="id"><span 
+class="Cabin-Regular-tlf-t1-x-x-109">(a) </span></span><span  
+class="content"><span 
+class="Cabin-Regular-tlf-t1-x-x-109">Read operation in a layered filesystem</span>
+</span></div>                                                  </div> <div class="subfigure">
+<!--l. 167--><p class="noindent" ></p><!--l. 168--><p class="noindent" ><img 
+src="main3x.svg" alt="$hphdpeaeiaelslascpsprysh.mw.m.woeoemordr"dd12ss3..4ttxx"tt » passwords.txt  "  />
+<a 
+ id="x1-4002r2"></a></p>
+<div class="caption" ><span class="id"><span 
+class="Cabin-Regular-tlf-t1-x-x-109">(b) </span></span><span  
+class="content"><span 
+class="Cabin-Regular-tlf-t1-x-x-109">Write operation in a layered filesystem</span>
+</span></div>                                             </div>
+<a 
+ id="x1-4003r2"></a>
+<div class="caption" ><span class="id">Figure&#x00A0;2:  </span><span  
+class="content">Read  and  write  operations  in  a  layered  filesystem.  The  leftmost  column  in  each  diagram
+represents the most recent &#8216;writable&#8217; layer.
+</span></div>
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
+<!--l. 191--><p class="indent" >   Docker uses this technique to reduce the amount of duplicated files. If you have Docker containers
+which run nginx, MySQL, and Python but all containers run on Ubuntu, then your computer will only
+need to store one copy of the Ubuntu filesystem. Each container will store the changes to the base
+operating system required to install each application and project that layer over the immutable Ubuntu
+filesystem.
+</p>
+   <h4 class="subsectionHead"><span class="titlemark">2.3    </span> <a 
+ id="x1-50002.3"></a>Summary</h4>
+<!--l. 197--><p class="noindent" >While Docker itself only came out in 2013, the two primary technologies which it is composed of, namespaces
+and the layered filesystem, were around since the early 1990s. Docker combines these technologies to enable
+applications to run in an isolated environment which can be efficiently replicated across different
+host computers. The reproducibility of Docker containers, and the fact that they are so light weight,
+makes them an ideal target for two important aspects of modern development; developers simulating
+production environments locally, and duplicating production machines to scale for large loads of
+traffic.
+</p><!--l. 204--><p class="noindent" >
+</p>
+   <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
+ id="x1-60003"></a>Docker FROM scratch</h3>
+<!--l. 205--><p class="noindent" >Now that we understand the fundamentals of how Docker works, let&#8217;s start building our
+very first Docker container. To follow along, you will need to have Docker installed on your
+computer<span class="footnote-mark"><a 
+href="#fn7x0" id="fn7x0-bk"><sup class="textsuperscript">7</sup></a></span><a 
+ id="x1-6001f7"></a> and have access to basic
+Unix command line applications.<span class="footnote-mark"><a 
+href="#fn8x0" id="fn8x0-bk"><sup class="textsuperscript">8</sup></a></span><a 
+ id="x1-6003f8"></a>
+</p><!--l. 210--><p class="indent" >   To start with, we will write a <span 
+class="ectt-1200">Dockerfile </span>which builds a Docker image without an operating system and just
+prints &#8216;Hello World&#8217; <span class="cite">[<a 
+href="#Xdocker-from-scratch">1</a>]</span>. The Docker &#8216;code&#8217; is written in a <span 
+class="ectt-1200">Dockerfile </span>which is then &#8216;compiled&#8217; into a
+Docker image and finally run as a Docker container. The first command in your <span 
+class="ectt-1200">Dockerfile </span>should
+always be <span 
+class="ectt-1200">FROM</span>. This command tells Docker what immutable filesystem we want to start from, often,
+this will be your chosen operating environment. In this exercise, since we do not want an operating
+system, we start with <span 
+class="ectt-1200">FROM scratch</span>, a no-op instruction that tells Docker to start with an empty
+filesystem.
+</p><!--l. 218--><p class="indent" >   Let&#8217;s get something in this container. For this, we will use the <span 
+class="ectt-1200">COPY </span>command which copies files from the host
+machine (your computer) into the container. For now, we will write <span 
+class="ectt-1200">COPY hello-world /</span>, which says to copy
+a file from the current directory named <span 
+class="ectt-1200">hello-world </span>into the root directory (<span 
+class="ectt-1200">/</span>) of the container.
+We do not yet have a <span 
+class="ectt-1200">hello-world </span>file but we can worry about that later. Finally, we use the <span 
+class="ectt-1200">CMD</span>
+command to tell the container what to do when it is run. This should be the command which starts your
+application.
+</p>
+   <div class="framedenv" id="shaded*-1">
+   <!--l. 227--><pre class="lstinputlisting" id="listing-1"><span class="label"><a 
+ id="x1-6006r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#006699"><span 
+class="ectt-1200">FROM</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">scratch</span></span> 
+<span class="label"><a 
+ id="x1-6007r2"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">2</span></span><span style="color:#006699"><span 
+class="ectt-1200">COPY</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">hello</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">world</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span> 
+<span class="label"><a 
+ id="x1-6008r3"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span style="color:#006699"><span 
+class="ectt-1200">CMD</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">/</span></span><span style="color:#669900"><span 
+class="ectt-1200">hello</span></span><span style="color:#669900"><span 
+class="ectt-1200">-</span></span><span style="color:#669900"><span 
+class="ectt-1200">world</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">]</span></span>
+   </pre>
+</div>
+                                                                                                    
+                                                                                                    
+<!--l. 231--><p class="indent" >   Next, we will need a minimal hello world program. Unfortunately, we will have to use C here as better
+programming languages have a bit too much overhead. For everyone who has done CSSE2310, this
+should be painfully familiar, create a <span 
+class="ectt-1200">main </span>function, print hello world, with a new line, and return
+0.
+</p>
+   <div class="framedenv" id="shaded*-1">
+   <!--l. 236--><pre class="lstinputlisting" id="listing-2"><span class="label"><a 
+ id="x1-6010r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#006699"><span 
+class="ectt-1200">#</span></span><span style="color:#006699"><span 
+class="ectt-1200">include</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">&#x003C;</span></span><span style="color:#000000"><span 
+class="ectt-1200">stdio</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">h</span></span><span style="color:#000000"><span 
+class="ectt-1200">&#x003E;</span></span> 
+<span class="label"><a 
+ id="x1-6011r2"></a></span> 
+<span class="label"><a 
+ id="x1-6012r3"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span style="color:#006699"><span 
+class="ectt-1200">int</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">main</span></span><span style="color:#000000"><span 
+class="ectt-1200">()</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-6013r4"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">4</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">printf</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">(</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">Hello</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">World</span></span><span style="color:#669900"><span 
+class="ectt-1200">\</span></span><span style="color:#669900"><span 
+class="ectt-1200">n</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">;</span></span> 
+<span class="label"><a 
+ id="x1-6014r5"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">5</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">return</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">0;</span></span> 
+<span class="label"><a 
+ id="x1-6015r6"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">6</span></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+   </pre>
+</div>
+<!--l. 239--><p class="indent" >   Let&#8217;s try running this container. </p><div class="tcolorbox tcolorbox" id="tcolobox-1">     
+<div class="tcolorbox-title">
+<!--l. 239--><p class="indent" >   Hint</p></div> 
+<div class="tcolorbox-content"><!--l. 239--><p class="noindent" >Try to guess if this is going to work. Why? Why not? </p> 
+</div> 
+</div>
+<!--l. 241--><p class="indent" >   First, the hello world program needs to be compiled into a binary file.
+</p>
+   <div class="framedenv" id="shaded*-1">
+   <!--l. 244-->
+<pre class="lstlisting" id="listing-3"><span class="label"><a 
+ id="x1-6016r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">&#x003E;&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">gcc</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">o</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">hello</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">world</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">hello</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">world</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">c</span></span> 
+<span class="label"><a 
+ id="x1-6017r2"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">2</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">&#x003E;&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ls</span></span> 
+<span class="label"><a 
+ id="x1-6018r3"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">Dockerfile</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">hello</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">world</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">hello</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">world</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">c</span></span></pre>
+   </div>
+<!--l. 251--><p class="indent" >   Next we will use the <span 
+class="ectt-1200">Dockerfile </span>to build a Docker image and run that image. Images are stored
+centrally for a user account so to identify the image, we need to tag it when it is built, we will use
+&#8216;hello&#8217;.
+</p>
+   <div class="framedenv" id="shaded*-1">
+   <!--l. 255-->
+<pre class="lstlisting" id="listing-4"><span class="label"><a 
+ id="x1-6019r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">&#x003E;&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">build</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">--</span></span><span style="color:#000000"><span 
+class="ectt-1200">tag</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">hello</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span> 
+<span class="label"><a 
+ id="x1-6020r2"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">2</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">&#x003E;&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">run</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">hello</span></span> 
+<span class="label"><a 
+ id="x1-6021r3"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">standard_init_linux</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">go</span></span><span style="color:#000000"><span 
+class="ectt-1200">:228:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">exec</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">user</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">process</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">caused</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">no</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">such</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">file</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">or</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">directory</span></span></pre>
+   </div>
+<!--l. 262--><p class="indent" >   Unless this is Docker&#8217;s unique way of saying hello world, something has gone terribly wrong. Here we are
+illustrating the power of Docker isolation as well as the difficulty of not having an operating system. This
+very simple hello world program still relies on other libraries in the operating system, libraries which
+are not available in the empty Docker container. <span 
+class="ectt-1200">ldd </span>tells us exactly what <span 
+class="ectt-1200">hello-world </span>depends
+on. The hello world program can be statically compiled so that it does not depend on any libraries
+<span class="cite">[<a 
+href="#Xstatic-hello-world">2</a>]</span>.
+</p>
+   <div class="framedenv" id="shaded*-1">
+   <!--l. 269-->
+<pre class="lstlisting" id="listing-5"><span class="label"><a 
+ id="x1-6022r1"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">&#x003E;&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ldd</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">hello</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">world</span></span> 
+<span class="label"><a 
+ id="x1-6023r2"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">2</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">linux</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">vdso</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">so</span></span><span style="color:#000000"><span 
+class="ectt-1200">.1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">(0</span></span><span style="color:#000000"><span 
+class="ectt-1200">x00007ffc51db1000</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-6024r3"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">libc</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">so</span></span><span style="color:#000000"><span 
+class="ectt-1200">.6</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">lib</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">x86_64</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">linux</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">gnu</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">libc</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">so</span></span><span style="color:#000000"><span 
+class="ectt-1200">.6</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">(0</span></span><span style="color:#000000"><span 
+class="ectt-1200">x00007fcff8553000</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-6025r4"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">4</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">lib64</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">ld</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">linux</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">x86</span></span><span style="color:#000000"><span 
+class="ectt-1200">-64.</span></span><span style="color:#000000"><span 
+class="ectt-1200">so</span></span><span style="color:#000000"><span 
+class="ectt-1200">.2</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">(0</span></span><span style="color:#000000"><span 
+class="ectt-1200">x00007fcff8759000</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span> 
+<span class="label"><a 
+ id="x1-6026r5"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">5</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">&#x003E;&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">gcc</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">o</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">hello</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">world</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">hello</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">world</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">c</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">static</span></span> 
+<span class="label"><a 
+ id="x1-6027r6"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">6</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">&#x003E;&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">ldd</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">hello</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">world</span></span> 
+<span class="label"><a 
+ id="x1-6028r7"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">7</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">not</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">a</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">dynamic</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">executable</span></span> 
+<span class="label"><a 
+ id="x1-6029r8"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">8</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">&#x003E;&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">build</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">--</span></span><span style="color:#000000"><span 
+class="ectt-1200">tag</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">hello</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span> 
+<span class="label"><a 
+ id="x1-6030r9"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">9</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
+class="ectt-1200">&#x003E;&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">run</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">hello</span></span> 
+<span class="label"><a 
+ id="x1-6031r10"></a><span 
+class="Cabin-Regular-tlf-t1-x-x-60">10</span></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">Hello</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">World</span></span></pre>
+   </div>
+<!--l. 283--><p class="indent" >   Now we have a Docker image built from scratch, without an operating system, which can say &#8216;Hello World&#8217;!
+</p>
+<div class="center" 
+>
+<!--l. 284--><p class="noindent" >
+                                                                                                    
+                                                                                                    
+</p>
+<div class="tabular"> <table id="TBL-1" class="tabular" 
+ 
+><colgroup id="TBL-1-1g"><col 
+id="TBL-1-1" /></colgroup><tr 
+class="hline"><td><hr /></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-1-"><td  style="white-space:normal; text-align:left;" id="TBL-1-1-1"  
+class="td11"> <!--l. 285--><p class="noindent" >
+                                                                              </p></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-2-"><td  style="white-space:normal; text-align:left;" id="TBL-1-2-1"  
+class="td11"> <!--l. 285--><p class="noindent" >If you are interested in exploring in more depth, try using the &#8216;<span 
+class="ectt-1200">docker image inspect hello</span>&#8217;
+  and &#8216;<span 
+class="ectt-1200">docker history hello</span>&#8217; commands.                                                                                                    </p></td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-3-"><td  style="white-space:normal; text-align:left;" id="TBL-1-3-1"  
+class="td11"> <!--l. 287--><p class="noindent" >
+                                                                               </p></td>
+</tr><tr 
+class="hline"><td><hr /></td></tr><tr  
+ style="vertical-align:baseline;" id="TBL-1-4-"><td  style="white-space:normal; text-align:left;" id="TBL-1-4-1"  
+class="td11">                                                                               </td></tr></table>     </div></div>
+<!--l. 1--><p class="noindent" >
+</p>
+   <h3 class="likesectionHead"><a 
+ id="x1-7000"></a>References</h3>
+<!--l. 1--><p class="noindent" >
+   </p><div class="thebibliography">
+   <p class="bibitem" ><span class="biblabel">
+ [1]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xdocker-from-scratch"></a>C.&#x00A0;Xu, &#8220;Docker: From scratch.&#8221; <a 
+href="https://codeburst.io/docker-from-scratch-2a84552470c8" class="url" ><span 
+class="ectt-1200">https://codeburst.io/docker-from-scratch-2a84552470c8</span></a>,
+   July 2020.
+   </p>
+   <p class="bibitem" ><span class="biblabel">
+ [2]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xstatic-hello-world"></a>henszey, &#8220;Smallest x86 ELF hello world.&#8221; <a 
+href="http://timelessname.com/elfbin/" class="url" ><span 
+class="ectt-1200">http://timelessname.com/elfbin/</span></a>.
+</p>
+   </div>
+   <div class="footnotes"><a 
+ id="x1-2002x2"></a>
+<!--l. 25--><p class="indent" >       <span class="footnote-mark"><a 
+href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span><a 
+href="https://www.youtube.com/watch?v=wW9CAH9nSLs" class="url" ><span 
+class="ectt-1000">https://www.youtube.com/watch?v=wW9CAH9nSLs</span></a></p><a 
+ id="x1-2004x2"></a>
+<!--l. 28--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span><a 
+href="https://www.youtube.com/watch?v=DB1Y4GrfrZk" class="url" ><span 
+class="ectt-1000">https://www.youtube.com/watch?v=DB1Y4GrfrZk</span></a></p><a 
+ id="x1-3002x2.1"></a>
+<!--l. 101--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn3x0-bk" id="fn3x0"><sup class="textsuperscript">3</sup></a></span><a 
+href="https://p9f.org/" class="url" ><span 
+class="ectt-1000">https://p9f.org/</span></a></p><a 
+ id="x1-3004x2.1"></a>
+<!--l. 106--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn4x0-bk" id="fn4x0"><sup class="textsuperscript">4</sup></a></span><span 
+class="Cabin-Regular-tlf-t1-">Of course, containers in a rudamentry form existed before introduction to the linux kernel but we have to start somewhere. </span>
+<a 
+href="https://blog.aquasec.com/a-brief-history-of-containers-from-1970s-chroot-to-docker-2016" class="url" ><span 
+class="ectt-1000">https://blog.aquasec.com/a-brief-history-of-containers-from-1970s-chroot-to-docker-2016</span></a></p><a 
+ id="x1-3006x2.1"></a>
+<!--l. 111--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn5x0-bk" id="fn5x0"><sup class="textsuperscript">5</sup></a></span><a 
+href="https://www.youtube.com/watch?v=7H__eF6hvWg" class="url" ><span 
+class="ectt-1000">https://www.youtube.com/watch?v=7H__eF6hvWg</span></a></p><a 
+ id="x1-3008x2.1"></a>
+<!--l. 117--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn6x0-bk" id="fn6x0"><sup class="textsuperscript">6</sup></a></span><span 
+class="Cabin-Regular-tlf-t1-">You might be asking yourself, wait but I have a Windows operating system and I can still run Docker, what gives? The answer,</span>
+<span 
+class="Cabin-Regular-tlf-t1-">ironically enough, is a virtual machine!</span></p><a 
+ id="x1-6002x3"></a>
+<!--l. 207--><p class="indent" >        <span class="footnote-mark"><a 
+href="#fn7x0-bk" id="fn7x0"><sup class="textsuperscript">7</sup></a></span><a 
+href="https://docs.docker.com/get-docker/" class="url" ><span 
+class="ectt-1000">https://docs.docker.com/get-docker/</span></a></p><a 
+ id="x1-6004x3"></a>
+<!--l. 208--><p class="indent" >   <span class="footnote-mark"><a 
+href="#fn8x0-bk" id="fn8x0"><sup class="textsuperscript">8</sup></a></span><span 
+class="Cabin-Regular-tlf-t1-">For windows users, we recommend Windows Subsystem for Linux.</span></p>                                                                                             </div>
+ 
+</body></html> 
+
+                                                                                                    
+
+
