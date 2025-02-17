@@ -200,8 +200,8 @@
     \frame[c,plain]{
         \par\bigskip
         {\huge\color{black}#2}
-        \par
-        {\hfill\large\color{primary}\textit{- #1}}
+        \par\medskip
+        {\hfill\large\color{primary}\textit{-- #1}}
     }
 }
 
