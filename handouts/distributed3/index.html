@@ -28,6 +28,7 @@ ________________________________________________________________________________
 Thomas</div>
 ____________________________________________________________________________________________
    </div>
+   
    <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
  id="x1-10001"></a>Introduction</h3>
 <!--l. 9--><p class="noindent" >In our introduction to distributed systems we described the fallacies of distributed systems <span class="cite">[<a 
@@ -44,7 +45,7 @@ guaranteed <span class="cite">[<a
 href="#Xdatacenter-computer">2</a>]</span>, the system must be designed to cater for <span 
 class="Cabin-Italic-tlf-t1-x-x-120">partial failure</span>. Even for small systems, some part will
 eventually fail, so fault handling must be part of the design.
-</p><!--l. 22--><p class="noindent" >
+   
 </p>
    <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
  id="x1-20002"></a>Fault Handling</h3>
@@ -99,8 +100,7 @@ delayed, or the response may not be received. Possible causes of these faults in
       <li class="itemize">
       <!--l. 50--><p class="noindent" >If the system is running on your own hardware, you may be able to query network switches to detect
       link failures.</p></li></ul>
-<!--l. 53--><p class="noindent" >
-</p>
+   
    <h4 class="subsectionHead"><span class="titlemark">2.1    </span> <a 
  id="x1-30002.1"></a>Retry and Restart</h4>
 <!--l. 55--><p class="noindent" >In general, despite the techniques above, the application needs to have a strategy to detect faults and to decide
@@ -109,8 +109,6 @@ the fault. A general strategy is to retry sending a message a certain number of 
 time limit. If no response is received within the time limit the system will then decide that the node
 is dead, will spin up a new node, and remove the dead node from the load balancer&#8217;s list of active
 nodes.
-                                                                                                    
-                                                                                                    
 </p><!--l. 62--><p class="indent" >   The challenge with this strategy is deciding how many retry requests and how long to wait. Multiple retries can
 swamp an already overloaded node, reducing its performance even more or possibly leading to it crashing. In the
 first lecture on distributed systems we introduced exponential backoff as a mechanism to reduce the impact of
@@ -120,6 +118,8 @@ href="#Xretry-pattern">5</a>]</span>. Simple
 exponential backoff can introduce peaks of load around the exponential delay. Jitter can be added to the delay to
 spread out these peaks <span class="cite">[<a 
 href="#Xbackoff-jitter">6</a>]</span>.
+                                                                                                    
+                                                                                                    
 </p><!--l. 69--><p class="indent" >   Determining how long to wait before deciding that a node is dead has its own challenges. If the system
 decides that a node is dead, then all clients who have sent messages to that node, and have not received a reply,
 will need to resend their messages to other nodes. Waiting too long reduces the system&#8217;s responsiveness, as
@@ -139,7 +139,7 @@ If the system is transmitting financial data, the greater reliability of TCP pro
 delay of UDP. Whereas a music streaming service will probably find that having less variability of delay is
 more beneficial than the reliability of TCP. (Receiving an audio packet, after it needed to be played, is
 pointless.)
-</p><!--l. 92--><p class="noindent" >
+   
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">2.1.1    </span> <a 
  id="x1-40002.1.1"></a>Idempotency</h5>
@@ -155,7 +155,7 @@ href="https://microservices.io/post/microservices/patterns/2020/10/16/idempotent
 pattern</a><span class="footnote-mark"><a 
 href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
  id="x1-4001f1"></a>.
-</p><!--l. 105--><p class="noindent" >
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.2    </span> <a 
  id="x1-50002.2"></a>Timing Faults</h4>
@@ -166,13 +166,13 @@ across multiple services (e.g. message queues in an event driven architecture), 
 overcome.
 </p><!--l. 111--><p class="indent" >   One intuitive strategy for dealing with some cases of determining event order, is to use a timestamp to record
 when the event was created. For write conflicts, the idea being that the most recent write is the correct value in
-                                                                                                    
-                                                                                                    
 the case of a write conflict. There are two problems with this strategy. It is likely that the clocks on the
 different machines will not be perfectly in sync. It is possible that the machine on which the last
 write was performed has a clock that is behind the machine with the previous write. If writes occur in
 close succession, it is probable that some writes will have timestamps indicating the wrong order of
 writes.
+                                                                                                    
+                                                                                                    
 </p><!--l. 119--><p class="indent" >   Trying to synchronise clocks on different computers is difficult. Synchronising using Network Time Protocol
 (NTP) is not reliable. Network transmission time means that two machines that access one NTP server at the same
 time are likely to get the time result after different lengths of network delays. The clocks on the two machines are
@@ -193,7 +193,7 @@ class="Cabin-Italic-tlf-t1-x-x-120">Designing Data Intensive Applications </span
 these problems in great detail and suggests some solution options, with their attendant tradeoffs
 <span class="cite">[<a 
 href="#Xdata-intensive">10</a>]</span>.
-</p><!--l. 139--><p class="noindent" >
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.3    </span> <a 
  id="x1-60002.3"></a>Byzantine Faults</h4>
@@ -213,16 +213,13 @@ Three common scenarios of lying nodes are: </p>
       </p></li>
       <li class="itemize">
       <!--l. 152--><p class="noindent" >Sending contradictory results to different nodes.</p></li></ul>
-<!--l. 155--><p class="noindent" >
-</p>
+   
    <h5 class="likesubsubsectionHead"><a 
  id="x1-7000"></a>Byzantine Generals Problem</h5>
 <!--l. 156--><p class="noindent" >The Byzantine Generals Problem <span class="cite">[<a 
 href="#Xbyzantine-generals">11</a>]</span> is a fictional scenario where several generals need to agree on a battle plan.
 Their armies are situated in different positions, so they can only communicate by sending messengers. These
 messengers can get delayed or lost (like packets in a network).
-                                                                                                    
-                                                                                                    
 </p><!--l. 160--><p class="indent" >   To complicate their decision making process, some of the generals may be traitors, though most generals are
 loyal. Loyal generals will only send honest messages. Traitors may send dishonest messages or send messages
 disguised as coming from another general.
@@ -230,6 +227,8 @@ disguised as coming from another general.
 distributed system. A Byzantine fault-tolerant system is one that continues to work correctly, even if some nodes
 are sending incorrect messages. This may be due to errors in the node itself or in the network connection.
 Data may be corrupted in storage or in transit, it may also be intercepted or spoofed by malicious
+                                                                                                    
+                                                                                                    
 attackers.
 </p><!--l. 170--><p class="indent" >   Most systems do not attempt to be Byzantine fault-tolerant, as the cost is often too high for the potential
 hazard. Stakeholders need to decide if the cost is warranted for a particular system. Flight control systems need to
@@ -246,7 +245,7 @@ correct. Simple error detection (e.g. checksums) should be used to catch corrupt
 sanitised before it is used as data in the system. These strategies do not handle subtler data corruption or
 persistent malicious attack, but they catch simple errors that should not propagate into the rest of the
 system.
-</p><!--l. 187--><p class="noindent" >
+   
 </p>
    <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
  id="x1-80003"></a>Consistency</h3>
@@ -254,7 +253,7 @@ system.
 Implementing consistency is much more complex than the idea, due to many of the faults that are described in
 section <a 
 href="#x1-20002">2<!--tex4ht:ref: sec:faults --></a>.
-</p><!--l. 191--><p class="noindent" >
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.1    </span> <a 
  id="x1-90003.1"></a>Eventual Consistency</h4>
@@ -297,6 +296,7 @@ difficult, as you have to force data inconsistencies.
 </p><!--l. 218--><p class="indent" >
                                                                                                     
                                                                                                     
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.2    </span> <a 
  id="x1-100003.2"></a>Linearisability</h4>
@@ -309,7 +309,7 @@ systems.
 </p><!--l. 227--><p class="indent" >   Linearisability means that once a client has written data to the database, all clients who read the that data will
 see the same value, regardless of the replica from which they read the data. The challenge is implementing
 linearisability.
-</p><!--l. 231--><p class="noindent" >
+   
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.1    </span> <a 
  id="x1-110003.2.1"></a>Application</h5>
@@ -328,7 +328,7 @@ that the product is out of stock, they generate an event that changes one of the
 backorder.
 </p><!--l. 249--><p class="indent" >   The simplistic implementation of linearisability is to have a single database. This defeats the purpose of
 replicating a database to improve performance and reliability.
-</p><!--l. 252--><p class="noindent" >
+   
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.2    </span> <a 
  id="x1-120003.2.2"></a>Single-Leader Replication</h5>
@@ -343,16 +343,16 @@ communication, but at least allows queries on followers. Either of these approac
 advantage of replicating the database.
 </p><!--l. 263--><p class="indent" >   An additional complication to implementing linearisable single-leader replication is determining which replica
 is the leader. A typical approach is to have a lock of some form that is acquired by the leader, and all other replicas
+                                                                                                    
+                                                                                                    
 are followers. Acquiring the lock itself must be a linearisable operation. If more than one replica believes it
 is the leader, it means that write behaviour cannot be linearisable. A coordination service, such as
 <a 
 href="https://etcd.io/" >etcd</a><span class="footnote-mark"><a 
 href="#fn4x0" id="fn4x0-bk"><sup class="textsuperscript">4</sup></a></span><a 
  id="x1-12001f4"></a>,
-                                                                                                    
-                                                                                                    
 can be used to implement distributed locks in a linearisable fashion.
-</p><!--l. 269--><p class="noindent" >
+   
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.3    </span> <a 
  id="x1-130003.2.3"></a>Multi-Leader Replication</h5>
@@ -360,7 +360,7 @@ can be used to implement distributed locks in a linearisable fashion.
 any benefit of using the approach in the first place. This is because multi-leader replication allows
 concurrent writes to multiple leaders, and the data is asynchronously replicated to the followers and other
 leaders.
-</p><!--l. 275--><p class="noindent" >
+   
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.4    </span> <a 
  id="x1-140003.2.4"></a>Leaderless Replication</h5>
@@ -377,7 +377,7 @@ and obtain a lock on the value before performing the write. This allows the writ
 synchronously.
 </p><!--l. 289--><p class="indent" >   In leaderless replication, only basic read and write operations are linearisable. More sophisticated atomic
 operations or transactions require a consensus algorithm to be used to provide linearisability.
-</p><!--l. 292--><p class="noindent" >
+   
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.5    </span> <a 
  id="x1-150003.2.5"></a>Consensus Algorithms</h5>
@@ -386,7 +386,7 @@ href="#x1-190004">4<!--tex4ht:ref: sec:consensus --></a>, have some similarity t
 internal implementations prevent stale replica data or having multiple leader nodes. The previously mentioned
 coordination service, etcd, implements its own consensus algorithm, that provides a key-value store that
 guarantees linearisability.
-</p><!--l. 298--><p class="noindent" >
+   
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.6    </span> <a 
  id="x1-160003.2.6"></a>Consequences</h5>
@@ -396,6 +396,8 @@ may obtain stale data.
 </p><!--l. 304--><p class="indent" >   Consequently, systems, or parts of systems, that require linearisability demonstrate lower availability due to
 potential network faults. This observation is known as the CAP theorem <span class="cite">[<a 
 href="#XBrewerE2012Ctyl">12</a>]</span>. Distributed systems can have
+                                                                                                    
+                                                                                                    
 <span 
 class="Cabin-Italic-tlf-t1-x-x-120">consistency </span>in the presence of network <span 
 class="Cabin-Italic-tlf-t1-x-x-120">partitioning</span>. Or, they can have <span 
@@ -404,10 +406,8 @@ class="Cabin-Italic-tlf-t1-x-x-120">availability </span>in the presence of netwo
 class="Cabin-Italic-tlf-t1-x-x-120">partitioning</span>. The ideas have been around since the mid 1970&#8217;s <span class="cite">[<a 
 href="#Xrfc677">13</a>]</span>, despite the much more recent reference to the
 CAP theorem. The prime value of the CAP theorem is how it influenced the development of NoSQL
-                                                                                                    
-                                                                                                    
 databases.
-</p><!--l. 311--><p class="noindent" >
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.3    </span> <a 
  id="x1-170003.3"></a>Causal Ordering</h4>
@@ -436,7 +436,7 @@ records in its log. Followers can then read the log to execute writes in sequenc
 then be causally consistent with the leader. The drawback is that a single-leader cannot be scaled if asynchronous
 writes occur faster than it can process them. There is also the difficulty of handling the situation where the leader
 fails and selecting a new leader.
-</p><!--l. 339--><p class="noindent" >
+   
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.3.1    </span> <a 
  id="x1-180003.3.1"></a>Lamport Timestamps</h5>
@@ -516,6 +516,7 @@ href="https://etcd.io/" >etcd</a><span class="footnote-mark"><a
 href="#fn6x0" id="fn6x0-bk"><sup class="textsuperscript">6</sup></a></span><a 
  id="x1-18002f6"></a>,
 implement total order broadcast.
+   
 </p>
    <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
  id="x1-190004"></a>Consensus</h3>
@@ -527,7 +528,7 @@ ignore the faults it handles. Abstractions like consensus and transactions <span
 href="#Xdistributed2-notes">3</a>]</span> make it easier to reason
 about the behaviour of a distributed system. In this section, we will look at how consensus can be
 implemented.
-</p><!--l. 386--><p class="noindent" >
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.1    </span> <a 
  id="x1-200004.1"></a>Consensus Algorithms</h4>
@@ -554,11 +555,11 @@ class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Validity</span> </dt><dd 
 class="description">
+                                                                                                    
+                                                                                                    
       <!--l. 398--><p class="noindent" >If the decision is the value <span 
 class="cmmi-12">v</span>, then <span 
 class="cmmi-12">v </span>must have been proposed by a node.
-                                                                                                    
-                                                                                                    
       </p></dd><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Termination</span> </dt><dd 
@@ -595,7 +596,7 @@ sending contradictory messages to other nodes). It is possible to implement a co
 manage Byzantine faults, as long as fewer than one-third of the nodes generate Byzantine faults <span class="cite">[<a 
 href="#Xbyzantine-tolerance-2002">20</a>]</span>. The details
 of how to do this are beyond the scope of this course.
-</p><!--l. 431--><p class="noindent" >
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.2    </span> <a 
  id="x1-210004.2"></a>Distributed Transactions</h4>
@@ -614,10 +615,10 @@ and a message is placed in the notification queue to notify the customer that th
 successful. Storing the order may be a transaction in only a single database partition, but to ensure
 the notification message is only added to the queue if the order is successful requires a distributed
 transaction.
-</p><!--l. 446--><p class="noindent" >
+   
+                                                                                                    
+                                                                                                    
 </p>
-                                                                                                    
-                                                                                                    
    <h5 class="subsubsectionHead"><span class="titlemark">4.2.1    </span> <a 
  id="x1-220004.2.1"></a>Two-Phase Commit</h5>
 <!--l. 447--><p class="noindent" >A two-phase commit algorithm is a type of consensus algorithm that solves the atomic commit problem. As the
@@ -716,9 +717,10 @@ is reported that distributed transactions are ten times slower than single-node 
 href="#Xdistrib-mysql">22</a>]</span>.
 Consequently, most NoSQL databases and many cloud-based relational databases do not support distributed
 transactions.
+   
+                                                                                                    
+                                                                                                    
 </p>
-                                                                                                    
-                                                                                                    
    <h4 class="subsectionHead"><span class="titlemark">4.3    </span> <a 
  id="x1-230004.3"></a>Leaders</h4>
 <!--l. 524--><p class="noindent" >Section <a 
@@ -736,7 +738,7 @@ wins as the new leader.
 </p><!--l. 538--><p class="indent" >   Before a leader can decide on a value that has been proposed for consensus, it checks to see if there are any
 other leaders with a higher epoch number. It must obtain the results from this check from a quorum of nodes,
 otherwise the check fails.
-</p><!--l. 544--><p class="noindent" >
+   
 </p>
    <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
  id="x1-240005"></a>Conclusion</h3>
@@ -753,7 +755,7 @@ href="#fn7x0" id="fn7x0-bk"><sup class="textsuperscript">7</sup></a></span><a
  id="x1-24001f7"></a>
 provides the background knowledge required to perform these proofs and introduces some of the initial
 modelling techniques required for distributed systems.
-</p><!--l. 1--><p class="noindent" >
+   
 </p>
    <h3 class="likesectionHead"><a 
  id="x1-25000"></a>References</h3>
@@ -773,14 +775,14 @@ class="Cabin-Italic-tlf-t1-x-x-120">The   Datacenter   as   a   Computer:   Desi
      <span 
 class="Cabin-Italic-tlf-t1-x-x-120">Warehouse-Scale Machines</span>. Morgan &amp; Claypool, 3rd&#x00A0;ed., October 2018.
      </p>
+                                                                                                    
+                                                                                                    
      <p class="bibitem" ><span class="biblabel">
   [3]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
  id="Xdistributed2-notes"></a>B.&#x00A0;Webb       and       R.&#x00A0;Thomas,       &#8220;Distributed       systems       II,&#8221;       March       2024.                       
 <a 
 href="https://csse6400.uqcloud.net/handouts/distributed2.pdf" class="url" ><span 
 class="ectt-1200">https://csse6400.uqcloud.net/handouts/distributed2.pdf</span></a>.
-                                                                                                    
-                                                                                                    
      </p>
      <p class="bibitem" ><span class="biblabel">
   [4]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
@@ -845,6 +847,8 @@ class="Cabin-Italic-tlf-t1-x-x-120">Lang. Syst.</span>, vol.&#x00A0;4, p.&#x00A0
  id="XBrewerE2012Ctyl"></a>E.&#x00A0;Brewer,  &#8220;Cap  twelve  years  later:  How  the  "rules"  have  changed,&#8221;  <span 
 class="Cabin-Italic-tlf-t1-x-x-120">Computer</span>,  vol.&#x00A0;45,  no.&#x00A0;2,
      pp.&#x00A0;23&#8211;29, 2012.
+                                                                                                    
+                                                                                                    
      </p>
      <p class="bibitem" ><span class="biblabel">
  [13]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
@@ -852,8 +856,6 @@ class="Cabin-Italic-tlf-t1-x-x-120">Computer</span>,  vol.&#x00A0;45,  no.&#x00A
 <a 
 href="https://www.ietf.org/rfc/rfc677.html" class="url" ><span 
 class="ectt-1200">https://www.ietf.org/rfc/rfc677.html</span></a>, January 1975.
-                                                                                                    
-                                                                                                    
      </p>
      <p class="bibitem" ><span class="biblabel">
  [14]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
@@ -916,10 +918,10 @@ class="ectt-1200">https://pubs.opengroup.org/onlinepubs/009680699/toc.pdf</span>
  id="Xdistrib-mysql"></a>R.&#x00A0;Wigginton, R.&#x00A0;Lowe, M.&#x00A0;Albe, and F.&#x00A0;Ipar, &#8220;Distributed transactions: A primer with mysql,&#8221; in
      <span 
 class="Cabin-Italic-tlf-t1-x-x-120">MySQL Conference and Expo</span>, (Santa Clara, CA), April 2013.
+                                                                                                    
+                                                                                                    
 </p>
      </div>
-                                                                                                    
-                                                                                                    
    <div class="footnotes"><a 
  id="x1-4002x2.1.1"></a>
 <!--l. 103--><p class="indent" >       <span class="footnote-mark"><a 

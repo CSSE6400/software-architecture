@@ -24,7 +24,7 @@ dl dd {text-align: left}</style>
  id="Q1-1-1"></a>
 _________________________________________________________________________________________________
 <h2 class="titleHead">Scaling Stateless Components</h2>                                                  Software Architecture
-   <div class="date" >April 2, 2025</div>                                                                                      <div class="author" >Evan Hughes &amp; Anna Truffet &amp; Brae Webb
+   <div class="date" >April 1, 2025</div>                                                                                       <div class="author" >Evan Hughes &amp; Anna Truffet &amp; Brae Webb
 </div>
 ____________________________________________________________________________________________________
    </div>
@@ -50,6 +50,7 @@ href="https://edstem.org/au/courses/15375/discussion/1753712" class="url" ><span
 class="ectt-1200">https://edstem.org/au/courses/15375/discussion/1753712</span></a> </p> 
 </div> 
 </div>
+   
    <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
  id="x1-10001"></a>This Week</h3>
 <!--l. 28--><p class="noindent" >Our goal is to scale out the stateless component of our TaskOverflow application across multiple compute
@@ -70,8 +71,7 @@ class="Cabin-Italic-tlf-t1-x-x-120">healthcheck</span>.
       <li class="itemize">
       <!--l. 34--><p class="noindent" ><span 
 class="Cabin-Italic-tlf-t1-x-x-120">Dynamically scale </span>our application based on load.</p></li></ul>
-<!--l. 37--><p class="noindent" >
-</p>
+   
    <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
  id="x1-20002"></a>Load Balancers</h3>
 <!--l. 39--><p class="noindent" >Load balancing distributes a load over a set of resources. For example, balancing network traffic across several
@@ -80,7 +80,7 @@ the volume of requests or the processing demand (e.g. the large amount network t
 website).
 </p><!--l. 45--><p class="indent" >   A service which load balances, is called a <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Load Balancer</span>.
-</p><!--l. 48--><p class="noindent" >
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.1    </span> <a 
  id="x1-30002.1"></a>Routing Algorithms</h4>
@@ -119,13 +119,13 @@ class="description">
       multiple transactions that need to be done in a consistent order or if the data is stored/cached on
       the node. This can be done by hashing the information in the request payload or headers and then
       routing the request to the node that handles hashes in the range of the computed hash.</p></dd></dl>
-<!--l. 70--><p class="noindent" >
-</p>
+   
    <h4 class="subsectionHead"><span class="titlemark">2.2    </span> <a 
  id="x1-40002.2"></a>Health Checks</h4>
 <!--l. 72--><p class="noindent" >When load balancing, it is important to ensure that the nodes to which we route requests are able to service the
 request. A good health check can save or break your service. Consider the two following examples from UQ&#8217;s
 Information Technology Services (ITS):
+   
 </p>
 <!--l. 76--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-5000"></a><span 
@@ -155,6 +155,7 @@ of the time. However, the health check was too weak. When
       <!--l. 86--><p class="noindent" >the service was still running in memory.</p></li></ol>
 <!--l. 89--><p class="indent" >   The health check passed, but in reality, the service was talking to dead nodes, causing upstream services to
 have intermittent failures.
+   
 </p>
 <!--l. 91--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-6000"></a><span 
@@ -170,12 +171,11 @@ a proper level of health check. We want a health check that is specific enough f
 not so specific that it is too brittle. For the TaskOverflow application that we have been building so far, a
 reasonable health check would be that the health endpoint ensures the database is available and that the
 application is able to connect to it.
-</p><!--l. 103--><p class="noindent" >
+   
 </p>
    <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
  id="x1-70003"></a>Load Balancers in AWS</h3>
-<!--l. 105--><p class="noindent" >
-</p>
+   
    <h4 class="subsectionHead"><span class="titlemark">3.1    </span> <a 
  id="x1-80003.1"></a>Types of AWS Load Balancers</h4>
 <!--l. 106--><p class="noindent" >Not all load balancers are the same. Some load balancers inspect the transmitted packets to correctly route the
@@ -199,10 +199,9 @@ href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a
  id="x1-8003f2"></a>
       load balancer which routes traffic based on the source and destination IP addresses and ports. This
       is useful for services that are using TCP or UDP.</p></dd></dl>
+   
                                                                                                     
                                                                                                     
-<!--l. 121--><p class="noindent" >
-</p>
    <h4 class="subsectionHead"><span class="titlemark">3.2    </span> <a 
  id="x1-90003.2"></a>AWS Load Balancer Design</h4>
 <!--l. 123--><p class="noindent" >An AWS Elastic<span class="footnote-mark"><a 
@@ -245,6 +244,7 @@ width="525" height="525"  />
                                                                                                     
 </p>
    </div><hr class="endfigure" />
+   
    <h4 class="subsectionHead"><span class="titlemark">3.3    </span> <a 
  id="x1-100003.3"></a>Autoscaling in AWS</h4>
 <!--l. 141--><p class="noindent" >Instead of creating the maxiumum amount of services we predict we will need, we can automatically scale the
@@ -263,7 +263,7 @@ premade triggers are based around a node&#8217;s
       <li class="itemize">
       <!--l. 152--><p class="noindent" >network usage.</p></li></ul>
 <!--l. 155--><p class="indent" >   We create custom triggers based on our application&#8217;s metrics.
-</p><!--l. 157--><p class="noindent" >
+   
 </p>
    <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
  id="x1-110004"></a>Load Balancing TaskOverflow</h3>
@@ -275,6 +275,7 @@ href="#fn4x0" id="fn4x0-bk"><sup class="textsuperscript">4</sup></a></span><a
  id="x1-11001f4"></a>
 Other methods could also be employed to help deal with the load like caching but we will leave that for another
 day.
+   
 </p>
 <!--l. 169--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-12000"></a><span 
@@ -299,8 +300,7 @@ class="Cabin-Bold-tlf-t1-x-x-120">Getting Started</span></span>
 <li 
   class="enumerate" id="x1-12008x4">
       <!--l. 175--><p class="noindent" >In the repository you will have the starter Terraform code for the ECS path from last week.</p></li></ol>
-<!--l. 178--><p class="noindent" >
-</p>
+   
    <h4 class="subsectionHead"><span class="titlemark">4.1    </span> <a 
  id="x1-130004.1"></a>[Path A] EC2</h4>
    <div class="tcolorbox tcolorbox" id="tcolobox-2">     
@@ -324,6 +324,7 @@ width="525" height="525"  />
                                                                                                     
 </p>
    </div><hr class="endfigure" />
+   
    <h4 class="subsectionHead"><span class="titlemark">4.2    </span> <a 
  id="x1-140004.2"></a>[Path B] ECS</h4>
 <!--l. 193--><p class="noindent" >This week we need create an Application Scaling Policy for our ECS service and a Load Balancer to handle the
@@ -362,7 +363,10 @@ width="14" height="14"  /></p></div>
 </div><hr class="endfigure" />
 <!--l. 211--><p class="indent" >   </p><div class="framedenv" id="code-1">
 <!--l. 211--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 211--><pre class="listings" id="listing-1"><span class="label"><a 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1">
+    <!--l. 211--><p class="indent" >
+    <a 
+ id="x1-140004.2"></a></p><!--l. 211--><pre class="listings" id="listing-1"><span class="label"><a 
  id="x1-14001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -467,7 +471,8 @@ class="ectt-1200">}</span></span>
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-14018r18"></a></span></pre>
+ id="x1-14018r18"></a></span></pre><a 
+ id="x1-14018r4.2"></a>
    </div>
 <!--l. 231--><p class="indent" >   Load balancing is core to how ECS works and so the <span 
 class="ectt-1200">aws_ecs_service </span>resource that we used last week
@@ -478,7 +483,10 @@ class="ectt-1200">aws_ecs_service.taskoverflow </span>resource to include a <spa
 class="ectt-1200">load_balancer </span>block.
 </p><!--l. 235--><p class="indent" >   </p><div class="framedenv" id="code-1">
 <!--l. 235--><p class="indent" >   <span 
-class="ectt-1200">» cat ecs.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 235--><pre class="listings" id="listing-2"><span class="label"><a 
+class="ectt-1200">» cat ecs.tf</span> </p></div>   <div class="framedenv" id="code-1">
+    <!--l. 235--><p class="indent" >
+    <a 
+ id="x1-14018r4.2"></a></p><!--l. 235--><pre class="listings" id="listing-2"><span class="label"><a 
  id="x1-14019r1"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">load_balancer</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
@@ -508,7 +516,8 @@ class="ectt-1200">6400</span></span>
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-14024r6"></a></span></pre>
+ id="x1-14024r6"></a></span></pre><a 
+ id="x1-14024r4.2"></a>
    </div>
 <!--l. 243--><p class="indent" >   With the internal side of the load balancer done, we can create it and a firewall for the external side. This
 firewall allows us to restrict what traffic will be allowed to reach the load balancer.
@@ -528,7 +537,10 @@ width="14" height="14"  /></p></div>
 </div><hr class="endfigure" />
 <!--l. 252--><p class="indent" >   </p><div class="framedenv" id="code-1">
 <!--l. 252--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 252--><pre class="listings" id="listing-3"><span class="label"><a 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1">
+    <!--l. 252--><p class="indent" >
+    <a 
+ id="x1-14024r4.2"></a></p><!--l. 252--><pre class="listings" id="listing-3"><span class="label"><a 
  id="x1-14025r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -685,7 +697,8 @@ class="ectt-1200">}</span></span>
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-14051r27"></a></span></pre>
+ id="x1-14051r27"></a></span></pre><a 
+ id="x1-14051r4.2"></a>
    </div>
 <!--l. 281--><p class="indent" >   Now over to the external side of the load balancer. We need to create a listener which is the entry point for the
 load balancer.
@@ -705,7 +718,10 @@ width="14" height="14"  /></p></div>
 </div><hr class="endfigure" />
 <!--l. 290--><p class="indent" >   </p><div class="framedenv" id="code-1">
 <!--l. 290--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 290--><pre class="listings" id="listing-4"><span class="label"><a 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1">
+    <!--l. 290--><p class="indent" >
+    <a 
+ id="x1-14051r4.2"></a></p><!--l. 290--><pre class="listings" id="listing-4"><span class="label"><a 
  id="x1-14052r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -768,13 +784,17 @@ class="ectt-1200">}</span></span>
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-14062r11"></a></span></pre>
+ id="x1-14062r11"></a></span></pre><a 
+ id="x1-14062r4.2"></a>
    </div>
 <!--l. 303--><p class="indent" >   If we deployed now, we would have implemented the deployment diagram above. However, we want to add
 autoscaling to our service so that it can scale up and down based on the load.
 </p><!--l. 306--><p class="indent" >   </p><div class="framedenv" id="code-1">
 <!--l. 306--><p class="indent" >   <span 
-class="ectt-1200">» cat autoscaling.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 306--><pre class="listings" id="listing-5"><span class="label"><a 
+class="ectt-1200">» cat autoscaling.tf</span> </p></div>   <div class="framedenv" id="code-1">
+    <!--l. 306--><p class="indent" >
+    <a 
+ id="x1-14062r4.2"></a></p><!--l. 306--><pre class="listings" id="listing-5"><span class="label"><a 
  id="x1-14063r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -931,13 +951,15 @@ class="ectt-1200">}</span></span>
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-14089r27"></a></span></pre>
+ id="x1-14089r27"></a></span></pre><a 
+ id="x1-14089r4.2"></a>
    </div>
 <!--l. 335--><p class="indent" >   This auto scaling policy looks at the average CPU utilization of the service and scales up if it is above 20% and
 scales down if it is below 20%. This is a very simple policy but it is a good starting point. We can now deploy our
 service and see it scale up and down.
 </p><!--l. 339--><p class="indent" >   Continue onto the next section to see how to send multiple requests to our service to generate traffic to
 trigger scaling.
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.3    </span> <a 
  id="x1-150004.3"></a>Producing Load with k6</h4>
@@ -951,7 +973,10 @@ environment or locally.
 endpoint of our service.
 </p><!--l. 352--><p class="indent" >   </p><div class="framedenv" id="code-1">
 <!--l. 352--><p class="indent" >   <span 
-class="ectt-1200">» cat k6.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 352--><pre class="listings" id="listing-6"><span class="label"><a 
+class="ectt-1200">» cat k6.js</span> </p></div>   <div class="framedenv" id="code-1">
+    <!--l. 352--><p class="indent" >
+    <a 
+ id="x1-150004.3"></a></p><!--l. 352--><pre class="listings" id="listing-6"><span class="label"><a 
  id="x1-15001r1"></a></span><span style="color:#404040"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">http</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1098,13 +1123,16 @@ class="ectt-1200">;</span></span>
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-15016r16"></a></span></pre>
+ id="x1-15016r16"></a></span></pre><a 
+ id="x1-15016r4.3"></a>
    </div>
 <!--l. 370--><p class="indent" >   We can then run this file using the following command.
 </p>
    <div class="framedenv" id="shaded*-1">
    <!--l. 372-->
-<pre class="lstlisting" id="listing-7"><span class="label"><a 
+     <!--l. 372--><p class="indent" >
+     <a 
+ id="x1-15016r4.3"></a><pre class="lstlisting" id="listing-7"><span class="label"><a 
  id="x1-15017r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">k6</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1112,10 +1140,16 @@ class="ectt-1200">run</span></span><span style="color:#000000"> </span><span sty
 class="ectt-1200">k6</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">js</span></span><span 
-class="ectt-1200">&#x00A0;</span></pre>
+class="ectt-1200">&#x00A0;</span></p></pre>
+<a 
+ id="x1-15017r4.3"></a>
+                                                                                                    
+                                                                                                    
    </div>
    <div class="framedenv" id="code-1">
-<!--l. 374--><pre class="listings" id="listing-8"><span class="label"><a 
+    <!--l. 374--><p class="indent" >
+    <a 
+ id="x1-15017r4.3"></a></p><!--l. 374--><pre class="listings" id="listing-8"><span class="label"><a 
  id="x1-15018r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">execution</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
@@ -1222,12 +1256,10 @@ class="ectt-1200">.0</span></span><span style="color:#000000"><span
 class="ectt-1200">s</span></span>
  
 <span class="label"><a 
- id="x1-15030r13"></a></span></pre>
+ id="x1-15030r13"></a></span></pre><a 
+ id="x1-15030r4.3"></a>
    </div>
-                                                                                                    
-                                                                                                    
-<!--l. 388--><p class="noindent" >
-</p>
+   
    <h5 class="subsubsectionHead"><span class="titlemark">4.3.1    </span> <a 
  id="x1-160004.3.1"></a>ECS Auto Scaling</h5>
 <!--l. 390--><p class="noindent" >With all the pieces together we can now see if our efforts have paid off. While the k6 code from above is running,
@@ -1288,6 +1320,7 @@ instances.
 src="images/ecs3.png" alt="PIC"  
 width="525" height="525"  /></p></div>
 </div><hr class="endfigure" />
+   
    <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
  id="x1-170005"></a>Conclusion</h3>
 <!--l. 420--><p class="noindent" >You have now deployed an scalable stateless service. If you would like to experiment with generating different
@@ -1298,7 +1331,7 @@ class="ectt-1200">https://k6.io/docs/</span></a>.
 class="ectt-1200">k6 </span>to test various scenarios as described in the task sheet and
 evaluate how your service performs. It will be beneficial to be familiar with how this type of testing
 works.
-</p><!--l. 1--><p class="noindent" >
+   
 </p>
    <h3 class="likesectionHead"><a 
  id="x1-18000"></a>References</h3>

@@ -28,6 +28,7 @@ ________________________________________________________________________________
 Thomas</div>
 ____________________________________________________________________________________________
    </div>
+   
    <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
  id="x1-10001"></a>Introduction</h3>
 <!--l. 8--><p class="noindent" >Event-driven is an asynchronous architectural style. It reacts to events, which is different to the common
@@ -124,6 +125,7 @@ class="Cabin-Italic-tlf-t1-x-x-120">broker topology </span>is the simpler of the
 responsiveness, scalability, extensibility, fault tolerance, and low coupling. The <span 
 class="Cabin-Italic-tlf-t1-x-x-120">mediator topology </span>is more complex
 but is designed to provide process control, error handling, and recoverability.
+   
 </p>
    <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
  id="x1-20002"></a>Broker Topology</h3>
@@ -227,6 +229,7 @@ class="Cabin-Bold-tlf-t1-x-x-120">&#x00A0;2. Event Handler Independence Principl
 <!--l. 117--><p class="indent" >   Dependencies between event handlers limit the processing throughput of the system, and increases the
 complexity of implementing event handlers. The only dependency should be the event that is processed by the
 event handler.
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.1    </span> <a 
  id="x1-30002.1"></a>Extensibility</h4>
@@ -261,13 +264,13 @@ href="#x1-2001r3">3<!--tex4ht:ref: fig:broker-components --></a>, does not send 
 valid design choice when implementing the system, if there is nothing foreseeable that might need to know when
 <span 
 class="Cabin-Italic-tlf-t1-x-x-120">Event Handler B </span>is finished processing. The drawback is that if the system later needs to do something else when
+                                                                                                    
+                                                                                                    
 <span 
 class="Cabin-Italic-tlf-t1-x-x-120">Event Handler B </span>is finished, it will need to be modified to send an event to the event broker. The tradeoff is
-                                                                                                    
-                                                                                                    
 reducing asynchronous communication traffic with unnecessary events, versus providing easy extensibility
 later.
-</p><!--l. 146--><p class="noindent" >
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.2    </span> <a 
  id="x1-40002.2"></a>Scalability</h4>
@@ -311,7 +314,7 @@ href="#fn5x0" id="fn5x0-bk"><sup class="textsuperscript">5</sup></a></span><a
  id="x1-4009f5"></a>)
 that provide this functionality. They can still be used when the system does not need to scale to a federated event
 broker, as they provide the underlying implementation for the event broker.
-</p><!--l. 174--><p class="noindent" >
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.3    </span> <a 
  id="x1-50002.3"></a>Queues</h4>
@@ -328,9 +331,9 @@ be implemented in the queue by having multiple <span
 class="Cabin-Italic-tlf-t1-x-x-120">front of queue pointers</span>, one for each type of event
 handler listening to the channel. This allows different event handlers to process through events in the
 queue at different rates. The queue should be implemented to pass queue size or the amount of time
+                                                                                                    
+                                                                                                    
 events are in the queue to the auto-scaling mechanism for each event handler. This can be used as
-                                                                                                    
-                                                                                                    
 part of the logic to determine when to deploy new event handlers, or to scale-back when traffic
 decreases.
 </p><!--l. 191--><p class="indent" >   To increase reliability, the queue can be implemented to only remove the event from the queue once the
@@ -344,7 +347,7 @@ queues are implemented as in-memory queues, events in the queue will be lost whe
 fails. Queues can be implemented to persistently store events until they have been processed. A federated event
 broker will further improve reliability by making it less likely that a single queue will fail between receiving an event
 and storing it persistently.
-</p><!--l. 203--><p class="noindent" >
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.4    </span> <a 
  id="x1-60002.4"></a>Streams</h4>
@@ -358,7 +361,7 @@ it.
 stream. Event handlers can process events at their own pace. Because the events are stored permanently, history
 is maintained. This allows the system to go back and redo past processing or for an audit to be conducted of what
 happened during processing.
-</p><!--l. 217--><p class="noindent" >
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.5    </span> <a 
  id="x1-70002.5"></a>Queues vs. Streams</h4>
@@ -380,9 +383,9 @@ href="https://www.oracle.com/au/internet-of-things/what-is-iot/" >Internet of
 Things</a><span class="footnote-mark"><a 
 href="#fn6x0" id="fn6x0-bk"><sup class="textsuperscript">6</sup></a></span><a 
  id="x1-7001f6"></a>
+                                                                                                    
+                                                                                                    
 (IoT), would be an example of such a system. There could be a very large number of monitoring devices that
-                                                                                                    
-                                                                                                    
 generate frequent events to notify the system of physiology changes. Streams make it practical to process
 different events at an appropriate pace. Some events may need almost immediate processing (e.g. a monitor
 reporting heart failure). Other events may need periodic processing (e.g. analysing patient blood pressure over a
@@ -397,7 +400,7 @@ class="Cabin-Italic-tlf-t1-x-x-120">event sourcing </span>as a persistence mecha
 associated state, rather than storing and updating system state. System state at any earlier point in time can be
 recreated from the event history. This makes it easier to analyse how the system is used and what changes
 happen to the state over time.
-</p><!--l. 264--><p class="noindent" >
+   
 </p>
    <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
  id="x1-80003"></a>Mediator Topology</h3>
@@ -481,14 +484,15 @@ Based on the result received from an event handler, when it finishes processing 
 which processing event to send next. This allows conditional or iterative logic to be implemented in the business
 process. Unlike the broker topology, which only has a sequential flow through the business logic based on event
 handlers sending new events when they finish processing.
+   
+                                                                                                    
+                                                                                                    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.1    </span> <a 
  id="x1-90003.1"></a>Implementation</h4>
 <!--l. 308--><p class="noindent" >Commonly, the mediator topology will implement multiple event mediators. Each one deals with a subset of
 events. These are usually related to a particular part of the problem domain. For example, in the Sahara
 eCommerce system, there could be event mediators for:
-                                                                                                    
-                                                                                                    
       </p><dl class="description"><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Customer Events</span> </dt><dd 
@@ -580,6 +584,7 @@ more developer effort than implementing the logic programmatically. To minimise 
 client still only sends initiating events to a single event queue. An event mediator retrieves the events
 from the event queue and classifies them, adding the events to a queue for the appropriate type of
 mediator.
+   
 </p>
    <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
  id="x1-100004"></a>Broker vs. Mediator Topologies</h3>
@@ -666,7 +671,7 @@ from errors and complete a business process.
 </p><!--l. 428--><p class="indent" >   It is possible to have a hybrid architecture that uses both broker and mediator topologies. Event mediators can
 implement complex business processes in the system. Event brokers can handle events related to simpler
 business processes.
-</p><!--l. 433--><p class="noindent" >
+   
 </p>
    <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
  id="x1-110005"></a>Conclusion</h3>

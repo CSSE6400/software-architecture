@@ -28,6 +28,7 @@ ________________________________________________________________________________
 Thomas</div>
 ____________________________________________________________________________________________
    </div>
+   
    <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
  id="x1-10001"></a>Introduction</h3>
 <!--l. 8--><p class="noindent" >In the previous course notes <span class="cite">[<a 
@@ -73,6 +74,7 @@ detailed treatment of these topics, please refer to the <span
 class="Cabin-Italic-tlf-t1-x-x-120">Designing Data-Intensive Applications </span>textbook
 <span class="cite">[<a 
 href="#Xdata-intensive">3</a>]</span>.
+   
 </p>
    <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
  id="x1-20002"></a>Replication</h3>
@@ -80,7 +82,7 @@ href="#Xdata-intensive">3</a>]</span>.
 occur much more frequently than write operations, in such cases replication can enable improved capacity for
 read operations whilst keeping the write capacity roughly equivalent. Replication involves creating complete
 database copies, called replicas, that reduce the load on any single replica.
-</p><!--l. 45--><p class="noindent" >
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.1    </span> <a 
  id="x1-30002.1"></a>Leader and Followers</h4>
@@ -128,6 +130,7 @@ class="content">A leader-follower replication of the Sahara database.</span></di
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
+   
    <h5 class="likesubsubsectionHead"><a 
  id="x1-4000"></a>Replication Lag</h5>
 <!--l. 79--><p class="noindent" >For leader-follower replication to be practical, write updates from the leader to the followers need to be
@@ -167,8 +170,7 @@ class="Cabin-Bold-tlf-t1-x-x-120">Consistent Prefix Reads</span> </dt><dd
 class="description">
       <!--l. 98--><p class="noindent" >Ensures that sequential writes are always read in the same order. Consider a Twitter feed, each post
       is a write. Consistent Prefix Reads guarantees that those readers do not see the posts out of order.</p></dd></dl>
-<!--l. 101--><p class="noindent" >
-</p>
+   
    <h4 class="subsectionHead"><span class="titlemark">2.2    </span> <a 
  id="x1-50002.2"></a>Multi-leader Replication</h4>
 <!--l. 103--><p class="noindent" >Leader-follower replications are sufficient for most use cases as reads often occur far more frequently than writes.
@@ -212,6 +214,7 @@ placed a bulk order for all of Sahara&#8217;s remaining stock. Both write operat
 team and the tutors but a conflict has occurred &#8212; this is known as a <span 
 class="Cabin-Italic-tlf-t1-x-x-120">write conflict</span>, and it is a common problem in
 multi-leader replications.
+   
 </p>
    <h5 class="likesubsubsectionHead"><a 
  id="x1-6000"></a>Write Conflicts</h5>
@@ -240,10 +243,9 @@ we can use.
       <!--l. 153--><p class="noindent" >Application code resolution. As most conflict resolution is application dependent, many databases
       allow users to write code which can be executed on write of a conflict or read of a conflict to resolve
       the conflict, where appropriate our application could even ask the user to resolve the conflict.</p></li></ul>
+   
                                                                                                     
                                                                                                     
-<!--l. 156--><p class="noindent" >
-</p>
    <h4 class="subsectionHead"><span class="titlemark">2.3    </span> <a 
  id="x1-70002.3"></a>Leaderless Replication</h4>
 <!--l. 158--><p class="noindent" >Leaderless replication does not rely on writes being sent to and processed by a single designated leader,
@@ -301,6 +303,7 @@ class="content">A leaderless replication using a coordinator node of the Sahara 
 function, assuming only a few nodes go offline. This type of database gives us excellent reliability and
 scalability as we can keep adding extra replicas to increase our capacity. But how can we support
 this?
+   
 </p>
    <h5 class="likesubsubsectionHead"><a 
  id="x1-8000"></a>Quorum</h5>
@@ -316,8 +319,7 @@ class="cmmi-12">n </span>replicas, we need to satisfy that,
 </p>
    <div class="math-display" >
 <img 
-src="main0x.svg" alt="w + r &#x003E; n
-" class="math-display"  /></div>
+src="main0x.svg" alt="w + r &#x003E; n" class="math-display"  /></div>
 <!--l. 208--><p class="indent" >   where <span 
 class="cmmi-12">w </span>is the amount of replicas to write to and <span 
 class="cmmi-12">r </span>is the amount of replicas to read from. By satisfying this
@@ -326,7 +328,7 @@ is <span
 class="Cabin-Italic-tlf-t1-x-x-120">unlikely</span><span class="footnote-mark"><a 
 href="#fn3x0" id="fn3x0-bk"><sup class="textsuperscript">3</sup></a></span><a 
  id="x1-8001f3"></a>.
-</p><!--l. 214--><p class="noindent" >
+   
 </p>
    <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
  id="x1-90003"></a>Partitioning</h3>
@@ -336,15 +338,15 @@ the lost of data if one of the partitions fails. Partitioning is required when w
 store.
 </p><!--l. 221--><p class="indent" >   When we start partitioning data onto multiple nodes, we need to consider how we decide which data belongs
 to which node. There are two primary approaches to this decision.
-</p><!--l. 225--><p class="noindent" >
+   
 </p>
    <h4 class="likesubsectionHead"><a 
  id="x1-10000"></a>Partition by Key Range</h4>
+                                                                                                    
+                                                                                                    
 <!--l. 226--><p class="noindent" >We assume that data is given a key, with a key-value database this is required, in relational databases the schema
 should specify a primary key column. One approach to partitioning is to divide the range of key values and
 partition based on that. Consider the UQ student database, the key would be the student ID. We can then
-                                                                                                    
-                                                                                                    
 partition the database based on student ID, say all student numbers between <span 
 class="ectt-1200">s0000000 </span>and <span 
 class="ectt-1200">s1000000</span>
@@ -358,7 +360,7 @@ moment, partitions 5 and 6 would be used far more frequently than partition 0. T
 class="Cabin-Italic-tlf-t1-x-x-120">skewed</span>
 <span 
 class="Cabin-Italic-tlf-t1-x-x-120">partitioning</span>.
-</p><!--l. 243--><p class="noindent" >
+   
 </p>
    <h4 class="likesubsectionHead"><a 
  id="x1-11000"></a>Partition by Hash</h4>
@@ -371,7 +373,7 @@ class="Cabin-Italic-tlf-t1-x-x-120">all </span>partitions to be
 queried.<span class="footnote-mark"><a 
 href="#fn4x0" id="fn4x0-bk"><sup class="textsuperscript">4</sup></a></span><a 
  id="x1-11001f4"></a>
-</p><!--l. 254--><p class="noindent" >
+   
 </p>
    <h4 class="likesubsectionHead"><a 
  id="x1-12000"></a>Secondary Indices</h4>
@@ -387,7 +389,7 @@ students.
 However, it introduces slower reads as all partitions must be queried for their index. Global indices slow down
 writing as all relevant partitions need to have their partition updated. Although it can increase read speeds as a
 query only needs to look at the relevant partitions.
-</p><!--l. 272--><p class="noindent" >
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.1    </span> <a 
  id="x1-130003.1"></a>Rebalancing</h4>
@@ -396,9 +398,9 @@ require the data to be rebalanced to update the range of values stored on any pa
 automated or a manual process. It is important to consider the effects of rebalancing automatically as they are
 costly operations and if triggered at an inappropriate time they can greatly impact the performance of a
 database.
+   
                                                                                                     
                                                                                                     
-</p><!--l. 281--><p class="noindent" >
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.2    </span> <a 
  id="x1-140003.2"></a>Routing</h4>
@@ -412,7 +414,7 @@ the request to the node which is capable of answering the query.
 can forward requests to the appropriate node.
 </p><!--l. 296--><p class="indent" >   Finally, we might offload the problem to the client. Requiring that our database clients are aware of how to
 map their query to the appropriate node.
-</p><!--l. 299--><p class="noindent" >
+   
 </p>
    <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
  id="x1-150004"></a>Transactions</h3>
@@ -424,7 +426,7 @@ class="Cabin-Italic-tlf-t1-x-x-120">transactions</span>.
 </p><!--l. 306--><p class="indent" >   Transactions bundle related groups of read/write operations together and guarantee useful properties.
 Traditionally, these properties are referred to as ACID properties, Atomicity, Consistency, Isolation, and
 Durability.
-</p><!--l. 309--><p class="noindent" >
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.1    </span> <a 
  id="x1-160004.1"></a>Atomicity</h4>
@@ -434,14 +436,14 @@ When purchasing a product we may wish to both update the stock of the product an
 funds of a customer&#8217;s account. If either of those operations occurred on their own, someone would
 be very unhappy. Atomicity guarantees that either all operations in a transaction succeed or none
 do.
-</p><!--l. 318--><p class="noindent" >
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.2    </span> <a 
  id="x1-170004.2"></a>Consistency</h4>
 <!--l. 319--><p class="noindent" >Consistency guarantees that any application specific invariants of the database are preserved by transactions. For
 example, we might introduce the invariant that the stock of an item cannot be below zero. This invariant must
 then be maintained by all transactions.
-</p><!--l. 323--><p class="noindent" >
+   
 </p>
                                                                                                     
                                                                                                     
@@ -450,14 +452,14 @@ then be maintained by all transactions.
 <!--l. 324--><p class="noindent" >Isolation allows transactions to pretend that they are the only operation performing on the data. Transactions
 appear to preform sequentially even though they may in reality be performing concurrently. This allows
 transactions to ignore a whole host of issues related to concurrency.
-</p><!--l. 328--><p class="noindent" >
+   
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.4    </span> <a 
  id="x1-190004.4"></a>Durability</h4>
 <!--l. 329--><p class="noindent" >Durability provides a guarantee that once transactions are completed, their updates are preserved.
 In distributed databases this is often an assurance that the updated data has been copied to other
 machines.
-</p><!--l. 333--><p class="noindent" >
+   
 </p>
    <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
  id="x1-200005"></a>Conclusion</h3>
@@ -474,7 +476,7 @@ class="Cabin-Italic-tlf-t1-x-x-120">Designing Data-Intensive Applications </span
 href="#Xdata-intensive">3</a>]</span>. You
 are strongly encouraged to read these chapters of the book for a more in-depth coverage of these
 topics.
-</p><!--l. 1--><p class="noindent" >
+   
 </p>
    <h3 class="likesectionHead"><a 
  id="x1-21000"></a>References</h3>
