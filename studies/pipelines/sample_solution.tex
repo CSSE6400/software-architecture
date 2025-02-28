@@ -2,8 +2,8 @@
 
 \usepackage{languages}
 
-\title{Codegram Write-up}
-\author{Brae Webb}
+\title{Codegram Write-Up}
+\author{Brae Webb \& Richard Thomas}
 
 \date{\week{2}}
 \begin{document}
@@ -23,13 +23,15 @@ The functions are called in sequence to form a pipeline.
 The incoming HTTP request will specify the image and the steps of filters to apply.
 This allows the image to be processed in a single pass through the pipeline.
 
+
 \section{Discussion}
 
 \paragraph{Which quality attributes are prioritised in this design}
 Our design prioritises simplicity and to an extent extensibility.
 A pipeline is a conceptually simple way to think about filtering.
-We have also prioritised simplicity by implementing each step of the pipeline as a separate function rather than a different modules, or programs.
-Extensibility is also a priority because the pipeline can be easily extended by adding new functions to the pipeline.
+We have also prioritised simplicity by implementing each step of the pipeline as a separate function,
+rather than different modules or programs.
+Extensibility is a priority because the pipeline can be easily extended by adding new functions to the pipeline.
 
 \paragraph{How would you extend this design to support more filters?}
 To support more filters, we would add a new function to the pipeline.
@@ -45,6 +47,7 @@ Each filter could be implemented as a separate endpoint.
 This would allow the filters to be scaled independently and reduce latency on the less popular filters.
 However, this would make the code more complex and harder to understand.
 
+
 \section{Sketching}
 
 \subsection{Overview}
@@ -54,7 +57,7 @@ In our minimal implementation we will implement each filter as a separate functi
     \item The configuration options will be a dictionary of key-value pairs, allowing arbitrary configuration options to be passed to each filter.
     Using a dictionary also allows the configuration options to be passed to the filter as a JSON object from the HTTP request.
     \item The HTTP request will specify the image and the steps of filters to apply.
-    \item A flask service will process the HTTP request and call the appropriate filter functions in sequence.
+    \item A Flask service will process the HTTP request and call the appropriate filter functions in sequence.
     \item The resulting image will be returned to the client.
 \end{itemize}
 
@@ -96,16 +99,19 @@ The following is an example HTTP request to apply the \texttt{grayscale}, \textt
 }
 \end{code}
 
+\clearpage
+
 \subsection{Diagram}
 
 A possible diagram of the design is shown below.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{diagram.pdf}
+    \includegraphics[width=\textwidth]{diagram.pdf}
     \caption{Design Diagram}
     \label{fig:diagram}
 \end{figure}
+
 
 \section{Optimisation}
 
@@ -135,6 +141,7 @@ Images are given to the filtering service as a public URL.
 This means that all user images are publicly accessible,
 which may be a security concern of the system but is not a concern of the image filtering feature.
 
+
 \section{Design Challenges}
 
 \subsection{Malicious Images}
@@ -163,13 +170,14 @@ If we apply this filter before the grayscale filter, the hats will be coloured.
 We would need to flag this filter as order dependent and not cache the results.
 This could be done by a naming convention such as \texttt{order\_dependent\_party\_hats}.
 Or we could keep a list of order dependent filters in the code.
-This would limit the extensibility of the system so we need to consider the weigh the benefits based on what our system priorities are.
-
+This would limit the extensibility of the system,
+so we need to consider the benefits based on what are our system priorities.
 
 \subsection{Global Access}
 To optimise for global access,
 we can consider using a distributed system or a CDN to store and serve the filtered images.
 This would allow users to access their images from a location close to them and reduce latency.
+
 
 \section{Programming Challenge}
 
