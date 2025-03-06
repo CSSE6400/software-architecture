@@ -1,0 +1,40 @@
+@startuml lb4fargate
+title Building a AWS Load Balancer
+
+top to bottom direction
+
+skinparam dpi 300
+skinparam shadowing false
+skinparam monochrome false
+skinparam componentStyle uml2
+skinparam packageStyle rectangle
+skinparam packageTitleAlignment left
+
+Person user
+
+package "AWS" {
+    frame "Elastic Load Balancing" {
+        [Listener] as listener
+        [Application Load Balancer] as alb
+        [Target Group] as tg
+    }
+
+    frame "Application Scaling Group" {
+        [Application Scaling Group] as asg
+        [Fargate Instances] as fargate
+
+        asg -> fargate : launches instances
+    }
+}
+
+listener -[hidden]d- alb
+alb -[hidden]d- tg
+
+asg -[hidden]d- fargate
+
+user -> listener: sends traffic to port & protocol
+listener -[bold,#red]> alb : forwards traffic
+alb -> tg : forwards traffic
+tg -> fargate : sends traffic to instances
+
+@enduml

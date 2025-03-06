@@ -1,0 +1,68 @@
+@startuml ecsdeployment
+    title TaskOverflow on ECS (Deployment Diagram)
+    skinparam dpi 300
+ 
+    left to right direction
+
+    !include <C4/C4_Container>
+    !include <C4/C4_Context>
+    !include <C4/C4_Deployment>
+
+    !define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v15.0/dist
+    !includeurl AWSPuml/AWSCommon.puml
+    !includeurl AWSPuml/AWSC4Integration.puml
+    !includeurl AWSPuml/Groups/all.puml
+    !includeurl AWSPuml/Groups/AutoScalingGroup.puml
+    !includeurl AWSPuml/NetworkingContentDelivery/all.puml
+    !includeurl AWSPuml/Database/all.puml
+    !includeurl AWSPuml/Compute/all.puml
+    !includeurl AWSPuml/Containers/all.puml
+
+    skinparam PackageTitleAlignment Center
+    UpdateElementStyle(Container, $bgColor="#FFFFFF", $borderColor="#d3d3d3", $fontColor="#000000")
+    skinparam rectangle {
+        roundCorner 25
+    }
+    skinparam rectangle<<RDS>> { 
+        BorderColor AWS_COLOR_BLUE 
+    }
+    skinparam rectangle<<AuroraPostgreSQLInstance>> {
+        BorderColor AWS_COLOR_BLUE
+    }
+    skinparam rectangle<<ElasticLoadBalancingApplicationLoadBalancer>> {
+        BorderColor AWS_COLOR_PURPLE
+    }
+    skinparam rectangle<<Route53>> {
+        BorderColor AWS_COLOR_PURPLE
+    }
+
+    AWSCloudGroup(aws, "Amazon Web Services") {
+        RegionGroup(useast1, "us-east-1") {
+
+            RDS(rds, "Amazon RDS", "Postgres 14 | db.t4g.micro | Public IP") {
+                AuroraPostgreSQLInstance(postgresql-grouper, "TaskOverflow", "PostgreSQL") {
+                    ContainerDb(database, "Todo Database", "Stores the todo items for TaskOverflow.")
+                }
+            }
+
+            ElasticContainerService(ecs, "Amazon ECS", "TaskOverflow Cluster") {
+
+                AutoScalingGroupGroup(asg1) {
+                    ElasticContainerServiceService(taskoverflow-service, "TaskOverflow Service", "Task definition: taskoverflow:latest") {
+                        Fargate(todo-compute, "Fargate", "1 vCPU | 2GB RAM") {
+                            ElasticContainerServiceTask(todo, "Todo", "Flask/Python | 1 vCPU | 2GB RAM", "Web application for TaskOverflow including static resources.")
+                        }
+                    }
+                }
+            }
+            
+            ElasticLoadBalancingApplicationLoadBalancer(alb, "Application Load Balancer", "Load balancer for TaskOverflow, listening on port 80 for HTTP.")
+        }
+    }
+
+    Rel_D(todo, database, "Connects to", "TCP/5432")
+    Rel_D(alb, todo, "Routes to", "HTTP/6400")
+
+
+   SHOW_LEGEND(true)
+@enduml
