@@ -1,5 +1,6 @@
 \documentclass{slide}
 \usepackage[T1]{fontenc}  % Suddenly required to compile using GH Actions.
+\usepackage{alltt}
 % \usepackage{pgfpages}
 
 %\setbeameroption{show notes on second screen}
@@ -15,7 +16,7 @@
 
 \title{Containers}
 \subtitle{Software Architecture}
-\author{Brae Webb}
+\author{Brae Webb \& Richard Thomas}
 \date{\week{3}}
 
 \usepackage{languages}
@@ -62,7 +63,7 @@ A way of \highlight{packaging software} and its dependencies such that the softw
 
 \point[Okay...]{How hard could that be?}
 
-\begin{frame}[fragile]{Packaging software}
+\begin{frame}[fragile]{Packaging Software}
     \vspace{-1em}
     \begin{code}[language=python]{program.py}
 #!/usr/bin/env python3
@@ -135,11 +136,13 @@ ModuleNotFoundError: No module named 'numpy'
     \vspace{-2em}
     \begin{columns}
     \begin{column}{0.4\textwidth}
-    {\color{primary}\large A wall}
+    {\color{primary}\huge A wall}
     \vspace{1em}
 
+    \Large{
     A big wall around our environment so that we
     \highlight{know what software} we are actually depending upon.
+    }
     \end{column}
     \begin{column}{0.6\textwidth}
     \begin{center}
@@ -159,11 +162,13 @@ ModuleNotFoundError: No module named 'numpy'
     \end{column}
 
     \begin{column}{0.4\textwidth}
-    {\color{primary}\large A package}
+    {\color{primary}\huge A package}
     \vspace{1em}
 
+    \Large{
     A way to box up all your software and dependencies
-    so that it can be \highlight{transferred} and \highlight{run} in a different environment.
+    so it can be \highlight{transferred} and \highlight{run} in a different environment.
+    }
     \end{column}
     \end{columns}
 \end{frame}
@@ -175,10 +180,10 @@ ModuleNotFoundError: No module named 'numpy'
     \vspace{-3em}
     \begin{columns}
     \begin{column}{0.5\textwidth}
-    {\color{primary}\Large Unix Version 7}
+    {\color{primary}\huge Unix Version 7}
     \vspace{1em}
 
-    \large Introducing... \highlight{chroot}
+    \Large Introducing... \highlight{chroot}
     \end{column}
     \begin{column}{0.5\textwidth}
     \begin{center}
@@ -275,18 +280,18 @@ ls
 }
     \end{center}
     \end{column}
-     \begin{column}{0.25\textwidth}
-    {\color{primary}\Large Plan 9}
+     \begin{column}{0.3\textwidth}
+    {\color{primary}\huge Plan 9}
     \vspace{1em}
 
-    \large Introducing... \highlight{layered filesystem}
+    \Large Introducing... \highlight{layered filesystem}
     \end{column}
 
     \end{columns}
 
 \end{frame}
 
-\point[Layered filesystem]{
+\point[\huge Layered filesystem]{
     \begin{itemize}
         \item Projection on \highlight{read}
         \item Copy on \highlight{write}
@@ -390,13 +395,13 @@ password1234
 
 \begin{frame}{2002}
     \begin{columns}
-    \begin{column}{0.3\textwidth}
-    {\color{primary}\Large Linux kernel 2.4.19}
+    \begin{column}{0.45\textwidth}
+    {\color{primary}\huge Linux kernel 2.4.19}
     \vspace{1em}
 
-    \large Introducing... \highlight{namespaces}
+    \Large Introducing... \highlight{namespaces}
     \end{column}
-    \begin{column}{0.7\textwidth}
+    \begin{column}{0.55\textwidth}
     \begin{center}
     \includegraphics[height=0.8\textheight]{images/linux-kernel}
     \end{center}
@@ -422,7 +427,7 @@ password1234
 \begin{frame}{2008}
     \begin{columns}
     \begin{column}{0.4\textwidth}
-    {\color{primary} \Large LinuX Containers (LXC)}
+    {\color{primary} \huge LinuX Containers\\ \vspace{0.5em}(LXC)}
 
     \end{column}
     \begin{column}{0.6\textwidth}
@@ -441,11 +446,11 @@ password1234
 }
     \end{center}
     \end{column}
-     \begin{column}{0.25\textwidth}
-    {\color{primary}\Large PyCon 2013}
+     \begin{column}{0.3\textwidth}
+    {\color{primary}\huge PyCon 2013}
     \vspace{1em}
 
-    \large Introducing... \highlight{Docker}
+    \Large Introducing... \highlight{Docker}
     \end{column}
 
     \end{columns}
@@ -498,11 +503,11 @@ bin   dev  home  lib64  mnt  proc  run   srv
 \end{frame}
 
 \definition{Container Engine}{
-    A tool to \highlight{create} and \highlight{manage} containers.
+    A tool to \highlight{create} and \highlight{manage} containers.\\
     Often also manages container images.
 }
 
-\point[Container Engines]{
+\point[\huge Container Engines]{
     \begin{itemize}
         \item Docker
         \item rkt
@@ -514,15 +519,15 @@ bin   dev  home  lib64  mnt  proc  run   srv
     \end{itemize}
 }
 
-\point[Creating a container image]{
+\point[\huge Creating a Container Image]{
     \vspace{3mm}
     To create a container image,
     we need to \highlight{create a collection of image layers}.
 
     \vspace{3mm}
     Fortunately, this is no longer a manual process...
+
     \pause
-    
     \vspace{3mm}
     Instead we use a \highlight{build file}, or image blueprints.
 }
@@ -548,6 +553,20 @@ CMD ["/usr/games/cowsay", "Hello World"]
 \begin{code}[numbers=none]{}
 > docker run cowsay
 \end{code}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{verbatim}
+
+ _____________
+< Hello World >
+ -------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+\end{verbatim}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -696,22 +715,23 @@ CMD ["/usr/games/cowsay", "Hello World"]
 \end{columns}
 \end{frame}
 
-\point[Isolation]{
-    Virtual machines are used for \highlight{machine isolation}.
-    \vspace{1em}
+\point[\huge Isolation]{
+    \vspace{0.5em}
+    Virtual machines are used for \highlight{machine isolation}
 
-    Containers are used for \highlight{process isolation}.
+    \vspace{1em}
+    Containers are used for \highlight{process isolation}
 }
 
 \begin{frame}{Size Comparison}
 
-    I want \highlight{10} flask servers running on Ubuntu 22.
+    I want \highlight{10} Flask servers running on Ubuntu 24.
 
     \normalsize
     \begin{align*}
-        \text{Ubuntu 22} &\simeq 3.8GB \\
-        \text{Python 3.6} &\simeq 232MB \\
-        \text{Flask} &\simeq 11.1MB \\
+        \text{Ubuntu 24} &\simeq 5.9GB \\
+        \text{Python 3.13.2} &\simeq 649MB \\
+        \text{Flask} &\simeq 12MB \\
         \text{My App} &\simeq 12K 
     \end{align*}
 
@@ -719,21 +739,21 @@ CMD ["/usr/games/cowsay", "Hello World"]
     \begin{column}{0.5\textwidth}
     {\color{primary} Virtual Machine}
     \begin{align*}
-        \text{Image Size} &= 3.8GB + 232MB \\
-                          &+ 11.1MB + 12K\\
-        &= 4.04GB \\
-        \text{Total Space} &= 4.04GB * 10 \\
-        &= 40.4GB
+        \text{Image Size} &= 5.9GB + 649MB \\
+                          &+ 12MB + 12K\\
+        &= 6.56GB \\
+        \text{Total Space} &= 6.56GB * 10 \\
+        &= 65.6GB
     \end{align*}
     \end{column}
     \begin{column}{0.5\textwidth}
     {\color{primary} Container}
     \begin{align*}
         \text{Image Size} &= 12K \\
-        \text{Layer Size} &= 3.8GB + 232MB + 11.1MB \\
-                             &= 4.04GB \\
-        \text{Total Space} &= (12K * 10) + 4.04GB \\
-                           &\simeq 4.04GB
+        \text{Layer Size} &= 5.9GB + 649MB + 12MB \\
+                             &= 6.56GB \\
+        \text{Total Space} &= (12K * 10) + 6.56GB \\
+                           &\simeq 6.56GB
     \end{align*}
     \end{column}
 \end{columns}
@@ -743,7 +763,7 @@ CMD ["/usr/games/cowsay", "Hello World"]
     \begin{itemize}
         \item Running a \highlight{different operating system}.
         \item \highlight{Unique hardware requirements} such as emulating old computer hardware.
-        \item Where \highlight{security} is crucial virtual machines can offer greater isolation.
+        \item Where \highlight{security} is crucial, virtual machines can offer greater isolation.
     \end{itemize}
 }
 
@@ -766,7 +786,8 @@ CMD ["/usr/games/cowsay", "Hello World"]
 
 \section{Use Cases}
 
-\point[Dependency Management]{
+\point[\huge Dependency Management]{
+\vspace{2mm}
 Containers provide a reliable,
 if brute force,
 way to \highlight{manage dependencies}.
@@ -775,28 +796,33 @@ way to \highlight{manage dependencies}.
 Wrap the whole machine state up and ship it.
 }
 
-\point[Continuous Integration]{
+\point[\huge Continuous Integration]{
+\vspace{2mm}
 Containers allow developers to locally
 \highlight{replicate the same test environment}
 as the CI system.
 }
 
-\point[Continuous Delivery]{
+\point[\huge Continuous Delivery]{
+\vspace{2mm}
 Containers allow teams to package, deploy, and manage applications more efficiently.
 
 \vspace{4mm}
 Containers can be used to \highlight{deploy} on cloud platforms or on-premise servers with \highlight{minimal manual configuration}.
 }
 
-\point[Scaling]{
+\point[\huge Scaling]{
+\vspace{2mm}
 Containers allow applications to be \highlight{scaled up or down quickly and efficiently}.
 }
 
-\point[Microservices]{
+\point[\huge Microservices]{
+\vspace{2mm}
 Containers make it easy to deploy and manage \highlight{individual services independently}.
 }
 
-\point[Serverless]{
+\point[\huge Serverless]{
+\vspace{2mm}
 Containers are the basis for \highlight{serverless computing}.
 }
 
@@ -913,7 +939,8 @@ Password: password
 
 \section{Docker Compose}
 
-\point[Exercise]{
+\point[\huge Exercise]{
+    \vspace{2mm}
     We want to create \highlight{multiple} containers that \highlight{work together}.
     \pause
 
@@ -921,7 +948,8 @@ Password: password
     But we don't want to remember all the \highlight{commands to start and manage} the containers and get them to talk to each other\dots
 }
 
-\point[When faced with tedium]{
+\point[\huge When faced with tedium]{
+    \vspace{2mm}
     Script it!
 }
 
@@ -967,7 +995,6 @@ docker run
     \end{column}%
     \begin{column}{0.5\textwidth}
     \begin{code}[numbers=none,escapechar=!]{docker-compose.yml}
-version: '3'
 services:
   frontend:
     !\colorbox{Aquamarine}{build: ./frontend}!
@@ -998,32 +1025,37 @@ services:
     \end{column}
     \end{columns}
 \end{frame}
+\note[itemize]{
+    \item \texttt{docker-compose}, a Python app, is deprecated.
+    \item \texttt{docker compose} is a Go plug-in for Docker.
+    \item First line of a version number higher than the Python version is no longer required.
+}
 
-\command{docker-compose up}{
+\command{docker compose up}{
     Create and run containers.
 }{
     \item[-d] Detached mode: Run containers in the background, print new container names.
     \item[--build] Rebuild containers if necessary.
 }
 
-\command{docker-compose down}{
+\command{docker compose down}{
     Stop and remove containers, networks, images, and volumes.
 }{
     \item[-v] Remove named volumes declared in the `volumes' section of the Compose file and anonymous volumes attached to containers.
 \item[-t] Specify a shutdown timeout in seconds.
 }
 
-\commandnoarg{docker-compose ps}{
+\commandnoarg{docker compose ps}{
     List containers.
 }
 
-\command{docker-compose logs}{
+\command{docker compose logs}{
     View output from containers.
 }{
     \item[-f] Follow log output.
 }
 
-\command{docker-compose exec [service]}{
+\command{docker compose exec [service]}{
     Run a command in a running container.
 }{
     \item[-d] Detached mode: Run command in the background.
@@ -1031,7 +1063,7 @@ services:
 \item[-e] Set environment variables.
 }
 
-\command{docker-compose build}{
+\command{docker compose build}{
     Build or rebuild services.
 }{
     \item[--no-cache] Do not use cache when building the image.
