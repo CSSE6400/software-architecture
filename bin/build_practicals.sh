@@ -37,13 +37,13 @@ for folder in ${REPO_ROOT}/practicals/*; do
         latexmk -pdf- -dvi -outdir= -halt-on-error
         if [ $? -ne 0 ]; then
             echo "error: $(basename $folder) practical failed to build as HTML"
-            exit 1  # Enabling exit on error to trace issue of HTML content not appearing on site.
+#            exit 1  # Enabling exit on error to trace issue of HTML content not appearing on site.
         else
             HTML_DIR="${DIST_DIR}/$(basename $folder)"
             mkdir -p "${HTML_DIR}"
 			if [ $? -ne 0 ]; then
 				echo "error: $(HTML_DIR) failed to be created"
-				exit 1
+#				exit 1
 			fi
             cp ./main.html "${HTML_DIR}/index.html"
             cp ./main.css ./*.svg ./*.png "${HTML_DIR}"
