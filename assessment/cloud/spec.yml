@@ -1,37 +1,32 @@
-openapi: 3.0.3
+openapi: 3.0.4
 info:
-  title: SpamOverflow
+  title: CoughOverflow
   description: |
-    An API service for scanning malicious emails and providing reports on malicious actors, their targets, and link domains that are used.
+    A service to analyse images of saliva samples to identify if a patient has COVID-19 or avian influenza (H5N1).
 
-    Notes: It is common for users to have email aliases, e.g. example@uq.edu.au could have an alias of example+csse6400@uq.edu.au. For the purposes of this assignment we will treat these as separate email addresses and not the same.
-
-
-    Updates in v1.1.0:
-    - GET /customer/{customer_id}/emails description updated.
-    - GET /customer/{customer_id}/emails limit and offset parameters defaults described.
+#    Updates in v1.1.0:
   contact:
     name: CSSE6400
     url: https://csse6400.uqcloud.net
     email: noreply@uq.edu.au
-  version: 1.1.0
+  version: 1.0
 servers:
-- url: http://email.api.spamoverflow.com/api/v1
+- url: http://analysis.coughoverflow.com/api/v1
 tags:
-- name: email
-  description: Malicious email service
+- name: pas
+  description: Pathogen Analysis Service
 paths:
   /health:
     get:
       tags:
-      - email
+      - pas
       summary: Query the health of the service.
       description: |
         The health endpoint is useful for determining whether an instance is still healthy.
         This can help if you are configuring auto-scaling groups or load balancers.
 
-        We do not specify the response payload for this endpoint,
-        however you may find it useful to return a more detailed status of your system.
+        We do not specify the response payload for this endpoint.
+        However, you may find it useful to return a more detailed status of your system.
         For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
       responses:
         200:
@@ -43,458 +38,480 @@ paths:
         503:
           description: Service is not healthy.
           content: {}
-  /customers/{customer_id}/emails:
+
+  /analysis:
     get:
       tags:
-      - email
-      summary: List all submitted emails for a given customer.
-      description: |
-        Returns a list of all emails submitted for the given customer id with the optional filters applied. The limit and offset parameters are used for stepping through blocks of emails / paging through the results. If the offset is greater than the amount of entries that exist then an empty array should be returned.
-        
-        If there are no emails associated with the given customer id, an empty array should be returned.
-
-        All other parameters are used to filter the results and should be applied before the limit and offset parameters. e.g. if 300 emails exists and 200 are labelled as malicious then a request of limit=100 and only_malicious=true should return 100 emails. If limit=100, only_malicious=true, and offset=200 then the response should be 0 emails (an empty array).
-
-        **The filters are additive and as such if the filter is not in the request then it should not be applied. e.g. if only_malicious=true is not in the request then all emails should be returned regardless of their malicious status. The exception to this is the limit and offset parameters which have defaults which are applied if they are not in the request.**
+      - pas
+      summary: Returns the current status of an analysis request.
+      description: Returns the current status of the specified analysis request.
       parameters:
-      - name: customer_id
-        in: path
-        description: The customer identifier is a UUIDv4.
+      - name: request_id
+        in: query
+        description: The analysis request identifier is a UUIDv4.
         required: true
         schema:
           type: string
+          example: "a8adfe49-d88f-4656-bb8c-7c2272358ccd"
+      responses:
+        200:
+          description: Get the result or current status of the analysis job.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        404:
+          description: |
+            Analysis request identifier does not correspond to any submitted analysis requests.
+
+            Invalid request identifiers will also return 404 errors.
+            Return value is not specified but should not leak any internal system data structure information.
+          content: {}
+        500:
+          description: |
+            An unknown error occurred trying to process the request.
+
+            Return value is not specified but should describe the error.
+          content: {}
+    post:
+      tags:
+      - pas
+      summary: Request analysis of a sample.
+      description: Submits a request to process an image and classify the sample as indicative of the patient being healthy, or having COVID-19 or H5N1.
+      parameters:
+      - name: patient_id
+        in: query
+        description: The patient identifier is a Medicare number.
+        required: true
+        schema:
+          type: string
+          example: "36295831522"
+      - name: lab_id
+        in: query
+        description: The lab identifier is one of the provided lab names.
+        required: true
+        schema:
+          type: string
+          example: lab123
+      - name: urgent
+        in: query
+        description: Flag to indicate whether this analysis has higher processing priority than a standard request.
+        required: false
+        schema:
+          type: boolean
+          example: true
+      requestBody:
+        description: |
+          Image to be analysed, along with processing metadata.
+
+          Image is a base64 encoded jpeg.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Image'
+        required: true
+      responses:
+        201:
+          description: Analysis request has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisResponse'
+        400:
+          description: Request data was malformed or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: |
+            An unknown error occurred trying to process the request.
+
+            Return value is not specified but should describe the error.
+          content: {}
+    put:
+      tags:
+      - pas
+      summary: Update the lab associated with an analysis request.
+      description: Change the lab identifier for an analysis request to another lab.
+      parameters:
+      - name: request_id
+        in: query
+        description: The identifier of the analysis request that is to be updated.
+        required: true
+        schema:
+          type: string
+          example: "a8adfe49-d88f-4656-bb8c-7c2272358ccd"
+      - name: lab_id
+        in: query
+        description: The new lab identifier.
+        required: true
+        schema:
+          type: string
+          example: lab123
+      responses:
+        200:
+          description: |
+            Analysis request has been successfully updated with the new lab identifier.
+
+            If the new and old lab identifiers are identical, it will still be considered to be a valid update.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        400:
+          description: |
+            New lab identifier is invalid.
+
+            The identifier is not one of the provided lab names.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Invalid lab identifier."
+        404:
+          description: |
+            Analysis request identifier does not correspond to any submitted analysis requests.
+
+            Invalid request identifiers will also return 404 errors.
+            Return value is not specified but should not leak any internal system data structure information.
+          content: {}
+        500:
+          description: |
+            An unknown error occurred trying to process the request.
+
+            Return value is not specified but should describe the error.
+          content: {}
+      x-codegen-request-body-name: body
+
+  /results/lab/{lab_id}:
+    get:
+      tags:
+      - pas
+      summary: List all analysis requests associated with a lab.
+      description: |
+        Returns a list of the results of all analysis requests associated with the provided lab identifier, with the optional filters applied.
+        The limit and offset parameters are used to page through the results.
+        If the offset is greater than the amount of analysis requests associated with that lab identifier, then an empty array should be returned.
+        
+        If there are no analysis requests associated with the lab identifier, an empty array should be returned.
+
+        All other parameters are used to filter the results and should be applied before the limit and offset parameters.
+        (e.g. If 300 analysis requests exist and 20 have an h5n1 result, then a request of limit=10 and status=h5n1 should return 10 results.
+        If limit=10, status=h5n1, and offset=25 then the response should be 0 results (an empty array).)
+
+        **The filters are additive, and as such, if the filter is not in the request then it should not be applied.
+        (e.g. If status parameter is not in the request, then the results of all analysis requests should be returned regardless of their status.
+        The exception to this is the limit and offset parameters. They have defaults which are applied if they are not in the request.)**
+      parameters:
+      - name: lab_id
+        in: path
+        description: The lab identifier is one of the provided lab names.
+        required: true
+        schema:
+          type: string
+          example: lab123
       - name: limit
         in: query
-        description: Returns only this many results, 0 < limit <= 1000. **Default is 100**.
+        description: Returns up to a maximum of the specified number of results, 0 < limit <= 1000. **Default is 100**.
+        required: false
         schema:
           type: integer
           minimum: 1
           maximum: 1000
           default: 100
-        example: 20
+          example: 20
       - name: offset
         in: query
         description: Skip this many results before returning, 0 <= offset. **Default is 0**.
+        required: false
         schema:
           type: integer
           minimum: 0
           default: 0
-        example: 0
+          example: 10
       - name: start
         in: query
         description: |
-          Only return emails submitted from this date.
+          Only return analysis requests submitted from this date.
           The date should be in RFC3339 format.
+        required: false
         schema:
           type: string
           format: date-time
-          example: 2024-02-21T13:10:05Z
+          example: 2025-03-12T13:00:00Z
       - name: end
         in: query
         description: |
-          Only return emails submitted before this date.
+          Only return analysis requests submitted before this date.
           The date should be in RFC3339 format.
+        required: false
         schema:
           type: string
           format: date-time
-          example: 2024-02-21T14:10:05Z
-      - name: from
+          example: 2025-03-12T14:00:00Z
+      - name: patient_id
         in: query
         description: |
-          Only return emails submitted from this email address.
-          The email address should be in the format of user@domain.
+          Only return analysis requests for this patient identifier.
+          The patient identifier is a Medicare number.
+        required: false
         schema:
           type: string
-          format: email
-          example: 'no-reply@uq.edu.au'
-      - name: to
+          example: "36295831522"
+      - name: status
         in: query
         description: |
-          Only return emails submitted to this email address.
-          The email address should be in the format of user@domain.
-        schema:
-          type: string
-          format: email
-          example: 'support@uq.edu.au'
-      - name: state
-        in: query
-        description: |
-          Only return emails with this state.
-          The state should be one of 'pending', 'scanned', 'failed'.
+          Only return analysis requests with this status.
+          The state should be one of 'pending', 'covid', 'h5n1', 'healthy', or 'failed'.
+        required: false
         schema:
           type: string
           enum:
             - pending
-            - scanned
+            - covid
+            - h5n1
+            - healthy
             - failed
-        example: 'scanned'
-      - name: only_malicious
+          example: 'h5n1'
+      - name: urgent
         in: query
-        description: |
-          Only return emails that have been flagged as malicious.
+        description: Only return analysis requests that were flagged as being urgent.
+        required: false
         schema:
           type: boolean
           example: true
       responses:
         200:
-          description: List of all emails, with the filters applied.
+          description: |
+            List of results of all analysis requests.
+
+            After applying the specified filters.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Email'
+                  $ref: '#/components/schemas/Result'
         400:
           description: |
-            Invalid customer_id or query parameters.
-
-            Return value is not specified but should describe the error.
-        500:
-          description: |
-            An unknown error occurred trying to process the request.
-
-            Return value is not specified but should describe the error.
-    post:
-      tags:
-      - email
-      summary: Post a new email scan request.
-      description: |
-        If the customer account does not exist, it will be created. The customer's ID identifies if the request must have a high priority or not, see the description in the parameters section.
-      parameters:
-      - name: customer_id
-        in: path
-        description: The customer identifier is a UUIDv4 where the first 4 characters represent the customer type. Customers with 1111####-####-####-####-############ are to be treated as high priority while all other valid UUIDv4's are to be treated as standard priority.
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EmailPost'
-        required: true
-      responses:
-        201:
-          description: The Email scan request has been successfully created.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Email'
-        400:
-          description: |
-            Body/Path parameter was malformed or invalid.
-
-            Return value is not specified but should describe the error.
-          content: {}
-        500:
-          description: |
-            An unknown error occurred trying to process the request.
-
-            Return value is not specified but should describe the error.
-      x-codegen-request-body-name: body
-  /customers/{customer_id}/emails/{id}:
-    get:
-      tags:
-      - email
-      summary: Get information for a particular email.
-      description: |
-        Returns a representation of an email for a customer with the status of the scan and its result. 
-      parameters:
-      - name: customer_id
-        in: path
-        description: The customer identifier is a UUIDv4.
-        required: true
-        schema:
-          type: string
-      - name: id
-        in: path
-        description: The email identifier that was returned when the request was created.
-        required: true
-        schema:
-          type: string
-      responses:
-        200:
-          description: Information about the requested email message.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Email'
-        400:
-          description: |
-            Body/Path parameter was malformed or invalid.
+            Invalid query parameters.
 
             Return value is not specified but should describe the error.
           content: {}
         404:
           description: |
-            The requested email for the customer does not exist. If a customer does not exist for the given customer_id then the response will be a 404.
+            Lab identifier does not correspond to a known lab.
 
-            Return value is not specified but should describe the error.
+            Return value is not specified but should not leak any internal system data structure information.
           content: {}
         500:
           description: |
             An unknown error occurred trying to process the request.
 
             Return value is not specified but should describe the error.
-  /customers/{customer_id}/reports/actors:
+          content: {}
+      x-codegen-request-body-name: body
+
+  /results/patient:
     get:
       tags:
-      - email
-      summary: Get malicious senders of emails.
+      - pas
+      summary: List all analysis requests associated with a patient.
       description: |
-        Returns a list of all senders/actors identified as sending at least one email that is flagged as malicious. This report should be kept up-to-date with a maximum of five minutes delay.
+        Returns a list of the results of all analysis requests associated with the provided patient identifier, with the optional filters applied.
+
+        **The filters are additive, and as such, if the filter is not in the request then it should not be applied.
+        (e.g. If status parameter is not in the request, then the results of all analysis requests should be returned regardless of their status.)**
       parameters:
-      - name: customer_id
-        in: path
-        description: The customer identifier is a UUIDv4.
+      - name: patient_id
+        in: query
+        description: The patient identifier is a Medicare number.
         required: true
         schema:
           type: string
+          example: "36295831522"
+      - name: start
+        in: query
+        description: |
+          Only return results of analysis requests submitted from this date.
+          The date should be in RFC3339 format.
+        required: false
+        schema:
+          type: string
+          format: date-time
+          example: 2025-03-12T13:00:00Z
+      - name: end
+        in: query
+        description: |
+          Only return results of analysis requests submitted before this date.
+          The date should be in RFC3339 format.
+        required: false
+        schema:
+          type: string
+          format: date-time
+          example: 2025-03-12T14:00:00Z
+      - name: status
+        in: query
+        description: |
+          Only return results of analysis requests with this status.
+          The state should be one of 'pending', 'covid', 'h5n1', 'healthy', or 'failed'.
+        required: false
+        schema:
+          type: string
+          enum:
+            - pending
+            - covid
+            - h5n1
+            - healthy
+            - failed
+          example: 'h5n1'
+      - name: urgent
+        in: query
+        description: Only return results of analysis requests that were flagged as being urgent.
+        required: false
+        schema:
+          type: boolean
+          example: true
       responses:
         200:
-          description: List of all senders/actors identified as sending at least one email that is flagged as malicious.
+          description: |
+            List of results of all analysis requests.
+
+            After applying the specified filters.
           content:
             application/json:
               schema:
-                type: object
-                example:
-                  generated_at: "2024-02-21T13:10:05Z"
-                  total: 1
-                  data:
-                    - id: "no-reply@uq.edu.au"
-                      count: 256
-                properties:
-                  generated_at:
-                    type: string
-                    format: date-time
-                    description: The date and time the report was generated in RFC3339 format. If the report is being made live then this should be the current date and time.
-                    example: 2024-02-21T13:10:05Z
-                  total:
-                    type: integer
-                    description: The number of entries in the list.
-                    minimum: 0
-                  data:
-                    type: array
-                    description: The list of actors identified as sending at least one malicious email.
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          description: Email address of the sender of malicious email.
-                        count:
-                          type: integer
-                          description: The number of email messages, which have been identified as malicious, that this actor has sent.
-                          minimum: 1
+                type: array
+                items:
+                  $ref: '#/components/schemas/Result'
+        400:
+          description: |
+            Invalid query parameters.
+
+            Return value is not specified but should describe the error.
+          content: {}
+        404:
+          description: |
+            Patient identifier does not correspond to a known patient.
+
+            Invalid patient identifiers will also return 404 errors.
+            Return value is not specified but should not leak any internal system data structure information.
+          content: {}
         500:
           description: |
             An unknown error occurred trying to process the request.
 
             Return value is not specified but should describe the error.
-  /customers/{customer_id}/reports/recipients:
-    get:
-      tags:
-      - email
-      summary: Get users who have received malicious emails.
-      description: |
-        Returns a list of all recipients who have received at least one email message that is identified as malicious. This report should be kept up-to-date with a maximum of five minutes delay.
-      parameters:
-      - name: customer_id
-        in: path
-        description: The customer identifier is a UUIDv4. 
-        required: true
-        schema:
-          type: string
-      responses:
-        200:
-          description: List of all recipients, who are associated with this customer, who have received malicious email.
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  generated_at: "2024-02-21T13:10:05Z"
-                  total: 1
-                  data:
-                    - id: "support@uq.edu.au"
-                      count: 10000
-                properties:
-                  generated_at:
-                    type: string
-                    format: date-time
-                    description: The date and time the report was generated in RFC3339 format. If the report is being made live then this should be the current date and time.
-                    example: 2024-02-21T13:10:05Z
-                  total:
-                    type: integer
-                    description: The number of entries in the list.
-                    minimum: 0
-                  data:
-                    type: array
-                    description: The list of recipients who have received at least one email message that is identified as malicious.
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          description: Email address of the recipient of the malicious email.
-                        count:
-                          type: integer
-                          description: The number of malicious emails identified as being received by this recipient.
-                          minimum: 1
-        500:
-          description: |
-            An unknown error occurred trying to process the request.
+          content: {}
+      x-codegen-request-body-name: body
 
-            Return value is not specified but should describe the error.
-  /customers/{customer_id}/reports/domains:
-    get:
-      tags:
-      - email
-      summary: Get the domains that appeared in malicious emails.
-      description: |
-        Returns a report consisting of the link domains found in malicious emails for the given customer. This report should be kept up-to-date with a maximum of five minutes delay.
-      parameters:
-      - name: customer_id
-        in: path
-        description: The customer identifier is a UUIDv4.
-        required: true
-        schema:
-          type: string
-      responses:
-        200:
-          description: A report consisting of the link domains found in email messages that were identified as being malicious, for the given customer.
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  generated_at: "2024-02-21T13:10:05Z"
-                  total: 2
-                  data:
-                    - id: "uq.edu.au"
-                      count: 16
-                    - id: "uq.mu"
-                      count: 5
-                properties:
-                  generated_at:
-                    type: string
-                    format: date-time
-                    description: The date and time the report was generated in RFC3339 format. If the report is being made live then this should be the current date and time.
-                    example: 2024-02-21T13:10:05Z
-                  total:
-                    type: integer
-                    description: The number of entries in the list.
-                    minimum: 0
-                  data:
-                    type: array
-                    description: The list of domains which were contained in email messages that were identified as being malicious.
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          description: The domain found in at least one email message that was identified as being malicious.
-                        count:
-                          type: integer
-                          description: The number of times this domain has been seen in email messages that were identified as being malicious.
-                          minimum: 1
-        500:
-          description: |
-            An unknown error occurred trying to process the request.
-
-            Return value is not specified but should describe the error.
- 
 components:
   schemas:
-    Email:
+    AnalysisResponse:
       type: object
       properties:
         id:
           type: string
-          description: The email message's unique identifier. This is generated by the email scanning service when the scan request is submitted.
+          description: The analysis request's unique identifier. This is a UUIDv4 that is generated by the analysis service when the analysis request is received.
+          example: "a8adfe49-d88f-4656-bb8c-7c2272358ccd"
         created_at:
           type: string
           format: date-time
-          description: The date and time the email was submitted.
-          example: 2024-02-21T13:10:05Z
+          description: The date and time the analysis request was received.
+          example: 2025-03-12T13:10:05Z
         updated_at:
           type: string
           format: date-time
-          description: The date and time the email was updated including its creation.
-          example: 2024-02-21T13:10:05Z
-        contents:
-          type: object
-          description: The contents of the email.
-          properties:
-            to:
-              type: string
-              format: email
-              description: The email address <strong>to</strong> which the email was sent.
-              example: "no-reply@uq.edu.au"
-            from:
-              type: string
-              format: email
-              description: The email address <strong>from</strong> which the email was sent.
-              example: "support@uq.edu.au"
-            subject:
-              type: string
-              description: The subject of the email.
-              example: "Important information about your account."
+          description: The date and time the analysis job was last updated, including creation and completion of analysis.
+          example: 2025-02-12T13:10:05Z
         status:
           type: string
           enum:
             - pending
-            - scanned
+            - covid
+            - h5n1
+            - healthy
             - failed
-          description: The status of the email scan.
+          description: The status of the analysis job.
           default: "pending"
-          example: "scanned"
-        malicious:
-          type: boolean
-          description: Whether the email was flagged as malicious.
-        domains:
-          type: array
-          description: The domains of links found within the email body.
-          items:
-            type: string
-            example: "scam-check.uq.edu.au"
-        metadata:
-          type: object
-          properties:
-            spamhammer:
-              type: string
-              description: SpamHammer metadata for this email.
-              example: "1|14"
+          example: "pending"
         
-    EmailPost:
+    Image:
       type: object
       properties:
         metadata:
           type: object
           properties:
-            spamhammer:
+            engine:
               type: string
-              description: SpamHammer metadata for this email.
+              description: Analysis engine metadata for this image.
               example: "1|14"
-        contents:
-          type: object
-          description: The contents of the email.
-          properties:
-            to:
-              type: string
-              format: email
-              description: The email address <strong>to</strong> which the email was sent.
-              example: "no-reply@uq.edu.au"
-            from:
-              type: string
-              format: email
-              description: The email address <strong>from</strong> which the email was sent.
-              example: "support@uq.edu.au"
-            subject:
-              type: string
-              description: The subject of the email.
-              example: "Important information about your account."
-            body:
-              type: string
-              description: The body of the email.
-              example: "Dear customer,\nWe have noticed some suspicious activity on your account. Please click [here](https://scam-check.uq.edu.au?userId=uqehugh3) to reset your password."
+        image:
+          type: string
+          description: Base64 encoding of the image to be analysed.
+          example: "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAVAB0DASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9NoPG+i3MtnFDeCV7qQxxqsbZyOPm4+UHIwT1yCMjmvFP2hNLvfiIttNcfETUPh38PPDsk1/r8+kSvb3N9FGuFXz0IZIw+SQudwA7kYzdG8QpovjZby1tRLDbIZhbyuyM8eJAo+7yQMfN0yB61teKNcs/C+kXaa7bGfRSZLPVS1qLqOOI5DNJDtbfGSADgHGc4wCR+C4zjXFV54WlKPLGVf2dRQdm48miUpNJc8nJqzTtFK6e/wBJLLo01Jxd3y3V+9+y7K33nP8Ajjwz4M8YeHNG8Map4+1DQbfW5Et9P1TSLtrW81CQQswBkjUFeBvYHaMqAeCVPrnww1O/8LeEdP8AD3i3XV1nW9Jt47SfWXj8s37INplZcnDnbluepz3rwe4+Ofweih06OylOuzaZIsml2tr4eLeVMo2x+QJIwiMM4UrjHQcV31tpGueLLG0kaArqSQpJexxNuCSuMsM9+Q3PeuPB4nFcKSwuCwGHnz1alZum5xneC5nBrllLlcY8t2rXaabeg54aVa88RorKzs12vuldHq6/DXw3Hqo1FdMVLoEEbZpBHwcj93u24B7YxVbxv4Ugu4Z9UhkNvcon70BdyzAccj1xxn09eMFFfsuZZLluNwVXC16EXCWrVrapaPSzv57ni0sRVhUjJSd0eIeDfAegXHjITWOjafpt7I20XMVuCUJ6lRkAH6Yr6O0LQrbw/Yi2twWydzyP96RvU0UV8B4eZbhY4WePcL1ruHM22+VWslduy9N+p6+cYmtVqKE5NqyP/9k="
+
+    Result:
+      type: object
+      properties:
+        request_id:
+          type: string
+          description: The analysis request's unique identifier. This is a UUIDv4 that was generated by the analysis service when the analysis request was received.
+          example: "a8adfe49-d88f-4656-bb8c-7c2272358ccd"
+        lab_id:
+          type: string
+          description: The lab identifier associated with this request.
+          example: "lab123"
+        patient_id:
+          type: string
+          description: The Medicare number of the patient associated with this request.
+          example: "1234567890"
+        result:
+          type: string
+          enum:
+            - pending
+            - covid
+            - h5n1
+            - healthy
+            - failed
+          description: The result or status of the analysis job.
+          example: "covid"
+        urgent:
+          type: boolean
+          description: Whether the request was flagged as being urgent.
+          example: true
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time the analysis request was received.
+          example: 2025-03-12T13:10:05Z
+        updated_at:
+          type: string
+          format: date-time
+          description: The date and time the analysis job was last updated, including creation and completion of analysis.
+          example: 2025-02-12T13:10:35Z
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          enum:
+            - missing_patient_id
+            - invalid_patient_id
+            - missing_lab_id
+            - invalid_lab_id
+            - no_image
+            - invalid_image
+            - image_size
+            - unknown_error
+          description: Error code indicating the problem with the request data.
+          example: "image_size"
+        detail:
+          type: string
+          description: |
+            Additional information about the error.
+
+            No specific information is required but informative error messages are beneficial in debugging.
+          example: "Image was too large (>500KB). Uploaded image size was 4528764 bytes."
