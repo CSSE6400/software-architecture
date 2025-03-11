@@ -18,6 +18,7 @@ tags:
 paths:
   /health:
     get:
+      operationId: getHealth
       tags:
       - pas
       summary: Query the health of the service.
@@ -41,10 +42,10 @@ paths:
 
   /analysis:
     get:
+      operationId: getResult
       tags:
       - pas
-      summary: Returns the current status of an analysis request.
-      description: Returns the current status of the specified analysis request.
+      summary: Returns the result or current status of the specified analysis request.
       parameters:
       - name: request_id
         in: query
@@ -74,6 +75,7 @@ paths:
             Return value is not specified but should describe the error.
           content: {}
     post:
+      operationId: submitRequest
       tags:
       - pas
       summary: Request analysis of a sample.
@@ -88,11 +90,11 @@ paths:
           example: "36295831522"
       - name: lab_id
         in: query
-        description: The lab identifier is one of the provided lab names.
+        description: The lab identifier is one from the definitive list of labs (https://csse6400.uqcloud.net/resources/labs.csv).
         required: true
         schema:
           type: string
-          example: lab123
+          example: "QML40671"
       - name: urgent
         in: query
         description: Flag to indicate whether this analysis has higher processing priority than a standard request.
@@ -102,17 +104,20 @@ paths:
           example: true
       requestBody:
         description: |
-          Image to be analysed, along with processing metadata.
+          Image to be analysed.
 
           Image is a base64 encoded jpeg.
         content:
           application/json:
             schema:
+              # type: string
+              # description: Base64 encoding of the image to be analysed.
+              # example: "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAVAB0DASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9NoPG+i3MtnFDeCV7qQxxqsbZyOPm4+UHIwT1yCMjmvFP2hNLvfiIttNcfETUPh38PPDsk1/r8+kSvb3N9FGuFXz0IZIw+SQudwA7kYzdG8QpovjZby1tRLDbIZhbyuyM8eJAo+7yQMfN0yB61teKNcs/C+kXaa7bGfRSZLPVS1qLqOOI5DNJDtbfGSADgHGc4wCR+C4zjXFV54WlKPLGVf2dRQdm48miUpNJc8nJqzTtFK6e/wBJLLo01Jxd3y3V+9+y7K33nP8Ajjwz4M8YeHNG8Map4+1DQbfW5Et9P1TSLtrW81CQQswBkjUFeBvYHaMqAeCVPrnww1O/8LeEdP8AD3i3XV1nW9Jt47SfWXj8s37INplZcnDnbluepz3rwe4+Ofweih06OylOuzaZIsml2tr4eLeVMo2x+QJIwiMM4UrjHQcV31tpGueLLG0kaArqSQpJexxNuCSuMsM9+Q3PeuPB4nFcKSwuCwGHnz1alZum5xneC5nBrllLlcY8t2rXaabeg54aVa88RorKzs12vuldHq6/DXw3Hqo1FdMVLoEEbZpBHwcj93u24B7YxVbxv4Ugu4Z9UhkNvcon70BdyzAccj1xxn09eMFFfsuZZLluNwVXC16EXCWrVrapaPSzv57ni0sRVhUjJSd0eIeDfAegXHjITWOjafpt7I20XMVuCUJ6lRkAH6Yr6O0LQrbw/Yi2twWydzyP96RvU0UV8B4eZbhY4WePcL1ruHM22+VWslduy9N+p6+cYmtVqKE5NqyP/9k="
               $ref: '#/components/schemas/Image'
         required: true
       responses:
         201:
-          description: Analysis request has been successfully created.
+          description: Analysis job has been successfully created.
           content:
             application/json:
               schema:
@@ -130,14 +135,15 @@ paths:
             Return value is not specified but should describe the error.
           content: {}
     put:
+      operationId: updateRequest
       tags:
       - pas
-      summary: Update the lab associated with an analysis request.
-      description: Change the lab identifier for an analysis request to another lab.
+      summary: Update the lab associated with an analysis job.
+      description: Change the lab identifier for an analysis job to another lab's identifier.
       parameters:
       - name: request_id
         in: query
-        description: The identifier of the analysis request that is to be updated.
+        description: The identifier of the analysis job that is to be updated.
         required: true
         schema:
           type: string
@@ -148,13 +154,13 @@ paths:
         required: true
         schema:
           type: string
-          example: lab123
+          example: "QML40671"
       responses:
         200:
           description: |
-            Analysis request has been successfully updated with the new lab identifier.
+            Analysis job has been successfully updated with the new lab identifier.
 
-            If the new and old lab identifiers are identical, it will still be considered to be a valid update.
+            If the new and old lab identifiers are identical, it is still a valid update.
           content:
             application/json:
               schema:
@@ -163,7 +169,7 @@ paths:
           description: |
             New lab identifier is invalid.
 
-            The identifier is not one of the provided lab names.
+            The new lab identifier is not one from the definitive list of labs (https://csse6400.uqcloud.net/resources/labs.csv).
           content:
             text/plain:
               schema:
@@ -184,33 +190,64 @@ paths:
           content: {}
       x-codegen-request-body-name: body
 
-  /results/lab/{lab_id}:
+  /labs:
     get:
+      operationId: getLabs
       tags:
       - pas
-      summary: List all analysis requests associated with a lab.
+      summary: List all labs with permission to use this service.
       description: |
-        Returns a list of the results of all analysis requests associated with the provided lab identifier, with the optional filters applied.
-        The limit and offset parameters are used to page through the results.
-        If the offset is greater than the amount of analysis requests associated with that lab identifier, then an empty array should be returned.
-        
-        If there are no analysis requests associated with the lab identifier, an empty array should be returned.
+        Returns a list of lab identifiers for all labs that are allowed to use this service.
 
-        All other parameters are used to filter the results and should be applied before the limit and offset parameters.
-        (e.g. If 300 analysis requests exist and 20 have an h5n1 result, then a request of limit=10 and status=h5n1 should return 10 results.
-        If limit=10, status=h5n1, and offset=25 then the response should be 0 results (an empty array).)
+        The definitive list of lab identifiers is available in the labs.csv file at
+        https://csse6400.uqcloud.net/resources/labs.csv
+      responses:
+        200:
+          description: List of lab identifiers for all labs with permission to use this service.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Lab identifier
+                example: ["4CT24811", "4CT41221", "ACL42151", "ACL42163", "QML40671", "QML41203", "SNP40011", "SNP4570"]
+        500:
+          description: |
+            An unknown error occurred trying to process the request.
+
+            Return value is not specified but should describe the error.
+          content: {}
+      x-codegen-request-body-name: body
+
+  /labs/results/{lab_id}:
+    get:
+      operationId: getLabResults
+      tags:
+      - pas
+      summary: List all analysis jobs associated with a lab.
+      description: |
+        Returns a list of the results of all analysis jobs associated with the provided lab identifier, with the optional filters applied.
+        The `limit` and `offset` parameters are used to page through the results.
+        If the offset is greater than the amount of analysis jobs associated with that lab identifier, then an empty array should be returned.
+
+        If there are no analysis jobs associated with the lab identifier, an empty array should be returned.
+
+        All other parameters are used to filter the results and should be applied before the `limit` and `offset` parameters.
+        (e.g. If 300 analysis jobs exist and 20 have an h5n1 result, then a request of `limit=10` and `status="h5n1"` should return 10 results.
+        If `limit=10`, `status="h5n1"`, and `offset=25` then the response should be 0 results (an empty array).)
 
         **The filters are additive, and as such, if the filter is not in the request then it should not be applied.
-        (e.g. If status parameter is not in the request, then the results of all analysis requests should be returned regardless of their status.
-        The exception to this is the limit and offset parameters. They have defaults which are applied if they are not in the request.)**
+        (e.g. If the `status` parameter is not in the request, then the results of all analysis jobs should be returned regardless of their status.
+        The exception to this is the `limit` and `offset` parameters. They have defaults which are applied if they are not in the request.)**
       parameters:
       - name: lab_id
         in: path
-        description: The lab identifier is one of the provided lab names.
+        description: The lab identifier is one from the definitive list of labs (https://csse6400.uqcloud.net/resources/labs.csv).
         required: true
         schema:
           type: string
-          example: lab123
+          example: "QML40671"
       - name: limit
         in: query
         description: Returns up to a maximum of the specified number of results, 0 < limit <= 1000. **Default is 100**.
@@ -233,7 +270,7 @@ paths:
       - name: start
         in: query
         description: |
-          Only return analysis requests submitted from this date.
+          Only return analysis jobs submitted from this date.
           The date should be in RFC3339 format.
         required: false
         schema:
@@ -243,7 +280,7 @@ paths:
       - name: end
         in: query
         description: |
-          Only return analysis requests submitted before this date.
+          Only return analysis jobs submitted before this date.
           The date should be in RFC3339 format.
         required: false
         schema:
@@ -253,8 +290,8 @@ paths:
       - name: patient_id
         in: query
         description: |
-          Only return analysis requests for this patient identifier.
-          The patient identifier is a Medicare number.
+          Only return analysis jobs for this patient identifier.
+          The patient identifier is an eleven digit Medicare number.
         required: false
         schema:
           type: string
@@ -262,7 +299,7 @@ paths:
       - name: status
         in: query
         description: |
-          Only return analysis requests with this status.
+          Only return analysis jobs with this status.
           The state should be one of 'pending', 'covid', 'h5n1', 'healthy', or 'failed'.
         required: false
         schema:
@@ -276,7 +313,7 @@ paths:
           example: 'h5n1'
       - name: urgent
         in: query
-        description: Only return analysis requests that were flagged as being urgent.
+        description: Only return analysis jobs that were flagged as being urgent.
         required: false
         schema:
           type: boolean
@@ -284,7 +321,7 @@ paths:
       responses:
         200:
           description: |
-            List of results of all analysis requests.
+            List of results of all analysis jobs for this lab.
 
             After applying the specified filters.
           content:
@@ -313,16 +350,17 @@ paths:
           content: {}
       x-codegen-request-body-name: body
 
-  /results/patient:
+  /patients/results:
     get:
+      operationId: getPatientResults
       tags:
       - pas
-      summary: List all analysis requests associated with a patient.
+      summary: List all analysis jobs associated with a patient.
       description: |
-        Returns a list of the results of all analysis requests associated with the provided patient identifier, with the optional filters applied.
+        Returns a list of the results of all analysis jobs associated with the provided patient identifier, with the optional filters applied.
 
         **The filters are additive, and as such, if the filter is not in the request then it should not be applied.
-        (e.g. If status parameter is not in the request, then the results of all analysis requests should be returned regardless of their status.)**
+        (e.g. If `status` parameter is not in the request, then the results of all analysis jobs should be returned regardless of their status.)**
       parameters:
       - name: patient_id
         in: query
@@ -334,7 +372,7 @@ paths:
       - name: start
         in: query
         description: |
-          Only return results of analysis requests submitted from this date.
+          Only return results of analysis jobs submitted from this date.
           The date should be in RFC3339 format.
         required: false
         schema:
@@ -344,7 +382,7 @@ paths:
       - name: end
         in: query
         description: |
-          Only return results of analysis requests submitted before this date.
+          Only return results of analysis jobs submitted before this date.
           The date should be in RFC3339 format.
         required: false
         schema:
@@ -354,7 +392,7 @@ paths:
       - name: status
         in: query
         description: |
-          Only return results of analysis requests with this status.
+          Only return results of analysis jobs with this status.
           The state should be one of 'pending', 'covid', 'h5n1', 'healthy', or 'failed'.
         required: false
         schema:
@@ -368,7 +406,7 @@ paths:
           example: 'h5n1'
       - name: urgent
         in: query
-        description: Only return results of analysis requests that were flagged as being urgent.
+        description: Only return results of analysis jobs that were flagged as being urgent.
         required: false
         schema:
           type: boolean
@@ -376,7 +414,7 @@ paths:
       responses:
         200:
           description: |
-            List of results of all analysis requests.
+            List of results of all analysis jobs for this patient.
 
             After applying the specified filters.
           content:
@@ -413,7 +451,9 @@ components:
       properties:
         id:
           type: string
-          description: The analysis request's unique identifier. This is a UUIDv4 that is generated by the analysis service when the analysis request is received.
+          description: |
+            The analysis job's unique identifier.
+            This is a UUIDv4 that is generated by the analysis service when the analysis request is received.
           example: "a8adfe49-d88f-4656-bb8c-7c2272358ccd"
         created_at:
           type: string
@@ -438,35 +478,38 @@ components:
           example: "pending"
         
     Image:
-      type: object
-      properties:
-        metadata:
-          type: object
-          properties:
-            engine:
-              type: string
-              description: Analysis engine metadata for this image.
-              example: "1|14"
-        image:
-          type: string
-          description: Base64 encoding of the image to be analysed.
-          example: "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAVAB0DASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9NoPG+i3MtnFDeCV7qQxxqsbZyOPm4+UHIwT1yCMjmvFP2hNLvfiIttNcfETUPh38PPDsk1/r8+kSvb3N9FGuFXz0IZIw+SQudwA7kYzdG8QpovjZby1tRLDbIZhbyuyM8eJAo+7yQMfN0yB61teKNcs/C+kXaa7bGfRSZLPVS1qLqOOI5DNJDtbfGSADgHGc4wCR+C4zjXFV54WlKPLGVf2dRQdm48miUpNJc8nJqzTtFK6e/wBJLLo01Jxd3y3V+9+y7K33nP8Ajjwz4M8YeHNG8Map4+1DQbfW5Et9P1TSLtrW81CQQswBkjUFeBvYHaMqAeCVPrnww1O/8LeEdP8AD3i3XV1nW9Jt47SfWXj8s37INplZcnDnbluepz3rwe4+Ofweih06OylOuzaZIsml2tr4eLeVMo2x+QJIwiMM4UrjHQcV31tpGueLLG0kaArqSQpJexxNuCSuMsM9+Q3PeuPB4nFcKSwuCwGHnz1alZum5xneC5nBrllLlcY8t2rXaabeg54aVa88RorKzs12vuldHq6/DXw3Hqo1FdMVLoEEbZpBHwcj93u24B7YxVbxv4Ugu4Z9UhkNvcon70BdyzAccj1xxn09eMFFfsuZZLluNwVXC16EXCWrVrapaPSzv57ni0sRVhUjJSd0eIeDfAegXHjITWOjafpt7I20XMVuCUJ6lRkAH6Yr6O0LQrbw/Yi2twWydzyP96RvU0UV8B4eZbhY4WePcL1ruHM22+VWslduy9N+p6+cYmtVqKE5NqyP/9k="
+     type: object
+     properties:
+       image:
+         type: string
+         description: Base64 encoding of the image to be analysed.
+         example: "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAVAB0DASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9NoPG+i3MtnFDeCV7qQxxqsbZyOPm4+UHIwT1yCMjmvFP2hNLvfiIttNcfETUPh38PPDsk1/r8+kSvb3N9FGuFXz0IZIw+SQudwA7kYzdG8QpovjZby1tRLDbIZhbyuyM8eJAo+7yQMfN0yB61teKNcs/C+kXaa7bGfRSZLPVS1qLqOOI5DNJDtbfGSADgHGc4wCR+C4zjXFV54WlKPLGVf2dRQdm48miUpNJc8nJqzTtFK6e/wBJLLo01Jxd3y3V+9+y7K33nP8Ajjwz4M8YeHNG8Map4+1DQbfW5Et9P1TSLtrW81CQQswBkjUFeBvYHaMqAeCVPrnww1O/8LeEdP8AD3i3XV1nW9Jt47SfWXj8s37INplZcnDnbluepz3rwe4+Ofweih06OylOuzaZIsml2tr4eLeVMo2x+QJIwiMM4UrjHQcV31tpGueLLG0kaArqSQpJexxNuCSuMsM9+Q3PeuPB4nFcKSwuCwGHnz1alZum5xneC5nBrllLlcY8t2rXaabeg54aVa88RorKzs12vuldHq6/DXw3Hqo1FdMVLoEEbZpBHwcj93u24B7YxVbxv4Ugu4Z9UhkNvcon70BdyzAccj1xxn09eMFFfsuZZLluNwVXC16EXCWrVrapaPSzv57ni0sRVhUjJSd0eIeDfAegXHjITWOjafpt7I20XMVuCUJ6lRkAH6Yr6O0LQrbw/Yi2twWydzyP96RvU0UV8B4eZbhY4WePcL1ruHM22+VWslduy9N+p6+cYmtVqKE5NqyP/9k="
+# Metadata not used in the 2025 scalability assignment.
+#        metadata:
+#          type: object
+#          properties:
+#            engine:
+#              type: string
+#              description: Analysis engine metadata for this image.
+#              example: "1|14"
 
     Result:
       type: object
       properties:
         request_id:
           type: string
-          description: The analysis request's unique identifier. This is a UUIDv4 that was generated by the analysis service when the analysis request was received.
+          description: |
+            The analysis job's unique identifier.
+            This is a UUIDv4 that was generated by the analysis service when the analysis request was received.
           example: "a8adfe49-d88f-4656-bb8c-7c2272358ccd"
         lab_id:
           type: string
-          description: The lab identifier associated with this request.
-          example: "lab123"
+          description: The lab identifier associated with this analysis job.
+          example: "QML40671"
         patient_id:
           type: string
-          description: The Medicare number of the patient associated with this request.
-          example: "1234567890"
+          description: The Medicare number of the patient associated with this analysis job.
+          example: "36295831522"
         result:
           type: string
           enum:
