@@ -15,7 +15,7 @@
 % RUBRIC
 
 \title{CoughOverflow}
-\author{Evan Hughes, Brae Webb and Richard Thomas}
+\author{Brae Webb and Richard Thomas}
 \date{Semester 1, 2025}
 
 \begin{document}
@@ -44,81 +44,86 @@ Your service will be deployed to AWS and will undergo automated correctness and 
 
 \section{Introduction}
 
-%\paragraph{Task}
 For this assignment, you are working for CoughOverflow, a new UQ start-up.
-CoughOverflow uses machine learning techniques to analyse images of saliva samples.
+CoughOverflow uses machine learning techniques developed by
+\link{QDHeC}{https://chsr.centre.uq.edu.au/research/queensland-digital-health-centre}
+to analyse images of saliva samples.
 The analysis is able to identify if an individual is infected with one of a few pathogens.
 The initial service focuses on identification of COVID-19 or H5N1,
-due to their current level of risk in the community.
+due to their current level of risk to the public.
 
+\paragraph{Task}
 CoughOverflow uses a microservices architecture to implement their analysis platform.
-The CTO saw on your resume that you are taking Software Architecture and has assigned you to design and implement a service.
-This service must be scalable to cope with the anticipated large number of tests.
+The CTO saw on your resume that you are taking Software Architecture
+and has assigned you to design and implement the pathogen analysis service.
+This service must scale to cope with the anticipated large number of tests.
 
 \paragraph{Requirements}
-Email filtering software can filter email as it arrives or after.
-SpamOverflow will implement a service that does not impede the flow of traffic (i.e. does not prevent the email arriving).
-It will receive an API call when the mail server receives an email message.
-The service then pulls the email from the user's inbox as fast as it can to prevent the user from seeing the malicious email or clicking any links.
+Automated identification of pathogens is an important service.
+Manual testing by lab technicians is labour intensive and time consuming.
+Automated tests free lab technicians for more important work,
+and provide faster responses to healthcare staff.
+This is critical in an epidemic or pandemic scenario,
+when tens or hundreds of thousands of tests need to be performed daily.
 
-Commercial email providers send an API request for each email received.
-For optimal performance this service needs to be able to handle a large number of requests in a short period of time, so as to not miss any emails.
+CoughOverflow's pathogen analysis service (PAS) needs to be designed to scale to match demand.
+Pathology labs will obtain saliva samples from patients.
+The labs will create images of the cells in the samples.
+These images will be sent to the PAS for analysis.
 
-Since these emails can be dangerous, the service must be able to report that it is bad or good in a timely manner.
-Though genuine emails that are incorrectly marked as dangerous should be returned to the user as quickly as possible.
+The algorithms used to analyse the images are computationally intensive.
+It is not possible to return a result immediately for a submitted image.
+Labs, or other healthcare providers, will need to query the PAS to obtain results at a later time.
+Results can be queried for a single test, or a batch of tests for a lab or patient.
+
+As COVID-19 and H5N1 are potentially life threatening to some patients,
+the service must be able to provide test results in a timely manner.
+Early treatment and effective isolation practices can significantly reduce the impacts of these diseases,
+as well as reducing strain on healthcare resources.
 
 Persistence is an important characteristic of the platform.
-Customers will want to analyse why emails were flagged after the fact.
-Upon receiving an email scan request, and after filtering, the system must guarantee that the data has been saved to persistent storage before returning a success response.
+Resubmitting analysis requests due to lost data would place unnecessary strain on pathology labs,
+at times when they may be under extreme pressure to deliver results.
+Upon receiving an analysis request, and after error checking,
+the PAS must guarantee that the data has been saved to persistent storage before returning a success response.
+
 
 \section{Interface}
-As you are operating in a microservices context, other service providers have been given an API specification for your service.
+As you are operating in a microservices context,
+other service providers have been given an API specification for your service.
 They have been developing their services based on this specification so you must match it \emph{exactly}.
 
 The interface specification is available to all service owners online: 
 
-\url{https://csse6400.uqcloud.net/assessment/spamoverflow}
+\url{https://csse6400.uqcloud.net/assessment/coughoverflow}
+
 
 \section{Implementation}
 The following constraints apply to the implementation of your assignment solution.
 
-\subsection{SpamHammer}
+\subsection{Analysis Engine}
 
-% Change to be only Dr. Richardson's tool and similarity.
+You have been provided with a command line tool called \texttt{engine} that must be used to analyse sample images.
+This tool was developed by AI and medical researchers at
+\link{QDHeC}{https://chsr.centre.uq.edu.au/research/queensland-digital-health-centre}.
+The tool has varying performance, due to how clear the pathogen markers are in the cell sample images.
+You will have to work around this bottleneck in the design and development of the PAS.
 
-You have been provided with a command line tool called \texttt{spamhammer} that can be used to scan emails for malicious content.
-This tool is developed by Dr. Richardson who is an AI and linguistic expert.
-The tool has varying performance, roughly related to the length of the content.
-You will have to work around this bottleneck in the design and development of your parts of the system.
-
-Your service \textbf{must} utilise the \texttt{spamhammer} command line tool provided for this assignment.
-The compiled binaries are available in the tool's GitHub repository: \url{https://github.com/CSSE6400/spamhammer}.
+Your service \textbf{must} utilise the \texttt{engine} command line tool provided for this assignment.
+The compiled binaries are available in the tool's GitHub repository: \url{https://github.com/CSSE6400/pathogenanalysisengine}.
 
 \warning{You are \textbf{not} allowed to reimplement or modify this tool.}
 
-This tool is not as magical as it sounds.
-For the purposes of this assignment, in the API specification you will notice the metadata->spamhammer field in the POST body.
-This is a setting which decides whether the email is malicious and how long processing should take.
-Demonstrations are provided in the repository to show how to use the tool to generate your own examples.
-You \textbf{must} not use this field to simplify the task of scanning the email.
+The analysis engine requires pre-processing of cell sample images to highlight pathogen markers.
+This pre-processing is done by the pathology labs.
+You \textbf{must} use the provided sample images for testing purposes.
+If you try to generate your own images, they are likely to fail analysis or give false results.
 
-\subsection{Similarity}
-
-Dr. Richardson has also provided some advice to help you with filtering through the emails.
-She has suggested that you use a similarity metric to compare the body of emails to previously known bad emails.
-The doctor explains it as ``many of the emails we have seen with our first customers have the same content and structure it is just that the link or `Dear <name>' is slightly different''.
-
-With this knowledge you have found a common method of getting the difference between documents called the 
-\link{Cosine Similarity}{https://www.learndatasci.com/glossary/cosine-similarity/} which is explained in these videos.
-
-\begin{itemize}
-  \item \url{https://www.youtube.com/watch?v=e9U0QAFbfLI}
-  \item \url{https://www.youtube.com/watch?v=Dd16LVt5ct4}
-\end{itemize}
-
-For the purposes of the assignment you may build up a database of known bad emails during the operation of your API. You must only use the body of the email content to compare similarity.
-
-\info{Dr. Richardson emphasises that the similarity metric is not a replacement for the scanner and is an optional way to improve the efficiency of the system.}
+%For the purposes of this assignment,
+%in the API specification you will notice the metadata->spamhammer field in the POST body.
+%This is a setting which decides whether the email is malicious and how long processing should take.
+%Demonstrations are provided in the repository to show how to use the tool to generate your own examples.
+%You \textbf{must} not use this field to simplify the task of scanning the email.
 
 \subsection{AWS Services}
 Please make note of the \link{AWS services}
@@ -128,7 +133,7 @@ To view this page you need to be logged in to your AWS Learner Lab environment a
 
 \subsection{External Services}
 You may \textbf{not} use services or products from outside of the AWS Learner Lab environment.
-For example, you may not host instances of the \texttt{spamhammer} command line tool on another cloud platform
+For example, you may not host instances of the \texttt{engine} command line tool on another cloud platform
 (e.g. Google Cloud).
 
 You may \textbf{not} use services or products that run on AWS infrastructure external to your Learner Lab environment.
@@ -136,10 +141,11 @@ For example, you may not deploy a third-party product like MongoDB Atlas on AWS 
 
 You may \textbf{not} deploy machine learning or GPU backed services.
 
+
 \section{Submission}
 This assignment has three submissions.
 
-\begin{enumerate}
+\begin{enumerate}[topsep=7pt,partopsep=2pt,itemsep=4pt,parsep=4pt]
   \item March 25$^{th}$ -- API Functionality
   \item April 12$^{th}$ -- Deployed to Cloud
   \item May 3$^{rd}$ -- Scalable Application
@@ -147,51 +153,70 @@ This assignment has three submissions.
 All submissions are due at 15:00 on the specified date.
 Your solution for each submission must be committed and pushed to the GitHub repository specified in Section \ref{sec:github}.
 
-Each submission is to be tagged\footnote{Atlassian has a good tutorial about Git tag, if you are not familiar with tagging. See: \url{https://www.atlassian.com/git/tutorials/inspecting-a-repository/git-tag}.}
-to indicate which commit is to be marked.
-The tags that you \textbf{\underline{must}} use are:
-\begin{itemize}
+%Each submission is to be tagged\footnote{Atlassian has a good tutorial about Git tag,
+%if you are not familiar with tagging.
+%See: \url{https://www.atlassian.com/git/tutorials/inspecting-a-repository/git-tag}.}
+%to indicate which commit is to be marked.
+%The tags that you \textbf{\underline{must}} use are:
+Each submission is to be in its own branch.
+You \textbf{\underline{must}} use the branch names \textbf{\underline{exactly}} as indicated below.
+Failure to use these branch names may result in your submission not being marked,
+and you obtaining a grade of 0 for the submission.
+\begin{itemize}[topsep=7pt,partopsep=2pt,itemsep=4pt,parsep=4pt]
   \item \textbf{stage-1} for API Functionality, due on March 25$^{th}$
   \item \textbf{stage-2} for Deployed to Cloud, due on April 12$^{th}$
   \item \textbf{stage-3} for Scalable Application, due on May 3$^{rd}$
 \end{itemize}
 
-When marking a stage, we will checkout the commit you have tagged for that stage.
-This allows you to make a conscious decision, if you wish to make a late submission.
-We will mark the late submission that you have tagged for the stage.
-Late penalties will be applied, as described in the course profile.
+When marking a stage, we will checkout the branch for that stage.
+Any code in the main branch or \textit{any} other branch, will be ignored when marking.
+We will checkout the latest commit in the branch being marked.
+If the commit date and time is after the submission deadline, late penalties will be applied,
+unless you have an extension.
+Late penalties are described in the course profile.
 
 \textbf{\underline{Note:}} Experience has shown that the large majority of students who make a late submission,
 lose more marks from the late penalty than they gain from any improvements they make to their solution.
-We strongly encourage you to submit your work on-time.
+We \textit{strongly} encourage you to submit your work on-time.
 
-If you forget to tag your submission, we will checkout and mark the latest commit that you made to the main branch before the submission deadline.
+%If you forget to tag your submission,
+%we will checkout and mark the latest commit that you made to the main branch before the submission deadline.
 You should commit and push your work to your repository regularly.
-If a misconduct case is raised about your submission, a history of regular progress on the assignment through a series of commits could support your argument that the work was your own.
+If a misconduct case is raised about your submission,
+a history of regular progress on the assignment through a series of commits
+could support your argument that the work was your own.
 
 Extension requests \textbf{must} be made \emph{prior} to the submission deadline via \link{my.UQ}{https://my.uq.edu.au/}.
 
 Your repository \textbf{must} contain everything required to successfully deploy your application.
 
-\begin{samepage}
+%\begin{samepage}
 \subsection{API Functionality Submission}
 Your first submission \textbf{must} include the following in your repository:
 \begin{itemize}
-  \item Docker container (Dockerfile) of your implementation of the service API, including the source code and a mechanism to build and run the service.%
-  \footnote{If you use external libraries, ensure that you pin the versions to avoid external changes breaking your application.}
-  \item A \texttt{local.sh} script that can be used to build and run your service locally. Where your container will be launched with port 8080 being passed from the container to the testing environment and your service must be available at \texttt{http://localhost:8080/}.
+  \item Docker container (Dockerfile) of your implementation of the service API,
+        including the source code and a mechanism to build and run the service.%
+        \footnote{If you use external libraries,
+                  ensure that you pin the versions to avoid external changes breaking your application.}
+  \item A \texttt{local.sh} script that can be used to build and run your service locally.
+        Where your container will be launched with port 8080 being passed from the container
+        to the testing environment and your service \textbf{must} be available at \texttt{http://localhost:8080/}.
 \end{itemize}
 We will run a suite of tests against your API on this endpoint.
-\end{samepage}
+%\end{samepage}
 
+\newpage
 \begin{samepage}
-\subsection{Deployed to Cloud \& Scalabiliity Submissions}
-The second and third submissions must include all of the following in your repository:
+\subsection{Deployed to Cloud \& Scalability Submissions}
+The second and third submissions must include all the following in your repository:
 \begin{itemize}
   \item Your implementation of the service API, including the source code and a mechanism to build the service.%
-  \footnote{If you use external libraries, ensure that you pin the versions to avoid external changes breaking your application.}
+        \footnote{If you use external libraries,
+                  ensure that you pin the versions to avoid external changes breaking your application.}
   \item Terraform code that can provision your service in a fresh AWS environment.
-  \item A \texttt{deploy.sh} script that can use your Terraform code to deploy your application. This script \textbf{must} be in the top-level of your repository. This script may perform other tasks as required.
+  \item A \texttt{deploy.sh} script that can use your Terraform code to deploy your application.
+        This script \textbf{must} be in the top-level of your repository.
+        This script may perform other tasks as required.
 \end{itemize}
 \end{samepage}
 
@@ -200,26 +225,35 @@ When deploying your second and third submissions to mark, we will follow reprodu
 You may re-create the process yourself.
 
 \begin{enumerate}
-  \item Your Git repository will be checked out locally.
+  \item Your Git repository will be cloned locally.
+        The submission branch will be checked out.
   \item AWS credentials will be copied into your repository in the top-level directory,
-  in a file called \texttt{credentials}.
-  \item The script \texttt{deploy.sh} in the top-level of the repository will be run.
-  \item The \texttt{deploy.sh} script \textbf{must} create a file named \texttt{api.txt} which contains the URL at which your API is deployed, e.g. \texttt{http://my-api.com/} or \texttt{http://123.456.789.012/}.
+        in a file called \texttt{credentials}.
+  \item The script \texttt{deploy.sh} in the \textbf{root directory} will be run.
+  \item The \texttt{deploy.sh} script \textbf{must} create a file named \texttt{api.txt},
+        which contains the URL at which your API is deployed,
+        e.g. \texttt{http://my-api.com/} or \texttt{http://123.456.789.012/}.
   \item We will run automated functionality and load-testing on the URL provided in the \texttt{api.txt} file.
 \end{enumerate}
 
 \noindent
-\textbf{Important Note: Ensure your service does not exceed the resource limits of AWS Learner Labs. For example, AWS will deactivate your account if more than fifteen EC2 instances are running.}
+\textbf{Important Note:} Ensure your service does not exceed the resource limits of AWS Learner Labs.
+For example, AWS will \textbf{deactivate} your account if more than fifteen EC2 instances are running.
+If you use your allocated budget in the Learner Lab, you will not be able to run any services.
 
 \subsection{GitHub Repository}\label{sec:github}
-You will be provisioned with a private repository on GitHub for this assignment, via GitHub Classroom. You must click on the link below and associate your GitHub username with your UQ student ID in the Classroom.
+You will be provisioned with a private repository on GitHub for this assignment, via GitHub Classroom.
+You must click on the link below and associate your GitHub username with your UQ student ID in the Classroom.
 
 \url{https://classroom.github.com/a/whdIS1AE}
 
 \noindent
-Associating your GitHub username with another student's ID, or getting someone else to associate their GitHub username with your student ID, is \link{academic misconduct} {https://my.uq.edu.au/information-and-services/manage-my-program/student-integrity-and-conduct/academic-integrity-and-student-conduct}.
+Associating your GitHub username with another student's ID,
+or getting someone else to associate their GitHub username with your student ID, is \link{academic misconduct}
+{https://my.uq.edu.au/information-and-services/manage-my-program/student-integrity-and-conduct/academic-integrity-and-student-conduct}.
 
-If for some reason you have accidentally associated your GitHub username with the wrong student ID, contact the course staff as soon as possible.
+If for some reason you have accidentally associated your GitHub username with the wrong student ID,
+contact the course staff as soon as possible.
 
 \subsection{Tips}
 
@@ -233,13 +267,18 @@ Your AWS Learner Lab can be reset using the reset button in the toolbar.
 \includegraphics[width=\textwidth]{images/reset-button.png}
 
 \noindent
-To ensure that you are not accidentally depending on anything specific to your Learner Lab environment, we recommend that you reset your lab prior to final submission. Note that resetting the lab can take a considerable amount of time, in the order of hours. You should do this at \textit{least} 4 to 6 hours before the submission deadline. Please do not wait to the last minute.
+To ensure that you are not accidentally depending on anything specific to your Learner Lab environment,
+we recommend that you reset your lab prior to final submission.
+Note that resetting the lab can take a \textit{considerable} amount of time, on the order of hours.
+You should do this at \textit{least} 3 to 4 hours before the submission deadline.
+Please do not wait to the last minute.
 
 \paragraph{Deploying with Docker}
 In this course, you have been shown how to use Docker containers to deploy on ECS. You may refer to the practical worksheets for a description of how to deploy with containers \cite{prac-week5}.
 
 \subsection{Fine Print}
-You can reproduce our process for deploying your application using our \link{Docker image}{https://ghcr.io/CSSE6400/csse6400-cloud-testing}.
+You can reproduce our process for deploying your application using our
+\link{Docker image}{https://ghcr.io/CSSE6400/csse6400-cloud-testing}.
 \codefile[language=docker]{Dockerfile}{deployment/Dockerfile}
 
 Our steps for deploying your infrastructure using this container are as follows.
@@ -257,24 +296,31 @@ Note that the Docker socket of the host has been mounted. This enables running \
 
 \section{Criteria}
 Your assignment submission will be assessed on its ability to support the specified use cases.
-Testing is divided into functionality, deployment and scalability testing, corresponding to the three submission stages of the assignment.
-Functionality testing is to ensure that your backend software and API meet the MVP requirements by satisfying the API specification without any excessive load.
+Testing is divided into functionality, deployment and scalability testing,
+corresponding to the three submission stages of the assignment.
+Functionality testing is to ensure that your backend software and API
+meet the MVP requirements by satisfying the API specification without any excessive load.
 Deployment is to ensure that this MVP can then be hosted in the target cloud provider.
-Quality testing is based upon several likely use case scenarios.
+Scalability testing is based upon several likely usage scenarios.
 The scenarios create different scaling requirements.
 
 \subsection{API Functionality} % Pesistence: Does not need to be "truly" persistent.
-40\% of the total marks for the assignment are for correctly implementing the API specification, irrespective of whether it is able to cope with high loads. A suite of automated API tests will assess the correctness of your implementation, via a sequence of API calls.
+10\% from the 35\% of the grade for the assignment are for correctly implementing the API specification,
+irrespective of whether it is able to cope with high loads.
+A suite of automated API tests will assess the correctness of your implementation, via a sequence of API calls.
 
 \subsection{Deployed to Cloud} % Persistence working correctly in the cloud.
-25\% of the total marks for the assignment are for deploying a correctly implemented service to AWS irrespective of whether it is able to cope with high loads.
-The deployment will be assessed by running a script that deploys your service to AWS and then runs a suite of automated API tests to assess the correctness of your implementation.
+10\% from the 35\% of the grade for the assignment are for deploying a correctly implemented service to AWS,
+irrespective of whether it is able to cope with high loads.
+The deployment will be assessed by running a script that deploys your service to AWS
+and then runs a suite of automated API tests to assess the correctness of your implementation.
 
 \subsection{Scalable Application}\label{sec:scenarios} % Can it scale!
-The remaining 35\% of the marks will be derived from how well your service handles various scenarios.
+15\% from the 35\% of the grade for the assignment will be derived from how well your service handles various scenarios.
 These scenarios will require you to consider how your application performs under load.
 Examples of possible scenarios are described below.
-These are not descriptions of specific tests that will be run, rather they are examples of the types of tests that will be run.
+These are not descriptions of specific tests that will be run,
+rather they are examples of the types of tests that will be run.
 
 \paragraph{Steady Stream}
 Steady receipt of email messages at a rate of \emph{M} per minute, fairly evenly spread across all customers.
@@ -306,19 +352,44 @@ These messages can only be identified by SpamHammer.
 They have sent these phishing messages to 2,000 users at the same time.
 
 \subsection{Marking}
-Persistence is a core functional requirement of the system. If your implementation does not save email scans to persistent storage, your grade for the assignment will be capped at 4.
+Persistence is a core functional requirement of your service.
+If your implementation does not save analysis requests, with their associated images,
+to persistent storage, your grade for the assignment will be capped at 4.
 
-Your persistence mechanism must be robust, so that it can cope with catastrophic failure of the system. If all running instances of your services are terminated, the system must be able to restart and guarantee that it has not lost any data about emails for which it returned a success response to the caller. There will not be a test that explicitly kills all services and restarts the system. This will be assessed based on the services you use and how your implementation invokes those services. Not saving data to a persistent data store, or returning a success response before the data has been saved, are the criteria that determine whether you have successfully implemented persistence.
+Your persistence mechanism must be robust, so that it can cope with catastrophic failure of your service.
+If all running instances of your services are terminated,
+the system must be able to restart and guarantee that it has not lost \textit{any} data
+about analysis requests for which it returned a success response to the client.
+There will not be a test that explicitly kills all services and restarts the system.
+This will be assessed based on the services you use and how your implementation invokes those services.
+Not saving data to a persistent data store, or returning a success response before the data has been saved,
+are the criteria that determine whether you have successfully implemented persistence.
 
-Functionality of your service is worth 40\% of the marks for the assignment. This is based on the successful implementation of the API specification given and the ability to use the given tool in your implementation.
+Functionality of your service is worth \textbf{10\%} from the 35\% of the grade for the assignment.
+This is based on successful implementation of the given API specification
+and the ability to use the provided tool in your implementation.
 
-Deploying your service is worth 25\% of the marks for the assignment. This is based on the successful deployment, using Terraform, of your service to AWS and the ability to access the service via the API. Your service must be fully functional while deployed so the functionality tests can be run which determines the marks for deployment.
+Deploying your service is worth \textbf{10\%} from the 35\% of the grade for the assignment.
+This is based on the successful deployment, using Terraform,
+of your service to AWS and the ability to access the service via the API.
+Your service must be fully functional while deployed,
+so the functionality tests can be run which determines the marks for deployment.
 
-Scaling your application to successfully handle the usage scenarios accounts for the other 35\% of the marks. The scenarios described in section \ref{sec:scenarios} provide guidance as to the type of scalability issues your system is expected to handle. They are not literal descriptions of the exact loads that will be used. Tests related to scenarios that involve more complex behaviour will have higher weight than other tests.
+Scaling your application to successfully handle the usage scenarios accounts for the remaining \textbf{15\%}
+of the grade for the assignment.
+The scenarios described in section \ref{sec:scenarios} provide guidance
+as to the type of scalability issues your system is expected to handle.
+They are not literal descriptions of the exact loads that will be used.
+Tests related to scenarios that involve more complex behaviour will have higher weight than other tests.
 
-The scenarios will evaluate whether your service is being wasteful in resource usage. The amount of resources deployed in your AWS account will be monitored to ensure that your service implements a scaling up \emph{and} scaling down procedure.
+The scenarios will evaluate whether your service is being wasteful in resource usage.
+The amount of resources deployed in your AWS account will be monitored to ensure that
+your service implements a scaling up \textbf{\emph{and}} scaling down procedure.
 
-All stages of the assessment will be marked using automation and a subset of the tests will be released. These tests may consume a \textbf{\emph{significant}} portion of your AWS credit. You are advised to be prudent in how many times you execute these tests. The amount of tests to be released is at the Course Coordinator's discretion.
+All stages of the assessment will be marked using automation and a subset of the tests will be released.
+These tests may consume a \textbf{\emph{significant}} portion of your AWS credit.
+You are advised to be prudent in how many times you execute these tests.
+The amount of tests to be released is at the Course Coordinator's discretion.
 
 Please refer to the marking criteria at the end of this document.
 
@@ -336,26 +407,50 @@ Similarly, if your deployed stage 3 submission passes more of the functionality 
 
 \paragraph{Late Penalties}
 If an earlier submission was late, the same late penalty will be applied to your improved grade.
-(e.g. If your stage 1 submission was 3 hours late, and in stage 2 your submission's functionality improved from a grade of 4 to a grade of 6,
+(e.g. If your stage 1 submission was 3 hours late,
+and in stage 2 your submission's functionality improved from a grade of 4 to a grade of 6,
 your grade for stage 1 would be increased to a 5 after the one grade point per 24 hours penalty was applied.)
 
+
 \section{Academic Integrity}
-As this is a higher-level course, you are expected to be familiar with the importance of academic integrity in general, and the details of UQ's rules.
-If you need a reminder, review the \link{Academic Integrity Modules} {https://web.library.uq.edu.au/library-services/it/learnuq-blackboard-help/academic-integrity-modules}.
+As this is a higher-level course, you are expected to be familiar with the importance of academic integrity in general,
+and the details of UQ's rules.
+If you need a reminder, review the \link{Academic Integrity Modules}
+{https://web.library.uq.edu.au/library-services/it/learnuq-blackboard-help/academic-integrity-modules}.
 Submissions will be checked to ensure that the work submitted is not plagiarised or of no academic merit.
 
-This is an \textit{individual} assignment. You may \textbf{not} discuss details of approaches to solve the problem with other students in the course.
-The Grade Improvement rule (section \ref{sec:improve}) means that you may \textbf{not} discuss details of any earlier submission stage with other students
+This is an \textit{individual} assignment.
+You may \textbf{not} discuss details of approaches to solve the problem with other students in the course.
+The Grade Improvement rule (section \ref{sec:improve}) means that
+you may \textbf{not} discuss details of any earlier submission stage with other students
 until \textbf{two weeks} \textit{after} the final submission date of May 3$^{rd}$ (i.e. \textbf{May 20$^{th}$}).
 
-All code that you submit \textbf{must} be your own work. You may \textbf{not} directly copy code that you have found on-line to solve parts of the assignment. If you find ideas from on-line sources (e.g. Stack Overflow), you must \link{cite and reference}{https://web.library.uq.edu.au/node/4221/2} these sources. Use the \link{IEEE referencing style}{https://libraryguides.vu.edu.au/ieeereferencing/gettingstarted} for citations and references. Citations should be included in a comment at the location where the idea is used in your code. All references for citations \textbf{must} be included in a file called \texttt{refs.txt}. This file must be in the top-level of your repository.
+All code that you submit \textbf{must} be your own work.
+You may \textbf{not} directly copy code that you have found on-line to solve parts of the assignment.
+If you find ideas from on-line sources (e.g. Stack Overflow),
+you must \link{cite and reference}{https://web.library.uq.edu.au/node/4221/2} these sources.
+Use the \link{IEEE referencing style}{https://libraryguides.vu.edu.au/ieeereferencing/gettingstarted}
+for citations and references.
+Citations should be included in a comment at the location where the idea is used in your code.
+All references for citations \textbf{must} be included in a file called \texttt{refs.txt}.
+This file must be in the root directory of your repository.
 
-You may use generative AI tools (e.g. Copilot) to assist you in writing code to implement your solutions. You may also use generative AI tools to help you test your implementations. You \textbf{must} include, in the top-level of your repository, a file called \texttt{AI.md} that indicates the generative AI tools that you used, how you used them, and the extent of their use. (e.g. All code was written by providing copilot with class descriptions and then revising the generated code.)
+You may use generative AI tools (e.g. Copilot) to assist you in writing code to implement your solutions.
+You may also use generative AI tools to help you test your implementations.
+You \textbf{must} include, in the root directory of your repository,
+a file called \texttt{AI.md} that indicates the generative AI tools that you used,
+how you used them, and the extent of their use.
+(e.g. All code was written by providing copilot with class descriptions and then revising the generated code.)
 
-Uncited or unreferenced material, or unacknowledged use of generative AI tools, will be treated as not being your own work. Significant amounts of cited or acknowledged work from other sources will be considered to be of no academic merit.
+Uncited or unreferenced material, or unacknowledged use of generative AI tools,
+will be treated as not being your own work.
+Significant amounts of cited or acknowledged work from other sources
+will be considered to be of no academic merit.
+
 
 \bibliographystyle{ieeetr}
 \bibliography{ours}
+
 
 \input{criteria}
 
