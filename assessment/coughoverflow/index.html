@@ -946,8 +946,59 @@ ul.nav-tabs {
     "updated_at" : {
       "type" : "string",
       "description" : "The date and time the analysis job was last updated, including creation and completion of analysis.",
+      "format" : "date-time"
+    }
+  }
+};
+    defs["Summary"] = {
+  "type" : "object",
+  "properties" : {
+    "lab_id" : {
+      "type" : "string",
+      "description" : "The lab identifier of the lab who's data is being summarised.",
+      "example" : "QML40671"
+    },
+    "pending" : {
+      "minimum" : 0,
+      "type" : "integer",
+      "description" : "The number of analysis jobs that are currently still pending.",
+      "example" : 5
+    },
+    "covid" : {
+      "minimum" : 0,
+      "type" : "integer",
+      "description" : "The number of COVID-19 cases that have been identified.",
+      "example" : 150
+    },
+    "h5n1" : {
+      "minimum" : 0,
+      "type" : "integer",
+      "description" : "The number of H5N1 cases that have been identified.",
+      "example" : 65
+    },
+    "healthy" : {
+      "minimum" : 0,
+      "type" : "integer",
+      "description" : "The number of tests that reported that the patient was healthy.",
+      "example" : 355
+    },
+    "failed" : {
+      "minimum" : 0,
+      "type" : "integer",
+      "description" : "The number of analysis jobs that failed.",
+      "example" : 15
+    },
+    "urgent" : {
+      "minimum" : 0,
+      "type" : "integer",
+      "description" : "The number of analysis jobs that were flagged as being urgent.",
+      "example" : 50
+    },
+    "generated_at" : {
+      "type" : "string",
+      "description" : "The date and time that this summary was created.",
       "format" : "date-time",
-      "example" : "2025-02-12T13:10:35Z"
+      "example" : "2025-03-20T17:10:00Z"
     }
   }
 };
@@ -975,6 +1026,9 @@ ul.nav-tabs {
                     </li>
                     <li data-group="Pas" data-name="getLabResults" class="">
                       <a href="#api-Pas-getLabResults"><span style="float:right;text-transform:uppercase">get</span>/labs/results/{lab_id}</a>
+                    </li>
+                    <li data-group="Pas" data-name="getLabResultsSummary" class="">
+                      <a href="#api-Pas-getLabResultsSummary"><span style="float:right;text-transform:uppercase">get</span>/labs/results/{lab_id}/summary</a>
                     </li>
                     <li data-group="Pas" data-name="getLabs" class="">
                       <a href="#api-Pas-getLabs"><span style="float:right;text-transform:uppercase">get</span>/labs</a>
@@ -1696,6 +1750,378 @@ Return value is not specified but should describe the error.
                                     </script>
                                   </div>
                                   <input id='responses-Pas-getLabResults-500-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+                            
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Pas-getLabResultsSummary">
+                      <article id="api-Pas-getLabResultsSummary-0" data-group="User" data-name="getLabResultsSummary" data-version="0">
+                        <div class="pull-left">
+                          <!-- <h1>getLabResultsSummary</h1> -->
+                          <h1><pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/labs/results/{lab_id}/summary</span></code></pre></h1>
+                          <p>Summary of analysis jobs associated with this lab.</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked">Returns how many analysis jobs are associated with this lab.
+This includes analysis jobs updated to be associated with this lab.
+
+Data is broken down by each status type.
+</p>
+                        <p></p>
+                        <br />
+
+                        <h3>Curl Request Example</h3>
+                        <pre class="prettyprint"><code class="language-bsh">curl -X GET \
+ -H "Accept: application/json" \
+ "http://analysis.coughoverflow.com/api/v1/labs/results/{lab_id}/summary?start=2025-03-12T08:00Z&end=2025-03-15T18:00Z"
+</code></pre>
+
+                          <h2 class="methodsubtabletitle">Path parameters</h2>
+                          <table id="methodsubtable">
+                              <tr>
+                                <th width="150px">Name</th>
+                                <th>Description</th>
+                              </tr>
+                                <tr><td style="width:150px;">lab_id*</td>
+<td>
+
+
+    <div id="d2e199_getLabResultsSummary_labId">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    String
+                </span>
+
+                    <div class="inner description marked">
+The lab identifier is one from the definitive list of labs (https://csse6400.uqcloud.net/resources/labs.csv).
+                    </div>
+            </div>
+                <div class="inner required">
+                    Required
+                </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                          </table>
+
+
+
+
+                            <h2 class="methodsubtabletitle">Query parameters</h2>
+                            <table id="methodsubtable">
+                              <tr>
+                                <th width="150px">Name</th>
+                                <th>Description</th>
+                              </tr>
+                                <tr><td style="width:150px;">start</td>
+<td>
+
+
+    <div id="d2e199_getLabResultsSummary_start">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    Date
+                </span>
+                    <span class="format">
+                        (date-time)
+                    </span>
+
+                    <div class="inner description marked">
+Only return the number of analysis jobs submitted from this date.
+The date should be in RFC3339 format.
+
+If the start date is not provided, the report should start from the earliest accepted analysis job.
+
+                    </div>
+            </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                                <tr><td style="width:150px;">end</td>
+<td>
+
+
+    <div id="d2e199_getLabResultsSummary_end">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    Date
+                </span>
+                    <span class="format">
+                        (date-time)
+                    </span>
+
+                    <div class="inner description marked">
+Only return the number of analysis jobs submitted before this date.
+The date should be in RFC3339 format.
+
+If the end date is not provided, the report should finish with the most recently accepted analysis job.
+
+                    </div>
+            </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                            </table>
+
+                          <h2>Responses</h2>
+                            <h3 id="examples-Pas-getLabResultsSummary-title-200"></h3>
+                            <p id="examples-Pas-getLabResultsSummary-description-200" class="marked"></p>
+                            <script>
+                              var responsePas200_description = `Breakdown of the number of analysis jobs submitted.`;
+                              var responsePas200_description_break = responsePas200_description.indexOf('\n');
+                              if (responsePas200_description_break == -1) {
+                                $("#examples-Pas-getLabResultsSummary-title-200").text("Status Code: 200 - " + responsePas200_description);
+                              } else {
+                                $("#examples-Pas-getLabResultsSummary-title-200").text("Status Code: 200 - " + responsePas200_description.substring(0, responsePas200_description_break));
+                                $("#examples-Pas-getLabResultsSummary-description-200").html(responsePas200_description.substring(responsePas200_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Pas-getLabResultsSummary-200" class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-Pas-getLabResultsSummary-200-schema">Schema</a>
+                                </li>
+
+
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Pas-getLabResultsSummary-200-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Pas-getLabResultsSummary-200-schema">
+                                  <div id="responses-Pas-getLabResultsSummary-schema-200" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Breakdown of the number of analysis jobs submitted.",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/Summary"
+      }
+    }
+  }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Pas-getLabResultsSummary-200-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Pas-getLabResultsSummary-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Pas-getLabResultsSummary-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                                <div class="tab-pane" id="examples-Pas-getLabResultsSummary-200-example">
+                                  <pre class="prettyprint"><code class="json"></code></pre>
+                                </div>
+                            </div>
+                            
+                            <h3 id="examples-Pas-getLabResultsSummary-title-400"></h3>
+                            <p id="examples-Pas-getLabResultsSummary-description-400" class="marked"></p>
+                            <script>
+                              var responsePas400_description = `Invalid query parameters.
+
+Return value is not specified but should describe the error
+(e.g. "13 is not a valid month").
+`;
+                              var responsePas400_description_break = responsePas400_description.indexOf('\n');
+                              if (responsePas400_description_break == -1) {
+                                $("#examples-Pas-getLabResultsSummary-title-400").text("Status Code: 400 - " + responsePas400_description);
+                              } else {
+                                $("#examples-Pas-getLabResultsSummary-title-400").text("Status Code: 400 - " + responsePas400_description.substring(0, responsePas400_description_break));
+                                $("#examples-Pas-getLabResultsSummary-description-400").html(responsePas400_description.substring(responsePas400_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Pas-getLabResultsSummary-400" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Pas-getLabResultsSummary-400-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Pas-getLabResultsSummary-400-schema">
+                                  <div id="responses-Pas-getLabResultsSummary-schema-400" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Invalid query parameters.\n\nReturn value is not specified but should describe the error\n(e.g. \"13 is not a valid month\").\n",
+  "content" : { }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Pas-getLabResultsSummary-400-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Pas-getLabResultsSummary-schema-400');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Pas-getLabResultsSummary-400-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+                            
+                            <h3 id="examples-Pas-getLabResultsSummary-title-404"></h3>
+                            <p id="examples-Pas-getLabResultsSummary-description-404" class="marked"></p>
+                            <script>
+                              var responsePas404_description = `Lab identifier does not correspond to a known lab.
+
+Return value is not specified but should not leak any internal system data structure information.
+`;
+                              var responsePas404_description_break = responsePas404_description.indexOf('\n');
+                              if (responsePas404_description_break == -1) {
+                                $("#examples-Pas-getLabResultsSummary-title-404").text("Status Code: 404 - " + responsePas404_description);
+                              } else {
+                                $("#examples-Pas-getLabResultsSummary-title-404").text("Status Code: 404 - " + responsePas404_description.substring(0, responsePas404_description_break));
+                                $("#examples-Pas-getLabResultsSummary-description-404").html(responsePas404_description.substring(responsePas404_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Pas-getLabResultsSummary-404" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Pas-getLabResultsSummary-404-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Pas-getLabResultsSummary-404-schema">
+                                  <div id="responses-Pas-getLabResultsSummary-schema-404" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Lab identifier does not correspond to a known lab.\n\nReturn value is not specified but should not leak any internal system data structure information.\n",
+  "content" : { }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Pas-getLabResultsSummary-404-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Pas-getLabResultsSummary-schema-404');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Pas-getLabResultsSummary-404-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+                            
+                            <h3 id="examples-Pas-getLabResultsSummary-title-500"></h3>
+                            <p id="examples-Pas-getLabResultsSummary-description-500" class="marked"></p>
+                            <script>
+                              var responsePas500_description = `An unknown error occurred trying to process the request.
+
+Return value is not specified but should describe the error.
+`;
+                              var responsePas500_description_break = responsePas500_description.indexOf('\n');
+                              if (responsePas500_description_break == -1) {
+                                $("#examples-Pas-getLabResultsSummary-title-500").text("Status Code: 500 - " + responsePas500_description);
+                              } else {
+                                $("#examples-Pas-getLabResultsSummary-title-500").text("Status Code: 500 - " + responsePas500_description.substring(0, responsePas500_description_break));
+                                $("#examples-Pas-getLabResultsSummary-description-500").html(responsePas500_description.substring(responsePas500_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Pas-getLabResultsSummary-500" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Pas-getLabResultsSummary-500-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Pas-getLabResultsSummary-500-schema">
+                                  <div id="responses-Pas-getLabResultsSummary-schema-500" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "An unknown error occurred trying to process the request.\n\nReturn value is not specified but should describe the error.\n",
+  "content" : { }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Pas-getLabResultsSummary-500-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Pas-getLabResultsSummary-schema-500');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Pas-getLabResultsSummary-500-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
                             
