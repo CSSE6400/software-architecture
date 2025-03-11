@@ -350,6 +350,77 @@ paths:
           content: {}
       x-codegen-request-body-name: body
 
+  /labs/results/{lab_id}/summary:
+    get:
+      operationId: getLabResultsSummary
+      tags:
+      - pas
+      summary: Summary of analysis jobs associated with this lab.
+      description: |
+        Returns how many analysis jobs are associated with this lab.
+        This includes analysis jobs updated to be associated with this lab.
+
+        Data is broken down by each status type.
+      parameters:
+      - name: lab_id
+        in: path
+        description: The lab identifier is one from the definitive list of labs (https://csse6400.uqcloud.net/resources/labs.csv).
+        required: true
+        schema:
+          type: string
+          example: "QML40671"
+      - name: start
+        in: query
+        description: |
+          Only return the number of analysis jobs submitted from this date.
+          The date should be in RFC3339 format.
+
+          If the start date is not provided, the report should start from the earliest accepted analysis job.
+        required: false
+        schema:
+          type: string
+          format: date-time
+          example: 2025-03-12T08:00:00Z
+      - name: end
+        in: query
+        description: |
+          Only return the number of analysis jobs submitted before this date.
+          The date should be in RFC3339 format.
+
+          If the end date is not provided, the report should finish with the most recently accepted analysis job.
+        required: false
+        schema:
+          type: string
+          format: date-time
+          example: 2025-03-15T18:00:00Z
+      responses:
+        200:
+          description: Breakdown of the number of analysis jobs submitted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Summary'
+        400:
+          description: |
+            Invalid query parameters.
+
+            Return value is not specified but should describe the error
+            (e.g. "13 is not a valid month").
+          content: {}
+        404:
+          description: |
+            Lab identifier does not correspond to a known lab.
+
+            Return value is not specified but should not leak any internal system data structure information.
+          content: {}
+        500:
+          description: |
+            An unknown error occurred trying to process the request.
+
+            Return value is not specified but should describe the error.
+          content: {}
+      x-codegen-request-body-name: body
+
   /patients/results:
     get:
       operationId: getPatientResults
@@ -533,7 +604,49 @@ components:
           type: string
           format: date-time
           description: The date and time the analysis job was last updated, including creation and completion of analysis.
-          example: 2025-02-12T13:10:35Z
+
+    Summary:
+      type: object
+      properties:
+        lab_id:
+          type: string
+          description: The lab identifier of the lab who's data is being summarised.
+          example: "QML40671"
+        pending:
+          type: integer
+          description: The number of analysis jobs that are currently still pending.
+          minimum: 0
+          example: 5
+        covid:
+          type: integer
+          description: The number of COVID-19 cases that have been identified.
+          minimum: 0
+          example: 150
+        h5n1:
+          type: integer
+          description: The number of H5N1 cases that have been identified.
+          minimum: 0
+          example: 65
+        healthy:
+          type: integer
+          description: The number of tests that reported that the patient was healthy.
+          minimum: 0
+          example: 355
+        failed:
+          type: integer
+          description: The number of analysis jobs that failed.
+          minimum: 0
+          example: 15
+        urgent:
+          type: integer
+          description: The number of analysis jobs that were flagged as being urgent.
+          minimum: 0
+          example: 50
+        generated_at:
+          type: string
+          format: date-time
+          description: The date and time that this summary was created.
+          example: 2025-03-20T17:10:00Z
 
     Error:
       type: object
