@@ -7,7 +7,7 @@
 \usepackage{languages}
 
 \title{Events \& Worker Queues}
-\author{Evan Hughes \& Brae Webb}
+\author{Evan Hughes, Brae Webb \& Richard Thomas}
 
 \date{\week[practical]{7}}
 \begin{document}
@@ -20,7 +20,8 @@
 \end{figure}
 
 \aside{
-  Github Classroom links for this practical can be found on Edstem \url{https://edstem.org/au/courses/15375/discussion/1753712}
+  Github Classroom links for this practical can be found on Edstem
+  \url{https://edstem.org/au/courses/21491/discussion/2429006}
 }
 
 \section{This Week}
@@ -274,13 +275,14 @@ Hopefully like our example you can see that some of the messages arrive out of o
 Next add more publishers and subscribers and experiment with the different configurations.
 
 \info{
-  When making multiple publishes you may want to change the client-name cli parameter so you can keep track of when the messages arrived at the subscribers.
+  When making multiple publishers you may want to change the client-name CLI parameter
+  so you can keep track of when the messages arrived at the subscribers.
 }
 
 
 \subsection{SQS FIFO}
 Now we will experiment with the FIFO based service offered by SQS.
-Like before, we will start a subscriber but make sure the name of the queue matches the FIFO queue we created in terraform.
+Like before, we will start a subscriber but make sure the name of the queue matches the FIFO queue we created in Terraform.
 
 \begin{code}[numbers=none,keepspaces=true]{}
 > docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1" --receive
@@ -306,17 +308,18 @@ If we re-run the publisher though we may not see any new messages make it to the
 This is because we have asked AWS to de-dupe messages where it can.
 
 \teacher{
-  Theres a cli param which prepends to the message to allow you to rerun if needed. It is --prepend "abcdef"
+  There is a CLI parameter which prepends to the message to allow you to rerun if needed. It is --prepend "abcdef"
 }
 
 As before try experimenting with different publisher / subscriber configurations to see how they behave.
 
 \info{
-  When making multiple publishes you may want to change the client-name cli parameter so you can keep track of when the messages arrived at the subscribers.
+  When making multiple publishers you may want to change the client-name CLI parameter
+  so you can keep track of when the messages arrived at the subscribers.
 }
 
 \warning{
-  \textbf{Please remember to terraform destroy to delete your resources}
+  \textbf{Please remember to \texttt{terraform destroy} to delete your resources}
 }
 
 
@@ -351,7 +354,7 @@ The worker will pick-up jobs and generate the calendar.
 The webserver can then serve the calendar to the user.
 
 Calendar generation occurs asynchronously with this architecture.
-The user will not have to wait for the calendar view to be generated and the webserver can handle other requests.
+The user will not have to wait for the calendar view to be generated and the web server can handle other requests.
 
 \subsection{API Extension}
 \label{sect:apiext}
@@ -359,7 +362,8 @@ The user will not have to wait for the calendar view to be generated and the web
 We will extend our existing API with the following endpoints.
 
 \begin{description}
-    \item[POST /todos/ical] Create an asynchronous calendar generation job.\footnote{Ideally a POST procedural endpoint should use a verb like \texttt{/generate}.}
+    \item[POST /todos/ical] Create an asynchronous calendar generation job.%
+         \footnote{Ideally a POST procedural endpoint should use a verb like \texttt{/generate}.}
     \item[GET /todos/ical/\{task\_id\}/status] Check the status of the generation job.
     \item[GET /todos/ical/\{task\_id\}/result] Download the generated iCal file when it is ready.
 \end{description}
@@ -427,7 +431,7 @@ we can use this to make the local development easier.
       - "6379:6379"
 \end{code}
 
-Now we have a queue,
+Now that we have a queue,
 we will create the worker that accepts jobs from the queue.
 We will create this worker in \texttt{todo/tasks/ical.py}.
 
@@ -446,6 +450,7 @@ def create_ical(tasks):
     return "Hello World"
 \end{code}
 
+\noindent
 Note that we are getting a URL from the environment variables:
 \texttt{CELERY\_BROKER\_URL} and \texttt{CELERY\_RESULT\_BACKEND}.
 We need to remember to set these variables in whichever environment the service is run in.
@@ -641,7 +646,7 @@ resource "aws_sqs_queue" "ical_queue" {
 \end{code}
 
 \info{
-    Celery will automatically create a queue if it doesn't exist,
+    Celery will automatically create a queue if it does not exist,
     however, we want to manage it with Terraform so it is easier to destroy.
 }
 
