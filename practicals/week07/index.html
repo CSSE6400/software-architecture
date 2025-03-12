@@ -1,4 +1,4 @@
-Last Updated on 2024/04/07
+Last Updated on 2025/03/12
                                                                                                     
 
 <?xml version="1.0" encoding="iso-8859-1" ?> 
@@ -24,9 +24,9 @@ dl dd {text-align: left}</style>
  id="Q1-1-1"></a>
 _________________________________________________________________________________________________
 <h2 class="titleHead">Events &amp; Worker Queues</h2>                                                             Software Architecture
-   <div class="date" >April 8, 2025</div>                                                                                                                              <div class="author" >Evan Hughes &amp; Brae
-Webb</div>
-______________________________________________________________________________________________
+   <div class="date" >April 8, 2025</div>                                                                                                  <div class="author" >Evan Hughes, Brae Webb &amp; Richard
+Thomas</div>
+____________________________________________________________________________________________
    </div>
    <hr class="figure" /><div class="figure" 
 >
@@ -43,30 +43,30 @@ width="420" height="420"  />
    </div><hr class="endfigure" />
    <div class="tcolorbox tcolorbox" id="tcolobox-1">     
 <div class="tcolorbox-title">
-<!--l. 24--><p class="indent" >   Aside</p></div> 
-<div class="tcolorbox-content"><!--l. 24--><p class="noindent" >Github       Classroom       links       for       this       practical       can       be       found       on       Edstem       
+<!--l. 25--><p class="indent" >   Aside</p></div> 
+<div class="tcolorbox-content"><!--l. 25--><p class="noindent" >Github       Classroom       links       for       this       practical       can       be       found       on       Edstem       
 <a 
-href="https://edstem.org/au/courses/15375/discussion/1753712" class="url" ><span 
-class="ectt-1200">https://edstem.org/au/courses/15375/discussion/1753712</span></a> </p> 
+href="https://edstem.org/au/courses/21491/discussion/2429006" class="url" ><span 
+class="ectt-1200">https://edstem.org/au/courses/21491/discussion/2429006</span></a> </p> 
 </div> 
 </div>
    
    <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
  id="x1-10001"></a>This Week</h3>
-<!--l. 27--><p class="noindent" >Our goal is to: </p>
+<!--l. 28--><p class="noindent" >Our goal is to: </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 29--><p class="noindent" >Explore events and worker queues in the context of AWS.
+      <!--l. 30--><p class="noindent" >Explore events and worker queues in the context of AWS.
       </p></li>
       <li class="itemize">
-      <!--l. 30--><p class="noindent" >Deploy our own TaskOverflow container on AWS Elastic Container Registry (ECS).
+      <!--l. 31--><p class="noindent" >Deploy our own TaskOverflow container on AWS Elastic Container Registry (ECS).
       </p></li>
       <li class="itemize">
-      <!--l. 31--><p class="noindent" >Develop an event-based architecture to generate a calendar from tasks in TaskOverflow.</p></li></ul>
+      <!--l. 32--><p class="noindent" >Develop an event-based architecture to generate a calendar from tasks in TaskOverflow.</p></li></ul>
    
    <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
  id="x1-20002"></a>Event Processing</h3>
-<!--l. 36--><p class="noindent" >As we saw in Event-Driven Architectures <span class="cite">[<a 
+<!--l. 37--><p class="noindent" >As we saw in Event-Driven Architectures <span class="cite">[<a 
 href="#Xevents-notes">1</a>]</span>, event processing enable us to build highly scalable and extensible
 systems. In this practical we will get our hands dirty with event processing using AWS SQS. AWS SQS is a service
 which acts as an event broker.
@@ -74,19 +74,19 @@ which acts as an event broker.
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.1    </span> <a 
  id="x1-30002.1"></a>Technologies</h4>
-<!--l. 43--><p class="noindent" >There are other technologies that can be useful in developing an event-based architecture. The following is a
+<!--l. 44--><p class="noindent" >There are other technologies that can be useful in developing an event-based architecture. The following is a
 non-exhaustive list of services native to AWS.
    
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">2.1.1    </span> <a 
  id="x1-40002.1.1"></a>AWS SQS</h5>
-<!--l. 48--><p class="noindent" >AWS provides the Simple Queue Service, SQS, which offers a simple and fully managed message queue service.
+<!--l. 49--><p class="noindent" >AWS provides the Simple Queue Service, SQS, which offers a simple and fully managed message queue service.
 There are two flavours of SQS to be aware of.
       </p><dl class="description"><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Standard message queues</span> </dt><dd 
 class="description">
-      <!--l. 52--><p class="noindent" >allow for greater scalability by providing higher through-put. However, standard message queues in
+      <!--l. 53--><p class="noindent" >allow for greater scalability by providing higher through-put. However, standard message queues in
       SQS are not exactly queues, messages are not first in first out, they are best-effort ordered.
                                                                                                     
                                                                                                     
@@ -94,46 +94,46 @@ class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">FIFO message queues</span> </dt><dd 
 class="description">
-      <!--l. 56--><p class="noindent" >guarantees that messages are First in First Out.</p></dd></dl>
+      <!--l. 57--><p class="noindent" >guarantees that messages are First in First Out.</p></dd></dl>
    
    <h5 class="subsubsectionHead"><span class="titlemark">2.1.2    </span> <a 
  id="x1-50002.1.2"></a>AWS SNS</h5>
-<!--l. 60--><p class="noindent" >
+<!--l. 61--><p class="noindent" >
       Amazon Simple Notification Service (Amazon SNS) is a fully managed messaging service for
       both application-to-application (A2A) and application-to-person (A2P) communication.
-      </p><!--l. 63--><p class="noindent" >The                  A2A                  pub/sub                  functionality                  provides                  topics
+      </p><!--l. 64--><p class="noindent" >The                  A2A                  pub/sub                  functionality                  provides                  topics
       for  high-throughput,  push-based,  many-to-many  messaging  between  distributed  systems,
       microservices,  and  event-driven  serverless  applications.  Using  Amazon  SNS  topics,  your
       publisher systems can fanout messages to a large number of subscriber systems, including
       Amazon SQS queues, AWS Lambda functions, HTTPS endpoints, and Amazon Kinesis Data
       Firehose, for parallel processing. The A2P functionality enables you to send messages to users
       at scale via SMS, mobile push, and email.
-                                                                                             </p><!--l. 73--><p class="noindent" >&#8211;
+                                                                                             </p><!--l. 74--><p class="noindent" >&#8211;
                                                                                           AWS
    
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">2.1.3    </span> <a 
  id="x1-60002.1.3"></a>AWS MQ / Apache ActiveMQ / RabbitMQ</h5>
-<!--l. 77--><p class="noindent" >
+<!--l. 78--><p class="noindent" >
       Amazon  MQ  is  a  managed  message  broker  service  for  Apache  ActiveMQ  and  RabbitMQ
       that  makes  it  easy  to  set  up  and  operate  message  brokers  on  AWS.  Amazon  MQ  reduces
       your  operational  responsibilities  by  managing  the  provisioning,  setup,  and  maintenance  of
       message  brokers  for  you.  Because  Amazon  MQ  connects  to  your  current  applications  with
       industry-standard APIs and protocols, you can easily migrate to AWS without having to rewrite
       code.
-                                                                                             </p><!--l. 83--><p class="noindent" >&#8211;
+                                                                                             </p><!--l. 84--><p class="noindent" >&#8211;
                                                                                           AWS
 </p>
    <div class="tcolorbox tcolorbox" id="tcolobox-2">     
 <div class="tcolorbox-title">
-<!--l. 86--><p class="indent" >   Aside</p></div> 
-<div class="tcolorbox-content"><!--l. 86--><p class="noindent" >Not available in the lab environments. </p> 
+<!--l. 87--><p class="indent" >   Aside</p></div> 
+<div class="tcolorbox-content"><!--l. 87--><p class="noindent" >Not available in the lab environments. </p> 
 </div> 
 </div>
    
    <h5 class="subsubsectionHead"><span class="titlemark">2.1.4    </span> <a 
  id="x1-70002.1.4"></a>AWS MSK ( Managed Streaming for Apache Kafka )</h5>
-<!--l. 89--><p class="noindent" >
+<!--l. 90--><p class="noindent" >
                                                                                                     
                                                                                                     
       Amazon  Managed  Streaming  for  Apache  Kafka  (Amazon  MSK)  is  a  fully  managed  service
@@ -145,41 +145,41 @@ class="description">
       are supported without requiring changes to application code. You can use Amazon MSK to
       create clusters that use any of the Apache Kafka versions listed under Supported Apache Kafka
       versions.
-                                                                                             </p><!--l. 98--><p class="noindent" >&#8211;
+                                                                                             </p><!--l. 99--><p class="noindent" >&#8211;
                                                                                           AWS
 </p>
    <div class="tcolorbox tcolorbox" id="tcolobox-3">     
 <div class="tcolorbox-title">
-<!--l. 101--><p class="indent" >   Aside</p></div> 
-<div class="tcolorbox-content"><!--l. 101--><p class="noindent" >Not available in the lab environments. </p> 
+<!--l. 102--><p class="indent" >   Aside</p></div> 
+<div class="tcolorbox-content"><!--l. 102--><p class="noindent" >Not available in the lab environments. </p> 
 </div> 
 </div>
    
    <h5 class="subsubsectionHead"><span class="titlemark">2.1.5    </span> <a 
  id="x1-80002.1.5"></a>Redis</h5>
-<!--l. 104--><p class="noindent" >
+<!--l. 105--><p class="noindent" >
       Redis, which stands for Remote Dictionary Server, is a fast, open source, in-memory, key-value
       data  store.  The  project  started  when  Salvatore  Sanfilippo,  the  original  developer  of  Redis,
       wanted to improve the scalability of his Italian startup. From there, he developed Redis, which
       is now used as a database, cache, message broker, and queue.
-      </p><!--l. 113--><p class="noindent" >Redis delivers sub-millisecond response times, enabling millions of requests per second for
+      </p><!--l. 114--><p class="noindent" >Redis delivers sub-millisecond response times, enabling millions of requests per second for
       real-time applications in industries like gaming, ad-tech, financial services, healthcare, and IoT.
       Today, Redis is one of the most popular open source engines today, named the &#8220;Most Loved&#8221;
       database by Stack Overflow for five consecutive years. Because of its fast performance, Redis is
       a popular choice for caching, session management, gaming, leaderboards, real-time analytics,
       geospatial, ride-hailing, chat/messaging, media streaming, and pub/sub apps.
-      </p><!--l. 120--><p class="noindent" >AWS  offers  two  fully  managed  services  to  run  Redis.  Amazon  MemoryDB  for  Redis  is  a
+      </p><!--l. 121--><p class="noindent" >AWS  offers  two  fully  managed  services  to  run  Redis.  Amazon  MemoryDB  for  Redis  is  a
       Redis-compatible, durable, in-memory database service that delivers ultra-fast performance.
       Amazon ElastiCache for Redis is a fully managed caching service that accelerates data access
       from primary databases and data stores with microsecond latency. Furthermore, ElastiCache
       also offers support for Memcached, another popular open source caching engine.
-                                                                                             </p><!--l. 125--><p class="noindent" >&#8211;
+                                                                                             </p><!--l. 126--><p class="noindent" >&#8211;
                                                                                           AWS
 </p>
    <div class="tcolorbox tcolorbox" id="tcolobox-4">     
 <div class="tcolorbox-title">
-<!--l. 128--><p class="indent" >   Aside</p></div> 
-<div class="tcolorbox-content"><!--l. 128--><p class="noindent" >Not available in the lab environments. </p> 
+<!--l. 129--><p class="indent" >   Aside</p></div> 
+<div class="tcolorbox-content"><!--l. 129--><p class="noindent" >Not available in the lab environments. </p> 
 </div> 
 </div>
    
@@ -189,19 +189,19 @@ class="description">
 <div class="tcolorbox-title">
                                                                                                     
                                                                                                     
-<!--l. 135--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 135--><p class="noindent" >This section is intended to be demonstrated by your practical tutor. You may work through it on your
+<!--l. 136--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 136--><p class="noindent" >This section is intended to be demonstrated by your practical tutor. You may work through it on your
 own if you wish.  </p> 
 </div> 
 </div>
-<!--l. 137--><p class="noindent" >We will demonstrate working with the two queue flavours of AWS SQS. A standard queue, named
+<!--l. 138--><p class="noindent" >We will demonstrate working with the two queue flavours of AWS SQS. A standard queue, named
 <span 
 class="ectt-1200">csse6400_prac </span>and a FIFO queue, named <span 
 class="ectt-1200">csse6400_prac.fifo</span>. The Terraform code below can be used to
 create these two queues.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 146--><pre class="listings" id="listing-1"><span class="label"><a 
+<!--l. 147--><pre class="listings" id="listing-1"><span class="label"><a 
  id="x1-9001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">terraform</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
@@ -396,7 +396,7 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-9032r32"></a></span></pre>
    </div>
-<!--l. 180--><p class="indent" >   Now that we have provisioned the queues we can have a look at them in the AWS Console. In the
+<!--l. 181--><p class="indent" >   Now that we have provisioned the queues we can have a look at them in the AWS Console. In the
 main AWS dashboard you can search for &#8220;SQS&#8221; to find these queues. You should reach a page like
 this:
 </p>
@@ -406,28 +406,28 @@ this:
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 185--><p class="noindent" ><img 
+<!--l. 186--><p class="noindent" ><img 
 src="images/sqspanel.png" alt="PIC"  
 width="525" height="525"  />
                                                                                                     
                                                                                                     
 </p>
    </div><hr class="endfigure" />
-<!--l. 188--><p class="indent" >   Like the EC2 and RDS dashboards, we can browse the queue configurations and metrics.
+<!--l. 189--><p class="indent" >   Like the EC2 and RDS dashboards, we can browse the queue configurations and metrics.
    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.1    </span> <a 
  id="x1-100003.1"></a>Queue Command-line Interface</h4>
-<!--l. 203--><p class="noindent" >We have provided a small docker container to demonstrate the differnce between the implementations. First we
+<!--l. 204--><p class="noindent" >We have provided a small docker container to demonstrate the differnce between the implementations. First we
 must retrieve our AWS credentials and setup our environment.
-</p><!--l. 206--><p class="indent" >   Grab the AWS credentials from the Learner Lab but instead of creating a credentials file we will be using
+</p><!--l. 207--><p class="indent" >   Grab the AWS credentials from the Learner Lab but instead of creating a credentials file we will be using
 environment variables.
-</p><!--l. 208--><p class="indent" >   Now we need to create an environment file for our docker container to read so that it can access AWS. Create a
+</p><!--l. 209--><p class="indent" >   Now we need to create an environment file for our docker container to read so that it can access AWS. Create a
 &#8220;.env&#8221; file in the current directory and edit the contents so that it looks similar to the below: The AWS keys will be
 from the credentials shown in your lab environment.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 210--><pre class="listings" id="listing-2"><span class="label"><a 
+<!--l. 211--><pre class="listings" id="listing-2"><span class="label"><a 
  id="x1-10001r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">TERM</span></span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"><span 
@@ -451,7 +451,7 @@ class="ectt-1200">=...</span></span>
  id="x1-10005r5"></a></span></pre>
    </div>
    <div class="framedenv" id="code-1">
-<!--l. 217--><pre class="listings" id="listing-3"><span class="label"><a 
+<!--l. 218--><pre class="listings" id="listing-3"><span class="label"><a 
  id="x1-10006r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -597,20 +597,20 @@ class="ectt-1200">test</span></span>
    
    <h4 class="subsectionHead"><span class="titlemark">3.2    </span> <a 
  id="x1-110003.2"></a>SQS Standard</h4>
-<!--l. 239--><p class="noindent" >The &#8220;standard&#8221; offering of SQS does not guarantee order or &#8220;only once delivery&#8221;. We will create a message
+<!--l. 240--><p class="noindent" >The &#8220;standard&#8221; offering of SQS does not guarantee order or &#8220;only once delivery&#8221;. We will create a message
 publisher and a message subscriber.
 </p>
    <div class="tcolorbox tcolorbox" id="tcolobox-6">     
 <div class="tcolorbox-title">
-<!--l. 244--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 244--><p class="noindent" >For the rest of this practical you will require multiple terminals. Make sure these are all in the same
+<!--l. 245--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 245--><p class="noindent" >For the rest of this practical you will require multiple terminals. Make sure these are all in the same
 folder so we can reuse the .enf file.  </p> 
 </div> 
 </div>
-<!--l. 246--><p class="indent" >   To create the subscriber run the following command:
+<!--l. 247--><p class="indent" >   To create the subscriber run the following command:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 248--><pre class="listings" id="listing-4"><span class="label"><a 
+<!--l. 249--><pre class="listings" id="listing-4"><span class="label"><a 
  id="x1-11001r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -658,17 +658,17 @@ class="ectt-1200">receive</span></span>
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 253--><p class="noindent" ><img 
+<!--l. 254--><p class="noindent" ><img 
 src="images/stacksub.png" alt="PIC"  
 width="525" height="525"  />
                                                                                                     
                                                                                                     
 </p>
    </div><hr class="endfigure" />
-<!--l. 256--><p class="indent" >   Now start a publisher in another terminal.
+<!--l. 257--><p class="indent" >   Now start a publisher in another terminal.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 258--><pre class="listings" id="listing-5"><span class="label"><a 
+<!--l. 259--><pre class="listings" id="listing-5"><span class="label"><a 
  id="x1-11003r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -714,14 +714,14 @@ class="ectt-1200">1"</span></span>
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 263--><p class="noindent" ><img 
+<!--l. 264--><p class="noindent" ><img 
 src="images/stackpub.png" alt="PIC"  
 width="525" height="525"  />
                                                                                                     
                                                                                                     
 </p>
    </div><hr class="endfigure" />
-<!--l. 266--><p class="indent" >   When the publisher connects to the queue it is going to put 100 messages of increasing increment into the
+<!--l. 267--><p class="indent" >   When the publisher connects to the queue it is going to put 100 messages of increasing increment into the
 queue. On the subscriber we will be able to see the messages being received, an example is provided
 below:
 </p>
@@ -731,31 +731,31 @@ below:
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 270--><p class="noindent" ><img 
+<!--l. 271--><p class="noindent" ><img 
 src="images/stacksubdata.png" alt="PIC"  
 width="525" height="525"  />
                                                                                                     
                                                                                                     
 </p>
    </div><hr class="endfigure" />
-<!--l. 273--><p class="indent" >   Hopefully like our example you can see that some of the messages arrive out of order. Next add more
+<!--l. 274--><p class="indent" >   Hopefully like our example you can see that some of the messages arrive out of order. Next add more
 publishers and subscribers and experiment with the different configurations.
 </p>
    <div class="tcolorbox tcolorbox" id="tcolobox-7">     
 <div class="tcolorbox-title">
-<!--l. 278--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 278--><p class="noindent" >When making multiple publishes you may want to change the client-name cli parameter so you can
-keep track of when the messages arrived at the subscribers.  </p> 
+<!--l. 280--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 280--><p class="noindent" >When making multiple publishers you may want to change the client-name CLI parameter so you
+can keep track of when the messages arrived at the subscribers.  </p> 
 </div> 
 </div>
    
    <h4 class="subsectionHead"><span class="titlemark">3.3    </span> <a 
  id="x1-120003.3"></a>SQS FIFO</h4>
-<!--l. 282--><p class="noindent" >Now we will experiment with the FIFO based service offered by SQS. Like before, we will start a subscriber but
-make sure the name of the queue matches the FIFO queue we created in terraform.
+<!--l. 284--><p class="noindent" >Now we will experiment with the FIFO based service offered by SQS. Like before, we will start a subscriber but
+make sure the name of the queue matches the FIFO queue we created in Terraform.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 285--><pre class="listings" id="listing-6"><span class="label"><a 
+<!--l. 287--><pre class="listings" id="listing-6"><span class="label"><a 
  id="x1-12001r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -799,10 +799,10 @@ class="ectt-1200">receive</span></span>
 <span class="label"><a 
  id="x1-12002r2"></a></span></pre>
    </div>
-<!--l. 289--><p class="indent" >   Now start a publisher in another terminal.
+<!--l. 291--><p class="indent" >   Now start a publisher in another terminal.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 291--><pre class="listings" id="listing-7"><span class="label"><a 
+<!--l. 293--><pre class="listings" id="listing-7"><span class="label"><a 
  id="x1-12003r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -850,14 +850,14 @@ class="ectt-1200">1"</span></span>
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 296--><p class="noindent" ><img 
+<!--l. 298--><p class="noindent" ><img 
 src="images/fifopub.png" alt="PIC"  
 width="525" height="525"  />
                                                                                                     
                                                                                                     
 </p>
    </div><hr class="endfigure" />
-<!--l. 299--><p class="indent" >   On the subscriber we now see the messages arriving in order which is to be expected.
+<!--l. 301--><p class="indent" >   On the subscriber we now see the messages arriving in order which is to be expected.
 </p>
    <hr class="figure" /><div class="figure" 
 >
@@ -865,60 +865,62 @@ width="525" height="525"  />
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 302--><p class="noindent" ><img 
+<!--l. 304--><p class="noindent" ><img 
 src="images/fifosub.png" alt="PIC"  
 width="525" height="525"  />
                                                                                                     
                                                                                                     
 </p>
    </div><hr class="endfigure" />
-<!--l. 305--><p class="indent" >   If we re-run the publisher though we may not see any new messages make it to the consumer. This is because
+<!--l. 307--><p class="indent" >   If we re-run the publisher though we may not see any new messages make it to the consumer. This is because
 we have asked AWS to de-dupe messages where it can.
-</p><!--l. 312--><p class="indent" >   As before try experimenting with different publisher / subscriber configurations to see how they
+</p><!--l. 314--><p class="indent" >   As before try experimenting with different publisher / subscriber configurations to see how they
 behave.
 </p>
    <div class="tcolorbox tcolorbox" id="tcolobox-8">     
 <div class="tcolorbox-title">
-<!--l. 316--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 316--><p class="noindent" >When making multiple publishes you may want to change the client-name cli parameter so you can
-keep track of when the messages arrived at the subscribers.  </p> 
+<!--l. 319--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 319--><p class="noindent" >When making multiple publishers you may want to change the client-name CLI parameter so you
+can keep track of when the messages arrived at the subscribers.  </p> 
 </div> 
 </div>
    <div class="tcolorbox tcolorbox" id="tcolobox-9">     
 <div class="tcolorbox-title">
-<!--l. 320--><p class="indent" >   Warning</p></div> 
-<div class="tcolorbox-content"><!--l. 320--><p class="noindent" ><span 
-class="Cabin-Bold-tlf-t1-x-x-120">Please remember to terraform destroy to delete your resources</span>  </p> 
+<!--l. 323--><p class="indent" >   Warning</p></div> 
+<div class="tcolorbox-content"><!--l. 323--><p class="noindent" ><span 
+class="Cabin-Bold-tlf-t1-x-x-120">Please remember to </span><span 
+class="ectt-1200">terraform destroy </span><span 
+class="Cabin-Bold-tlf-t1-x-x-120">to delete your resources</span>  </p> 
 </div> 
 </div>
    
    <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
  id="x1-130004"></a>Worker Queues</h3>
-<!--l. 325--><p class="noindent" >One good use case for queues is for distributing work to scale to demand. In this exercise we encourage you
+<!--l. 328--><p class="noindent" >One good use case for queues is for distributing work to scale to demand. In this exercise we encourage you
 to have a look at these widly used libraries to see how you could integrate them into a distributed
 system.
 </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 329--><p class="noindent" >Python:  <a 
+      <!--l. 332--><p class="noindent" >Python:  <a 
 href="https://docs.celeryq.dev/en/stable/" >Celery</a>
       </p></li>
       <li class="itemize">
-      <!--l. 330--><p class="noindent" >Java:  <a 
+      <!--l. 333--><p class="noindent" >Java:  <a 
 href="https://www.rabbitmq.com/tutorials/tutorial-one-java.html" >RabbitMQ</a></p></li></ul>
-<!--l. 333--><p class="indent" >   The two above libraries are integrated into many popular application frameworks. Today we will be using the
+<!--l. 336--><p class="indent" >   The two above libraries are integrated into many popular application frameworks. Today we will be using the
 Python library Celery to create a simple worker queue for TaskOverflow.
    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.1    </span> <a 
  id="x1-140004.1"></a>Celery</h4>
-<!--l. 338--><p class="noindent" >Celery is a Python library which allows you to create a worker queue. It is popular and used in many large scale
+<!--l. 341--><p class="noindent" >Celery is a Python library which allows you to create a worker queue. It is popular and used in many large scale
 applications. It is also relatively easy to use and has comprehensive documentation.
    
 </p>
    <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
  id="x1-150005"></a>Task Calendar</h3>
-<!--l. 345--><p class="noindent" >TaskOverflow will use celery to distribute the work of generating a calendar view of tasks, as this could be a time-intensive
+<!--l. 348--><p class="noindent" >TaskOverflow will use celery to distribute the work of generating a calendar view of tasks, as this could be a time-intensive
 task.<span class="footnote-mark"><a 
 href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
  id="x1-15001f1"></a>
@@ -927,35 +929,35 @@ requests on the Celery queue. The worker will pick-up jobs and generate the cale
 serve the calendar to the user.
                                                                                                     
                                                                                                     
-</p><!--l. 353--><p class="indent" >   Calendar generation occurs asynchronously with this architecture. The user will not have to wait for the
-calendar view to be generated and the webserver can handle other requests.
+</p><!--l. 356--><p class="indent" >   Calendar generation occurs asynchronously with this architecture. The user will not have to wait for the
+calendar view to be generated and the web server can handle other requests.
    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">5.1    </span> <a 
  id="x1-160005.1"></a>API Extension</h4>
-<!--l. 359--><p class="noindent" >We will extend our existing API with the following endpoints.
-</p><!--l. 361--><p class="indent" >
+<!--l. 362--><p class="noindent" >We will extend our existing API with the following endpoints.
+</p><!--l. 364--><p class="indent" >
       </p><dl class="description"><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">POST /todos/ical</span> </dt><dd 
 class="description">
-      <!--l. 362--><p class="noindent" >Create an asynchronous calendar generation job.<span class="footnote-mark"><a 
+      <!--l. 365--><p class="noindent" >Create an asynchronous calendar generation job.<span class="footnote-mark"><a 
 href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
  id="x1-16001f2"></a>
       </p></dd><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">GET /todos/ical/{task_id}/status</span> </dt><dd 
 class="description">
-      <!--l. 363--><p class="noindent" >Check the status of the generation job.
+      <!--l. 367--><p class="noindent" >Check the status of the generation job.
       </p></dd><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">GET /todos/ical/{task_id}/result</span> </dt><dd 
 class="description">
-      <!--l. 364--><p class="noindent" >Download the generated iCal file when it is ready.</p></dd></dl>
-<!--l. 367--><p class="indent" >   An example interaction with the API might look like:
+      <!--l. 368--><p class="noindent" >Download the generated iCal file when it is ready.</p></dd></dl>
+<!--l. 371--><p class="indent" >   An example interaction with the API might look like:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 369--><pre class="listings" id="listing-8"><span class="label"><a 
+<!--l. 373--><pre class="listings" id="listing-8"><span class="label"><a 
  id="x1-16003r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">curl</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1321,10 +1323,10 @@ class="ectt-1200">VCALENDAR</span></span>
 <span class="label"><a 
  id="x1-16031r29"></a></span></pre>
    </div>
-<!--l. 400--><p class="indent" >   We will stub out the implementation of these endpoints.
-</p><!--l. 402--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 402--><p class="indent" >   <span 
-class="ectt-1200">» cat todo/views/routes.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 402--><pre class="listings" id="listing-9"><span class="label"><a 
+<!--l. 404--><p class="indent" >   We will stub out the implementation of these endpoints.
+</p><!--l. 406--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 406--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/views/routes.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 406--><pre class="listings" id="listing-9"><span class="label"><a 
  id="x1-16032r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">@api</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
@@ -1440,13 +1442,13 @@ class="ectt-1200">pass</span></span>
    
    <h4 class="subsectionHead"><span class="titlemark">5.2    </span> <a 
  id="x1-170005.2"></a>Queue and Workers</h4>
-<!--l. 418--><p class="noindent" >Next we will modify our <span 
+<!--l. 422--><p class="noindent" >Next we will modify our <span 
 class="ectt-1200">docker-compose.yml </span>to include a local queuing service called Redis. We will later use
 AWS SQS but as Celery supports multiple queues, we can use this to make the local development
 easier.
-</p><!--l. 422--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 422--><p class="indent" >   <span 
-class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 422--><pre class="listings" id="listing-10"><span class="label"><a 
+</p><!--l. 426--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 426--><p class="indent" >   <span 
+class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 426--><pre class="listings" id="listing-10"><span class="label"><a 
  id="x1-17001r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">redis</span></span><span style="color:#000000"><span 
@@ -1488,12 +1490,12 @@ class="ectt-1200">"6379:6379"</span></span>
 <span class="label"><a 
  id="x1-17006r6"></a></span></pre>
    </div>
-<!--l. 430--><p class="indent" >   Now we have a queue, we will create the worker that accepts jobs from the queue. We will create this worker in
-<span 
+<!--l. 434--><p class="indent" >   Now that we have a queue, we will create the worker that accepts jobs from the queue. We will create this
+worker in <span 
 class="ectt-1200">todo/tasks/ical.py</span>.
-</p><!--l. 434--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 434--><p class="indent" >   <span 
-class="ectt-1200">» cat todo/tasks/ical.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 434--><pre class="listings" id="listing-11"><span class="label"><a 
+</p><!--l. 438--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 438--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/tasks/ical.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 438--><pre class="listings" id="listing-11"><span class="label"><a 
  id="x1-17007r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">os</span></span> 
@@ -1611,16 +1613,15 @@ class="ectt-1200">"</span></span>
                                                                                                     
                                                                                                     
    </div>
-<!--l. 449--><p class="indent" >   Note that we are getting a URL from the environment variables: <span 
-class="ectt-1200">CELERY_BROKER_URL </span>and
-<span 
-class="ectt-1200">CELERY_RESULT_BACKEND</span>. We need to remember to set these variables in whichever environment the service is
-run in.
-</p><!--l. 453--><p class="indent" >   We need to install Celery. We will do this in the same poetry environment as the Flask server as we will later
+<!--l. 453--><p class="noindent" >Note that we are getting a URL from the environment variables: <span 
+class="ectt-1200">CELERY_BROKER_URL </span>and <span 
+class="ectt-1200">CELERY_RESULT_BACKEND</span>.
+We need to remember to set these variables in whichever environment the service is run in.
+</p><!--l. 458--><p class="indent" >   We need to install Celery. We will do this in the same poetry environment as the Flask server as we will later
 require our Flask server to use Celery to put jobs onto the task queue.
 </p>
    <div class="framedenv" id="shaded*-1">
-   <!--l. 456-->
+   <!--l. 461-->
 <pre class="lstlisting" id="listing-12"><span class="label"><a 
  id="x1-17020r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1635,11 +1636,11 @@ class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style
 class="ectt-1200">boto3</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 458--><p class="indent" >   The above will install the Celery core and Redis and AWS SQS drivers for communication.
-</p><!--l. 460--><p class="indent" >   We will now start our local Redis queue and our worker to ensure that they can communicate.
+<!--l. 463--><p class="indent" >   The above will install the Celery core and Redis and AWS SQS drivers for communication.
+</p><!--l. 465--><p class="indent" >   We will now start our local Redis queue and our worker to ensure that they can communicate.
 </p>
    <div class="framedenv" id="shaded*-1">
-   <!--l. 462-->
+   <!--l. 467-->
 <pre class="lstlisting" id="listing-13"><span class="label"><a 
  id="x1-17021r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1651,7 +1652,7 @@ class="ectt-1200">redis</span></span><span
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
    <div class="framedenv" id="code-1">
-<!--l. 464--><pre class="listings" id="listing-14"><span class="label"><a 
+<!--l. 469--><pre class="listings" id="listing-14"><span class="label"><a 
  id="x1-17022r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
 class="ectt-1200">export</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1696,11 +1697,11 @@ class="ectt-1200">info</span></span>
 <span class="label"><a 
  id="x1-17025r4"></a></span></pre>
    </div>
-<!--l. 470--><p class="indent" >   You should see something like the below. This indicates that the worker has successfully subscribed to the
+<!--l. 475--><p class="indent" >   You should see something like the below. This indicates that the worker has successfully subscribed to the
 queue and is ready to accept events.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 473--><pre class="listings" id="listing-15"><span class="label"><a 
+<!--l. 478--><pre class="listings" id="listing-15"><span class="label"><a 
  id="x1-17026r1"></a></span> 
 <span class="label"><a 
  id="x1-17027r2"></a></span><span style="color:#000000"><span 
@@ -1943,12 +1944,12 @@ class="ectt-1200">.</span></span>
 <span class="label"><a 
  id="x1-17050r25"></a></span></pre>
    </div>
-<!--l. 500--><p class="indent" >   Finally, we will run Celery inside a new container. For this we will modify our <span 
+<!--l. 505--><p class="indent" >   Finally, we will run Celery inside a new container. For this we will modify our <span 
 class="ectt-1200">docker-compose.yml</span>
 file.
-</p><!--l. 503--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 503--><p class="indent" >   <span 
-class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 503--><pre class="listings" id="listing-16"><span class="label"><a 
+</p><!--l. 508--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 508--><p class="indent" >   <span 
+class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 508--><pre class="listings" id="listing-16"><span class="label"><a 
  id="x1-17051r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">worker</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
@@ -2032,10 +2033,10 @@ class="ectt-1200">info</span></span>
 <span class="label"><a 
  id="x1-17060r10"></a></span></pre>
    </div>
-<!--l. 515--><p class="indent" >   Note that we are re-using the same image development image as the Flask server. This makes sense since it
+<!--l. 520--><p class="indent" >   Note that we are re-using the same image development image as the Flask server. This makes sense since it
 shares very similar dependencies. It would make sense to separate the dependencies between the two containers
 as they grow larger.
-</p><!--l. 519--><p class="indent" >   We are overriding the command to run when the container starts to use the celery command. We have also
+</p><!--l. 524--><p class="indent" >   We are overriding the command to run when the container starts to use the celery command. We have also
 remembered to set the environment variables appropriately. We have to use the domain name of the redis
 image instead of the localhost because redis is not running on our localhost. Earlier we were able to
 pretend it was because the redis port, 6379, was being forwarded from our localhost to our redis
@@ -2046,11 +2047,11 @@ container.
 </p>
    <h4 class="subsectionHead"><span class="titlemark">5.3    </span> <a 
  id="x1-180005.3"></a>Creating Tasks</h4>
-<!--l. 526--><p class="noindent" >We will now return to our Flask server. We can modify our new endpoints to use Celery to create tasks on the task
+<!--l. 531--><p class="noindent" >We will now return to our Flask server. We can modify our new endpoints to use Celery to create tasks on the task
 queue.
-</p><!--l. 529--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 529--><p class="indent" >   <span 
-class="ectt-1200">» cat todo/views/routes.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 529--><pre class="listings" id="listing-17"><span class="label"><a 
+</p><!--l. 534--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 534--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/views/routes.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 534--><pre class="listings" id="listing-17"><span class="label"><a 
  id="x1-18001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">celery</span></span><span style="color:#000000"><span 
@@ -2502,16 +2503,16 @@ class="ectt-1200">404</span></span>
 <span class="label"><a 
  id="x1-18039r39"></a></span></pre>
    </div>
-<!--l. 570--><p class="indent" >   The variable that we create as tasks and pass to the delay method is the JSON data that is stored with the
+<!--l. 575--><p class="indent" >   The variable that we create as tasks and pass to the delay method is the JSON data that is stored with the
 event. It is then deserialized from JSON and passed as a variable to the <span 
 class="ectt-1200">create_ical </span>function. Celery is able to
 create impressive abstractions so that message passing over a task queue looks almost like regular function
 calls.
-</p><!--l. 574--><p class="indent" >   Before we can successfully use this endpoint to get our important &#8220;Hello World&#8221; result, we will also need to
+</p><!--l. 579--><p class="indent" >   Before we can successfully use this endpoint to get our important &#8220;Hello World&#8221; result, we will also need to
 configure the server to talk to our Redis container.
-</p><!--l. 577--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 577--><p class="indent" >   <span 
-class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 577--><pre class="listings" id="listing-18"><span class="label"><a 
+</p><!--l. 582--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 582--><p class="indent" >   <span 
+class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 582--><pre class="listings" id="listing-18"><span class="label"><a 
  id="x1-18040r1"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">environment</span></span><span style="color:#000000"><span 
@@ -2542,10 +2543,10 @@ class="ectt-1200">:6379</span></span>
 <span class="label"><a 
  id="x1-18043r4"></a></span></pre>
    </div>
-<!--l. 583--><p class="indent" >   You should now be able to start the server and worker with docker compose.
+<!--l. 588--><p class="indent" >   You should now be able to start the server and worker with docker compose.
 </p>
    <div class="framedenv" id="shaded*-1">
-   <!--l. 585-->
+   <!--l. 590-->
 <pre class="lstlisting" id="listing-19"><span class="label"><a 
  id="x1-18044r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2555,19 +2556,19 @@ class="ectt-1200">compose</span></span><span style="color:#000000"> </span><span
 class="ectt-1200">up</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 587--><p class="indent" >   You can now send a POST request to the <span 
+<!--l. 592--><p class="indent" >   You can now send a POST request to the <span 
 class="ectt-1200">/api/v1/todos/ical </span>endpoint to start a job and follow the
 subsequent URLs to see the result of the job.
    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">5.4    </span> <a 
  id="x1-190005.4"></a>Creating the Calendar</h4>
-<!--l. 591--><p class="noindent" >Once we have confirmed that the task queue can communicate with our worker, we can return to the calendar
+<!--l. 596--><p class="noindent" >Once we have confirmed that the task queue can communicate with our worker, we can return to the calendar
 generation. We will use the <span 
 class="ectt-1200">icalendar </span>library for this.
 </p>
    <div class="framedenv" id="shaded*-1">
-   <!--l. 595-->
+   <!--l. 600-->
 <pre class="lstlisting" id="listing-20"><span class="label"><a 
  id="x1-19001r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2576,9 +2577,9 @@ class="ectt-1200">add</span></span><span style="color:#000000"> </span><span sty
 class="ectt-1200">icalendar</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 597--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 597--><p class="indent" >   <span 
-class="ectt-1200">» cat todo/tasks/ical.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 597--><pre class="listings" id="listing-21"><span class="label"><a 
+<!--l. 602--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 602--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/tasks/ical.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 602--><pre class="listings" id="listing-21"><span class="label"><a 
  id="x1-19002r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">icalendar</span></span> 
@@ -2846,14 +2847,14 @@ class="ectt-1200">)</span></span>
 <span class="label"><a 
  id="x1-19026r25"></a></span></pre>
    </div>
-<!--l. 624--><p class="indent" >   Now you should be able to test your application.
+<!--l. 629--><p class="indent" >   Now you should be able to test your application.
       </p><ol  class="enumerate1" >
                                                                                                     
                                                                                                     
 <li 
   class="enumerate" id="x1-19028x1">
-      <!--l. 626--><p class="noindent" >Start it with docker-compose.  </p><div class="framedenv" id="shaded*-1">
-      <!--l. 627-->
+      <!--l. 631--><p class="noindent" >Start it with docker-compose.  </p><div class="framedenv" id="shaded*-1">
+      <!--l. 632-->
       <pre class="lstlisting" id="listing-22"><span class="label"><a 
  id="x1-19029r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2869,22 +2870,22 @@ class="ectt-1200">&#x00A0;</span></pre>
       </li>
 <li 
   class="enumerate" id="x1-19031x2">
-      <!--l. 628--><p class="noindent" >Open the user interface on <a 
+      <!--l. 633--><p class="noindent" >Open the user interface on <a 
 href="http://localhost:6400" class="url" ><span 
 class="ectt-1200">http://localhost:6400</span></a> and create some tasks.
       </p></li>
 <li 
   class="enumerate" id="x1-19033x3">
-      <!--l. 629--><p class="noindent" >Follow the cURL interaction from Section <a 
+      <!--l. 634--><p class="noindent" >Follow the cURL interaction from Section <a 
 href="#x1-160005.1">5.1<!--tex4ht:ref: sect:apiext --></a> to generate an appropriate iCal.</p></li></ol>
    
    <h3 class="sectionHead"><span class="titlemark">6    </span> <a 
  id="x1-200006"></a>Deploying with SQS</h3>
-<!--l. 634--><p class="noindent" >First we will modify our worker so that it can run locally and connect to an SQS queue. We need to create an
+<!--l. 639--><p class="noindent" >First we will modify our worker so that it can run locally and connect to an SQS queue. We need to create an
 appropriate SQS queue.
-</p><!--l. 637--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 637--><p class="indent" >   <span 
-class="ectt-1200">» cat sqs.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 637--><pre class="listings" id="listing-23"><span class="label"><a 
+</p><!--l. 642--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 642--><p class="indent" >   <span 
+class="ectt-1200">» cat sqs.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 642--><pre class="listings" id="listing-23"><span class="label"><a 
  id="x1-20001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -2913,20 +2914,20 @@ class="ectt-1200">}</span></span>
    </div>
    <div class="tcolorbox tcolorbox" id="tcolobox-10"> 
 <div class="tcolorbox-title">
-<!--l. 646--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 646--><p class="noindent" >Celery  will  automatically  create  a  queue  if  it  doesn&#8217;t  exist,  however,  we  want  to  manage  it  with
+<!--l. 651--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 651--><p class="noindent" >Celery will automatically create a queue if it does not exist, however, we want to manage it with
 Terraform so it is easier to destroy.  </p> 
 </div> 
 </div>
-<!--l. 648--><p class="indent" >   Now we need to tell our worker to use our SQS queue. To do this we will use the <span 
+<!--l. 653--><p class="indent" >   Now we need to tell our worker to use our SQS queue. To do this we will use the <span 
 class="ectt-1200">sqs:// </span>broker URL. This tells
 Celery to use SQS. Celery will then attempt to find appropriate AWS credentials to use to authenticate. We could
 pass these in as environment variables. However, for convinence we will mount the <span 
 class="ectt-1200">credentials </span>file that already
 exists within our container.
-</p><!--l. 655--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 655--><p class="indent" >   <span 
-class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 655--><pre class="listings" id="listing-24"><span class="label"><a 
+</p><!--l. 660--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 660--><p class="indent" >   <span 
+class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 660--><pre class="listings" id="listing-24"><span class="label"><a 
  id="x1-20005r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">volumes</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
@@ -2967,22 +2968,22 @@ class="ectt-1200">://</span></span>
 <span class="label"><a 
  id="x1-20010r6"></a></span></pre>
    </div>
-<!--l. 663--><p class="indent" >   Ensure that you update both the worker and the server. Note that we are using <span 
+<!--l. 668--><p class="indent" >   Ensure that you update both the worker and the server. Note that we are using <span 
 class="ectt-1200">/root </span>since the container is run
 as the root user and Celery will therefore look at <span 
 class="ectt-1200">~/.aws/credentials</span>.
-</p><!--l. 666--><p class="indent" >   We can use the SQS queue in this state to create tasks and our workers will pick it up. This is often sufficient,
+</p><!--l. 671--><p class="indent" >   We can use the SQS queue in this state to create tasks and our workers will pick it up. This is often sufficient,
 however, in our implementation we have made use of Celery&#8217;s built-in functionality to track jobs with a persistent
 data store. This is by use of the <span 
 class="ectt-1200">AsyncResult </span>class. If we tried to go to the status or result page for a task we
 submitted, we would receive an error.
-</p><!--l. 672--><p class="indent" >   To work around this issue, we will use our existing PostgreSQL database as our persistent store to track
+</p><!--l. 677--><p class="indent" >   To work around this issue, we will use our existing PostgreSQL database as our persistent store to track
 tasks.
-</p><!--l. 675--><p class="indent" >   We can update our <span 
+</p><!--l. 680--><p class="indent" >   We can update our <span 
 class="ectt-1200">docker-compose.yml </span>as below to allow Celery to use our PostgreSQL database.
-</p><!--l. 677--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 677--><p class="indent" >   <span 
-class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 677--><pre class="listings" id="listing-25"><span class="label"><a 
+</p><!--l. 682--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 682--><p class="indent" >   <span 
+class="ectt-1200">» cat docker-compose.yml</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 682--><pre class="listings" id="listing-25"><span class="label"><a 
  id="x1-20011r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">environment</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
@@ -3008,7 +3009,7 @@ class="ectt-1200">todo</span></span>
                                                                                                     
                                                                                                     
    </div>
-<!--l. 682--><p class="indent" >   This is the same as the <span 
+<!--l. 687--><p class="indent" >   This is the same as the <span 
 class="ectt-1200">SQLALCHEMY_DATABASE_URI </span>except for <span 
 class="ectt-1200">db+ </span>at the start to help Celery identify the type
 of data store.
@@ -3016,37 +3017,37 @@ of data store.
 </p>
    <h3 class="sectionHead"><span class="titlemark">7    </span> <a 
  id="x1-210007"></a>Deploying with ECS</h3>
-<!--l. 686--><p class="noindent" >Now we have;
+<!--l. 691--><p class="noindent" >Now we have;
       </p><ol  class="enumerate1" >
 <li 
   class="enumerate" id="x1-21002x1">
-      <!--l. 688--><p class="noindent" >an SQS queue on AWS,
+      <!--l. 693--><p class="noindent" >an SQS queue on AWS,
       </p></li>
 <li 
   class="enumerate" id="x1-21004x2">
-      <!--l. 689--><p class="noindent" >a worker Celery container running locally,
+      <!--l. 694--><p class="noindent" >a worker Celery container running locally,
       </p></li>
 <li 
   class="enumerate" id="x1-21006x3">
-      <!--l. 690--><p class="noindent" >a server Flask container running locally, and
+      <!--l. 695--><p class="noindent" >a server Flask container running locally, and
       </p></li>
 <li 
   class="enumerate" id="x1-21008x4">
-      <!--l. 691--><p class="noindent" >a PostgreSQL database running locally.</p></li></ol>
-<!--l. 694--><p class="indent" >   Earlier in the practical we showed how to host a container on ECR. In previous practicals we used a hosted
+      <!--l. 696--><p class="noindent" >a PostgreSQL database running locally.</p></li></ol>
+<!--l. 699--><p class="indent" >   Earlier in the practical we showed how to host a container on ECR. In previous practicals we used a hosted
 image to deploy containers on ECS or EC2. In previous practicals we also deployed a PostgreSQL database on
 RDS.
-</p><!--l. 698--><p class="indent" >   We would strongly encourage you to try and deploy all components of our application on AWS infrastructure.
+</p><!--l. 703--><p class="indent" >   We would strongly encourage you to try and deploy all components of our application on AWS infrastructure.
 This will be excellent practice for the cloud assignment.
    
 </p>
-<!--l. 701--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 706--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-22000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Hints</span></span>
       </p><ol  class="enumerate1" >
 <li 
   class="enumerate" id="x1-22002x1">
-      <!--l. 703--><p class="noindent" >ECS/EC2 containers will automatically authenticate with your AWS account (so <span 
+      <!--l. 708--><p class="noindent" >ECS/EC2 containers will automatically authenticate with your AWS account (so <span 
 class="ectt-1200">credentials </span>isn&#8217;t
       required).
       </p></li>
@@ -3054,7 +3055,7 @@ class="ectt-1200">credentials </span>isn&#8217;t
   class="enumerate" id="x1-22004x2">
                                                                                                     
                                                                                                     
-      <!--l. 704--><p class="noindent" >Attempt to test each component is deployed correctly individually, e.g. deploy RDS and ensure the
+      <!--l. 709--><p class="noindent" >Attempt to test each component is deployed correctly individually, e.g. deploy RDS and ensure the
       system works, then deploy the server and ensure the system works, etc.</p></li></ol>
    
    <h3 class="likesectionHead"><a 
@@ -3071,13 +3072,13 @@ class="ectt-1200">https://csse6400.uqcloud.net/handouts/event.pdf</span></a>.
    </div>
    <div class="footnotes"><a 
  id="x1-15002x5"></a>
-<!--l. 347--><p class="indent" >       <span class="footnote-mark"><a 
+<!--l. 350--><p class="indent" >       <span class="footnote-mark"><a 
 href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span><span 
 class="Cabin-Regular-tlf-t1-">In reality it is not but this is an example of a common use case for asynchronous tasks &#8212; file generation such as PDFs or videos</span>
 <span 
 class="Cabin-Regular-tlf-t1-">which do take time.</span></p><a 
  id="x1-16002x5.1"></a>
-<!--l. 362--><p class="noindent" ><span class="footnote-mark"><a 
+<!--l. 366--><p class="noindent" ><span class="footnote-mark"><a 
 href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span><span 
 class="Cabin-Regular-tlf-t1-">Ideally a POST procedural endpoint should use a verb like </span><span 
 class="ectt-1000">/generate</span><span 
