@@ -305,51 +305,67 @@ Scalability testing is based upon several likely usage scenarios.
 The scenarios create different scaling requirements.
 
 \subsection{API Functionality} % Pesistence: Does not need to be "truly" persistent.
-10\% from the 35\% of the grade for the assignment are for correctly implementing the API specification,
+10\%, from the 35\% of the grade for the assignment, is for correctly implementing the API specification,
 irrespective of whether it is able to cope with high loads.
 A suite of automated API tests will assess the correctness of your implementation, via a sequence of API calls.
 
 \subsection{Deployed to Cloud} % Persistence working correctly in the cloud.
-10\% from the 35\% of the grade for the assignment are for deploying a correctly implemented service to AWS,
+10\%, from the 35\% of the grade for the assignment, is for deploying a correctly implemented service to AWS,
 irrespective of whether it is able to cope with high loads.
 The deployment will be assessed by running a script that deploys your service to AWS
 and then runs a suite of automated API tests to assess the correctness of your implementation.
 
 \subsection{Scalable Application}\label{sec:scenarios} % Can it scale!
-15\% from the 35\% of the grade for the assignment will be derived from how well your service handles various scenarios.
-These scenarios will require you to consider how your application performs under load.
+15\%, from the 35\% of the grade for the assignment, will be derived from how well your service handles various scenarios.
+These scenarios will require you to consider how your application performs under different load characteristics.
 Examples of possible scenarios are described below.
 These are not descriptions of specific tests that will be run,
 rather they are examples of the types of tests that will be run.
 
-\paragraph{Steady Stream}
-Steady receipt of email messages at a rate of \emph{M} per minute, fairly evenly spread across all customers.
-Approximately 20\% of the messages are malicious.
+\paragraph{Normal Circumstances}
+Average number of analysis requests are submitted by a wide range of labs.
+These requests are distributed fairly evenly over the working day.
+Few of the analysis requests are urgent.
+Queries for results are also distributed fairly evenly over the day.
 
-\paragraph{Bad `News' Stream}
-Steady receipt of email messages at a rate of \emph{N} per minute, fairly evenly spread across all customers.
-Approximately 80\% of the messages are malicious.
+\paragraph{Epidemic Early Stages}
+There is a significant increase the number of analysis request submitted by a few labs.
+These labs also mark a much higher number of the requests as being urgent.
+Other labs are operating as per normal circumstances.
+There are many more queries for results, often being repeated for any pending analysis jobs.
+Health authorities make many requests for batches of results from labs or for patients.
 
-\paragraph{Peaks and Troughs}
-Periods of receipt of a high volume of email messages, followed by periods of low volume.
+\paragraph{Epidemic Peak}
+Almost all labs submit a very large volume of analysis requests.
+Up to 30\% of the requests may be given an urgent status.
+The service must still analyse non-urgent requests in a timely manner.
+If it does not, the risk is that labs will start to make all requests urgent.
+Due to the high volume of analysis requests, there will be a high volume of queries for results.
+Any results that are still pending analysis jobs, will be repeated.
+Health authorities make a moderate number of requests for batches of results from almost all labs.
+Labs start querying batches of results for individual patients.
 
-\paragraph{High Value Customer}
-The Department of Defence (DoD) has adopted SpamOverflow.
-They are a high value customer and you must ensure that their requests are handled quickly.
-All other customers have a service level agreement (SLA) that guarantees a certain level of responsiveness.
-You cannot ignore their requests to only prioritise the DoD's requests.
+\paragraph{Epidemic Tail}
+Almost all labs submit a large volume of analysis requests.
+Up to 10\% of the requests may be given an urgent status.
+Due to the high volume of analysis requests, there will be a high volume of queries for results.
+Most results that are still pending analysis jobs, will be repeated.
+Health authorities make a moderate number of requests for batches of results from almost all labs.
+Labs query batches of results for a moderate number of patients.
+
+\paragraph{Epidemic Follow-up}
+Some labs submit a large volume of analysis requests.
+Up to 5\% of the requests may be given an urgent status.
+Other labs are back to operating as per normal circumstances.
+There will be a moderate volume of queries for results.
+Most results that are still pending analysis jobs, will be repeated.
+Health authorities make a large number of requests for batches of results from almost all labs.
+Labs query batches of results for a large number of patients.
 
 \paragraph{Research Project}
 A researcher wants to analyse the progression of how a disease spreads in the community.
 They will query all the results from all the labs to generate their database of infections in different areas.
 The system must remain responsive to analysis requests while processing the researcher's queries.
-
-\paragraph{Personalised Attack}
-A bad actor has trained an AI model using social media profiles of targeted victims.
-They can generate personalised phishing email messages based on personal information.
-As the messages are personalised, they can be of greatly different lengths and contain different content.
-These messages can only be identified by SpamHammer.
-They have sent these phishing messages to 2,000 users at the same time.
 
 \subsection{Marking}
 Persistence is a core functional requirement of your service.
