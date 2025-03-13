@@ -192,31 +192,32 @@ Your repository \textbf{must} contain everything required to successfully deploy
 
 %\begin{samepage}
 \subsection{API Functionality Submission}
-Your first submission \textbf{must} include the following in your repository:
+Your first submission \textbf{must} include all of the following in your repository:
 \begin{itemize}
   \item Docker container (Dockerfile) of your implementation of the service API,
         including the source code and a mechanism to build and run the service.%
         \footnote{If you use external libraries,
                   ensure that you pin the versions to avoid external changes breaking your application.}
   \item A \texttt{local.sh} script that can be used to build and run your service locally.
-        Where your container will be launched with port 8080 being passed from the container
-        to the testing environment and your service \textbf{must} be available at \texttt{http://localhost:8080/}.
+        This script \textbf{must} be in the root directory of your repository.
+        The \texttt{local.sh} script must launch your container with port 8080 being passed from the container
+        to the testing environment, and your service \textbf{must} be available at \texttt{http://localhost:8080/}.
 \end{itemize}
-We will run a suite of tests against your API on this endpoint.
+We will run a suite of tests against your API at this URL.
 %\end{samepage}
 
 \newpage
 \begin{samepage}
 \subsection{Deployed to Cloud \& Scalability Submissions}
-The second and third submissions must include all the following in your repository:
+The second and third submissions \textbf{must} include all of the following in your repository:
 \begin{itemize}
   \item Your implementation of the service API, including the source code and a mechanism to build the service.%
         \footnote{If you use external libraries,
                   ensure that you pin the versions to avoid external changes breaking your application.}
-  \item Terraform code that can provision your service in a fresh AWS environment.
-  \item A \texttt{deploy.sh} script that can use your Terraform code to deploy your application.
-        This script \textbf{must} be in the top-level of your repository.
-        This script may perform other tasks as required.
+  \item Terraform code that provisions your service in a fresh AWS environment.
+  \item A \texttt{deploy.sh} script that uses your Terraform code to deploy your application.
+        This script \textbf{must} be in the root directory of your repository.
+        This script may perform other tasks as required by your implementation.
 \end{itemize}
 \end{samepage}
 
@@ -227,7 +228,7 @@ You may re-create the process yourself.
 \begin{enumerate}
   \item Your Git repository will be cloned locally.
         The submission branch will be checked out.
-  \item AWS credentials will be copied into your repository in the top-level directory,
+  \item AWS credentials will be copied into your repository in the root directory,
         in a file called \texttt{credentials}.
   \item The script \texttt{deploy.sh} in the \textbf{root directory} will be run.
   \item The \texttt{deploy.sh} script \textbf{must} create a file named \texttt{api.txt},
@@ -239,7 +240,7 @@ You may re-create the process yourself.
 \noindent
 \textbf{Important Note:} Ensure your service does not exceed the resource limits of AWS Learner Labs.
 For example, AWS will \textbf{deactivate} your account if more than fifteen EC2 instances are running.
-If you use your allocated budget in the Learner Lab, you will not be able to run any services.
+If you use up your allocated budget in the Learner Lab, you will not be able to run any services.
 
 \subsection{GitHub Repository}\label{sec:github}
 You will be provisioned with a private repository on GitHub for this assignment, via GitHub Classroom.
@@ -328,6 +329,10 @@ These requests are distributed fairly evenly over the working day.
 Few of the analysis requests are urgent.
 Queries for results are also distributed fairly evenly over the day.
 
+\paragraph{Curiosity Killed the Server}
+Queensland Health creates a web portal allowing patients to view their analysis results.
+Tens of thousands of people all try to access their results in a short period of time.
+
 \paragraph{Epidemic Early Stages}
 There is a significant increase the number of analysis request submitted by a few labs.
 These labs also mark a much higher number of the requests as being urgent.
@@ -409,23 +414,23 @@ The amount of tests to be released is at the Course Coordinator's discretion.
 
 Please refer to the marking criteria at the end of this document.
 
-\subsubsection{Grade Improvement}\label{sec:improve}
-Improving your application's functionality in a later submission will be used to improve the grade you received for an earlier submission.
-
-\paragraph{Stage 1 Improvement}
-If your stage 1 submission (API Functionality) performs poorly, you may improve your grade for this stage in a later stage.
-This will occur if your deployed stage 2 or 3 submission passes more of the functionality tests than your stage 1 submission.
-This new result will be used to recalculate your grade for stage 1.
-(We will \textbf{not} rerun the local functionality tests in stages 2 or 3. We will \textbf{only} test your deployed application.)
-
-\paragraph{Stage 2 Improvement}
-Similarly, if your deployed stage 3 submission passes more of the functionality tests than your stage 2 submission, this result will be used to recalculate your grade for stage 2.
-
-\paragraph{Late Penalties}
-If an earlier submission was late, the same late penalty will be applied to your improved grade.
-(e.g. If your stage 1 submission was 3 hours late,
-and in stage 2 your submission's functionality improved from a grade of 4 to a grade of 6,
-your grade for stage 1 would be increased to a 5 after the one grade point per 24 hours penalty was applied.)
+%\subsubsection{Grade Improvement}\label{sec:improve}
+%Improving your application's functionality in a later submission will be used to improve the grade you received for an earlier submission.
+%
+%\paragraph{Stage 1 Improvement}
+%If your stage 1 submission (API Functionality) performs poorly, you may improve your grade for this stage in a later stage.
+%This will occur if your deployed stage 2 or 3 submission passes more of the functionality tests than your stage 1 submission.
+%This new result will be used to recalculate your grade for stage 1.
+%(We will \textbf{not} rerun the local functionality tests in stages 2 or 3. We will \textbf{only} test your deployed application.)
+%
+%\paragraph{Stage 2 Improvement}
+%Similarly, if your deployed stage 3 submission passes more of the functionality tests than your stage 2 submission, this result will be used to recalculate your grade for stage 2.
+%
+%\paragraph{Late Penalties}
+%If an earlier submission was late, the same late penalty will be applied to your improved grade.
+%(e.g. If your stage 1 submission was 3 hours late,
+%and in stage 2 your submission's functionality improved from a grade of 4 to a grade of 6,
+%your grade for stage 1 would be increased to a 5 after the one grade point per 24 hours penalty was applied.)
 
 
 \section{Academic Integrity}
@@ -437,9 +442,18 @@ Submissions will be checked to ensure that the work submitted is not plagiarised
 
 This is an \textit{individual} assignment.
 You may \textbf{not} discuss details of approaches to solve the problem with other students in the course.
-The Grade Improvement rule (section \ref{sec:improve}) means that
-you may \textbf{not} discuss details of any earlier submission stage with other students
-until \textbf{two weeks} \textit{after} the final submission date of May 9$^{th}$ (i.e. \textbf{May 23$^{rd}$}).
+As some students may have an extension and then decide to make a late submission, 
+you may \textbf{not} discuss details of a submission stage with other students
+until \textbf{two weeks} \textit{after} the original submission date.
+i.e. You may not discuss how to
+\begin{itemize}
+    \item implement \textbf{functionality} until \emph{after} \textbf{April 18$^{th}$};
+    \item \textbf{deploy} the service to the cloud until \emph{after} \textbf{May 1$^{st}$}; and
+    \item implement \textbf{scalability} until \emph{after} \textbf{May 23$^{rd}$}.
+\end{itemize}
+%The Grade Improvement rule (section \ref{sec:improve}) means that
+%you may \textbf{not} discuss details of any earlier submission stage with other students
+%until \textbf{two weeks} \textit{after} the final submission date of May 9$^{th}$ (i.e. \emph{after} \textbf{May 23$^{rd}$}).
 
 All code that you submit \textbf{must} be your own work.
 You may \textbf{not} directly copy code that you have found on-line to solve parts of the assignment.
