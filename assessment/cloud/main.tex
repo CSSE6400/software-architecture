@@ -103,20 +103,23 @@ The following constraints apply to the implementation of your assignment solutio
 
 \subsection{Analysis Engine}
 
-You have been provided with a command line tool called \texttt{engine} that must be used to analyse sample images.
+You have been provided with a command line tool called \texttt{overflowengine} that must be used to analyse sample images.
 This tool was developed by AI and medical researchers at
 \link{QDHeC}{https://chsr.centre.uq.edu.au/research/queensland-digital-health-centre}.
 The tool has varying performance, due to how clear the pathogen markers are in the cell sample images.
 You will have to work around this bottleneck in the design and development of the PAS.
 
-Your service \textbf{must} utilise the \texttt{engine} command line tool provided for this assignment.
-The compiled binaries are available in the tool's GitHub repository: \url{https://github.com/CSSE6400/pathogenanalysis}.
+Your service \textbf{must} utilise the \texttt{overflowengine} command line tool provided for this assignment.
+The compiled binaries are available in the tool's GitHub repository:
+
+\url{https://github.com/CSSE6400/CoughOverflow-Engine}.
 
 \warning{You are \textbf{not} allowed to reimplement or modify this tool.}
 
 The analysis engine requires pre-processing of cell sample images to highlight pathogen markers.
 This pre-processing is done by the pathology labs.
-You \textbf{must} use the provided sample images for testing purposes.
+For testing purposes, you \textbf{must} use the sample images provided in the \link{analysis engine's repository}
+{https://github.com/CSSE6400/CoughOverflow-Engine}.
 If you try to generate your own images, they are likely to fail analysis or give false results.
 
 %For the purposes of this assignment,
@@ -133,8 +136,8 @@ To view this page you need to be logged in to your AWS Learner Lab environment a
 
 \subsection{External Services}
 You may \textbf{not} use services or products from outside of the AWS Learner Lab environment.
-For example, you may not host instances of the \texttt{engine} command line tool on another cloud platform
-(e.g. Google Cloud).
+For example, you may not host instances of the \texttt{overflowengine} command line tool on another cloud platform
+(e.g.~Google Cloud).
 
 You may \textbf{not} use services or products that run on AWS infrastructure external to your Learner Lab environment.
 For example, you may not deploy a third-party product like MongoDB Atlas on AWS and then use it from your service.
@@ -158,8 +161,8 @@ Your solution for each submission must be committed and pushed to the GitHub rep
 %See: \url{https://www.atlassian.com/git/tutorials/inspecting-a-repository/git-tag}.}
 %to indicate which commit is to be marked.
 %The tags that you \textbf{\underline{must}} use are:
-Each submission is to be in its own branch.
-You \textbf{\underline{must}} use the branch names \textbf{\underline{exactly}} as indicated below.
+Each submission is to be in its \textbf{own branch}.
+You \textbf{\textit{must}} use the branch names \textbf{\textit{exactly}} as indicated below.
 Failure to use these branch names may result in your submission not being marked,
 and you obtaining a grade of 0 for the submission.
 \begin{itemize}[topsep=7pt,partopsep=2pt,itemsep=4pt,parsep=4pt]
@@ -173,7 +176,8 @@ Any code in the main branch or \textit{any} other branch, will be ignored when m
 We will checkout the latest commit in the branch being marked.
 If the commit date and time is after the submission deadline, late penalties will be applied,
 unless you have an extension.
-Late penalties are described in the course profile.
+Late penalties are described in the \link{course profile}
+{https://course-profiles.uq.edu.au/course-profiles/CSSE6400-21553-7520\#assessment-detail-1}.
 
 \textbf{\underline{Note:}} Experience has shown that the large majority of students who make a late submission,
 lose more marks from the late penalty than they gain from any improvements they make to their solution.
@@ -194,7 +198,7 @@ Your repository \textbf{must} contain everything required to successfully deploy
 \subsection{API Functionality Submission}
 Your first submission \textbf{must} include all of the following in your repository:
 \begin{itemize}
-  \item Docker container (Dockerfile) of your implementation of the service API,
+  \item Docker image (Dockerfile) of your implementation of the service API,
         including the source code and a mechanism to build and run the service.%
         \footnote{If you use external libraries,
                   ensure that you pin the versions to avoid external changes breaking your application.}
@@ -206,7 +210,6 @@ Your first submission \textbf{must} include all of the following in your reposit
 We will run a suite of tests against your API at this URL.
 %\end{samepage}
 
-\newpage
 \begin{samepage}
 \subsection{Deployed to Cloud \& Scalability Submissions}
 The second and third submissions \textbf{must} include all of the following in your repository:
@@ -233,7 +236,7 @@ You may re-create the process yourself.
   \item The script \texttt{deploy.sh} in the \textbf{root directory} will be run.
   \item The \texttt{deploy.sh} script \textbf{must} create a file named \texttt{api.txt},
         which contains the URL at which your API is deployed,
-        e.g. \texttt{http://my-api.com/} or \texttt{http://123.456.789.012/}.
+        e.g. \texttt{http://my-api.com/} or \texttt{http://123.231.213.012/}.
   \item We will run automated functionality and load-testing on the URL provided in the \texttt{api.txt} file.
 \end{enumerate}
 
@@ -246,7 +249,7 @@ If you use up your allocated budget in the Learner Lab, you will not be able to 
 You will be provisioned with a private repository on GitHub for this assignment, via GitHub Classroom.
 You must click on the link below and associate your GitHub username with your UQ student ID in the Classroom.
 
-\url{https://classroom.github.com/a/whdIS1AE}
+\url{https://classroom.github.com/a/o7GwUHX6}
 
 \noindent
 Associating your GitHub username with another student's ID,
@@ -289,7 +292,7 @@ Our steps for deploying your infrastructure using this container are as follows.
 $ git clone git@github.com:CSSE6400/$REPO
 $ cp $CREDENTIALS $REPO
 $ docker run -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd)/$REPO:/workspace csse6400-cloud-testing
-$ cat $REPO/api.txt # this will be used for load-testing
+$ cat $REPO/api.txt  # This will be used for deployment and load testing.
 \end{code}
 
 Note that the Docker socket of the host has been mounted. This enables running \texttt{docker} in the container. This has been tested on Mac OSX and Linux but may require WSL2 on Windows.
@@ -321,7 +324,7 @@ and then runs a suite of automated API tests to assess the correctness of your i
 These scenarios will require you to consider how your application performs under different load characteristics.
 Examples of possible scenarios are described below.
 These are not descriptions of specific tests that will be run,
-rather they are examples of the types of tests that will be run.
+rather they are examples of the types of tests that may be run.
 
 \paragraph{Normal Circumstances}
 Average number of analysis requests are submitted by a wide range of labs.
@@ -334,11 +337,18 @@ Queensland Health creates a web portal allowing patients to view their analysis 
 Tens of thousands of people all try to access their results in a short period of time.
 
 \paragraph{Epidemic Early Stages}
-There is a significant increase the number of analysis request submitted by a few labs.
+There is a significant increase in the number of analysis request submitted by a few labs.
 These labs also mark a much higher number of the requests as being urgent.
 Other labs are operating as per normal circumstances.
 There are many more queries for results, often being repeated for any pending analysis jobs.
 Health authorities make many requests for batches of results from labs or for patients.
+
+\paragraph{Epidemic Mid Stages}
+There are periods of time where several labs submit a large volume of analysis requests.
+There are other periods of time with reduced numbers of analysis requests.
+Up to 15\% of the requests may be given an urgent status.
+Queries for results follow the same fluctuating pattern as analysis requests.
+Health authorities make a moderate number of requests for batches of results from labs or for patients.
 
 \paragraph{Epidemic Peak}
 Almost all labs submit a very large volume of analysis requests.
@@ -351,7 +361,7 @@ Health authorities make a moderate number of requests for batches of results fro
 Labs start querying batches of results for individual patients.
 
 \paragraph{Epidemic Tail}
-Almost all labs submit a large volume of analysis requests.
+Almost all labs submit a large volume of analysis requests, but timing may be variable.
 Up to 10\% of the requests may be given an urgent status.
 Due to the high volume of analysis requests, there will be a high volume of queries for results.
 Most results that are still pending analysis jobs, will be repeated.
@@ -374,16 +384,24 @@ The system must remain responsive to analysis requests while processing the rese
 
 \subsection{Marking}
 Persistence is a core functional requirement of your service.
-If your implementation does not save analysis requests, with their associated images,
-to persistent storage, your grade for the assignment will be capped at 4.
+Your grade for the assignment will be capped at \textbf{4}, if your implementation does not save
+\begin{itemize}[topsep=2pt,partopsep=0pt,itemsep=1pt,parsep=1pt]
+    \item analysis requests, with their associated images, or 
+    \item analysis results to persistent storage.
+\end{itemize}
+%to persistent storage.
 
 Your persistence mechanism must be robust, so that it can cope with catastrophic failure of your service.
 If all running instances of your services are terminated,
 the system must be able to restart and guarantee that it has not lost \textit{any} data
 about analysis requests for which it returned a success response to the client.
+It must also guarantee it has not lost any analysis results,
+after changing the status of analysis job from ``pending''.
+
 There will not be a test that explicitly kills all services and restarts the system.
 This will be assessed based on the services you use and how your implementation invokes those services.
 Not saving data to a persistent data store, or returning a success response before the data has been saved,
+or not saving an analysis job result effectively,
 are the criteria that determine whether you have successfully implemented persistence.
 
 Functionality of your service is worth \textbf{10\%} from the 35\% of the grade for the assignment.
@@ -407,10 +425,11 @@ The scenarios will evaluate whether your service is being wasteful in resource u
 The amount of resources deployed in your AWS account will be monitored to ensure that
 your service implements a scaling up \textbf{\emph{and}} scaling down procedure.
 
-All stages of the assessment will be marked using automation and a subset of the tests will be released.
+All stages of the assessment will be marked using automation.
+A subset of the tests will be released before the submission deadline.
 These tests may consume a \textbf{\emph{significant}} portion of your AWS credit.
 You are advised to be prudent in how many times you execute these tests.
-The amount of tests to be released is at the Course Coordinator's discretion.
+The number of tests to be released is at the Course Coordinator's discretion.
 
 Please refer to the marking criteria at the end of this document.
 
@@ -447,7 +466,9 @@ you may \textbf{not} discuss details of a submission stage with other students
 until \textbf{two weeks} \textit{after} the original submission date.
 i.e. You may not discuss how to
 \begin{itemize}
-    \item implement \textbf{functionality} until \emph{after} \textbf{April 18$^{th}$};
+    \item implement \textbf{functionality} until \emph{after} \textbf{May 1$^{st}$};%
+          \footnote{Students may improve their functionality for the stage-2 submission,
+                    consequently you may not discuss how to implement functionality until after this date.}
     \item \textbf{deploy} the service to the cloud until \emph{after} \textbf{May 1$^{st}$}; and
     \item implement \textbf{scalability} until \emph{after} \textbf{May 23$^{rd}$}.
 \end{itemize}
@@ -461,8 +482,8 @@ If you find ideas from on-line sources (e.g. Stack Overflow),
 you must \link{cite and reference}{https://web.library.uq.edu.au/node/4221/2} these sources.
 Use the \link{IEEE referencing style}{https://libraryguides.vu.edu.au/ieeereferencing/gettingstarted}
 for citations and references.
-Citations should be included in a comment at the location where the idea is used in your code.
-All references for citations \textbf{must} be included in a file called \texttt{refs.txt}.
+Citations must be included in a comment at the location where the idea is used in your code.
+All references for citations \textbf{must} be included in a file called \texttt{refs.md}.
 This file must be in the root directory of your repository.
 
 You may use generative AI tools (e.g. Copilot) to assist you in writing code to implement your solutions.
@@ -470,11 +491,13 @@ You may also use generative AI tools to help you test your implementations.
 You \textbf{must} include, in the root directory of your repository,
 a file called \texttt{AI.md} that indicates the generative AI tools that you used,
 how you used them, and the extent of their use.
-(e.g. All code was written by providing copilot with class descriptions and then revising the generated code.)
+(e.g. All code was written by providing Copilot with class descriptions and then revising the generated code.
+Classes A and B were produced by the following prompts to ChatGPT
+and were then adapted to work in the assignment's context.)
 
 Uncited or unreferenced material, or unacknowledged use of generative AI tools,
 will be treated as not being your own work.
-Significant amounts of cited or acknowledged work from other sources
+Significant amounts of cited or acknowledged work from other sources,
 will be considered to be of no academic merit.
 
 
