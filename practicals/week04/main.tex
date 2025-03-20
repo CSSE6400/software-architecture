@@ -20,17 +20,20 @@
   Github Classroom links for this practical can be found on Edstem \url{https://edstem.org/au/courses/15375/discussion/1753712}
 }
 
-% \section{Before Class}
-% It's preferable if you already have \link{terraform installed}{https://learn.hashicorp.com/tutorials/terraform/install-cli}.
-% Please also have one of IntelliJ IDEA, PyCharm, or VSCode with the terraform plugin installed.
+
+\section*{Before Class}
+\link{Install Terraform}{https://learn.hashicorp.com/tutorials/terraform/install-cli} \textit{before} your practical class.
+Also install the Terraform plugin for your IDE.
+
 
 \section{This Week}
 This week our goal is to get acquainted with AWS Academy.
 We use AWS Academy to learn how to deploy and manage infrastructure with AWS.
-Additionally, AWS Academy will be used to develop the Cloud assignment.
+Additionally, AWS Academy will be used to develop the Cloud Infrastructure assignment.
 If you have not already enrolled in the AWS Academy courses, you need to do so now.
 \begin{itemize}
-    \item AWS Academy Learner Lab [\href{https://awsacademy.instructure.com/courses/110995}{110995}]
+    \item AWS Academy \textbf{Practicals} Learner Lab [\href{https://awsacademy.instructure.com/courses/110995}{110995}]
+    \item AWS Academy \textbf{Assignment} Learner Lab [\href{https://awsacademy.instructure.com/courses/112082}{112082}]
     \item AWS Academy Cloud Foundations [\href{https://awsacademy.instructure.com/courses/110989}{110989}]
     \item AWS Academy Cloud Architecting [\href{https://awsacademy.instructure.com/courses/110993}{110993}]
     \item AWS Academy Cloud Developing [\href{https://awsacademy.instructure.com/courses/110994}{110994}]
@@ -61,8 +64,12 @@ In this course, we will be using it in two ways:
 \begin{enumerate}
     \item The AWS Cloud Foundations, Cloud Architecting, and Cloud Developing courses are supplementary material to help cement your ability to use AWS.
           You are encouraged to work your way through at least the AWS Cloud Foundations and Cloud Architecting courses.
-    \item The AWS Learner Lab provides access to an environment which will be used in these practicals to learn AWS. 
-          A separate Learn Lab will be used to develop your Cloud Infrastructure assignment.
+    \item The AWS Learner Lab (\href{https://awsacademy.instructure.com/courses/110995}{110995})
+          provides access to an environment which will be used in these practicals to learn AWS. 
+          A separate Learn Lab (\href{https://awsacademy.instructure.com/courses/112082}{112082})
+          will be used to develop your Cloud Infrastructure assignment.
+          Remember that you have a \$50 USD budget for \textit{each} Learner Lab.
+          Once you have spent your budget, you will not be able to use the Learner Lab.
 \end{enumerate}
 
 \section{Enrol in AWS Academy}
@@ -150,9 +157,10 @@ For example, they offer virtual compute resources, database storage options, and
 Services are offered on a pay as you go model, meaning you only pay for the seconds you use a service.
 We will now get acquainted with some simple services offered by AWS.}
 
+
 \section{AWS EC2}
 
-Today we are going to focus on using AWS's EC2 service.
+Today we are focussing on using AWS's EC2 service.
 Elastic Compute Cloud (EC2) is the primary compute service offered by AWS.
 It allows you to create virtual machines on Amazon's infrastructure.
 You have full control over this machine and can configure it for whatever purpose you need.
@@ -162,22 +170,29 @@ You might find this interface overwhelming.
 It is important to note that since EC2 is one of the primary services offered by AWS,
 many smaller services we do not need are bundled into this service.
 
-\teacher{The Cloud Foundation course has a module (6) that covers EC2 in more depth. You should direct students to it after completing the Hextris example.}
+\teacher{
+The Cloud Foundation course has a module (6) that covers EC2 in more depth.
+You should direct students to it after completing the Hextris example.
+}
 
-\vspace{2mm}
-\includegraphics[width=0.95\textwidth]{images/search-ec2}
-\vspace{5mm}
+\begin{center}
+  \noindent
+  \includegraphics[trim=0 20 0 0,clip,width=0.95\textwidth]{images/search-ec2}
+\end{center}
 
 \noindent
 Today, we only need the \texttt{Instances} dashboard.
 Navigate to there and select ``Launch instance''.
 
-\vspace{3mm}
-\includegraphics[width=0.96\textwidth]{images/ec2-interface}
+%\vspace{3mm}
+\begin{center}
+  \noindent
+  \includegraphics[trim=0 120 0 0,clip,width=0.95\textwidth]{images/ec2-interface}
+\end{center}
 
 \subsection{EC2 AMI}
 First we will need to select an Amazon Machine Image (AMI).
-An AMI is the template (cookie cutter) which provides instructions on how an instance should be provisioned.
+An AMI is the template that provides instructions on how an instance should be provisioned.
 Amazon offers a range of built-in AMIs. There are also community AMIs or you can create your own.
 As we just want a simple server today, we will use one of the built-in AMIs.
 
@@ -191,7 +206,7 @@ which is \texttt{ami-053a45fff0a704a47} for the Amazon Linux 2023 AMI.
 \noindent
 \includegraphics[width=\textwidth]{images/launch-instance}
 
-\teacher{This AMI is a RedHat style distro with yum as its package manager.}
+\teacher{This AMI is a RedHat style distro with \texttt{yum} as its package manager.}
 
 \subsection{Instance Settings}
 The settings to configure your instance are:
@@ -208,10 +223,12 @@ The settings to configure your instance are:
 \teacher{To make the box pingable don't forget to add the All-ICMP4 with source anywhere.}
 \end{enumerate}
 
+ 
 \section{Accessing the Instance}
 
 Return to the \texttt{Instances} dashboard.
-You should see that a new instance has been created, its instance state might not yet be \texttt{Running}, if not, wait.
+You should see that a new instance has been created.
+Its instance state might not yet be \texttt{Running}, if not, wait.
 
 \vspace{3mm}
 \noindent
@@ -219,7 +236,7 @@ You should see that a new instance has been created, its instance state might no
 \vspace{3mm}
 
 \noindent
-Note the public IPv4 address as we will need to use this to connect to the server.
+Note the public IPv4 address, as we will need to use this to connect to the server.
 
 \begin{enumerate}
     \item Return to the AWS Learner Lab interface.
@@ -228,6 +245,7 @@ Note the public IPv4 address as we will need to use this to connect to the serve
 \end{enumerate}
 \bash{ssh -i ~/.ssh/labsuser.pem ec2-user@127.0.0.1}
 
+\noindent
 For example:
 \hspace{5mm}
 \vtop{
@@ -261,6 +279,12 @@ For example:
 %https://aws.amazon.com/amazon-linux-2/
 %[ec2-user@ip-172-31-53-4 ~]$
 %\end{code}
+
+\vspace{5mm}
+\noindent
+You can also access the instance by selecting it from the list of instances in the dashboard and clicking the "Connect" button.
+This will open a new tab in your browser with terminal access to your instance.
+
 
 \section{Installing Hextris}\label{sec:installHextris}
 Hextris \cite{hextris} is very simple to install. Using an EC2 interface is perhaps overkill for it.
@@ -321,6 +345,7 @@ one problem could be using \texttt{https} to connect rather than \texttt{http}.}
 
 \teacher{Make sure they delete their instances.}
 
+
 \section{Switching to Terraform}
 
 For the remainder of the practical we will be using Terraform to provision the same instance we just created.
@@ -330,6 +355,7 @@ For the remainder of the practical we will be using Terraform to provision the s
     \item Next, navigate to the GitHub Classroom link for this practical provided by your tutor.
     This will create a new repository where we can work on Terraform.
 \end{enumerate}
+
 
 \section{Using Terraform in AWS Learner Labs}
 We will redeploy our Hextris application using Infrastructure as Code (IaC) to do so.
