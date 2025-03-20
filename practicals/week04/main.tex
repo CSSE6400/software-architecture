@@ -17,7 +17,7 @@
 \end{figure}
 
 \aside{
-  Github Classroom links for this practical can be found on Edstem \url{https://edstem.org/au/courses/15375/discussion/1753712}
+  Github Classroom links for this practical can be found on Edstem \url{https://edstem.org/au/courses/21491/discussion/2429006}
 }
 
 
@@ -199,7 +199,7 @@ As we just want a simple server today, we will use one of the built-in AMIs.
 We will use the Amazon Linux 2023 AMI today,
 it is considered one of the fundamental images.
 Every AMI has a unique AMI code,
-which is \texttt{ami-053a45fff0a704a47} for the Amazon Linux 2023 AMI.
+which is \texttt{ami-08b5b3a93ed654d19} for the Amazon Linux 2023 AMI.
 %Search for it via the code and select it.
 
 \vspace{3mm}
@@ -237,6 +237,7 @@ Its instance state might not yet be \texttt{Running}, if not, wait.
 
 \noindent
 Note the public IPv4 address, as we will need to use this to connect to the server.
+You will also need this address to test that installation of Hextris in section \ref{sec:installHextris} worked.
 
 \begin{enumerate}
     \item Return to the AWS Learner Lab interface.
@@ -288,11 +289,11 @@ This will open a new tab in your browser with terminal access to your instance.
 
 \section{Installing Hextris}\label{sec:installHextris}
 Hextris \cite{hextris} is very simple to install. Using an EC2 interface is perhaps overkill for it.
-It is an entirely client-side/static web application which means we just have to serve the static files.
+It is an entirely client-side/static web application, which means we just have to serve the static files.
 
 First, we will need to enable serving of static files.
-We can install and start the \texttt{httpd} service for this.
-The AMI we have picked uses the yum package manager, so to install httpd we run:
+We can install and start the \texttt{httpd} service to do this.
+The AMI we have picked uses the \texttt{yum} package manager, so to install \texttt{httpd} we run:
 
 \begin{code}[language=bash,numbers=none]{}
 > sudo yum install httpd
@@ -348,12 +349,12 @@ one problem could be using \texttt{https} to connect rather than \texttt{http}.}
 
 \section{Switching to Terraform}
 
-For the remainder of the practical we will be using Terraform to provision the same instance we just created.
+For the remainder of the practical we will use Terraform to provision the same instance we just created.
 
 \begin{enumerate}
     \item First, please delete any running instances in your AWS account using the AWS Console.
-    \item Next, navigate to the GitHub Classroom link for this practical provided by your tutor.
-    This will create a new repository where we can work on Terraform.
+    \item Next, navigate to the GitHub Classroom link for this practical provided at the start of this document.
+          This will create a new repository where we can work on Terraform.
 \end{enumerate}
 
 
@@ -400,8 +401,8 @@ The \texttt{terraform} block specifies the required external dependencies, here 
 The \texttt{provider} block configures the AWS provider, instructing it which region to use and how to authenticate (using the credentials file we created).
 We also include some \texttt{tags} to add to any resource made by this provider, these are useful for keeping track of resources in the console.
 
-\item We need to initialise Terraform which will download the required dependencies.
-    This is done with the \texttt{terraform init} command.
+\item We need to initialise Terraform, which will download the required dependencies.
+      This is done with the \texttt{terraform init} command.
 \bash{terraform init}
 
 This command will create a \texttt{.terraform} directory which stores providers and a provider lock file, \texttt{.terraform.lock.hcl}.
@@ -414,21 +415,22 @@ Note that this does not ensure our credentials are correctly configured, as Terr
 
 \end{enumerate}
 
+
 \section{Deploying Hextris}
 First, we will need to create an EC2 instance resource.
 The AWS provider calls this resource an \link{\texttt{aws\_instance}}{https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance}.
 Get familiar with the documentation page.
 Most Terraform providers have reasonable documentation.
-Reading the argument reference section helps to understand what a resource is capable of.
+Reading the argument reference section helps to understand what a resource is capable of doing.
 
 We will start off with the basic information for the resource.
-Configure it to use a specific Amazon Machine Instance (AMI) and chose the \texttt{t2.micro} size.
+Configure it to use a specific Amazon Machine Instance (AMI), and chose the \texttt{t2.micro} size.
 We will also give it a name so that it is easy to find.
-Add the following basic resource to \texttt{main.tf}:
+Add the following basic \texttt{resource} block to \texttt{main.tf}:
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
 resource "aws_instance" "hextris-server" {
-    ami           = "ami-0e731c8a588258d0d"
+    ami           = "ami-08b5b3a93ed654d19"
     instance_type = "t2.micro"
     key_name      = "vockey"
     
@@ -438,8 +440,8 @@ resource "aws_instance" "hextris-server" {
 }      
 \end{code}
 
-To create the server, invoke
-\texttt{terraform apply} which will first do \texttt{terraform plan} and prompt us to confirm if we want to apply changes.
+To create the server, invoke \texttt{terraform apply},
+which will first do \texttt{terraform plan} and prompt us to confirm if we want to apply the changes.
 
 \bash{terraform apply}
 
@@ -453,13 +455,14 @@ Terraform will perform the following actions:
 
   # aws_instance.hextris-server will be created
   + resource "aws_instance" "hextris-server" {
-      + ami                                  = "ami-0e731c8a588258d0d"
+      + ami                                  = "ami-08b5b3a93ed654d19"
       (omitted)
       + instance_type                        = "t2.micro"
       (omitted)
       + tags                                 = {
           + "Name" = "hextris"
         }
+      (omitted)
     }
 
 Plan: 1 to add, 0 to change, 0 to destroy.
@@ -488,7 +491,7 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 You can now check in the AWS Console that another EC2 instance with the name \texttt{hextris} has been created.
 Now that we have a server, we should try to configure it to serve Hextris.
-We will use the \texttt{user\_data} field which configures commands to run when launching the instance.
+We will use the \texttt{user\_data} field, which configures commands to run when launching the instance.
 First we need a script to provision the server, if we combine all our commands from section \ref{sec:installHextris}, we will produce this script:
 
 \begin{code}[language=bash,numbers=none]{serve-hextris.sh}
@@ -504,10 +507,11 @@ git clone https://github.com/Hextris/hextris .
 
 \teacher{The hash bang is required.}
 
-\teacher{Don't forget the -y on yum install}
+\teacher{Don't forget the \texttt{-y} on \texttt{yum install}.}
 
 Now we can add the following field to our Terraform resource.
-It uses the Terraform \texttt{file} function to load the contents of a file named \texttt{serve-hextris.sh} relative to the Terraform directory.
+It uses the Terraform \texttt{file} function to load the contents of a file named \texttt{serve-hextris.sh},
+relative to the Terraform directory.
 The contents of that file is passed to the \texttt{user\_data} field.
 
 \begin{code}[language=terraform,numbers=none]{}
@@ -516,7 +520,8 @@ user_data = file("./serve-hextris.sh")
 
 If you run the \texttt{terraform plan} command now,
 you will notice that Terraform has identified that this change will require creating a new EC2 instance.
-Where possible, Terraform will try to update a resource in-place but since this changes how an instance is started, it needs to be replaced.
+Where possible, Terraform will try to update a resource in-place
+but since this changes how an instance is started, it needs to be replaced.
 Go ahead and apply the changes.
 
 Now, in theory, we should have deployed Hextris to an EC2 instance.
@@ -525,7 +530,7 @@ We \textsl{could} go to the AWS Console and find the public IP address.
 However, it turns out that Terraform already knows the public IP address.
 In fact, if you open the Terraform state file (\texttt{terraform.tfstate}),
 you should be able to find it hidden away in there.
-But we do not want to go hunting through this file all the time.
+But, we do not want to go hunting through this file all the time.
 Instead we will use the \texttt{output} keyword.
 
 We can specify certain attributes as `output' attributes.
@@ -543,20 +548,21 @@ which references the \texttt{public\_ip} attribute of our \texttt{hextris-server
 Note that resources in Terraform are addressed by the resource type (\texttt{aws\_instance})
 followed by the name of the resource (\texttt{hextris-server}).
 
-If you plan or apply the changes, it should tell you the public IP address of the instance resource.
-\bash{terraform plan}
+If you \texttt{apply} the changes, it should tell you the public IP address of the instance resource.
+\bash{terraform apply}
 
 \begin{code}[numbers=none]{}
 aws_instance.hextris-server: Refreshing state... [id=i-043a61ff86aa272e0]
 
-Changes to Outputs:
-  + hextris-url = "3.82.225.65"
+Outputs:
+hextris-url = "3.82.225.65"
 \end{code}
 
 You can apply this plan to save these new output values to the Terraform state, without changing any real infrastructure.  
 
 So let's try and access that URL, hmm.
 That is strange. Something has gone wrong.
+
 
 \section{Security Groups}
 When we setup our EC2 instance using the AWS Console,
@@ -570,10 +576,10 @@ First, let us create an appropriate security group.
 Recall that in the AWS Console configuration,
 ingress SSH access (port 22) and all egress%
 \footnote{Ingress and egress in networking just means incoming and outgoing respectively.}
-traffic was automatically configured and we just added ingress port 80.
-In Terraform the whole state must be configured so we specify two
-\texttt{ingress} blocks one for HTTP (port 80) and one for SSH access (port 22).%
-\footnote{We do not actually need SSH access as all the server configuration is done when the machine is provisioned thanks to the \texttt{user\_data},
+traffic were automatically configured and we just added ingress port 80.
+In Terraform the whole state must be configured so we specify two \texttt{ingress} blocks,
+one for HTTP (port 80) and one for SSH access (port 22).%
+\footnote{We do not actually need SSH access as all the server configuration is done when the machine is provisioned, thanks to the \texttt{user\_data},
 but we are trying to create a new instance that is identical to the original AWS Console in section \ref{sec:installHextris}.}
 Additionally, we will create egress for all outgoing traffic.
 
@@ -608,11 +614,11 @@ resource "aws_security_group" "hextris-server" {
 Note the following:
 \begin{itemize}
   \item \texttt{from\_port} and \texttt{to\_port} are the start and end of a range of ports rather than incoming or outgoing. In this example our range is 80-80.
-  \item \texttt{protocol} set to -1 is a special flag to indicate all protocols.
+  \item \texttt{protocol} set to ``-1'' is a special flag to indicate all protocols.
   \item Explaining \texttt{cidr} is outside the scope of the course, but the specified block above means to apply to all IP addresses.
 \end{itemize}
 
-You may now apply the changes to create this new security group resource.
+You may now \texttt{apply} the changes to create this new security group resource.
 
 Next, we will attach the security group to the EC2 instance.
 Return to the \texttt{aws\_instance.hextrix-server} resource
@@ -629,10 +635,11 @@ Once again notice the structure of resource identifiers in AWS.
 % we'll noticed that the change of security group forces replacement.
 % TODO: I don't actually know why it does this.
 
-Now apply the changes.
+Now \texttt{apply} the changes.
 If you now try to access via the IP address
 (the IP address may have changed),
-you should be able to view the hextris website.
+you should be able to view the Hextris website.
+
 
 \section{Tearing Down}
 
@@ -658,6 +665,7 @@ That is the beauty of Infrastructure as Code!
 
 \textbf{Hint:} Destroy everything again before you finish.
 
+
 \section{Automated Testing}
 A quick note about automated testing.
 As with all the practicals thus far,
@@ -673,6 +681,7 @@ If fixing the test failures is not too hard,
 please try to do so.
 If you are repeatedly not passing the practicals,
 we may reach out to ensure that you are not being left behind in the content.
+
 
 \section{Extension}
 
@@ -734,8 +743,10 @@ resource "aws_instance" "hextris-server" {
 And now, if we run \texttt{terraform plan}, we will see that it wants to destroy and recreate the EC2 instance.
 This is because the AMI has changed since this practical was first updated for this year.
 
+
 \bibliographystyle{ieeetr}
 \bibliography{regions,hextris,ours,books}
+
 
 \appendix
 
@@ -751,7 +762,7 @@ we have picked \texttt{us-east-1} because it is the least expensive.
 
 \begin{figure}[ht]
 \includegraphics[width=\textwidth]{images/aws_regions}
-\caption{AWS Regions as of February 2024 \cite{aws-regions}}
+\caption{AWS Regions as of March 2025 \cite{aws-regions}}
 \end{figure}
 
 \paragraph{Availability Zones}
@@ -759,7 +770,7 @@ An AWS Region will consist of availability zones, normally named with letters.
 For example, the AWS Region located in Sydney, \texttt{ap-southeast-2} has three availability zones:
 \texttt{ap-southeast-2a}, \texttt{ap-southeast-2b}, and \texttt{ap-southeast-2c}.
 An availability zone is a collection of resources which run on separate power supplies and networks.
-Essentially minimising the risk that multiple availability zones would fail at once.
+Reducing the risk that multiple availability zones would fail at once.
 
 \paragraph{VPC}
 Virtual Private Clouds, or VPCs,
