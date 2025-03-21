@@ -2,6 +2,7 @@
 
 \usepackage{changepage}
 \usepackage{tabto}
+\usepackage{scrextend}  % For \begin{labeling
 % \usepackage{pgfpages}
 
 %\setbeameroption{show notes on second screen}
@@ -10,6 +11,7 @@
 \subtitle{Software Architecture}
 \author{Richard Thomas}
 \date{\week{6}}
+
 
 \begin{document}
 
@@ -57,18 +59,19 @@
 \begin{frame}{Terminology}
     \vspace{1mm}
     {\LARGE
-    \begin{description}
-        \item[Initiating Event] Starts the business process
+    \begin{labeling}{Processing Event}
+%    \begin{description}
+        \item<1->[\color{secondary} Initiating Event] Starts the business process
         \vspace{3mm}
-        \item[Processing Event] Indicates next step in the process can be performed
+        \item<2->[\color{secondary} Processing Event] Indicates next step in the process can be performed
         \vspace{3mm}
-        \item[Event Channel] Holds events waiting to be processed
+        \item<3->[\color{secondary} Event Channel] Holds events waiting to be processed
         \vspace{3mm}
-        \item[Event Handler] Processes events
+        \item<4->[\color{secondary} Event Handler] Processes events
         \begin{itemize}
             \Large\item Step, or part of a step, in the business process
-	\end{itemize}
-    \end{description}
+        \end{itemize}
+    \end{labeling}
     }
 \end{frame}
 
@@ -84,9 +87,11 @@
     \item Bid Processor could send back a high bid event or an async message.
 }
 
-\definition{Event Handler Cohesion Principle}{Each event handler is a simple cohesive unit that performs a \highlight{single} processing task.}
+\definition{Event Handler Cohesion Principle}
+{Each event handler is a simple cohesive unit that performs a \highlight{single} processing task.}
 
-\definition{Event Handler Independence Principle}{Event handlers should not depend on the implementation of any other event handler.}
+\definition{Event Handler Independence Principle}
+{Event handlers should not depend on the \highlight{implementation} of any other event handler.}
 
 \begin{frame}{Auction Example -- Error Handling}
     \begin{adjustwidth}{-10mm}{-10mm}
@@ -131,15 +136,32 @@
     \item Describe idea of channels.
     \item Send final processing event, even if it is not handled.
     \begin{itemize}
-        \item Easier to extend in the future.
+        \item Easier to \highlight{extend} in the future.
     \end{itemize}
 }
 
-\point[Event Broker Façade]{
+\point[\Large Event Broker Façade]{
+\vspace{0.5em}
 \begin{itemize}
-    \item Event handlers can register to listen for events
-    \item Receives events and directs them to the correct channel
+    \item Event handlers register to \highlight{listen} for events
+    \vspace{0.5em}
+    \item Receives events and \highlight{directs} them to the correct channel
 \end{itemize}
+}
+
+\begin{frame}{Broker with Façade Topology}
+    \begin{adjustwidth}{-10mm}{-10mm}
+        \centering
+        \includegraphics[trim=195 195 195 195,clip,width=0.91\paperwidth]{diagrams/broker-facade-components.png}
+    \end{adjustwidth}
+\end{frame}
+\note[itemize]{
+    \item Step through event process.
+    \item Describe idea of channels.
+    \item Send final processing event, even if it is not handled.
+    \begin{itemize}
+        \item Easier to \highlight{extend} in the future.
+    \end{itemize}
 }
 
 %TODO Add diagram showing façade.
@@ -181,9 +203,9 @@
                 \large\item Existing ignored event hooks
             \end{itemize}
             \item[Mediator] Implement event handler \& modify mediator logic
-	\end{description}
+        \end{description}
 	}
-        \vspace{3mm}
+        \vspace{0.5em}
         \item<2-> New event
         {\Large
         \begin{description}
@@ -195,52 +217,11 @@
     }
 \end{frame}
 
-%TODO Add diagrams showing adding new event handler & adding new event to Broker topology.
 
-%\begin{frame}{Broker Topology}
-%    \begin{adjustwidth}{-10mm}{-10mm}
-%        \centering
-%        \includegraphics[trim=195 195 195 195,clip,width=0.97\paperwidth]{../../notes/event/diagrams/broker-components.png}
-%    \end{adjustwidth}
-%\end{frame}
-%\note[itemize]{
-%    \item Step through event process.
-%    \item Describe idea of channels.
-%}
+%TODO Add diagrams showing adding new event handler & adding new event to Broker topology.
 
 %TODO Add diagrams showing adding new event handler & adding new event to Mediator topology.
 
-%\begin{frame}{Extensibility -- Mediator}
-%    \vspace{1mm}
-%    {\LARGE
-%    \begin{itemize}
-%        \item New behaviour for existing event
-%        {\vspace{1mm}\Large
-%        \begin{description}
-%            \item[Mediator] Implement event handler \& modify mediator logic
-%        \end{description}
-%    }
-%        \vspace{3mm}
-%        \item<2-> New event
-%        {\Large
-%        \begin{description}
-%            \item[Mediator] Implement event \& event handler, modify mediator logic
-%    \end{description}
-%    }
-%    \end{itemize}
-%    }
-%\end{frame}
-%
-%\begin{frame}{Mediator Topology}
-%    \begin{adjustwidth}{-10mm}{-10mm}
-%        \centering
-%        \includegraphics[trim=195 195 195 195,clip,width=1.43\paperheight]{../../notes/event/diagrams/mediator-components.png}
-%    \end{adjustwidth}
-%\end{frame}
-%\note[itemize]{
-%    \item Step through event process.
-%    \item Highlight process control performed by mediator.
-%}
 
 \begin{frame}{Scalability}
     \vspace{1mm}

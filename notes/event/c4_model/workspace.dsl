@@ -16,9 +16,11 @@ workspace "Event-Driven" "Example diagrams for an event-driven architecture." {
                 channel3 = component "Processing Event 2 Channel" "" "" "channel"
             }
             handler1 = container "Event Handler A" "Handles an Initiating Event" "" "processor" {
+                procInitEvent = component "Processing Initiating Event" "" "" "event"
+            }
+            handler2 = container "Event Handler B" "Handles a Processing Event 1" "" "processor" {
                 procEvent1 = component "Processing Event 1" "" "" "event"
             }
-            handler2 = container "Event Handler B" "Handles a Processing Event 1" "" "processor"
             handler3 = container "Event Handler C" "Handles a Processing Event 1." "" "processor" {
                 procEvent2 = component "Processing Event 2" "" "" "event"
             }
@@ -26,10 +28,47 @@ workspace "Event-Driven" "Example diagrams for an event-driven architecture." {
         
         initEvent -> channel1 "Sends Initiating Event"
         channel1 -> handler1 "Forwards Initiating Event"
-        procEvent1 -> channel2 "Sends Processing Event 1"
+        procInitEvent -> channel2 "Sends Processing Event 1"
         channel2 -> handler2 "Fowards Processing Event 1"
         channel2 -> handler3 "Forwards Processing Event 1"
         procEvent2 -> channel3 "Sends Processing Event 2"
+
+        # Broker Topology with Facade
+        brokerFacadeTopology = softwareSystem "Broker Topology with Façade" "Structure of the broker topology, with an event broker facade, for an event-driven architecture." {
+            brokerWithFacade = container "Event Broker" "Façade manages the interface to the event channels, which manage the event flow." "" "broker" {
+                facade = component "Event Broker Façade" "" "" "channel"
+                channel1F = component "Initiating Event Channel" "" "" "channel"
+                channel2F = component "Processing Event 1 Channel" "" "" "channel"
+                channel3F = component "Processing Event 2 Channel" "" "" "channel"
+            }
+            handler1F = container "Event Handler A" "Handles an Initiating Event" "" "processor" {
+                procInitEventF = component "Processing Initiating Event" "" "" "event"
+            }
+            handler2F = container "Event Handler B" "Handles a Processing Event 1" "" "processor" {
+                procEvent1F = component "Processing Event 1" "" "" "event"
+            }
+            handler3F = container "Event Handler C" "Handles a Processing Event 1." "" "processor" {
+                procEvent2F = component "Processing Event 2" "" "" "event"
+            }
+        }
+        
+        handler1F -> facade "Register as Init Event Handler"
+        facade -> channel1F "Register Init Event Handler"
+        handler2F -> facade "Register as Processing Event 1 Handler"
+        facade -> channel2F "Register Event 1 Handlers"
+        handler3F -> facade "Register as Processing Event 1 Handler"
+#        facade -> channel2F "Register Event 1 Handler"
+        initEvent -> facade "Sends Initiating Event"
+        facade -> channel1F "Forwards Initiating Event"
+        channel1F -> procInitEventF "Forwards Initiating Event"
+        handler1F -> facade "Sends Processing Event 1"
+# Not sure why component to component relationship doesn't appear in component diagram.
+#        procInitEventF -> facade "Sends Processing Event 1"
+        facade -> channel2F "Forwards Processing Event 1"
+        channel2F -> procEvent1F "Fowards Processing Event 1"
+        channel2F -> procEvent2F "Forwards Processing Event 1"
+        handler3F -> facade "Sends Processing Event 2"
+        facade -> channel3F "Forwards Processing Event 2"
 
         # Conceptual physical architecture of an event-driven architecture.
         deploymentEnvironment "Conceptual Architecture" {
@@ -100,7 +139,7 @@ workspace "Event-Driven" "Example diagrams for an event-driven architecture." {
         
         # Auction Example - Based on Broker Topology
         bidder = person "Bidder" "Someone who bids on an item."
-        enterprise "Auction System" {
+        group "Auction System" {
             auctionSite = softwareSystem "Auction Site" "Allows customers to find items and bid on them." {
                 auctionApp = container "Auction Pages" "Web pages from which customers can view and bid on items." "JavaScript" "browser" {
                     bidEvent = component "Bid Event"
@@ -155,8 +194,6 @@ workspace "Event-Driven" "Example diagrams for an event-driven architecture." {
 
 
         # Sahara eCommerce enterprise-wide system.
-		# Mostly from original service-based architecture model with some additions for the event-driven model.
-		# Could be refactored and rationalised.
         # Actors
         customer = person "Customer" "Someone who shops at the Sahara on-line store."
         orderPersonnel = person "Order Personnel" "Manages inventory and ordering products."
@@ -164,7 +201,7 @@ workspace "Event-Driven" "Example diagrams for an event-driven architecture." {
         paymentProvider = softwareSystem "Payment Provider" "External service providing payment facilities." "external"
 
         # Software Systems, Containers and Components
-        enterprise "Sahara eCommerce" {
+        group "Sahara eCommerce" {
             onlineStore = softwareSystem "On-line Store" "Allows customers to browse and search for items and to order them." {
                 inventoryApp = container "Inventory Application" "Interface to manage inventory." "React" "browser" {
                 }
@@ -278,7 +315,6 @@ workspace "Event-Driven" "Example diagrams for an event-driven architecture." {
 #        inventoryMediator -> orderStock "Sends Order Product Event"
     }
     
-	
     views {
         container brokerTopology "broker-container" {
             include *
@@ -288,6 +324,11 @@ workspace "Event-Driven" "Example diagrams for an event-driven architecture." {
         component broker "broker-components" {
             include *
 #            autolayout lr
+        }
+        
+        component brokerWithFacade "broker-facade-components" {
+            include *
+#            autolayout tb
         }
         
         component auctionBroker "auction-broker-components" {
