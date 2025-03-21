@@ -4,6 +4,7 @@
 \usetikzlibrary{arrows}
 \usepackage{tabto}
 \usepackage{languages}
+\usepackage{scrextend}  % For \begin{labeling
 
 % \usepackage{pgfpages}
 %\setbeameroption{show notes on second screen}
@@ -22,27 +23,30 @@
 %     {https://twitter.com/mathiasverraes/status/632260618599403520}%
 % }
 
+
 \begin{document}
 
 \maketitle
 
-\point[Distributed Systems Series]{
-    \begin{description}
-        \item[Distributed I] \highlight{Reliability} and \highlight{scalability} of \highlight{stateless} systems.
-        \item[Distributed II] \highlight{Complexities} of \highlight{stateful} systems.
-        \item[Distributed III] \highlight{Hard problems} in distributed systems.
-    \end{description}
+\point[\Large Distributed Systems Series]{
+    \vspace{1em}
+    \begin{labeling}{Distributed III}
+        \item[\color{secondary} Distributed I] \highlight{Reliability} and \highlight{scalability} of \highlight{stateless} systems
+        \item[\color{secondary} Distributed II] \highlight{Complexities} of \highlight{stateful} systems
+        \item[\color{secondary} Distributed III] \highlight{Hard problems} in distributed systems
+    \end{labeling}
 }
 
-\point[Distributed Systems Series]{
-    \begin{description}
-        \item[Distributed I] {\color{gray}Reliability and scalability of stateless systems.}
-        \item[Distributed II] \highlight{Complexities} of \highlight{stateful} systems.
-    \item[Distributed III] {\color{gray}Hard problems in distributed systems.}
-    \end{description}
+\point[\Large Distributed Systems Series]{
+    \vspace{1em}
+    \begin{labeling}{Distributed III}
+        \item[\color{secondary} Distributed I] \color{gray}Reliability and scalability of stateless systems
+        \item[\color{secondary} Distributed II] \highlight{Complexities} of \highlight{stateful} systems
+        \item[\color{secondary} Distributed III] \color{gray}Hard problems in distributed systems
+    \end{labeling}
 }
 
-\point[Previously in CSSE6400\dots]{
+\point[\Large Previously in CSSE6400\dots]{
 \begin{center}
 \includegraphics[width=0.8\textheight]{diagrams/SaharaScaled}
 \end{center}
@@ -57,7 +61,7 @@
 \question{What is the \highlight{problem}?}
 \note{The database}
 
-\point[Database]{
+\point[\Large Database]{
 \begin{center}
 \includegraphics[width=\textheight]{diagrams/FocusDB}
 \end{center}
@@ -67,7 +71,7 @@
     \item This is much harder to scale.
 }
 
-\point[Disclaimer]{This is \highlight{not} a database course.}
+\point[\Large Disclaimer]{This is \highlight{not} a database course}
 
 \image{images/infs3200}
 \note{This is a database course.}
@@ -117,19 +121,21 @@
     \item Updates, or writes, must \highlight{propagate} changes.
 }
 
-\point[First approach]{Leader-Follower Replication}
+\point[\Large First Approach]{Leader-Follower Replication}
 
-\image{diagrams/LeaderFollower}
+\image[height=\textheight]{diagrams/LeaderFollower}
 \note[itemize]{
     \item Leader-Follower is the most common implementation.
     \item Multiple followers, only \textit{one} leader.
 }
 
-\point[Leader-based Replication]{
-    \begin{description}[<+->]
-        \item[On write] Writes sent to \textit{leader}, change is propagated via change stream.
-        \item[On read] Any \textit{replica} can be queried. 
-    \end{description}
+\point[\Large Leader-based Replication]{
+    \vspace{1em}
+    \begin{labeling}{On write}
+        \item[\color{secondary} On write] Writes sent to \highlight{leader}, change is propagated via change stream.
+        \vspace{0.5em}
+        \item[\color{secondary} On read]<2-> Any \highlight{replica} can be queried. 
+    \end{labeling}
 }
 
 \image{diagrams/LeaderFollowerSpread}
@@ -138,7 +144,7 @@
     \item Can be added to Oracle and SQL Server.
 }
 
-\point[Propagating changes]{
+\point[\Large Propagating Changes]{
     \highlight{Synchronous} vs. \highlight{Asynchronous}
 }
 
@@ -155,18 +161,24 @@
     \item Following material deals with \textit{leader} or a \textit{replica} going down.
 }
 
-\point[Synchronous Propagation]{
+\point[\Large Synchronous Propagation]{
+\vspace{0.8em}
 \begin{itemize}[<+->]
     \item Writes must propagate to \highlight{all followers} before being successful.
+    \vspace{0.4em}
     \item \highlight{Any} replica goes down, \highlight{all} replicas are un-writeable.
+    \vspace{0.4em}
     \item Writes must \highlight{wait} for propagation to \highlight{all} replicas.
 \end{itemize}
 }
 
-\point[Asynchronous Propagation]{
+\point[\Large Asynchronous Propagation]{
+\vspace{0.8em}
 \begin{itemize}[<+->]
     \item Writes \highlight{don't} have to \highlight{wait} for propagation.
+    \vspace{0.4em}
     \item If the leader goes down before propagating, the \highlight{write is lost}.
+    \vspace{0.4em}
     \item Replicas can have out-dated or \highlight{stale} data.
 \end{itemize}
 }
@@ -191,7 +203,7 @@
 \image[height=\textheight]{diagrams/AsyncLag}
 \note{The purple lifeline bar is \textit{replication lag}.}
 
-\point[Eventually, all replicas must become consistent]{
+\point[\Large Eventually, all replicas must become consistent]{
     The system is \highlight{eventually consistent}.
 }
 \note[itemize]{
@@ -199,7 +211,7 @@
     \item Eventually is intentionally \highlight{ambiguous}.
 }
 
-\point[Eventual Consistency]{Problems?}
+\point[\Large Eventual Consistency]{Problems?}
 
 \begin{frame}
 \begin{center}
@@ -291,15 +303,18 @@
 % \point{Consistent Prefix Reads}
 % \todo{Consistent Prefix Example}
 
-\point[Summary]{
+\point[\Large Summary]{
+\vspace{0.6em}
 \begin{itemize}
     \item Leader-follower databases allow \highlight{reads to scale} more effectively.
+    \vspace{0.3em}
     \item Asynchronous propagation weakens consistency to \highlight{eventually consistent}.
+    \vspace{0.3em}
     \item Leader-follower databases still have a \highlight{leader write bottle-neck}.
 \end{itemize}
 }
 
-\point[Second approach]{Multi-leader Replication}
+\point[\Large Second approach]{Multi-leader Replication}
 
 \image[height=\textheight]{diagrams/MultiLeader}
 \note[itemize]{
@@ -307,7 +322,7 @@
     \item Reads are from replicas, as with Leader-Follower replication.
 }
 
-\point[Why multi-leader?]{
+\point[\Large Why multi-leader?]{
 \vspace{1em}
 \begin{itemize}[<+->]
     \item If you have multiple leaders,
@@ -341,31 +356,34 @@
     \item How do we resolve this?
 }
 
-\point[Where possible]{Avoid write conflicts}
+\point[\Large Where possible]{Avoid write conflicts}
 
 \image{diagrams/AvoidWriteConflict}
 \note{Requires application to ensure all writes to a field/table/shard are via the \highlight{same} leader.}
 
-\point[Where impossible]{Convergence}
+\point[\Large Where impossible]{Convergence}
 
-\point[Convergence Strategies]{
+\point[\Large Convergence Strategies]{
+\vspace{1em}
 \begin{itemize}[<+->]
-    \item Assign each \highlight{write} a unique ID.
-    \item Assign each \highlight{leader replica} a unique ID.
-    \item Custom resolution logic.
+    \item Assign each \highlight{write} a unique ID
+    \vspace{0.5em}
+    \item Assign each \highlight{leader replica} a unique ID
+    \vspace{0.5em}
+    \item Custom resolution logic
 \end{itemize}
 }
 \note{Yes, this can be \highlight{challenging}.}
 
 \image[height=\textheight]{diagrams/ResolveWriteConflict}
 
-\point[Resolving Conflicts]{
+\point[\Large Resolving Conflicts]{
 \vspace{1em}
-\begin{description}
-    \item[On Write] When a conflict is first noticed, take proactive resolution action.
-    \vspace{1em}
-    \item[On Read] When a conflict is next read, ask for a resolution.
-\end{description} 
+\begin{labeling}{On Write}
+    \item[\color{secondary} On Write] When a conflict is first noticed, take proactive resolution action.
+    \vspace{0.5em}
+    \item[\color{secondary} On Read] When a conflict is next read, ask for a resolution.
+\end{labeling} 
 }
 \note[itemize]{
     \item Bucardo allows a perl script for on write resolution.\vspace{1em}
@@ -374,7 +392,7 @@
 
 % \point[Cutting Edge]{Automatic Conflict Resolution}
 
-\point[Third Approach]{Leaderless Replication}
+\point[\Large Third Approach]{Leaderless Replication}
 \note[itemize]{
     \item Early distributed databases were leaderless.
     \item Resurgance after Amazon created Dynamo.
@@ -382,10 +400,11 @@
     \item Riak, Cassandra, and Voldemort are leaderless databases.
 }
 
-\image{diagrams/Leaderless}
+\image[width=1.05\textwidth]{diagrams/Leaderless}
 \note{Reads and writes can be written to any node.}
 
-\point[How do they work?]{
+\point[\Large How do they work?]{
+    \vspace{0.5em}
     Each read/write is sent to \highlight{multiple} replicas.
 }
 
@@ -395,10 +414,12 @@
 \image{diagrams/LeaderlessExampleRead}
 \note{Leaderless Read: At least one of the reads has the updated value.}
 
-\point[How are changes propagated?]{
+\point[\Large How are changes propagated?]{
+    \vspace{0.6em}
     \begin{itemize}[<+->]
         \item Read Repair
         \note[item]<1->{Read Repair: Client detects stale data on read and writes updated data to that replica.\vspace{1em}}
+        \vspace{0.5em}
         \item Anti-Entropy Process
         \note[item]<2>{Anti-Entropy Process: Background process looks for stale or missing data and updates replicas.}
     \end{itemize}
@@ -416,7 +437,7 @@
 \definecolor{eq1}{RGB}{116, 137, 227}
 \definecolor{eq2}{RGB}{227, 116, 137}
 
-\point[Quorum Consistency]{
+\point[\Large Quorum Consistency]{
 \only<1>{
 \begin{equation*}
 \textcolor{eq1}{w} + \textcolor{eq2}{r} > \textcolor{focus}{n}
@@ -491,7 +512,7 @@
   \end{enumerate}
 }
 
-\point[Summary]{
+\point[\Large Summary]{
 \begin{itemize}[<+->]
     \item \highlight{Replication} copies data to multiple replicas.
     \item \highlight{Leader-based} replication is most common and simpliest.
@@ -540,7 +561,7 @@
 }
 
 \questionanswer{
-    How should we decide which data is stored where?
+    How should we decide where data is stored?
 }{
     Maximize spread of requests, avoiding \highlight{skewing}.
 }
@@ -555,26 +576,29 @@
 \question{How do we route queries?}
 \note{Unlike stateless, only one node can process queries.}
 
-\point[Query-insensitive Load Balancer]{
+\point[\Large Query-Insensitive Load Balancer]{
+    \vspace{0.5em}
     Randomly route to any node, responsibility of the node to re-route to the correct node.
 }
 
 \image{diagrams/PartitioningLB1}
 
-\point[Query-sensitive Load Balancer]{
-    A load balancer which understands which queries should be forwarded to which node.
+\point[\Large Query-Sensitive Load Balancer]{
+    \vspace{0.5em}
+    Load balancer understands which queries should be forwarded to which node.
 }
 
 \image[height=\textheight]{diagrams/PartitioningLB2}
 
 
-\point[Client-aware Queries]{
+\point[\Large Client-aware Queries]{
+    \vspace{0.5em}
     Place the responsibility on clients to choose the correct node.
 }
 
 \image{diagrams/PartitioningLB3}
 
-\point[Summary]{
+\point[\Large Summary]{
 \begin{itemize}[<+->]
     \item \highlight{Partitioning} splits data across multiple nodes.
     \item Requires a \highlight{consistent method} to chose appropriate node.
@@ -584,7 +608,10 @@
 \end{itemize}
 }
 
-\point[Disclaimer]{We have ignored the hard parts of replication.}
+\point[\Large Disclaimer]{
+    \vspace{0.5em}
+    We have ignored the \highlight{hard} parts of replication.
+}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -637,24 +664,29 @@
 %    \centering \youtubevideo{images/transactions}{https://www.youtube.com/watch?v=5ZjhNTM8XU8}
 %}
 
-\point[Summary]{
+\point[\Large Summary]{
+    \vspace{1em}
     \begin{itemize}[<+->]
-        \vspace{4mm}
         \item Replications
         \begin{itemize}
             \Large
+            \vspace{0.1em}
             \item Leader-based, multi-leader, and leaderless
+            \vspace{0.1em}
             \item Eventual consistency
+            \vspace{0.1em}
             \item Write conflicts
         \end{itemize}
-        \vspace{2mm}
+        \vspace{0.5em}
         \item Partitioning
         \begin{itemize}
             \Large
+            \vspace{0.1em}
             \item Consistent method to pick nodes for data
+            \vspace{0.1em}
             \item Avoiding skewing
         \end{itemize}
-%        \vspace{2mm}
+%        \vspace{0.5em}
 %        \item Transactions
 %        \begin{itemize}
 %            \Large
