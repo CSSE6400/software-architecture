@@ -22,16 +22,22 @@ workspace "Event-Driven" "Example diagrams for an event-driven architecture." {
                 procEvent1 = component "Processing Event 1" "" "" "event"
             }
             handler3 = container "Event Handler C" "Handles a Processing Event 1." "" "processor" {
-                procEvent2 = component "Processing Event 2" "" "" "event"
+                procEvent2 = component "Processing Event 1" "" "" "event"
             }
+# Uncomment to show adding handler for Processing Event 2.
+#            handler4 = container "Event Handler D" "Handles a Processing Event 2." "" "processor" {
+#                procEvent3 = component "Processing Event 2" "" "" "event"
+#            }
         }
         
         initEvent -> channel1 "Sends Initiating Event"
-        channel1 -> handler1 "Forwards Initiating Event"
+        channel1 -> handler1 "Notification of Initiating Event"
         procInitEvent -> channel2 "Sends Processing Event 1"
-        channel2 -> handler2 "Fowards Processing Event 1"
-        channel2 -> handler3 "Forwards Processing Event 1"
+        channel2 -> handler2 "Notification of Processing Event 1"
+        channel2 -> handler3 "Notification of Processing Event 1"
         procEvent2 -> channel3 "Sends Processing Event 2"
+# Uncomment to show adding handler for Processing Event 2.
+#        channel3 -> handler4 "Notification of Processing Event 2"
 
         # Broker Topology with Facade
         brokerFacadeTopology = softwareSystem "Broker Topology with Façade" "Structure of the broker topology, with an event broker facade, for an event-driven architecture." {
@@ -59,16 +65,16 @@ workspace "Event-Driven" "Example diagrams for an event-driven architecture." {
         handler3F -> facade "Register as Processing Event 1 Handler"
 #        facade -> channel2F "Register Event 1 Handler"
         initEvent -> facade "Sends Initiating Event"
-        facade -> channel1F "Forwards Initiating Event"
-        channel1F -> procInitEventF "Forwards Initiating Event"
+        facade -> channel1F "Add Initiating Event to Channel"
+        channel1F -> procInitEventF "Notification of Initiating Event"
         handler1F -> facade "Sends Processing Event 1"
 # Not sure why component to component relationship doesn't appear in component diagram.
 #        procInitEventF -> facade "Sends Processing Event 1"
-        facade -> channel2F "Forwards Processing Event 1"
-        channel2F -> procEvent1F "Fowards Processing Event 1"
-        channel2F -> procEvent2F "Forwards Processing Event 1"
+        facade -> channel2F "Adds Processing Event 1 to Channel"
+        channel2F -> procEvent1F "Notification of Processing Event 1"
+        channel2F -> procEvent2F "Notification of Processing Event 1"
         handler3F -> facade "Sends Processing Event 2"
-        facade -> channel3F "Forwards Processing Event 2"
+        facade -> channel3F "Adds Processing Event 2 to Channel"
 
         # Conceptual physical architecture of an event-driven architecture.
         deploymentEnvironment "Conceptual Architecture" {
@@ -99,10 +105,10 @@ workspace "Event-Driven" "Example diagrams for an event-driven architecture." {
                 mediatorChannel2 = component "Processing Event 2 Channel" "" "" "channel"
                 mediatorChannel3 = component "Processing Event 3 Channel" "" "" "channel"
                 # Comment out the following four components for basic mediator topology diagram.
-                BPELQueue = component "BPEL Event Queue" "" "" "queue"
-                BPMQueue = component "BPM Event Queue" "" "" "queue"
-                BPELMediator = component "BPEL Event Mediator" "BPEL describes the flow of events to implement a business process." "Oracle BPEL Process Manager" "mediator"
-                BPMMediator = component "BPM Event Mediator" "BPM description of the business process, which controls the flow of events." "jBPM" "mediator"
+#                BPELQueue = component "BPEL Event Queue" "" "" "queue"
+#                BPMQueue = component "BPM Event Queue" "" "" "queue"
+#                BPELMediator = component "BPEL Event Mediator" "BPEL describes the flow of events to implement a business process." "Oracle BPEL Process Manager" "mediator"
+#                BPMMediator = component "BPM Event Mediator" "BPM description of the business process, which controls the flow of events." "jBPM" "mediator"
 # Mediator Processing Events commented out so they do not appear in component diagram.
 #                mediatorProcEvent1 = component "Processing Event 1" "" "" "event"
 #                mediatorProcEvent2 = component "Processing Event 2" "" "" "event"
@@ -118,23 +124,23 @@ workspace "Event-Driven" "Example diagrams for an event-driven architecture." {
         initEvent -> eventQueue "Sends Initiating Event"
         mediator -> eventQueue "Dequeues Initiating Event"
         mediator -> mediatorChannel1 "Sends Processing Event 1"
-        mediatorChannel1 -> mediatorHandler1 "Fowards Processing Event 1"
+        mediatorChannel1 -> mediatorHandler1 "Notification of Processing Event 1"
         # Comment out the following five relationships for complex mediator topology diagram.
-#        mediator -> mediatorChannel2 "Sends Processing Event 2"
-#        mediatorChannel2 -> mediatorHandler2 "Fowards Processing Event 2"
-#        mediatorChannel2 -> mediatorHandler3 "Fowards Processing Event 2"
-#        mediator -> mediatorChannel3 "Sends Processing Event 3"
-#        mediatorChannel3 -> mediatorHandler4 "Fowards Processing Event 3"
+        mediator -> mediatorChannel2 "Sends Processing Event 2"
+        mediatorChannel2 -> mediatorHandler2 "Notification of Processing Event 2"
+        mediatorChannel2 -> mediatorHandler3 "Notification of Processing Event 2"
+        mediator -> mediatorChannel3 "Sends Processing Event 3"
+        mediatorChannel3 -> mediatorHandler4 "Notification of Processing Event 3"
 
         # Complex Mediator Topology - Comment out the following relationships for basic mediator topology diagram.
-        mediator -> BPELQueue "Forwards Initiating Event"
-        mediator -> BPMQueue "Forwards Initiating Event"
-        BPELMediator -> BPELQueue "Dequeues Initiating Event"
-        BPMMediator -> BPMQueue "Dequeues Initiating Event"
-        BPELMediator -> mediatorChannel2 "Sends Processing Event 2"
-        mediatorChannel2 -> mediatorHandler2 "Fowards Processing Event 2"
-        BPMMediator -> mediatorChannel3 "Sends Processing Event 3"
-        mediatorChannel3 -> mediatorHandler3 "Fowards Processing Event 3"
+#        mediator -> BPELQueue "Notification of Initiating Event"
+#        mediator -> BPMQueue "Notification of Initiating Event"
+#        BPELMediator -> BPELQueue "Dequeues Initiating Event"
+#        BPMMediator -> BPMQueue "Dequeues Initiating Event"
+#        BPELMediator -> mediatorChannel2 "Sends Processing Event 2"
+#        mediatorChannel2 -> mediatorHandler2 "Notification of Processing Event 2"
+#        BPMMediator -> mediatorChannel3 "Sends Processing Event 3"
+#        mediatorChannel3 -> mediatorHandler3 "Notification of Processing Event 3"
 
         
         # Auction Example - Based on Broker Topology
@@ -159,11 +165,11 @@ workspace "Event-Driven" "Example diagrams for an event-driven architecture." {
         
         bidder -> auctionApp "Bids on item."
         auctionApp -> bidChannel "Sends Bid Event"
-        bidChannel -> bidHandler "Forwards Bid Event"
+        bidChannel -> bidHandler "Notification of Bid Event"
         bidHandler -> highBidChannel "Sends High Bid Event"
-        highBidChannel -> pageUpdateHandler "Forwards High Bid Event"
-        highBidChannel -> bidNotificationHandler "Forwards High Bid Event"
-        highBidChannel -> rebidNotificationHandler "Forwards High Bid Event"
+        highBidChannel -> pageUpdateHandler "Notification of High Bid Event"
+        highBidChannel -> bidNotificationHandler "Notification of High Bid Event"
+        highBidChannel -> rebidNotificationHandler "Notification of High Bid Event"
 
         # Physical architecture for the auction example.
         deploymentEnvironment "Auction Architecture" {
@@ -301,18 +307,18 @@ workspace "Event-Driven" "Example diagrams for an event-driven architecture." {
         webApp_Mediator -> customerEventQueue "Sends Customer Account Events"
         register_Mediator -> customerEventQueue "Sends Register Customer Event"
         acctMgt_Mediator -> customerEventQueue "Sends Update Profile Event"
-        customerMediator -> registerCustomer "Sends Register Customer Event"
-        customerMediator -> updateProfile "Sends Update Profile Event"
+        customerMediator -> registerCustomer "Notification of Register Customer Event"
+        customerMediator -> updateProfile "Notification of Update Profile Event"
         webApp_Mediator -> browsingMediator "Sends Browse & Search Events"
         browsing_Mediator -> browsingMediator "Sends Browse Event"
-        browsingMediator -> browseActivity "Sends Get Products Event"
-        browsingMediator -> searchActivity "Sends Search Event"
+        browsingMediator -> browseActivity "Notification of Get Products Event"
+        browsingMediator -> searchActivity "Notification of Search Event"
         webApp_Mediator -> orderMediator "Sends Order Events"
-        orderMediator -> addToCart "Sends Add to Cart Event"
-        orderMediator -> checkOut "Sends Checkout Event"
+        orderMediator -> addToCart "Notification of Add to Cart Event"
+        orderMediator -> checkOut "Notification of Checkout Event"
 #        inventoryApp_Mediator -> inventoryMediator "Sends Inventory Management Events"
-#        inventoryMediator -> inventoryLevels "Sends Stock Level Event"
-#        inventoryMediator -> orderStock "Sends Order Product Event"
+#        inventoryMediator -> inventoryLevels "Notification of Stock Level Event"
+#        inventoryMediator -> orderStock "Notification of Order Product Event"
     }
     
     views {

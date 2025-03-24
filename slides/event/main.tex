@@ -53,7 +53,7 @@
 \begin{frame}{Event-Driven Architecture}
     \begin{adjustwidth}{-10mm}{-10mm}
         \centering
-        \includegraphics[trim=195 195 195 195,clip,width=0.97\paperwidth]{../../notes/event/diagrams/conceptual-architecture.png}
+        \includegraphics[trim=195 230 195 162,clip,width=0.97\paperwidth]{../../notes/event/diagrams/conceptual-architecture.png}
     \end{adjustwidth}
 \end{frame}
 \note{Comment on how each container is deployed in its own compute node.}
@@ -79,7 +79,7 @@
 \begin{frame}{Auction Example}
     \begin{adjustwidth}{-10mm}{-10mm}
         \centering
-        \includegraphics[trim=195 195 195 195,clip,width=0.97\paperwidth]{../../notes/event/diagrams/auction-architecture.png}
+        \includegraphics[trim=195 230 195 162,clip,width=0.97\paperwidth]{../../notes/event/diagrams/auction-architecture.png}
     \end{adjustwidth}
 \end{frame}
 \note[itemize]{
@@ -98,13 +98,26 @@
 \begin{frame}{Auction Example -- Error Handling}
     \begin{adjustwidth}{-10mm}{-10mm}
         \centering
-        \includegraphics[trim=195 195 195 195,clip,width=0.97\paperwidth]{../../notes/event/diagrams/auction-architecture.png}
+        \includegraphics[trim=195 230 195 162,clip,width=0.97\paperwidth]{../../notes/event/diagrams/auction-architecture.png}
     \end{adjustwidth}
 \end{frame}
 \note[itemize]{
+    \item Ask:
+    \vspace{0.6em}
     \item How to handle Bid Processor failing?
+    \begin{itemize}
+        \item \large Need to restart \& recover
+    \end{itemize}
+    \vspace{0.4em}
     \item How to handle Rebid Notifier failing?
+    \begin{itemize}
+        \item \large Need to restart -- Could losing events be acceptable?
+    \end{itemize}
+    \vspace{0.4em}
     \item How to handle Event Broker failing?
+    \begin{itemize}
+        \item \large Need to restart \& recover -- without losing events
+    \end{itemize}
 }
 
 \begin{frame}{Topologies}
@@ -130,19 +143,20 @@
 \begin{frame}{Broker Topology}
     \begin{adjustwidth}{-10mm}{-10mm}
         \centering
-        \includegraphics[trim=195 195 195 195,clip,width=0.97\paperwidth]{../../notes/event/diagrams/broker-components.png}
+        \includegraphics[trim=195 230 195 162,clip,width=0.97\paperwidth]{../../notes/event/diagrams/broker-components.png}
     \end{adjustwidth}
 \end{frame}
 \note[itemize]{
-    \item Step through event process.
-    \vspace{0.3em}
-    \item Channels facilitate message flow.
+    \item Step through event process
+    \vspace{0.4em}
+    \item Channels facilitate message flow
     \begin{itemize}
-        \item \large Commonly a lightweight message broker (e.g. RabbitMQ, ...).
+        \item \large Commonly a lightweight message broker (e.g. RabbitMQ, ...)
     \end{itemize}
-    \item Send final processing event, even if it is not handled.
+    \vspace{0.2em}
+    \item Send final processing event, even if it is not handled
     \begin{itemize}
-        \item \large Easier to \highlight{extend} in the future.
+        \item \large Easier to \highlight{extend} in the future
     \end{itemize}
 }
 
@@ -158,23 +172,23 @@
 \begin{frame}{Broker with Façade Topology}
     \begin{adjustwidth}{-10mm}{-10mm}
         \centering
-        \includegraphics[trim=195 195 195 195,clip,width=0.91\paperwidth]{diagrams/broker-facade-components.png}
+        \includegraphics[trim=195 230 195 162,clip,width=0.91\paperwidth]{diagrams/broker-facade-components.png}
     \end{adjustwidth}
 \end{frame}
 \note[itemize]{
-    \item Event processing \& event handling are the same.
+    \item Event processing \& event handling are the same
     \vspace{0.4em}
-    \item Now Event Handlers register, rather than being connected directly to Channels.
+    \item Event Handlers register to listen for events,\\ rather than being connected directly to Channels
     \begin{itemize}
-        \item \large Additional layer of abstraction.
+        \item \large Additional layer of abstraction
     \end{itemize}
-    \item Step through event process.
+    \item Step through event process
 }
 
 \begin{frame}{Mediator Topology}
     \begin{adjustwidth}{-10mm}{-10mm}
         \centering
-        \includegraphics[trim=195 195 195 195,clip,width=1.43\paperheight]{../../notes/event/diagrams/mediator-components.png}
+        \includegraphics[trim=195 230 195 162,clip,width=1.43\paperheight]{../../notes/event/diagrams/mediator-components.png}
     \end{adjustwidth}
 \end{frame}
 \note[itemize]{
@@ -185,7 +199,7 @@
 \begin{frame}{Sahara Mediator Topology}
     \begin{adjustwidth}{-10mm}{-10mm}
         \centering
-        \includegraphics[trim=195 195 195 195,clip,width=0.69\paperwidth]{diagrams/sahara-mediator-container.png}
+        \includegraphics[trim=195 230 195 162,clip,width=0.69\paperwidth]{diagrams/sahara-mediator-container.png}
     \end{adjustwidth}
 \end{frame}
 \note[itemize]{
@@ -339,7 +353,7 @@
         \item[Broker] dumb pipe
         \vspace{3mm}
         \item[Broker] events have occurred
-        \vspace{3mm}
+        \vspace{8mm}
         \item[Mediator]<2-> smart pipe
         \vspace{3mm}
         \item[Mediator]<2-> events are commands to process
@@ -392,5 +406,14 @@
     \end{description}
     }
 \end{frame}
+\note[itemize]{
+    \item Broker \& Mediator are both \highlight{very} scalable
+    \vspace{0.4em}
+    \item Due to simple event management through message queues
+    \begin{itemize}
+        \item \large Broker can handle a slightly higher load
+        \item \large Broker is slight easier to scale    
+    \end{itemize}
+}
 
 \end{document}
