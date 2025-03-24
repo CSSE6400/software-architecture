@@ -34,27 +34,37 @@
 }
 
 \point[\Large Distributed Systems Series]{
+    \vspace{0.8em}
     \begin{labeling}{Distributed III}
         \item[\color{secondary} Distributed I] \highlight{Reliability} and \highlight{scalability} of \highlight{stateless} systems.
+        \vspace{0.3em}
         \item[\color{secondary} Distributed II] \highlight{Complexities} of \highlight{stateful} systems.
+        \vspace{0.3em}
         \item[\color{secondary} Distributed III] \highlight{Hard problems} in distributed systems.
     \end{labeling}
 }
 
 \point[\Large What are the benefits?]{
+    \vspace{1em}
     \begin{itemize}
         \item Improved \highlight{reliability}
+        \vspace{0.4em}
         \item Improved \highlight{scalability}
+        \vspace{0.4em}
         \item Improved \highlight{latency}
     \end{itemize}
 }
 \note{Some systems are inherently distributed.}
 
 \point[\Large What are the drawbacks?]{
+    \vspace{1em}
     \begin{itemize}
         \item Increased \highlight{complexity}
+        \vspace{0.4em}
         \item Increased \highlight{attack surface}
+        \vspace{0.4em}
         \item Increased \highlight{latency}
+        \vspace{0.4em}
         \item Introduce \highlight{consistency} problems
     \end{itemize}
 }
@@ -105,7 +115,7 @@ while (status != SUCCESS and retries < MAX_RETRIES)
 \image{diagrams/ReceiveDropResend}
 \note[itemize]{
 \item Failure 1's \textit{solution} of resending request leads to:
-\item Duplicate actions, problem for ordering/payments.
+\item \textit{Duplicate actions}, problem for ordering/payments.
 }
 
 \image{diagrams/ReceiveDropToken}
@@ -114,6 +124,7 @@ while (status != SUCCESS and retries < MAX_RETRIES)
 \point[\Large Fallacy \#2]{Latency is zero}
 
 \point[\Large Network Statistics]{
+    \vspace{0.2em}
     \begin{description}[leftmargin=!,labelwidth=\widthof{Data}]
         \item[Home to UQ] \only<2->{20.025ms}
         \item[Home to us-east-1] \only<3->{249.296ms}
@@ -122,7 +133,7 @@ while (status != SUCCESS and retries < MAX_RETRIES)
 }
 \note[itemize]{
 \item Be mindful when designing distributed systems.
-\item Network call \highlight{much} slower than local call.
+\item Network calls are \highlight{much} slower than local calls.
 }
 
 \point[\Large Fallacy \#3]{Bandwidth is infinite}
@@ -131,6 +142,7 @@ while (status != SUCCESS and retries < MAX_RETRIES)
 \definition{Stamp Coupling}{
     Components which share a composite data structure.
 }
+\note{Particularly an issue if components are on different compute nodes.}
 
 \point[\Large Fallacy \#4]{The network is secure}
 
@@ -162,7 +174,6 @@ while (status != SUCCESS and retries < MAX_RETRIES)
 \point[\Large Remember]{
 \vspace{1em}
 Distributed systems are \highlight{hard}.
-
 \vspace{1em}
 Choosing to use them should be \highlight{well considered}.
 }
@@ -182,10 +193,14 @@ Choosing to use them should be \highlight{well considered}.
 }
 
 \point[\Large Distributed Systems Series]{
+    \vspace{0.8em}
+
     \begin{labeling}{Distributed III}
         \item[\color{secondary} Distributed I] \highlight{Reliability} and \highlight{scalability} of \highlight{stateless} systems.
         \color{gray}{
+        \vspace{0.3em}
         \item[Distributed II] Complexities of stateful systems.
+        \vspace{0.3em}
         \item[Distributed III] Hard problems in distributed systems.
         }
     \end{labeling}
@@ -200,7 +215,7 @@ Choosing to use them should be \highlight{well considered}.
     \end{labeling}
 }
 
-\question{\Large What makes software \highlight{reliable}?}
+\question{What makes software \highlight{reliable}?}
 
 \definition{Reliable Software}{Continues to work, even when things go wrong.}
 
@@ -236,7 +251,7 @@ Choosing to use them should be \highlight{well considered}.
     \item Why is this software somewhat reliable?
     \item Any individual service can go down and the rest still work.
     \item Can we do better?
-    \item Can a service go down but have that service still work?
+    \item Can a service go down but still have that service available?
 }
 
 \question{Who has used \highlight{auto-scaling}?}
@@ -245,30 +260,37 @@ Choosing to use them should be \highlight{well considered}.
 \Large
 \begin{description}[<+->]
     \item[Auto-scaling group] A \highlight{collection of instances} managed by auto-scaling.
+    \vspace{0.2em}
     \item[Capacity] Amount of instances \highlight{currently} in an auto-scaling group.
+    \vspace{0.2em}
     \item[Desired Capacity] Amount of instances \highlight{we want to have} in an auto-scaling group.
+    \vspace{0.2em}
     \item[Scaling Policy] How to determine the desired capacity.
+    \vspace{0.2em}
     \item[Minimum/Maximum Capacity] \highlight{Hard limits} on the minimum and maximum number of instances.
 \end{description}
 \end{frame}
 
 \point[\Large What we really want]{
+    \vspace{0.3em}
     {\color{secondary}Desired Capacity} Amount of \highlight{healthy} instances we want to have in an auto-scaling group.
 }
 
 \point[\Large Health check]{
+    \vspace{0.3em}
     Mechanism to determine whether an instance is \highlight{healthy}.
 }
 
-\point[\Large Auto-scaling]{An example}
+\point[\Large Auto-scaling]{\vspace{0.3em} An example}
 
 \image[height=1.085\textheight]{diagrams/Sahara}
 \note{Product Browsing service keeps going down}
 
-\image{diagrams/ProductIsolate}
+\image[trim=0 240 0 0,clip,width=0.88\paperwidth]{diagrams/ProductIsolate}
 \note{We might expect product browsing to have a much higher load than other services}
 
-\image{diagrams/ProductEC2}
+\image[trim=0 240 0 0,clip,width=0.88\paperwidth]{diagrams/ProductEC2}
+\note{Deploy product browsing on an EC2 instance}
 
 \image{diagrams/ProductScale}
 \note{Use an auto-scaling group to replicate the service}
@@ -278,17 +300,18 @@ Choosing to use them should be \highlight{well considered}.
 
 \image[height=1.1\textheight]{diagrams/ProductScaleLB}
 \note[itemize]{
-    \item Traffic was all sent through the \highlight{one} instance
-    \item Load balancer routes to \highlight{all}
+    \item Traffic was all sent through \highlight{one} instance
+    \item Load balancer routes to \highlight{all} instances
 }
 
 \image[width=\textheight]{diagrams/SaharaScaled}
+\note{Load balancing & scaling integrated into overall Sahara deployment diagram}
 
 \begin{frame}{In Summary}
 \Large
 \begin{labeling}{Scalability}
 %\begin{description}
-    \item[\color{secondary} Simplicity] \only<2->{\highlight{Minimal network communication} (compared to other distributed systems), less impacted by fallacies.}
+    \item[\color{secondary} Simplicity] \only<2->{\highlight{Minimal network communication} (compared to \textit{other} distributed systems), less impacted by fallacies.}
     \vspace{2mm}
     \item[\color{secondary} Reliability] \only<3->{Traffic is spread to various services, still \highlight{partially operational} if one goes down. Auto-scaling allows for \highlight{basic replication}.}
     \vspace{2mm}
