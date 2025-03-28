@@ -960,53 +960,30 @@ be used to store values that are used in multiple places.
    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">5.2    </span> <a 
- id="x1-70005.2"></a>EC2 Deployment</h4>
-   <div class="tcolorbox tcolorbox" id="tcolobox-4">     
-<div class="tcolorbox-title">
-<!--l. 361--><p class="indent" >   Aside</p></div> 
-<div class="tcolorbox-content"><!--l. 361--><p class="noindent" >The deployment diagram below is what it would look like, if we deployed our application to an EC2
-instance. This is shown as to allow comparison to deploying our container via ECS.  </p> 
-</div> 
-</div>
+ id="x1-70005.2"></a>ECS Deployment</h4>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 364--><p class="noindent" ><img 
-src="diagrams/ec2deployment.png" alt="PIC"  
-width="525" height="-1152"  />
-                                                                                                    
-                                                                                                    
-</p>
-   </div><hr class="endfigure" />
-   
-   <h4 class="subsectionHead"><span class="titlemark">5.3    </span> <a 
- id="x1-80005.3"></a>ECS Deployment</h4>
-   <hr class="figure" /><div class="figure" 
->
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-<!--l. 372--><p class="noindent" ><img 
+<!--l. 360--><p class="noindent" ><img 
 src="diagrams/ecsdeployment.png" alt="PIC"  
 width="525" height="-1152"  />
                                                                                                     
                                                                                                     
 </p>
    </div><hr class="endfigure" />
-<!--l. 375--><p class="indent" >   ECS mimics a similar environment as Docker Compose but as an AWS service.
-</p><!--l. 377--><p class="indent" >   To start off we need to get some information from our current AWS environment so that we can use it later.
+<!--l. 363--><p class="indent" >   ECS mimics a similar environment as Docker Compose but as an AWS service.
+</p><!--l. 365--><p class="indent" >   To start off we need to get some information from our current AWS environment so that we can use it later.
 Add the code below to fetch the IAM role known as LabRole. It is a super user in the Learner Lab
 environments which can do everything you can do through the AWS Console. We will also fetch
 the default VPC and the private subnets within that VPC, as they are required for the ECS network
 configuration.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 383--><pre class="listings" id="listing-7"><span class="label"><a 
- id="x1-8001r1"></a></span><span style="color:#006699"><span 
+<!--l. 371--><pre class="listings" id="listing-7"><span class="label"><a 
+ id="x1-7001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">data</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">aws_iam_role</span></span><span style="color:#669900"><span 
@@ -1016,7 +993,7 @@ class="ectt-1200">lab</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8002r2"></a></span><span 
+ id="x1-7002r2"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1026,12 +1003,12 @@ class="ectt-1200">"</span></span><span style="color:#669900"><span
 class="ectt-1200">LabRole</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-8003r3"></a></span><span style="color:#000000"><span 
+ id="x1-7003r3"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-8004r4"></a></span> 
+ id="x1-7004r4"></a></span> 
 <span class="label"><a 
- id="x1-8005r5"></a></span><span style="color:#006699"><span 
+ id="x1-7005r5"></a></span><span style="color:#006699"><span 
 class="ectt-1200">data</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">aws_vpc</span></span><span style="color:#669900"><span 
@@ -1041,7 +1018,7 @@ class="ectt-1200">default</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8006r6"></a></span><span 
+ id="x1-7006r6"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1049,12 +1026,12 @@ class="ectt-1200">default</span></span><span style="color:#000000"> </span><span
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">true</span></span> 
 <span class="label"><a 
- id="x1-8007r7"></a></span><span style="color:#000000"><span 
+ id="x1-7007r7"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-8008r8"></a></span> 
+ id="x1-7008r8"></a></span> 
 <span class="label"><a 
- id="x1-8009r9"></a></span><span style="color:#006699"><span 
+ id="x1-7009r9"></a></span><span style="color:#006699"><span 
 class="ectt-1200">data</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">aws_subnets</span></span><span style="color:#669900"><span 
@@ -1064,14 +1041,14 @@ class="ectt-1200">private</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8010r10"></a></span><span 
+ id="x1-7010r10"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">filter</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8011r11"></a></span><span 
+ id="x1-7011r11"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1086,7 +1063,7 @@ class="ectt-1200">-</span></span><span style="color:#669900"><span
 class="ectt-1200">id</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-8012r12"></a></span><span 
+ id="x1-7012r12"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1105,25 +1082,25 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">id</span></span><span style="color:#000000"><span 
 class="ectt-1200">]</span></span> 
 <span class="label"><a 
- id="x1-8013r13"></a></span><span 
+ id="x1-7013r13"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-8014r14"></a></span><span style="color:#000000"><span 
+ id="x1-7014r14"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-8015r15"></a></span></pre>
+ id="x1-7015r15"></a></span></pre>
    </div>
-<!--l. 400--><p class="indent" >   In Terraform, the way to retrieve external information is data sources. These are functionally like resources but
+<!--l. 388--><p class="indent" >   In Terraform, the way to retrieve external information is data sources. These are functionally like resources but
 they are not created or destroyed, instead they are populated with attributes from the current state. See the
 below for the minor syntactic difference.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 405--><pre class="listings" id="listing-8"><span class="label"><a 
- id="x1-8016r1"></a></span><span style="color:#000000"><span 
+<!--l. 393--><pre class="listings" id="listing-8"><span class="label"><a 
+ id="x1-7016r1"></a></span><span style="color:#000000"><span 
 class="colorbox" id="colorbox1"><span 
 class="ectt-1200">data</span></span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -1134,16 +1111,16 @@ class="ectt-1200">lab</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8017r2"></a></span><span 
+ id="x1-7017r2"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">...</span></span> 
 <span class="label"><a 
- id="x1-8018r3"></a></span><span style="color:#000000"><span 
+ id="x1-7018r3"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-8019r4"></a></span> 
+ id="x1-7019r4"></a></span> 
 <span class="label"><a 
- id="x1-8020r5"></a></span><span style="color:#000000"><span 
+ id="x1-7020r5"></a></span><span style="color:#000000"><span 
 class="colorbox" id="colorbox2"><span 
 class="ectt-1200">resource</span></span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -1154,24 +1131,24 @@ class="ectt-1200">database</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8021r6"></a></span><span 
+ id="x1-7021r6"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">...</span></span> 
 <span class="label"><a 
- id="x1-8022r7"></a></span><span style="color:#000000"><span 
+ id="x1-7022r7"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-8023r8"></a></span></pre>
+ id="x1-7023r8"></a></span></pre>
    </div>
-<!--l. 416--><p class="indent" >   Now that we have access to the information required, we can create the ECS cluster to host our
+<!--l. 404--><p class="indent" >   Now that we have access to the information required, we can create the ECS cluster to host our
 application.
-</p><!--l. 419--><p class="indent" >   The first step is to create the ECS cluster which is just a logical grouping of any images. All that is required is a
+</p><!--l. 407--><p class="indent" >   The first step is to create the ECS cluster which is just a logical grouping of any images. All that is required is a
 name for the new grouping.
-</p><!--l. 423--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 423--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 423--><pre class="listings" id="listing-9"><span class="label"><a 
- id="x1-8024r1"></a></span><span style="color:#006699"><span 
+</p><!--l. 411--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 411--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 411--><pre class="listings" id="listing-9"><span class="label"><a 
+ id="x1-7024r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">aws_ecs_cluster</span></span><span style="color:#669900"><span 
@@ -1181,7 +1158,7 @@ class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8025r2"></a></span><span 
+ id="x1-7025r2"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1191,29 +1168,29 @@ class="ectt-1200">"</span></span><span style="color:#669900"><span
 class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-8026r3"></a></span><span style="color:#000000"><span 
+ id="x1-7026r3"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-8027r4"></a></span></pre>
+ id="x1-7027r4"></a></span></pre>
    </div>
-<!--l. 429--><p class="indent" >   On its own this cluster is not particularly useful. We need to create a task definition which is a
+<!--l. 417--><p class="indent" >   On its own this cluster is not particularly useful. We need to create a task definition which is a
 description of the container that we want to run. This is where we will define the image that we want to
 run, the environment variables, the port mappings, etc. This is similar to a server entry in Docker
 Compose.
 </p>
-   <div class="tcolorbox tcolorbox" id="tcolobox-5">     
+   <div class="tcolorbox tcolorbox" id="tcolobox-4">     
 <div class="tcolorbox-title">
-<!--l. 439--><p class="indent" >   Warning</p></div> 
-<div class="tcolorbox-content"><!--l. 439--><p class="noindent" >The  <span 
+<!--l. 427--><p class="indent" >   Warning</p></div> 
+<div class="tcolorbox-content"><!--l. 427--><p class="noindent" >The  <span 
 class="ectt-1200">«DEFINITION </span>line  cannot  have  a  trailing  space.  Ensure  that  one  has  not  been  erroneously
 inserted.  </p> 
 </div> 
 </div>
-<!--l. 441--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 441--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 441--><pre class="listings" id="listing-10"><span class="label"><a 
- id="x1-8028r1"></a></span><span style="color:#006699"><span 
+<!--l. 429--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 429--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 429--><pre class="listings" id="listing-10"><span class="label"><a 
+ id="x1-7028r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">aws_ecs_task_definition</span></span><span style="color:#669900"><span 
@@ -1223,7 +1200,7 @@ class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8029r2"></a></span><span 
+ id="x1-7029r2"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1233,7 +1210,7 @@ class="ectt-1200">"</span></span><span style="color:#669900"><span
 class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-8030r3"></a></span><span 
+ id="x1-7030r3"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1243,7 +1220,7 @@ class="ectt-1200">"</span></span><span style="color:#669900"><span
 class="ectt-1200">awsvpc</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-8031r4"></a></span><span 
+ id="x1-7031r4"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1255,7 +1232,7 @@ class="ectt-1200">FARGATE</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">]</span></span> 
 <span class="label"><a 
- id="x1-8032r5"></a></span><span 
+ id="x1-7032r5"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1263,7 +1240,7 @@ class="ectt-1200">cpu</span></span><span style="color:#000000"> </span><span sty
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">1024</span></span> 
 <span class="label"><a 
- id="x1-8033r6"></a></span><span 
+ id="x1-7033r6"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1271,7 +1248,7 @@ class="ectt-1200">memory</span></span><span style="color:#000000"> </span><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">2048</span></span> 
 <span class="label"><a 
- id="x1-8034r7"></a></span><span 
+ id="x1-7034r7"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1285,9 +1262,9 @@ class="ectt-1200">lab</span></span><span style="color:#000000"><span
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">arn</span></span> 
 <span class="label"><a 
- id="x1-8035r8"></a></span> 
+ id="x1-7035r8"></a></span> 
 <span class="label"><a 
- id="x1-8036r9"></a></span><span 
+ id="x1-7036r9"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1296,17 +1273,17 @@ class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style
 class="ectt-1200">&#x003C;&#x003C;</span></span><span style="color:#000000"><span 
 class="ectt-1200">DEFINITION</span></span> 
 <span class="label"><a 
- id="x1-8037r10"></a></span><span 
+ id="x1-7037r10"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">[</span></span> 
 <span class="label"><a 
- id="x1-8038r11"></a></span><span 
+ id="x1-7038r11"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8039r12"></a></span><span 
+ id="x1-7039r12"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1325,7 +1302,7 @@ class="ectt-1200">}</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-8040r13"></a></span><span 
+ id="x1-7040r13"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1336,7 +1313,7 @@ class="ectt-1200">"</span></span><span style="color:#000000"><span
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">1024,</span></span> 
 <span class="label"><a 
- id="x1-8041r14"></a></span><span 
+ id="x1-7041r14"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1347,7 +1324,7 @@ class="ectt-1200">"</span></span><span style="color:#000000"><span
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">2048,</span></span> 
 <span class="label"><a 
- id="x1-8042r15"></a></span><span 
+ id="x1-7042r15"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1361,7 +1338,7 @@ class="ectt-1200">todo</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-8043r16"></a></span><span 
+ id="x1-7043r16"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1375,7 +1352,7 @@ class="ectt-1200">awsvpc</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-8044r17"></a></span><span 
+ id="x1-7044r17"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1386,7 +1363,7 @@ class="ectt-1200">"</span></span><span style="color:#000000"><span
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">[</span></span> 
 <span class="label"><a 
- id="x1-8045r18"></a></span><span 
+ id="x1-7045r18"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1395,7 +1372,7 @@ class="ectt-1200">&#x00A0;</span><span
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8046r19"></a></span><span 
+ id="x1-7046r19"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1409,7 +1386,7 @@ class="ectt-1200">"</span></span><span style="color:#000000"><span
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">6400,</span></span> 
 <span class="label"><a 
- id="x1-8047r20"></a></span><span 
+ id="x1-7047r20"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1423,7 +1400,7 @@ class="ectt-1200">"</span></span><span style="color:#000000"><span
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">6400</span></span> 
 <span class="label"><a 
- id="x1-8048r21"></a></span><span 
+ id="x1-7048r21"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1432,14 +1409,14 @@ class="ectt-1200">&#x00A0;</span><span
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-8049r22"></a></span><span 
+ id="x1-7049r22"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">],</span></span> 
 <span class="label"><a 
- id="x1-8050r23"></a></span><span 
+ id="x1-7050r23"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1450,7 +1427,7 @@ class="ectt-1200">"</span></span><span style="color:#000000"><span
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">[</span></span> 
 <span class="label"><a 
- id="x1-8051r24"></a></span><span 
+ id="x1-7051r24"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1459,7 +1436,7 @@ class="ectt-1200">&#x00A0;</span><span
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8052r25"></a></span><span 
+ id="x1-7052r25"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1476,7 +1453,7 @@ class="ectt-1200">SQLALCHEMY_DATABASE_URI</span></span><span style="color:#66990
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-8053r26"></a></span><span 
+ id="x1-7053r26"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1529,7 +1506,7 @@ class="ectt-1200">db_name</span></span><span style="color:#669900"><span
 class="ectt-1200">}</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-8054r27"></a></span><span 
+ id="x1-7054r27"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1538,14 +1515,14 @@ class="ectt-1200">&#x00A0;</span><span
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-8055r28"></a></span><span 
+ id="x1-7055r28"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">],</span></span> 
 <span class="label"><a 
- id="x1-8056r29"></a></span><span 
+ id="x1-7056r29"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1556,7 +1533,7 @@ class="ectt-1200">"</span></span><span style="color:#000000"><span
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8057r30"></a></span><span 
+ id="x1-7057r30"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1572,7 +1549,7 @@ class="ectt-1200">awslogs</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-8058r31"></a></span><span 
+ id="x1-7058r31"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1585,7 +1562,7 @@ class="ectt-1200">"</span></span><span style="color:#000000"><span
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8059r32"></a></span><span 
+ id="x1-7059r32"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1607,7 +1584,7 @@ class="ectt-1200">todo</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-8060r33"></a></span><span 
+ id="x1-7060r33"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1629,7 +1606,7 @@ class="ectt-1200">-1</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-8061r34"></a></span><span 
+ id="x1-7061r34"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1650,7 +1627,7 @@ class="ectt-1200">ecs</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-8062r35"></a></span><span 
+ id="x1-7062r35"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1670,7 +1647,7 @@ class="ectt-1200">"</span></span><span style="color:#669900"><span
 class="ectt-1200">true</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-8063r36"></a></span><span 
+ id="x1-7063r36"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1679,44 +1656,44 @@ class="ectt-1200">&#x00A0;</span><span
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-8064r37"></a></span><span 
+ id="x1-7064r37"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-8065r38"></a></span><span 
+ id="x1-7065r38"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-8066r39"></a></span><span 
+ id="x1-7066r39"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">]</span></span> 
 <span class="label"><a 
- id="x1-8067r40"></a></span><span 
+ id="x1-7067r40"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">DEFINITION</span></span> 
 <span class="label"><a 
- id="x1-8068r41"></a></span><span style="color:#000000"><span 
+ id="x1-7068r41"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-8069r42"></a></span></pre>
+ id="x1-7069r42"></a></span></pre>
    </div>
       <dl class="description"><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">family</span> </dt><dd 
 class="description">
-      <!--l. 486--><p class="noindent" >A family is similar to the name of the task but it is a name that persists through multiple revisions of
+      <!--l. 474--><p class="noindent" >A family is similar to the name of the task but it is a name that persists through multiple revisions of
       the task.
       </p></dd><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">network_mode</span> </dt><dd 
 class="description">
-      <!--l. 487--><p class="noindent" >This  is  the  network  mode  that  the  container  will  run  in,  we  want  to  run  on  regular  AWS  VPC
+      <!--l. 475--><p class="noindent" >This  is  the  network  mode  that  the  container  will  run  in,  we  want  to  run  on  regular  AWS  VPC
       infrastructure.
                                                                                                     
                                                                                                     
@@ -1724,40 +1701,40 @@ class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">requires_compatibilities</span> </dt><dd 
 class="description">
-      <!--l. 488--><p class="noindent" >This is the type of container that we want to run. This can be fargate, EC2, or external.
+      <!--l. 476--><p class="noindent" >This is the type of container that we want to run. This can be fargate, EC2, or external.
       </p></dd><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">cpu</span> </dt><dd 
 class="description">
-      <!--l. 489--><p class="noindent" >The amount of CPU units that the container will be allocated. 1024 is equivalen to one vCPU.
+      <!--l. 477--><p class="noindent" >The amount of CPU units that the container will be allocated. 1024 is equivalen to one vCPU.
       </p></dd><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">memory</span> </dt><dd 
 class="description">
-      <!--l. 490--><p class="noindent" >The amount of memory that the container will be allocated, here we&#8217;ve chosen 2GB.
+      <!--l. 478--><p class="noindent" >The amount of memory that the container will be allocated, here we&#8217;ve chosen 2GB.
       </p></dd><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">execution_role_arn</span> </dt><dd 
 class="description">
-      <!--l. 491--><p class="noindent" >The IAM role that the container will run as. Importantly, we have re-used the lab role we previously
+      <!--l. 479--><p class="noindent" >The IAM role that the container will run as. Importantly, we have re-used the lab role we previously
       retrieved. This gives the instance full admin permission for our lab environment.
       </p></dd><dt class="description">
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">container_definitions</span> </dt><dd 
 class="description">
-      <!--l. 494--><p class="noindent" >This  is  the  definition  of  the  container,  it  should  look  similar  to  Docker  Compose.  The  only
+      <!--l. 482--><p class="noindent" >This  is  the  definition  of  the  container,  it  should  look  similar  to  Docker  Compose.  The  only
       additional feature here is the <span 
 class="ectt-1200">logConfiguration</span>. This configures our container to write logs to AWS
       CloudWatch, so that we can see if anything has gone wrong.</p></dd></dl>
-<!--l. 499--><p class="indent" >   Now we have a description of our container as a task. We need a service on which to run the container. This is
+<!--l. 487--><p class="indent" >   Now we have a description of our container as a task. We need a service on which to run the container. This is
 functionally similar to an auto-scaling group, as described in the Distributed Systems I lecture <span class="cite">[<a 
 href="#Xdistributed1-slides">2</a>]</span>. We specify how
 many instances of the described container we want and it will provision them. We also specify which ECS cluster
 and AWS subnets to run the containers within.
-</p><!--l. 505--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 505--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 505--><pre class="listings" id="listing-11"><span class="label"><a 
- id="x1-8070r1"></a></span><span style="color:#006699"><span 
+</p><!--l. 493--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 493--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 493--><pre class="listings" id="listing-11"><span class="label"><a 
+ id="x1-7070r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">aws_ecs_service</span></span><span style="color:#669900"><span 
@@ -1767,7 +1744,7 @@ class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8071r2"></a></span><span 
+ id="x1-7071r2"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1777,7 +1754,7 @@ class="ectt-1200">"</span></span><span style="color:#669900"><span
 class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-8072r3"></a></span><span 
+ id="x1-7072r3"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1789,7 +1766,7 @@ class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">id</span></span> 
 <span class="label"><a 
- id="x1-8073r4"></a></span><span 
+ id="x1-7073r4"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1801,7 +1778,7 @@ class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">arn</span></span> 
 <span class="label"><a 
- id="x1-8074r5"></a></span><span 
+ id="x1-7074r5"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1809,7 +1786,7 @@ class="ectt-1200">desired_count</span></span><span style="color:#000000"> </span
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">1</span></span> 
 <span class="label"><a 
- id="x1-8075r6"></a></span><span 
+ id="x1-7075r6"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1819,16 +1796,16 @@ class="ectt-1200">"</span></span><span style="color:#669900"><span
 class="ectt-1200">FARGATE</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-8076r7"></a></span> 
+ id="x1-7076r7"></a></span> 
 <span class="label"><a 
- id="x1-8077r8"></a></span><span 
+ id="x1-7077r8"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">network_configuration</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8078r9"></a></span><span 
+ id="x1-7078r9"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1843,7 +1820,7 @@ class="ectt-1200">private</span></span><span style="color:#000000"><span
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">ids</span></span> 
 <span class="label"><a 
- id="x1-8079r10"></a></span><span 
+ id="x1-7079r10"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1858,7 +1835,7 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">id</span></span><span style="color:#000000"><span 
 class="ectt-1200">]</span></span> 
 <span class="label"><a 
- id="x1-8080r11"></a></span><span 
+ id="x1-7080r11"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1867,24 +1844,24 @@ class="ectt-1200">assign_public_ip</span></span><span style="color:#000000"> </s
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">true</span></span> 
 <span class="label"><a 
- id="x1-8081r12"></a></span><span 
+ id="x1-7081r12"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-8082r13"></a></span><span style="color:#000000"><span 
+ id="x1-7082r13"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-8083r14"></a></span></pre>
+ id="x1-7083r14"></a></span></pre>
    </div>
-<!--l. 521--><p class="indent" >   In the above we refer to a non-existent security group. As always, to be able to access our instances over the
+<!--l. 509--><p class="indent" >   In the above we refer to a non-existent security group. As always, to be able to access our instances over the
 network we need to add a security group policy to enable it.
-</p><!--l. 524--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 524--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 524--><pre class="listings" id="listing-12"><span class="label"><a 
- id="x1-8084r1"></a></span><span style="color:#006699"><span 
+</p><!--l. 512--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 512--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 512--><pre class="listings" id="listing-12"><span class="label"><a 
+ id="x1-7084r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">aws_security_group</span></span><span style="color:#669900"><span 
@@ -1894,7 +1871,7 @@ class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8085r2"></a></span><span 
+ id="x1-7085r2"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1904,7 +1881,7 @@ class="ectt-1200">"</span></span><span style="color:#669900"><span
 class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-8086r3"></a></span><span 
+ id="x1-7086r3"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1916,16 +1893,16 @@ class="ectt-1200">Security</span></span><span style="color:#669900"> </span><spa
 class="ectt-1200">Group</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-8087r4"></a></span> 
+ id="x1-7087r4"></a></span> 
 <span class="label"><a 
- id="x1-8088r5"></a></span><span 
+ id="x1-7088r5"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">ingress</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8089r6"></a></span><span 
+ id="x1-7089r6"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1934,7 +1911,7 @@ class="ectt-1200">from_port</span></span><span style="color:#000000"> </span><sp
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">6400</span></span> 
 <span class="label"><a 
- id="x1-8090r7"></a></span><span 
+ id="x1-7090r7"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1943,7 +1920,7 @@ class="ectt-1200">to_port</span></span><span style="color:#000000"> </span><span
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">6400</span></span> 
 <span class="label"><a 
- id="x1-8091r8"></a></span><span 
+ id="x1-7091r8"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1954,7 +1931,7 @@ class="ectt-1200">"</span></span><span style="color:#669900"><span
 class="ectt-1200">tcp</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-8092r9"></a></span><span 
+ id="x1-7092r9"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1967,22 +1944,22 @@ class="ectt-1200">0.0.0.0/0</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">]</span></span> 
 <span class="label"><a 
- id="x1-8093r10"></a></span><span 
+ id="x1-7093r10"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-8094r11"></a></span> 
+ id="x1-7094r11"></a></span> 
 <span class="label"><a 
- id="x1-8095r12"></a></span><span 
+ id="x1-7095r12"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">ingress</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8096r13"></a></span><span 
+ id="x1-7096r13"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1991,7 +1968,7 @@ class="ectt-1200">from_port</span></span><span style="color:#000000"> </span><sp
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">22</span></span> 
 <span class="label"><a 
- id="x1-8097r14"></a></span><span 
+ id="x1-7097r14"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2000,7 +1977,7 @@ class="ectt-1200">to_port</span></span><span style="color:#000000"> </span><span
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">22</span></span> 
 <span class="label"><a 
- id="x1-8098r15"></a></span><span 
+ id="x1-7098r15"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2011,7 +1988,7 @@ class="ectt-1200">"</span></span><span style="color:#669900"><span
 class="ectt-1200">tcp</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-8099r16"></a></span><span 
+ id="x1-7099r16"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2024,22 +2001,22 @@ class="ectt-1200">0.0.0.0/0</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">]</span></span> 
 <span class="label"><a 
- id="x1-8100r17"></a></span><span 
+ id="x1-7100r17"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-8101r18"></a></span> 
+ id="x1-7101r18"></a></span> 
 <span class="label"><a 
- id="x1-8102r19"></a></span><span 
+ id="x1-7102r19"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">egress</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-8103r20"></a></span><span 
+ id="x1-7103r20"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2048,7 +2025,7 @@ class="ectt-1200">from_port</span></span><span style="color:#000000"> </span><sp
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">0</span></span> 
 <span class="label"><a 
- id="x1-8104r21"></a></span><span 
+ id="x1-7104r21"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2057,7 +2034,7 @@ class="ectt-1200">to_port</span></span><span style="color:#000000"> </span><span
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">0</span></span> 
 <span class="label"><a 
- id="x1-8105r22"></a></span><span 
+ id="x1-7105r22"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2068,7 +2045,7 @@ class="ectt-1200">"</span></span><span style="color:#669900"><span
 class="ectt-1200">-1</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-8106r23"></a></span><span 
+ id="x1-7106r23"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2081,34 +2058,57 @@ class="ectt-1200">0.0.0.0/0</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">]</span></span> 
 <span class="label"><a 
- id="x1-8107r24"></a></span><span 
+ id="x1-7107r24"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-8108r25"></a></span><span style="color:#000000"><span 
+ id="x1-7108r25"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-8109r26"></a></span></pre>
+ id="x1-7109r26"></a></span></pre>
    </div>
-<!--l. 552--><p class="indent" >   Finally, if we run the <span 
+<!--l. 540--><p class="indent" >   Finally, if we run the <span 
 class="ectt-1200">terraform apply </span>command, it should provision an ECS cluster with a service that will
 then create one ECS container based on our task description.
-</p><!--l. 555--><p class="indent" >   Note that we are doing something a bit weird in this deployment. Normally ECS expects multiple instances of
+</p><!--l. 543--><p class="indent" >   Note that we are doing something a bit weird in this deployment. Normally ECS expects multiple instances of
 containers, so it naturally expects a load balancer. This makes it difficult for us to discover the public IP of our
 single instance using Terraform. Instead, you will need to use the AWS Console to find the public IP
 address.
-</p><!--l. 561--><p class="indent" >   This is an opportunity for you to explore the ECS interface and find the task, within the service, within the
+</p><!--l. 549--><p class="indent" >   This is an opportunity for you to explore the ECS interface and find the task, within the service, within the
 cluster that we have provisioned.
    
                                                                                                     
                                                                                                     
 </p>
+   <h4 class="subsectionHead"><span class="titlemark">5.3    </span> <a 
+ id="x1-80005.3"></a>EC2 Deployment</h4>
+   <div class="tcolorbox tcolorbox" id="tcolobox-5">     
+<div class="tcolorbox-title">
+<!--l. 563--><p class="indent" >   Aside</p></div> 
+<div class="tcolorbox-content"><!--l. 563--><p class="noindent" >The deployment diagram below is what it would look like, if we deployed our application to an EC2
+instance. As you can see, ECS provides us with features to manage services and tasks for us.  </p> 
+</div> 
+</div>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<!--l. 566--><p class="noindent" ><img 
+src="diagrams/ec2deployment.png" alt="PIC"  
+width="525" height="-1152"  />
+                                                                                                    
+                                                                                                    
+</p>
+   </div><hr class="endfigure" />
+   
    <h4 class="subsectionHead"><span class="titlemark">5.4    </span> <a 
  id="x1-90005.4"></a>EKS / K8S</h4>
-<!--l. 569--><p class="noindent" >Amazon Elastic Kubernetes Service (EKS) is a platform to run
+<!--l. 571--><p class="noindent" >Amazon Elastic Kubernetes Service (EKS) is a platform to run
 <a 
 href="https://kubernetes.io/" >Kubernetes</a><span class="footnote-mark"><a 
 href="#fn3x0" id="fn3x0-bk"><sup class="textsuperscript">3</sup></a></span><a 
@@ -2119,56 +2119,56 @@ industry.
 </p>
    <h3 class="sectionHead"><span class="titlemark">6    </span> <a 
  id="x1-100006"></a>Hosting TaskOverflow Images</h3>
-<!--l. 575--><p class="noindent" >When we last deployed a container on AWS, we used an existing hosted image. Now, we will be developing our
+<!--l. 577--><p class="noindent" >When we last deployed a container on AWS, we used an existing hosted image. Now, we will be developing our
 own image, so we will need a mechanism to host the image. For this, we will use AWS ECR, Docker, and Terraform.
 AWS ECR is the Elastic Container Registry. It is a container registry like DockerHub or GitHub. We can use it to host
 our image. The steps below use Terraform to
-</p><!--l. 583--><p class="indent" >
+</p><!--l. 585--><p class="indent" >
       </p><ol  class="enumerate1" >
 <li 
   class="enumerate" id="x1-10002x1">
-      <!--l. 584--><p class="noindent" >create an ECR repository for our image,
+      <!--l. 586--><p class="noindent" >create an ECR repository for our image,
       </p></li>
 <li 
   class="enumerate" id="x1-10004x2">
-      <!--l. 585--><p class="noindent" >build our Docker image, and
+      <!--l. 587--><p class="noindent" >build our Docker image, and
       </p></li>
 <li 
   class="enumerate" id="x1-10006x3">
-      <!--l. 586--><p class="noindent" >push our Docker image.</p></li></ol>
+      <!--l. 588--><p class="noindent" >push our Docker image.</p></li></ol>
    <div class="tcolorbox tcolorbox" id="tcolobox-6">     
 <div class="tcolorbox-title">
-<!--l. 597--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 597--><p class="noindent" >This is a non-standard process. As you may have seen in the DevOps tutorial, we would ordinarily
+<!--l. 599--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 599--><p class="noindent" >This is a non-standard process. As you may have seen in the DevOps tutorial, we would ordinarily
 like our code commits to trigger a CI/CD pipeline which builds the images.<br 
 class="newline" />
-</p><!--l. 597--><p class="noindent" >If  you  would  like,  you  can  use  GitHub  actions  to  build  and  push  your  container  to  the  GitHub
+</p><!--l. 599--><p class="noindent" >If  you  would  like,  you  can  use  GitHub  actions  to  build  and  push  your  container  to  the  GitHub
 container registry and authenticate when you pull the image. However, using ECR simplifies the
 process, despite the oddities introduced by having a non-persistent ECR repository.  </p> 
 </div> 
 </div>
    
-<!--l. 599--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 601--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-11000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Getting Started</span></span>
+                                                                                                    
+                                                                                                    
       </p><ol  class="enumerate1" >
 <li 
   class="enumerate" id="x1-11002x1">
-      <!--l. 602--><p class="noindent" >Using the GitHub Classroom link for this practical provided on Edstem, create a repository to work
+      <!--l. 604--><p class="noindent" >Using the GitHub Classroom link for this practical provided on Edstem, create a repository to work
       within.
-                                                                                                    
-                                                                                                    
       </p></li>
 <li 
   class="enumerate" id="x1-11004x2">
-      <!--l. 603--><p class="noindent" >Install Terraform, if it is not already installed, as it will be required again this week and in later weeks.
+      <!--l. 605--><p class="noindent" >Install Terraform, if it is not already installed, as it will be required again this week and in later weeks.
       </p></li>
 <li 
   class="enumerate" id="x1-11006x3">
-      <!--l. 604--><p class="noindent" >Start your Learner Lab and copy the AWS Learner Lab credentials into a credentials file in the root
+      <!--l. 606--><p class="noindent" >Start your Learner Lab and copy the AWS Learner Lab credentials into a credentials file in the root
       of the repository.</p></li></ol>
    
-<!--l. 607--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 609--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-12000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">What&#8217;s New</span></span>
    We are starting again with our todo application from roughly where we left off in the week 3
@@ -2180,11 +2180,11 @@ class="ectt-1200">bin </span>directory is used by this image. Our original Docke
 <span 
 class="ectt-1200">Dockerfile.dev</span>.<br 
 class="newline" />
-</p><!--l. 615--><p class="indent" >   We will setup our initial Terraform configuration. Note that now we introduce a new required provider. This
+</p><!--l. 617--><p class="indent" >   We will setup our initial Terraform configuration. Note that now we introduce a new required provider. This
 provider is for Docker.
-</p><!--l. 619--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 619--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 619--><pre class="listings" id="listing-13"><span class="label"><a 
+</p><!--l. 621--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 621--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 621--><pre class="listings" id="listing-13"><span class="label"><a 
  id="x1-12001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">terraform</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
@@ -2331,13 +2331,13 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12018r18"></a></span></pre>
    </div>
-<!--l. 639--><p class="indent" >   As with our AWS provider, when we initially configure the provider, we want to authenticate so that we can
+<!--l. 641--><p class="indent" >   As with our AWS provider, when we initially configure the provider, we want to authenticate so that we can
 later push to our registry using the Docker provider. We will use the <span 
 class="ectt-1200">aws_ecr_authorization_token </span>data block to
 get appropriate ECR credentials for Docker.
-</p><!--l. 644--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 644--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 644--><pre class="listings" id="listing-14"><span class="label"><a 
+</p><!--l. 646--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 646--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 646--><pre class="listings" id="listing-14"><span class="label"><a 
  id="x1-12019r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">data</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -2414,10 +2414,10 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12028r10"></a></span></pre>
    </div>
-<!--l. 656--><p class="indent" >   We need to use Terraform to create an ECR repository to push to.
-</p><!--l. 658--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 658--><p class="indent" >   <span 
-class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 658--><pre class="listings" id="listing-15"><span class="label"><a 
+<!--l. 658--><p class="indent" >   We need to use Terraform to create an ECR repository to push to.
+</p><!--l. 660--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 660--><p class="indent" >   <span 
+class="ectt-1200">» cat main.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 660--><pre class="listings" id="listing-15"><span class="label"><a 
  id="x1-12029r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -2442,15 +2442,17 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12032r4"></a></span></pre>
    </div>
-<!--l. 664--><p class="noindent" >The URL for containers in the ECR follow the format below:
-</p><!--l. 667--><p class="indent" >   <a 
+<!--l. 666--><p class="noindent" >The URL for containers in the ECR follow the format below:
+</p><!--l. 669--><p class="indent" >   <a 
 href="{ACCOUNT_ID}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME}" class="url" ><span 
 class="ectt-1200">{ACCOUNT_ID}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME}</span></a>
-</p><!--l. 669--><p class="indent" >   Remember &#8212; to push to a container registry we need a local container whose tag matches the remote URL.
+</p><!--l. 671--><p class="indent" >   Remember &#8212; to push to a container registry we need a local container whose tag matches the remote URL.
 We could then create and push the container locally with:
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 673--><pre class="listings" id="listing-16"><span class="label"><a 
+                                                                                                    
+                                                                                                    
+<!--l. 675--><pre class="listings" id="listing-16"><span class="label"><a 
  id="x1-12033r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">build</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2495,14 +2497,11 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12035r3"></a></span></pre>
    </div>
-<!--l. 678--><p class="indent" >   However, it would be easier if we could build and push this container from within Terraform. We can use the
+<!--l. 680--><p class="indent" >   However, it would be easier if we could build and push this container from within Terraform. We can use the
 Docker provider for this.
-</p><!--l. 681--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 681--><p class="indent" >   <span 
-class="ectt-1200">» cat image.tf</span> </p></div>   <div class="framedenv" id="code-1">
-                                                                                                    
-                                                                                                    
-<!--l. 681--><pre class="listings" id="listing-17"><span class="label"><a 
+</p><!--l. 683--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 683--><p class="indent" >   <span 
+class="ectt-1200">» cat image.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 683--><pre class="listings" id="listing-17"><span class="label"><a 
  id="x1-12036r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -2579,14 +2578,14 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12046r11"></a></span></pre>
    </div>
-<!--l. 694--><p class="indent" >   Notice that we are able to utilise the output of the ECR repository as the URL which resolves to the correct URL
+<!--l. 696--><p class="indent" >   Notice that we are able to utilise the output of the ECR repository as the URL which resolves to the correct URL
 for the image.
-</p><!--l. 696--><p class="indent" >   If you execute <span 
+</p><!--l. 698--><p class="indent" >   If you execute <span 
 class="ectt-1200">terraform plan</span>, it will probably report an inconsistent dependency. This is because we have
 added a new provider and its dependency needs to be added to the lock file. Execute <span 
 class="ectt-1200">terraform init -upgrade</span>
 to do this.
-</p><!--l. 700--><p class="indent" >   You can now <span 
+</p><!--l. 702--><p class="indent" >   You can now <span 
 class="ectt-1200">terraform apply </span>to push the container to the registry. Note that the Docker Engine / Daemon
 must be running so Terraform can talk to it.
    
@@ -2622,7 +2621,7 @@ class="Cabin-Regular-tlf-t1-">If you are interested, the source code is availabl
 href="https://github.com/csse6400/practical" class="url" ><span 
 class="ectt-1000">https://github.com/csse6400/practical</span></a></p><a 
  id="x1-9002x5.4"></a>
-<!--l. 569--><p class="indent" >   <span class="footnote-mark"><a 
+<!--l. 571--><p class="indent" >   <span class="footnote-mark"><a 
 href="#fn3x0-bk" id="fn3x0"><sup class="textsuperscript">3</sup></a></span><a 
 href="https://kubernetes.io/" class="url" ><span 
 class="ectt-1000">https://kubernetes.io/</span></a></p>                                                                      </div>
