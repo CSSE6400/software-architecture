@@ -6,7 +6,7 @@
 \usepackage{float}
 
 \title{Database \& Container Deployment}
-\author{Evan Hughes \& Brae Webb}
+\author{Evan Hughes, Brae Webb \& Richard Thomas}
 
 \date{\week[practical]{5}}
 \begin{document}
@@ -20,7 +20,7 @@
 \end{figure}
 
 \aside{
-  Github Classroom links for this practical can be found on Edstem \url{https://edstem.org/au/courses/15375/discussion/1753712}
+  Github Classroom links for this practical can be found on Edstem \url{https://edstem.org/au/courses/21491/discussion/2429006}
 }
 
 \section{This Week}
@@ -71,7 +71,7 @@ provider "aws" {
 }
 \end{code}
 
-\item We need to initialise terraform which will fetch the required dependencies.
+\item We need to initialise Terraform which will fetch the required dependencies.
     This is done with the \texttt{terraform init} command.
 \bash{terraform init}
 
@@ -85,133 +85,165 @@ Note that this does not ensure our credentials are correctly configured as Terra
 
 \end{enumerate}
 
+
 \section{Deploying a Database in AWS}
 
 \warning{
-This section manually deploys a PostgreSQL RDS instance,
-this is intended as a demonstration by your tutor.
-You should attempt to deploy your infrastructure using Terraform rather than manually.
+  This section manually deploys a PostgreSQL RDS instance,
+  this is intended as a demonstration by your tutor.
+  You should attempt to deploy your infrastructure using Terraform rather than manually.
 }
 
 \teacher{
-Instruct the class to observe you making the database and not to follow along.
+  Instruct the class to observe you making the database and not to follow along.
 }
 
-To get started let us jump into the lab environment and have a look at AWS RDS which is an AWS managed database service. To get to the RDS service either search it or browse Services -> Database -> RDS as shown below.
+\noindent
+To get started let us jump into the lab environment and have a look at AWS RDS which is an AWS managed database service. To get to the RDS service either search for it or browse Services -> Database -> Aurora and RDS, as shown below.
 
 \begin{figure}[H]
-\includegraphics[width=0.8\textwidth]{images/aws_1}
+\centering
+\includegraphics[trim=0 180 0 0,clip,width=0.78\textwidth]{images/aws_1}
 \end{figure}
 
+\noindent
 Now we are in the management interface for all our RDS instances.
-Head to ``DB Instances (0/40)'' or click ``Databases`` on the left panel.
+Select ``DB Instances (0/40)'' or click ``Databases'' on the left panel.
 
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{images/aws_2}
 \end{figure}
 
+\noindent
 This page should appear familiar as it is very similar to the AWS EC2 instance page.
-Let us create a new database by hitting the ``Create Database'' button.
+Let us create a new database by clicking on the ``Create Database'' button.
 
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{images/aws_3}
 \end{figure}
 
 \warning{
-In the next section we cannot use the Easy Create option as it tries to create an IAM account,
-which is disabled in Learner Labs.
+  In the next section we cannot use the Easy Create option as it tries to create an IAM account,
+  which is disabled in Learner Labs.
 }
 
 \teacher{
-Feel free to talk about the other offerings here, but make sure to flame Oracle and Microsoft SQL Server.
-A good thing to point out is the Amazon Aurora which is the serverless version of RDS.
+  Feel free to talk about the other offerings here, but make sure to flame Oracle and Microsoft SQL Server.
+  A good thing to point out is Aurora which is the serverless version of RDS.
 }
 
-We will be creating a standard database so select standard and PostgreSQL.
-We will use version 14, which is a fairly recent release.
+\newpage
+\noindent
+We will create a standard database so select standard and PostgreSQL.
+We will use version 17, which is a fairly recent release.
 
 \begin{figure}[H]
-\includegraphics[width=\textwidth]{images/db1}
+\includegraphics[trim=0 0 220 0,clip,width=\textwidth]{images/db1}
 \end{figure}
 
-For today we are going to use ``Free Tier'' but in the future,
+\newpage
+\noindent
+For today, we are going to use ``Free Tier'' but in the future,
 you may wish to explore the different deployment options.
-Please peruse the available different options.
+Please peruse the available options.
 
 \teacher{
   Walk through what Multi-AZ means aka Multiple Availability Zones.
 }
 
 \begin{figure}[H]
-  \includegraphics[width=\textwidth]{images/db2}
+  \includegraphics[trim=0 3 0 3,clip,width=\textwidth]{images/db2}
 \end{figure}
 
+\newpage
+\noindent
 Now we need to name our database and create credentials to use when connecting from our application.
 Enter memorable credentials as these will be used later.
 
 \begin{figure}[H]
-  \includegraphics[width=\textwidth]{images/db3}
+  \includegraphics[trim=0 1 0 3,clip,width=\textwidth]{images/db3}
 \end{figure}
 
-For exploring the process select t2.micro,
-which should be adaquate for our needs.
+\noindent
+For exploring the process select t3.micro, which should be adequate for our needs.
 
 \teacher{
-May want to mention that burstable is not recommended for consistantly used databases.
-Usually DBs are memory focused and thus the standard or memory optimised are used.
+  May want to mention that burstable is not recommended for consistently used databases.
+  Usually DBs are memory focused, so often the selection of memory is more important than the processing capability.
 }
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/db4}
 \end{figure}
 
+\newpage
+\noindent
 For storage we will leave all the default options.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/db5}
 \end{figure}
 
-In connectivity we need to make sure our instance is publicly available. Usually you do not want to expose your databases publicly and, would instead, have a web server sitting in-front. For our learning purposes though we are going to expose it directly just like we did with our EC2 instances early in the course.
+\teacher{
+  Summarise what each subsection of Connectivity means.
+}
 
-When selecting public access as yes we have to create a new Security Group,
-give this Security Group a sensible name.
+\noindent
+In connectivity we will leave the \textbf{Compute resource} and \textbf{VPC} with their default values.
+We need to make our instance publicly available.
+Usually you do \textbf{\textit{not}} want to expose your databases publicly and,
+would instead, have a server sitting in-front (e.g. an API, application or web server).
+For our learning purposes though we are going to expose it directly just like we did with our EC2 instances earlier in the course.
+
+When selecting public access as yes, we have to create a new Security Group.
+Give this Security Group a sensible name.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/db6}
 \end{figure}
 
-We will leave the authentication as password based but we need to expand the ``Additional configuration''.
-Fill in the ``Initial Database Name'' section to be ``todo'',
-this will automatically create the database that our todo application expects to connect to.
+\noindent
+We will leave the authentication as password based and monitoring with its default values.
+We need to expand the ``Additional configuration'' section.
+Fill in the ``Initial Database Name'' field as ``todo'',
+this will automatically create the database to which our todo application expects to connect.
 
 \teacher{
-The other options here are to do with the parameters used to start the database,
-it is uncommon to have to change these but this is where any settings you would pass in via cli to the db would be set.
+  The other options here are to do with the parameters used to start the database,
+  it is uncommon to have to change these but this is where any settings you would pass in via cli to the db would be set.
 }
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/db7}
 \end{figure}
 
-Now we can click create which will take some time.
+\noindent
+Now we can click create database, which will take some time.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/db8}
 \end{figure}
 
-It may take 10 to 30 minutes to create.
-The database will also do a initial backup when its created.
+\noindent
+It may take several minutes to create.
+If we had selected to enable automated backups, the database would do an initial backup when it is created.
+
+AWS will suggest add-ons for the newly created database.
+The suggested add-ons are useful features for a production environment.
+We do not need them for the purposes of this practical.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/aws_4}
 \end{figure}
 
-When the database has finished being created you can select it to view the configuration and details.
-In this menu we also see the endpoint address which we will need to configure our TaskOverflow application to use.
+\noindent
+When the database has been created, you can select it to view the configuration and details.
+In this menu we also see the endpoint address, which we will need to configure our TaskOverflow application to use.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/aws_5}
 \end{figure}
+
 
 \section{RDS Database with Terraform}
 
@@ -225,19 +257,19 @@ Using our manual configuration, we can come up with a resource with the appropri
 \begin{code}[language=terraform,numbers=none]{main.tf}
 locals {
   database_username = "administrator"
-  database_password = "foobarbaz" # this is bad
+  database_password = "foobarbaz"  # This is bad!
 }
 
 resource "aws_db_instance" "taskoverflow_database" {
   allocated_storage      = 20
   max_allocated_storage  = 1000
   engine                 = "postgres"
-  engine_version         = "14"
-  instance_class         = "db.t4g.micro"
+  engine_version         = "17"
+  instance_class         = "db.t3.micro"
   db_name                = "todo"
   username               = local.database_username
   password               = local.database_password
-  parameter_group_name   = "default.postgres14"
+  parameter_group_name   = "default.postgres17"
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.taskoverflow_database.id]
   publicly_accessible    = true
@@ -278,14 +310,16 @@ resource "aws_security_group" "taskoverflow_database" {
 }
 \end{code}
 
+
 \section{Container on AWS}
 
 As we mentioned in the Infrastructure as Code notes \cite{iac-notes},
 in this course we will use Docker to configure machines and Terraform to configure infrastructure.
 AWS has the ability to deploy Docker containers using a service known as Elastic Container Service (ECS).
-We will cover ECS and deploying maunally via EC2 so you can use the method you feel most comfortable with.
+We will cover ECS and briefly contrast it to manual deployment via EC2.
 
-For this practical we have made available a Docker container running the TaskOverflow application which you can use for your AWS deployment.
+For this practical we have made available a Docker container running the TaskOverflow application,
+which you can use for your AWS deployment.
 This container is available on GitHub under the CSSE6400 organisation:
 
 \url{https://ghcr.io/csse6400/taskoverflow:latest}
@@ -296,58 +330,55 @@ This container is very similar to what you have been building in the practicals 
 \subsection{Setup}
 
 Of all the different ways that we can deploy our application, we have decided to offload the database to AWS RDS.
-This means that we can move all the "state" of our application away from our containerised environment.
+This means that we can move all the "state" of our application out of our containerised environment.
 
-To begin, we will reuse our Terraform from above for deploying the RDS database.
-Extend the existing local Terraform variables to include the address of the container, such that we have:
+To begin, we will reuse the Terraform from above for deploying the RDS database.
+Extend the existing local Terraform variables to include the address of the container, so that we have:
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
 locals {
-    image             = "ghcr.io/csse6400/taskoverflow:latest"
-    database_username = "administrator"
-    database_password = "foobarbaz" # this is bad
+  image             = "ghcr.io/csse6400/taskoverflow:latest"
+  database_username = "administrator"
+  database_password = "foobarbaz" # this is bad
 }
 \end{code}
 
 This already sets up an RDS instance of Postgres and a security group to allow access to it.
 Now we can run \texttt{terraform init} and \texttt{terraform apply} to create our database.
+Like when creating the database from the AWS console, this may take several minutes.
+Once the database has been created, go to the AWS console and check its status and details.
 
 We have also added a local variable for us to use later.
 Variables in Terraform can be populated via two mechanisms,
 they can be in a variables block which can be overridden,
 or they can be in a locals block which can be used to store values that are used in multiple places.
 
-Now we will use ECS to deploy a containerised version of our application.
-
-\subsection{[Path A] EC2}
+\subsection{EC2 Deployment}
 
 \aside{
-In 2024 we have removed the EC2 pathway from this practical but we have left the deployment diagram to allow comparisons to ECS.
-Please skip to Section \ref{pathb} for the ECS approach.
+The deployment diagram below is what it would look like, if we deployed our application to an EC2 instance.
+This is shown as to allow comparison to deploying our container via ECS.
 }
 
 \begin{figure}[H]
-  \includegraphics[width=\textwidth]{diagrams/ec2deployment}
+  \includegraphics[trim=0 230 0 0,clip,width=\textwidth]{diagrams/ec2deployment}
 \end{figure}
 
 
-\subsection{[Path B] ECS}
+\subsection{ECS Deployment}
 \label{pathb}
 
-\aside{
-  This is the recommended path for the course and is the path that we will be suggesting for the future.
-}
-
 \begin{figure}[H]
-  \includegraphics[width=\textwidth]{diagrams/ecsdeployment}
+  \includegraphics[trim=0 230 0 0,clip,width=\textwidth]{diagrams/ecsdeployment}
 \end{figure}
 
-Congratulations! You have choosen to go down the ECS path which mimics a similar environment as Docker Compose but as an AWS service.
-This path is new for the course this year so please let your tutors know of any issues you have.
+ECS mimics a similar environment as Docker Compose but as an AWS service.
 
 To start off we need to get some information from our current AWS environment so that we can use it later.
-Add the below to fetch the IAM role known as LabRole which is a super user in the Learner Lab environments which can do everything you can do through the UI.
-We will also be fetching the default VPC and the private subnets within that VPC as they are required for the ECS network configuration.
+Add the code below to fetch the IAM role known as LabRole.
+It is a super user in the Learner Lab environments which can do everything you can do through the AWS Console.
+We will also fetch the default VPC and the private subnets within that VPC,
+ as they are required for the ECS network configuration.
 
 \begin{code}[language=terraform,numbers=none]{}
 data "aws_iam_role" "lab" {
@@ -395,7 +426,7 @@ resource "aws_ecs_cluster" "taskoverflow" {
 }
 \end{code}
 
-On it's own this cluster is not particularly useful.
+On its own this cluster is not particularly useful.
 We need to create a task definition which is a description of the container that we want to run.
 This is where we will define the image that we want to run,
 the environment variables,
@@ -403,8 +434,8 @@ the port mappings, etc.
 This is similar to a server entry in Docker Compose.
 
 \warning{
-The \texttt{<<DEFINITION} line cannot have a trailing space.
-Ensure that one has not been erroneously inserted.
+  The \texttt{<<DEFINITION} line cannot have a trailing space.
+  Ensure that one has not been erroneously inserted.
 }
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
@@ -460,14 +491,14 @@ resource "aws_ecs_task_definition" "taskoverflow" {
     \item[execution\_role\_arn] The IAM role that the container will run as.
         Importantly, we have re-used the lab role we previously retrieved.
         This gives the instance full admin permission for our lab environment.
-    \item[container\_definitions] This is the definition of the container, it should look very familiar to Docker Compose.
+    \item[container\_definitions] This is the definition of the container, it should look similar to Docker Compose.
         The only additional feature here is the \texttt{logConfiguration}.
-        This configures our container to write logs to AWS CloudWatch so that we can see if anything has gone wrong.
+        This configures our container to write logs to AWS CloudWatch, so that we can see if anything has gone wrong.
 \end{description}
 
 Now we have a description of our container as a task.
-We need a service to run the container on.
-This is functionally similar to an auto-scaling group from the lecture.
+We need a service on which to run the container.
+This is functionally similar to an auto-scaling group, as described in the Distributed Systems I lecture \cite{distributed1-slides}.
 We specify how many instances of the described container we want and it will provision them.
 We also specify which ECS cluster and AWS subnets to run the containers within.
 
@@ -518,7 +549,7 @@ resource "aws_security_group" "taskoverflow" {
 }
 \end{code}
 
-Finally, if we run the appropriate \texttt{terraform init} and \texttt{terraform apply} commands,
+Finally, if we run the \texttt{terraform apply} command,
 it should provision an ECS cluster with a service that will then create one ECS container based on our task description.
 
 Note that we are doing something a bit weird in this deployment.
@@ -529,33 +560,36 @@ Instead, you will need to use the AWS Console to find the public IP address.
 
 This is an opportunity for you to explore the ECS interface and find the task, within the service, within the cluster that we have provisioned.
 
-\subsection{[Path C] EKS / K8S}
+\teacher{
+  Demonstrate to students how to navigate to the ECS dashboard to view the cluster and then view the services and tasks.
+}
 
-This path is not described in the course yet,
-but we recommend that if you liked the course to have a look at \link{Kubernetes}{https://kubernetes.io/} as it is widely used in industry.
+\subsection{EKS / K8S}
+
+Amazon Elastic Kubernetes Service (EKS) is a platform to run \link{Kubernetes}{https://kubernetes.io/} (K8S) clusters.
+We recommend, when you have time, that you look at Kubernetes as it is widely used in industry.
+
 
 \section{Hosting TaskOverflow Images}
 
-When we last deployed a container on AWS,
-we used an existing hosted image.
-Now, we will be developing our own image,
-so we will need a mechanism to host the image.
-For this, we will being using an AWS ECR, Docker, and Terraform.
-AWS ECR is the Elastic Container Registry,
-it is a container registry like DockerHub or GitHub.
-We can use it to host our images,
-using the process below:
+When we last deployed a container on AWS, we used an existing hosted image.
+Now, we will be developing our own image, so we will need a mechanism to host the image.
+For this, we will use AWS ECR, Docker, and Terraform.
+AWS ECR is the Elastic Container Registry.
+It is a container registry like DockerHub or GitHub.
+We can use it to host our image.
+The steps below use Terraform to
 
 \begin{enumerate}
-    \item Use Terraform to create an ECR repository for our image.
-    \item Use Terraform to build our Docker image.
-    \item Use Terraform to push our Docker image.
+    \item create an ECR repository for our image,
+    \item build our Docker image, and
+    \item push our Docker image.
 \end{enumerate}
 
 \info{
 This is a non-standard process.
 As you may have seen in the DevOps tutorial,
-we would ordinarily like our code commits to trigger a CI/CD pipeline which builds the images.
+we would ordinarily like our code commits to trigger a CI/CD pipeline which builds the images.\\
 
 If you would like, you can use GitHub actions to build and push your container to the GitHub container registry and authenticate when you pull the image.
 However, using ECR simplifies the process,
@@ -565,14 +599,14 @@ despite the oddities introduced by having a non-persistent ECR repository.
 \paragraph{Getting Started}
 
 \begin{enumerate}
-    \item Using the GitHub Classroom link for this practical provided by your tutor on edstem, create a repository to work within.
-    \item Install Terraform if not already installed, as it will be required again this week.
-    \item Start your learner lab and copy the AWS Learner Lab credentials into a credentials file in the root of the repository.
+    \item Using the GitHub Classroom link for this practical provided on Edstem, create a repository to work within.
+    \item Install Terraform, if it is not already installed, as it will be required again this week and in later weeks.
+    \item Start your Learner Lab and copy the AWS Learner Lab credentials into a credentials file in the root of the repository.
 \end{enumerate}
 
 \paragraph{What's New}
 We are starting again with our todo application from roughly where we left off in the week 3 practical.
-We've added a new directory \texttt{todo/app} that has the static HTML files for the TaskOverflow website and added a route to serve these files.
+We have added a new directory \texttt{todo/app} that has the static HTML files for the TaskOverflow website and added a route to serve these files.
 We have also created a production version of the server that uses gunicorn,
 the \texttt{bin} directory is used by this image.
 Our original Docker image is now in \texttt{Dockerfile.dev}.\\
@@ -627,13 +661,14 @@ resource "aws_ecr_repository" "taskoverflow" {
 }
 \end{code}
 
-The URL for containers in the ECR following the format below:
+\noindent
+The URL for containers in the ECR follow the format below:
 
 \url{{ACCOUNT_ID}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME}}
 
 Remember --- to push to a container registry
 we need a local container whose tag matches the remote URL.
-We could then create and push the contianer locally with:
+We could then create and push the container locally with:
 
 \begin{code}[language=bash,numbers=none]{}
 docker build -t {ACCOUNT_ID}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME} .
@@ -656,7 +691,14 @@ resource "docker_registry_image" "taskoverflow" {
 }
 \end{code}
 
-Notice that we are able to utilize the output of the ECR repository as the URL which resolves to the correct URL for the image.
+Notice that we are able to utilise the output of the ECR repository as the URL which resolves to the correct URL for the image.
+
+If you execute \texttt{terraform plan}, it will probably report an inconsistent dependency.
+This is because we have added a new provider and its dependency needs to be added to the lock file.
+Execute \texttt{terraform init -upgrade} to do this.
+
+You can now \texttt{terraform apply} to push the container to the registry.
+Note that the Docker Engine / Daemon must be running so Terraform can talk to it.
 
 \bibliographystyle{ieeetr}
 \bibliography{books,ours}
