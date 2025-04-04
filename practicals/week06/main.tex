@@ -3,11 +3,11 @@
 % \teachermodetrue
 
 \usepackage{float}
-
+\usepackage{enumitem}
 \usepackage{languages}
 
 \title{Scaling Stateless Components}
-\author{Evan Hughes \& Anna Truffet \& Brae Webb }
+\author{Evan Hughes \& Anna Truffet \& Brae Webb \& Richard Thomas}
 
 \date{\week[practical]{6}}
 \begin{document}
@@ -21,29 +21,30 @@
 \end{figure}
 
 \aside{
-  Github Classroom links for this practical can be found on Edstem \url{https://edstem.org/au/courses/15375/discussion/1753712}
+  Github Classroom links for this practical can be found on Edstem: \url{https://edstem.org/au/courses/21491/discussion}
 }
 
+
 \section{This Week}
-Our goal is to scale out the stateless component of our TaskOverflow application across multiple compute instances.
-Specifically we will need to:
-\begin{itemize}
+Our goal is to scale out the stateless component of the TaskOverflow application across multiple compute instances.
+Specifically we need to:
+\begin{itemize}[topsep=4pt,partopsep=1pt,itemsep=2pt,parsep=2pt]
     \item Route traffic to our deployed TaskOverflow application with a \textsl{load balancer}.
     \item Scale out TaskOverflow instances with \textsl{autoscaling}.
     \item Check the status of our instances with a \textsl{healthcheck}.
     \item \textsl{Dynamically scale} our application based on load.
 \end{itemize}
 
+
 \section{Load Balancers}
 
 Load balancing distributes a load over a set of resources.
 For example, balancing network traffic across several servers.
 Load balancing is crucial to the scalability of modern systems, as often,
-one physical device cannot the volume of requests or the processing demand
+one physical device cannot manage the volume of requests or the processing demand
 (e.g. the large amount network traffic for a large website).
 
-A service which load balances, is called a \textbf{Load Balancer}.
-
+A service which balances load across resources, is called a \textbf{Load Balancer}.
 
 \subsection{Routing Algorithms}
 
@@ -86,26 +87,29 @@ However, the health check was too weak. When
     \item the service was still running in memory.
 \end{enumerate}
 
+\noindent
 The health check passed, but in reality, the service was talking to dead nodes, causing upstream services to have intermittent failures. 
 
 \paragraph{Example 2} During the rollout of a new prompt for UQ Authenticate, which required users to go to my.UQ to provide verified contact details -- the Blackboard (learn.uq.edu.au) service went completely offline.
 The health check for Blackboard at the time completed a full authentication as a test user to ensure everything was functioning as expected.
 Once this user was enrolled into the new rollout,
 the health checks started reporting failures and within a matter of minutes the entire pool of nodes were shutdown.
-This health check was too broad and was not isolated enough to the service that it was checking.
+This health check was too broad and was not isolated enough to the service that it was checking.\\
 
-
-A lot of services will provide a health check endpoint or a metrics endpoint which can help the engineer setup a proper level of health check.
+\newline\noindent
+A lot of services provide a health check endpoint or a metrics endpoint to help engineers setup a proper level of health check.
 We want a health check that is specific enough for the service that it is checking but not so specific that it is too brittle.
-For the TaskOverflow application that we have been building so far,
-a reasonable health check would be that the health endpoint ensures the database is available and that the application is able to connect to it.
+For the TaskOverflow application that we are building,
+a reasonable health check would be that the health endpoint ensures the database is available
+and that the application is able to connect to it.
+
 
 \section{Load Balancers in AWS}
 
 \subsection{Types of AWS Load Balancers}
 Not all load balancers are the same.
 Some load balancers inspect the transmitted packets to correctly route the packet.
-We will cover two types of load balancers provided by AWS:
+We will cover two types of load balancers provided by AWS.
 
 \begin{description}
   \item[Application Load Balancer] is an OSI layer 7%
@@ -154,6 +158,7 @@ Some premade triggers are based around a node's
 
 We create custom triggers based on our application's metrics.
 
+
 \section{Load Balancing TaskOverflow}
 
 This week we are going to explore load balancing the TaskOverflow service that we have been working with.
@@ -168,38 +173,25 @@ Other methods could also be employed to help deal with the load like caching but
 
 \paragraph{Getting Started}
 \begin{enumerate}
-    \item Using the GitHub Classroom link for this practical provided by your tutor on edstem,
-create a repository to work within.
-    \item Install Terraform if not already installed, as it will be required again this week.
-    \item Start your learner lab and copy the AWS Learner Lab credentials into a credentials file in the root of the repository.
-    \item In the repository you will have the starter Terraform code for the ECS path from last week.
+    \item Using the GitHub Classroom link for this practical provided on Edstem, create a repository to work within.
+    \item Install Terraform, if not already installed, as it will be required again this week.
+    \item Start your Learner Lab and copy the AWS Learner Lab credentials into a credentials file in the root of the repository.
+    \item In the repository you will have the starter Terraform code for the ECS Deployment from last week.
 \end{enumerate}
 
-\subsection{[Path A] EC2}
-
-\aside{
-In 2024 we have removed the EC2 pathway from this practical but we have left the deployment diagram to allow comparisons to ECS.
-Please skip to Section \ref{pathb} for the ECS approach.
-}
-
-
-\begin{figure}[H]
-  \includegraphics[width=\textwidth]{diagrams/ec2deployment}
-\end{figure}
-
-\subsection{[Path B] ECS}
+\subsection{ECS Deployment}
 \label{pathb}
 
-This week we need create an Application Scaling Policy for our ECS service
+This week we need to create an Application Scaling Policy for our ECS service,
 and a Load Balancer to handle the routing of our service.
 Our goal is to implement the deployment diagram below.
 
 \begin{figure}[H]
-  \includegraphics[width=\textwidth]{diagrams/ecsdeployment}
+  \includegraphics[trim=0 230 0 0,clip,width=\textwidth]{diagrams/ecsdeployment}
 \end{figure}
 
 Last week, when we setup the ECS service, we noticed that we could not get an endpoint because the instance would only be provisioned after our Terraform code had run.
-This is because ECS is already a dynamic scaling service and it expects a load balancer to route its traffic.
+This is because ECS is a dynamic scaling service and it expects a load balancer to route its traffic.
 To get started we need to create a target group which defines where traffic can be routed to.
 
 \begin{figure}[H]
@@ -228,7 +220,7 @@ resource "aws_lb_target_group" "todo" {
 }
 \end{code}
 
-Load balancing is core to how ECS works and so the \texttt{aws\_ecs\_service} resource that we used last week accepts a \texttt{load\_balancer} block.
+Load balancing is core to how ECS works, so the \texttt{aws\_ecs\_service} resource that we used last week accepts a \texttt{load\_balancer} block.
 To associate the target group with our ECS service,
 modify the given \texttt{aws\_ecs\_service.taskoverflow} resource to include a \texttt{load\_balancer} block.
 
@@ -336,13 +328,17 @@ This auto scaling policy looks at the average CPU utilization of the service and
 This is a very simple policy but it is a good starting point.
 We can now deploy our service and see it scale up and down.
 
-Continue onto the next section to see how to send multiple requests to our service to generate traffic to trigger scaling.
+\teacher {
+  Emphasise that scaling up at 20\% load is not appropriate in most circumstances.
+  We're using 20\% in our example to make it easy to demonstrate scaling up.
+}
+
+The next section describes how to send multiple requests to our service to generate traffic to trigger scaling.
 
 \subsection{Producing Load with k6}\label{k6}
 
-We have a service but us visiting it in our web browser is not going to be enough load for our scaling policies to trigger.
-To do this we will employ the help of a tool called k6,
-which is a relatively new load testing tool.
+We have a service but just visiting it in a web browser is not going to be enough load for our scaling policies to trigger.
+To test the scaling policies, we will employ the help of a tool called k6, which is a load testing tool.
 To install k6 visit \url{https://k6.io/docs/get-started/installation/}.
 It can be installed in the code spaces environment or locally.
 
@@ -397,7 +393,9 @@ Navigate to \texttt{ECS} -> \texttt{Clusters} -> \texttt{taskoverflow} -> \textt
   \end{center}
 \end{figure}
 
-In this panel we can see our Auto Scaling configuration which lists the desired, minimum and maximum number of tasks. The policies are listed further down and we can view the alarm which is a graphical representation of the CPU utilization vs the target value.
+In this panel we can see our Auto Scaling configuration which lists the desired, minimum and maximum number of tasks.
+The policies are listed further down and we can view the alarm which is a graphical representation of the CPU utilization vs.
+the target value.
 
 \begin{figure}[H]
   \begin{center}
@@ -405,9 +403,10 @@ In this panel we can see our Auto Scaling configuration which lists the desired,
   \end{center}
 \end{figure}
 
-In the Cloudwatch Alarm panel you will notice that we have two different alarms,
-these are for the scaling up and down of the service.
-Selecting the alarm you can view the status where an "in alert" alarm is when the auto scaling configuration needs to action increasing/decreasing the number of instances.
+In the CloudWatch Alarm panel you will notice that we have two different alarms.
+These are for the scaling up and down of the service.
+Selecting the alarm you can view the status,
+where ``in alarm'' is when the auto scaling configuration needs to action increasing/decreasing the number of instances.
 
 \begin{figure}[H]
   \begin{center}
@@ -415,15 +414,29 @@ Selecting the alarm you can view the status where an "in alert" alarm is when th
   \end{center}
 \end{figure}
 
+\subsection{EC2 Deployment}
+
+\aside{
+  The deployment diagram below is what it would look like,
+  if we wanted to use a load balance with our application deployed on EC2 instances.
+  The main difference still being the features that ECS provides to manage services and tasks for us.
+}
+
+\begin{figure}[H]
+  \includegraphics[trim=0 230 0 0,clip,width=\textwidth]{diagrams/ec2deployment}
+\end{figure}
+
 
 \section{Conclusion}
-You have now deployed an scalable stateless service.
-If you would like to experiment with generating different load for the service,
-please read through the k6 documentation at \url{https://k6.io/docs/}.
+You have now deployed a scalable stateless service.
+You should experiment with generating different loads for the service,
+please read through the \link{k6 documentation}{https://k6.io/docs/}.
 
-In the cloud assignment,
+In the \link{cloud infrastructure assignment}{https://csse6400.uqcloud.net/assessment/cloud.pdf},
 we will use \texttt{k6} to test various scenarios as described in the task sheet and evaluate how your service performs.
-It will be beneficial to be familiar with how this type of testing works.
+You will want to be familiar with how load testing works,
+so that you can test your scalable implementation.
+
 
 \bibliographystyle{ieeetr}
 \bibliography{books,ours}
