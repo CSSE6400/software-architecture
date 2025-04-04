@@ -11,7 +11,7 @@
 
 \title{Distributed Systems II}
 \subtitle{Software Architecture}
-\author{Brae Webb \& Richard Thomas}
+\author{Brae Webb \& Richard Thomas \& Guangdong Bai}
 \date{\week{6}}
 
 % \titlegraphic {
@@ -237,7 +237,7 @@
     \item Eventually is intentionally \highlight{ambiguous}.
 }
 
-\point[\Large Eventual Consistency]{Problems?}
+\point[\Large Eventual Consistency]{Sufficient? Problems?}
 
 \begin{frame}
 \begin{center}
@@ -277,7 +277,7 @@
 }
 
 \definition{Read-your-writes Consistency}{
-    Users always see the updates that \highlight{they have made}.
+    Users always see the updates that \highlight{they have made} (even though others see stale data).
 }
 \note{Doesn't care what other users see.}
 
@@ -326,8 +326,14 @@
 }
 \note{User doesn't travel back in time.}
 
+\definition{Causal Consistency}{
+    Causally related updates appear in order (e.g., comments appear under the right post).
+}
+\note{To generalize time to any dependent relations.}
+
 % \point{Consistent Prefix Reads}
 % \todo{Consistent Prefix Example}
+% @Richard, Brae: I use the causal consistency, which may be more general and easier to understand.  
 
 \point[\Large Summary]{
 \vspace{0.6em}
@@ -406,9 +412,11 @@
 \point[\Large Resolving Conflicts]{
 \vspace{1em}
 \begin{labeling}{On Write}
-    \item[\color{secondary} On Write] When a conflict is first noticed, take proactive resolution action.
+    \item[\color{secondary} On Write] When a conflict is first noticed, take proactive resolution action. 
+    \item[] Example: Last Write Wins (LWW) in DynamoDB. 
     \vspace{0.5em}
-    \item[\color{secondary} On Read] When a conflict is next read, ask for a resolution.
+    \item[\color{secondary} On Read] Stores all conflicting versions on write. When a conflict is next read, ask for a resolution.
+    \item[] Example: \emph{git pull}
 \end{labeling} 
 }
 \note[itemize]{
