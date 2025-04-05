@@ -2,8 +2,8 @@ resource "aws_ecs_cluster" "taskoverflow" {
   name = "taskoverflow"
 }
 
-resource "aws_ecs_task_definition" "todo" {
-  family                   = "todo"
+resource "aws_ecs_task_definition" "taskoverflow" {
+  family                   = "taskoverflow"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = 1024
@@ -16,7 +16,7 @@ resource "aws_ecs_task_definition" "todo" {
     "image": "${local.image}",
     "cpu": 1024,
     "memory": 2048,
-    "name": "todo",
+    "name": "taskoverflow",
     "networkMode": "awsvpc",
     "portMappings": [
       {
@@ -27,13 +27,13 @@ resource "aws_ecs_task_definition" "todo" {
     "environment": [
       {
         "name": "SQLALCHEMY_DATABASE_URI",
-        "value": "postgresql://${local.database_username}:${local.database_password}@${aws_db_instance.database.address}:${aws_db_instance.database.port}/${aws_db_instance.database.db_name}"
+        "value": "postgresql://${local.database_username}:${local.database_password}@${aws_db_instance.taskoverflow_database.address}:${aws_db_instance.taskoverflow_database.port}/${aws_db_instance.taskoverflow_database.db_name}"
       }
     ],
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-group": "/taskoverflow/todo",
+        "awslogs-group": "/taskoverflow/db",
         "awslogs-region": "us-east-1",
         "awslogs-stream-prefix": "ecs",
         "awslogs-create-group": "true"
@@ -47,25 +47,25 @@ DEFINITION
 resource "aws_ecs_service" "taskoverflow" {
   name            = "taskoverflow"
   cluster         = aws_ecs_cluster.taskoverflow.id
-  task_definition = aws_ecs_task_definition.todo.arn
+  task_definition = aws_ecs_task_definition.taskoverflow.arn
   desired_count   = 1
   launch_type     = "FARGATE"
 
   network_configuration {
     subnets             = data.aws_subnets.private.ids
-    security_groups     = [aws_security_group.todo.id]
+    security_groups     = [aws_security_group.taskoverflow.id]
     assign_public_ip    = true
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.todo.arn
-    container_name   = "todo"
+    target_group_arn = aws_lb_target_group.taskoverflow.arn
+    container_name   = "taskoverflow"
     container_port   = 6400
   }
 }
 
-resource "aws_security_group" "todo" {
-  name = "todo"
+resource "aws_security_group" "taskoverflow" {
+  name = "taskoverflow"
   description = "TaskOverflow Security Group"
 
   ingress {
@@ -87,5 +87,9 @@ resource "aws_security_group" "todo" {
     to_port = 0
     protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "taskoverflow_security_group"
   }
 }

@@ -7,7 +7,7 @@
 \usepackage{languages}
 
 \title{Scaling Stateless Components}
-\author{Evan Hughes \& Anna Truffet \& Brae Webb \& Richard Thomas}
+\author{Evan Hughes, Anna Truffet, Brae Webb \& Richard Thomas}
 
 \date{\week[practical]{6}}
 \begin{document}
@@ -148,7 +148,7 @@ When the load is low, we operate with minimal nodes.
 When the load is high, we increase the number of nodes available to cope.
 
 To compute the resources needed, AWS relies on triggers from CloudWatch and scaling policies.
-Some premade triggers are based around a node's
+Some pre-made triggers are based around a node's
 
 \begin{itemize}
     \item CPU usage,
@@ -168,16 +168,30 @@ This will not be a full solution to the scaling issue as our database is still a
 but it will be a good start.%
 \footnote{We will not explore scaling persistent data in the practicals.
 If you wish to try in your assignment,
-please see some of the concepts presented in the Distributed Systems II lecture \cite{distributed2-slides}.}
+please see some of the concepts presented in the Distributed Systems II lecture
+\cite{distributed2-slides} and notes \cite{distributed2-notes}.}
 Other methods could also be employed to help deal with the load like caching but we will leave that for another day.
 
 \paragraph{Getting Started}
 \begin{enumerate}
     \item Using the GitHub Classroom link for this practical provided on Edstem, create a repository to work within.
-    \item Install Terraform, if not already installed, as it will be required again this week.
+    \item Install Terraform, if not already installed, as it is required again this week.
     \item Start your Learner Lab and copy the AWS Learner Lab credentials into a credentials file in the root of the repository.
-    \item In the repository you will have the starter Terraform code for the ECS Deployment from last week.
+    \item The repository has starter Terraform code based on the ECS Deployment from last week.
+          This code has been refactored into different files to be more manageable.
 \end{enumerate}
+
+\teacher{
+  Explain why splitting Terraform code into multiple files makes it easier to work with.
+  Summarise what the code does, as a refresher of last week's material.
+  
+  Mention the idea of Terraform modules and suggest students look at the documentation for these.
+  
+  It would be worth getting student to execute \texttt{terraform apply}
+  so they can see that the code works the same as last week's.
+  This also means that the time it takes to create RDS is consumed now,
+  while they are working through extending the deployment code below.
+}
 
 \subsection{ECS Deployment}
 \label{pathb}
@@ -201,11 +215,11 @@ To get started we need to create a target group which defines where traffic can 
 \end{figure}
 
 \begin{code}[language=terraform,numbers=none,keepspaces=true]{lb.tf}
-resource "aws_lb_target_group" "todo" {
-  name          = "todo"
+resource "aws_lb_target_group" "taskoverflow" {
+  name          = "taskoverflow"
   port          = 6400
   protocol      = "HTTP"
-  vpc_id        = aws_security_group.todo.vpc_id
+  vpc_id        = aws_security_group.taskoverflow.vpc_id
   target_type   = "ip"
 
   health_check {
@@ -226,8 +240,8 @@ modify the given \texttt{aws\_ecs\_service.taskoverflow} resource to include a \
 
 \begin{code}[language=terraform,numbers=none,keepspaces=true]{ecs.tf}
   load_balancer {
-    target_group_arn = aws_lb_target_group.todo.arn
-    container_name   = "todo"
+    target_group_arn = aws_lb_target_group.taskoverflow.arn
+    container_name   = "taskoverflow"
     container_port   = 6400
   }
 \end{code}
@@ -247,12 +261,12 @@ resource "aws_lb" "taskoverflow" {
   internal           = false
   load_balancer_type = "application"
   subnets            = data.aws_subnets.private.ids
-  security_groups    = [aws_security_group.taskoverflow.id]
+  security_groups    = [aws_security_group.taskoverflow_lb.id]
 }
 
-resource "aws_security_group" "taskoverflow" {
-  name        = "taskoverflow"
-  description = "TaskOverflow Security Group"
+resource "aws_security_group" "taskoverflow_lb" {
+  name        = "taskoverflow_lb"
+  description = "TaskOverflow Load Balancer Security Group"
 
   ingress {
     from_port     = 80
@@ -267,6 +281,10 @@ resource "aws_security_group" "taskoverflow" {
     protocol      = "-1"
     cidr_blocks   = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = "taskoverflow_lb_security_group"
+  }
 }
 \end{code}
 
@@ -280,14 +298,14 @@ We need to create a listener which is the entry point for the load balancer.
 \end{figure}
 
 \begin{code}[language=terraform,numbers=none,keepspaces=true]{lb.tf}
-resource "aws_lb_listener" "todo" {
+resource "aws_lb_listener" "taskoverflow" {
   load_balancer_arn   = aws_lb.taskoverflow.arn
   port                = "80"
   protocol            = "HTTP"
 
   default_action {
     type              = "forward"
-    target_group_arn  = aws_lb_target_group.todo.arn
+    target_group_arn  = aws_lb_target_group.taskoverflow.arn
   }
 }
 \end{code}
@@ -296,7 +314,7 @@ If we deployed now, we would have implemented the deployment diagram above.
 However, we want to add autoscaling to our service so that it can scale up and down based on the load.
 
 \begin{code}[language=terraform,numbers=none,keepspaces=true]{autoscaling.tf}
-resource "aws_appautoscaling_target" "todo" {
+resource "aws_appautoscaling_target" "taskoverflow" {
   max_capacity        = 4
   min_capacity        = 1
   resource_id         = "service/taskoverflow/taskoverflow"
@@ -306,19 +324,17 @@ resource "aws_appautoscaling_target" "todo" {
   depends_on = [ aws_ecs_service.taskoverflow ]
 }
 
-
-resource "aws_appautoscaling_policy" "todo-cpu" {
-  name                = "todo-cpu"
+resource "aws_appautoscaling_policy" "taskoverflow-cpu" {
+  name                = "taskoverflow-cpu"
   policy_type         = "TargetTrackingScaling"
-  resource_id         = aws_appautoscaling_target.todo.resource_id
-  scalable_dimension  = aws_appautoscaling_target.todo.scalable_dimension
-  service_namespace   = aws_appautoscaling_target.todo.service_namespace
+  resource_id         = aws_appautoscaling_target.taskoverflow.resource_id
+  scalable_dimension  = aws_appautoscaling_target.taskoverflow.scalable_dimension
+  service_namespace   = aws_appautoscaling_target.taskoverflow.service_namespace
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
       predefined_metric_type  = "ECSServiceAverageCPUUtilization"
     }
-
     target_value              = 20
   }
 }
@@ -334,6 +350,23 @@ We can now deploy our service and see it scale up and down.
 }
 
 The next section describes how to send multiple requests to our service to generate traffic to trigger scaling.
+This means we need to know the IP address or DNS name of our service.
+We could look this up in the AWS console but,
+in most environments (including the cloud infrastructure assignment),
+you will want to retrieve this data automatically.
+The first Terraform practical described how to output the IP address of an EC2 instance \cite{prac-week4}.
+Similarly, we can output the DNS name of our load balancer.
+
+\begin{code}[language=terraform,numbers=none,keepspaces=true]{lb.tf}
+output "taskoverflow_dns_name" { 
+  value = aws_lb.taskoverflow.dns_name
+  description = "DNS name of the TaskOverflow load balancer."
+}\end{code}
+
+\teacher{
+  Tell students to execute \texttt{terraform apply} now, while you summarise k6 and get them to install it.
+  Warn them that creating the load balancer will take a few minutes.
+}
 
 \subsection{Producing Load with k6}\label{k6}
 
@@ -385,32 +418,51 @@ default   [--------------------------------------] 0091/5000 VUs  00m05.4s/11m00
 
 With all the pieces together we can now see if our efforts have paid off.
 While the k6 code from above is running, let's go to the ECS console and see if we can see any scaling events.
-Navigate to \texttt{ECS} -> \texttt{Clusters} -> \texttt{taskoverflow} -> \texttt{Services} -> \texttt{taskoverflow} -> \texttt{Configuration and tasks}.
+Navigate to \texttt{ECS} -> \texttt{Clusters} -> \texttt{taskoverflow} -> \texttt{Services} -> \texttt{taskoverflow} -> \texttt{Configuration}.
 
 \begin{figure}[H]
   \begin{center}
-    \includegraphics[width=\textwidth]{images/ecs1}
+    \includegraphics[width=\textwidth]{images/ecs-panel}
   \end{center}
 \end{figure}
 
-In this panel we can see our Auto Scaling configuration which lists the desired, minimum and maximum number of tasks.
-The policies are listed further down and we can view the alarm which is a graphical representation of the CPU utilization vs.
-the target value.
+In this panel we can see our Auto Scaling configuration which lists the desired,
+minimum and maximum number of tasks.
+The policies describing the auto scaling rules are listed just below.
 
 \begin{figure}[H]
   \begin{center}
-    \includegraphics[width=\textwidth]{images/ecs2}
+    \includegraphics[width=\textwidth]{images/ecs-panel-auto-scaling-policies}
   \end{center}
 \end{figure}
 
-In the CloudWatch Alarm panel you will notice that we have two different alarms.
+The \texttt{Health and metrics} tab displays CPU and memory utilization.
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=\textwidth]{images/ecs-panel-health}
+  \end{center}
+\end{figure}
+
+\newpage
+The \texttt{Tasks} tab displays a log of tasks with their last and desired status.
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=\textwidth]{images/ecs-panel-tasks}
+  \end{center}
+\end{figure}
+
+Open the CloudWatch Alarm panel.
+You will notice that we have two different alarms.
 These are for the scaling up and down of the service.
-Selecting the alarm you can view the status,
-where ``in alarm'' is when the auto scaling configuration needs to action increasing/decreasing the number of instances.
+Select an alarm and you can view its status.
+The ``In alarm'' status is when the auto scaling configuration needs to action
+increasing/decreasing the number of instances.
 
 \begin{figure}[H]
   \begin{center}
-    \includegraphics[width=\textwidth]{images/ecs3}
+    \includegraphics[width=\textwidth]{images/cloudwatch-in-alarm}
   \end{center}
 \end{figure}
 
