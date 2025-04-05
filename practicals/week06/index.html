@@ -1,4 +1,4 @@
-Last Updated on 2025/04/04
+Last Updated on 2025/04/05
                                                                                                     
 
 <?xml version="1.0" encoding="iso-8859-1" ?> 
@@ -24,7 +24,7 @@ dl dd {text-align: left}</style>
  id="Q1-1-1"></a>
 _________________________________________________________________________________________________
 <h2 class="titleHead">Scaling Stateless Components</h2>                                                  Software Architecture
-   <div class="date" >April 1, 2025</div>                                                                     <div class="author" >Evan Hughes &amp; Anna Truffet &amp; Brae Webb &amp; Richard
+   <div class="date" >April 1, 2025</div>                                                                          <div class="author" >Evan Hughes, Anna Truffet, Brae Webb &amp; Richard
 Thomas</div>
 ____________________________________________________________________________________________
    </div>
@@ -249,7 +249,7 @@ width="525" height="525"  />
 number of nodes we need to minimise resources. When the load is low, we operate with minimal nodes. When
 the load is high, we increase the number of nodes available to cope.
 </p><!--l. 150--><p class="indent" >   To compute the resources needed, AWS relies on triggers from CloudWatch and scaling policies. Some
-premade triggers are based around a node&#8217;s
+pre-made triggers are based around a node&#8217;s
 </p>
       <ul class="itemize1">
       <li class="itemize">
@@ -275,7 +275,7 @@ Other methods could also be employed to help deal with the load like caching but
 day.
    
 </p>
-<!--l. 174--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 175--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-12000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Getting Started</span></span>
       </p><dl class="enumerate-enumitem"><dt class="enumerate-enumitem">
@@ -284,7 +284,7 @@ class="enumerate-enumitem">Using the GitHub Classroom link for this practical pr
       within.
       </dd><dt class="enumerate-enumitem">
    2. </dt><dd 
-class="enumerate-enumitem">Install Terraform, if not already installed, as it will be required again this week.
+class="enumerate-enumitem">Install Terraform, if not already installed, as it is required again this week.
                                                                                                     
                                                                                                     
       </dd><dt class="enumerate-enumitem">
@@ -293,11 +293,12 @@ class="enumerate-enumitem">Start your Learner Lab and copy the AWS Learner Lab c
       of the repository.
       </dd><dt class="enumerate-enumitem">
    4. </dt><dd 
-class="enumerate-enumitem">In the repository you will have the starter Terraform code for the ECS Deployment from last week.</dd></dl>
+class="enumerate-enumitem">The repository has starter Terraform code based on the ECS Deployment from last week. This code
+      has been refactored into different files to be more manageable.</dd></dl>
    
    <h4 class="subsectionHead"><span class="titlemark">4.1    </span> <a 
  id="x1-130004.1"></a>ECS Deployment</h4>
-<!--l. 185--><p class="noindent" >This week we need to create an Application Scaling Policy for our ECS service, and a Load Balancer to handle the
+<!--l. 199--><p class="noindent" >This week we need to create an Application Scaling Policy for our ECS service, and a Load Balancer to handle the
 routing of our service. Our goal is to implement the deployment diagram below.
 </p>
    <hr class="figure" /><div class="figure" 
@@ -306,14 +307,14 @@ routing of our service. Our goal is to implement the deployment diagram below.
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 190--><p class="noindent" ><img 
+<!--l. 204--><p class="noindent" ><img 
 src="diagrams/ecsdeployment.png" alt="PIC"  
 width="525" height="-1152"  />
                                                                                                     
                                                                                                     
 </p>
    </div><hr class="endfigure" />
-<!--l. 193--><p class="indent" >   Last week, when we setup the ECS service, we noticed that we could not get an endpoint because the instance
+<!--l. 207--><p class="indent" >   Last week, when we setup the ECS service, we noticed that we could not get an endpoint because the instance
 would only be provisioned after our Terraform code had run. This is because ECS is a dynamic scaling service and
 it expects a load balancer to route its traffic. To get started we need to create a target group which defines where
 traffic can be routed to.
@@ -326,21 +327,21 @@ traffic can be routed to.
                                                                                                     
 <div class="center" 
 >
-<!--l. 198--><p class="noindent" >
-</p><!--l. 199--><p class="noindent" ><img 
+<!--l. 212--><p class="noindent" >
+</p><!--l. 213--><p class="noindent" ><img 
 src="diagrams/lb2fargate.png" alt="PIC"  
 width="14" height="14"  /></p></div>
 </div><hr class="endfigure" />
-<!--l. 203--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 203--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 203--><pre class="listings" id="listing-1"><span class="label"><a 
+<!--l. 217--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 217--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 217--><pre class="listings" id="listing-1"><span class="label"><a 
  id="x1-13001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">aws_lb_target_group</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">todo</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
@@ -348,7 +349,7 @@ class="ectt-1200">{</span></span>
 class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">todo</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
  id="x1-13003r3"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -368,7 +369,7 @@ class="ectt-1200">vpc_id</span></span><span style="color:#000000"> </span><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">aws_security_group</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">todo</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">vpc_id</span></span> 
 <span class="label"><a 
@@ -440,16 +441,16 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-13018r18"></a></span></pre>
    </div>
-<!--l. 223--><p class="indent" >   Load balancing is core to how ECS works, so the <span 
+<!--l. 237--><p class="indent" >   Load balancing is core to how ECS works, so the <span 
 class="ectt-1200">aws_ecs_service </span>resource that we used last week
 accepts a <span 
 class="ectt-1200">load_balancer </span>block. To associate the target group with our ECS service, modify the given
 <span 
 class="ectt-1200">aws_ecs_service.taskoverflow </span>resource to include a <span 
 class="ectt-1200">load_balancer </span>block.
-</p><!--l. 227--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 227--><p class="indent" >   <span 
-class="ectt-1200">» cat ecs.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 227--><pre class="listings" id="listing-2"><span class="label"><a 
+</p><!--l. 241--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 241--><p class="indent" >   <span 
+class="ectt-1200">» cat ecs.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 241--><pre class="listings" id="listing-2"><span class="label"><a 
  id="x1-13019r1"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">load_balancer</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
@@ -459,7 +460,7 @@ class="ectt-1200">target_group_arn</span></span><span style="color:#000000"> </s
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">aws_lb_target_group</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">todo</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">arn</span></span> 
 <span class="label"><a 
@@ -467,7 +468,7 @@ class="ectt-1200">arn</span></span>
 class="ectt-1200">container_name</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">todo</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
  id="x1-13022r4"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -481,7 +482,7 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-13024r6"></a></span></pre>
    </div>
-<!--l. 235--><p class="indent" >   With the internal side of the load balancer done, we can create it and a firewall for the external side. This
+<!--l. 249--><p class="indent" >   With the internal side of the load balancer done, we can create it and a firewall for the external side. This
 firewall allows us to restrict what traffic will be allowed to reach the load balancer.
 </p>
    <hr class="figure" /><div class="figure" 
@@ -492,14 +493,14 @@ firewall allows us to restrict what traffic will be allowed to reach the load ba
                                                                                                     
 <div class="center" 
 >
-<!--l. 239--><p class="noindent" >
-</p><!--l. 240--><p class="noindent" ><img 
+<!--l. 253--><p class="noindent" >
+</p><!--l. 254--><p class="noindent" ><img 
 src="diagrams/lb3fargate.png" alt="PIC"  
 width="14" height="14"  /></p></div>
 </div><hr class="endfigure" />
-<!--l. 244--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 244--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 244--><pre class="listings" id="listing-3"><span class="label"><a 
+<!--l. 258--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 258--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 258--><pre class="listings" id="listing-3"><span class="label"><a 
  id="x1-13025r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -546,7 +547,7 @@ class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style
 class="ectt-1200">[</span></span><span style="color:#000000"><span 
 class="ectt-1200">aws_security_group</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow_lb</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">id</span></span><span style="color:#000000"><span 
 class="ectt-1200">]</span></span> 
@@ -562,7 +563,7 @@ class="ectt-1200">"</span></span><span style="color:#669900"><span
 class="ectt-1200">aws_security_group</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow_lb</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
@@ -570,7 +571,7 @@ class="ectt-1200">{</span></span>
 class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow_lb</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
  id="x1-13035r11"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -578,6 +579,8 @@ class="ectt-1200">description</span></span><span style="color:#000000"> </span><
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">TaskOverflow</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">Load</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">Balancer</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
 class="ectt-1200">Security</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
 class="ectt-1200">Group</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
@@ -652,13 +655,30 @@ class="ectt-1200">]</span></span>
  id="x1-13049r25"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-13050r26"></a></span><span style="color:#000000"><span 
+ id="x1-13050r26"></a></span> 
+<span class="label"><a 
+ id="x1-13051r27"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">tags</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-13052r28"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Name</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow_lb_security_group</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-13053r29"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span> 
+<span class="label"><a 
+ id="x1-13054r30"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-13051r27"></a></span></pre>
+ id="x1-13055r31"></a></span></pre>
    </div>
-<!--l. 273--><p class="indent" >   Now over to the external side of the load balancer. We need to create a listener which is the entry point for the
+<!--l. 291--><p class="indent" >   Now over to the external side of the load balancer. We need to create a listener which is the entry point for the
 load balancer.
 </p>
    <hr class="figure" /><div class="figure" 
@@ -669,25 +689,25 @@ load balancer.
                                                                                                     
 <div class="center" 
 >
-<!--l. 277--><p class="noindent" >
-</p><!--l. 278--><p class="noindent" ><img 
+<!--l. 295--><p class="noindent" >
+</p><!--l. 296--><p class="noindent" ><img 
 src="diagrams/lb4fargate.png" alt="PIC"  
 width="14" height="14"  /></p></div>
 </div><hr class="endfigure" />
-<!--l. 282--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 282--><p class="indent" >   <span 
-class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 282--><pre class="listings" id="listing-4"><span class="label"><a 
- id="x1-13052r1"></a></span><span style="color:#006699"><span 
+<!--l. 300--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 300--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 300--><pre class="listings" id="listing-4"><span class="label"><a 
+ id="x1-13056r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">aws_lb_listener</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">todo</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-13053r2"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13057r2"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">load_balancer_arn</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">aws_lb</span></span><span style="color:#000000"><span 
@@ -696,77 +716,77 @@ class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">arn</span></span> 
 <span class="label"><a 
- id="x1-13054r3"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13058r3"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">port</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">80</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-13055r4"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13059r4"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">protocol</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">HTTP</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-13056r5"></a></span> 
+ id="x1-13060r5"></a></span> 
 <span class="label"><a 
- id="x1-13057r6"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13061r6"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">default_action</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-13058r7"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13062r7"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">type</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">forward</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-13059r8"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13063r8"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">target_group_arn</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">aws_lb_target_group</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">todo</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">arn</span></span> 
 <span class="label"><a 
- id="x1-13060r9"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13064r9"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-13061r10"></a></span><span style="color:#000000"><span 
+ id="x1-13065r10"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-13062r11"></a></span></pre>
+ id="x1-13066r11"></a></span></pre>
    </div>
-<!--l. 295--><p class="indent" >   If we deployed now, we would have implemented the deployment diagram above. However, we want to add
+<!--l. 313--><p class="indent" >   If we deployed now, we would have implemented the deployment diagram above. However, we want to add
 autoscaling to our service so that it can scale up and down based on the load.
-</p><!--l. 298--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 298--><p class="indent" >   <span 
-class="ectt-1200">» cat autoscaling.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 298--><pre class="listings" id="listing-5"><span class="label"><a 
- id="x1-13063r1"></a></span><span style="color:#006699"><span 
+</p><!--l. 316--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 316--><p class="indent" >   <span 
+class="ectt-1200">» cat autoscaling.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 316--><pre class="listings" id="listing-5"><span class="label"><a 
+ id="x1-13067r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">aws_appautoscaling_target</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">todo</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-13064r2"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13068r2"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">max_capacity</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">4</span></span> 
 <span class="label"><a 
- id="x1-13065r3"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13069r3"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">min_capacity</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">1</span></span> 
 <span class="label"><a 
- id="x1-13066r4"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13070r4"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">resource_id</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -777,7 +797,7 @@ class="ectt-1200">/</span></span><span style="color:#669900"><span
 class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-13067r5"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13071r5"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">scalable_dimension</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -788,16 +808,16 @@ class="ectt-1200">:</span></span><span style="color:#669900"><span
 class="ectt-1200">DesiredCount</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-13068r6"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13072r6"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">service_namespace</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">ecs</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-13069r7"></a></span> 
+ id="x1-13073r7"></a></span> 
 <span class="label"><a 
- id="x1-13070r8"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13074r8"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">depends_on</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">[</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -806,124 +826,162 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">taskoverflow</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">]</span></span> 
 <span class="label"><a 
- id="x1-13071r9"></a></span><span style="color:#000000"><span 
+ id="x1-13075r9"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-13072r10"></a></span> 
+ id="x1-13076r10"></a></span> 
 <span class="label"><a 
- id="x1-13073r11"></a></span> 
-<span class="label"><a 
- id="x1-13074r12"></a></span><span style="color:#006699"><span 
+ id="x1-13077r11"></a></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">aws_appautoscaling_policy</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">todo</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
 class="ectt-1200">-</span></span><span style="color:#669900"><span 
 class="ectt-1200">cpu</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-13075r13"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13078r12"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">name</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">todo</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#669900"><span 
 class="ectt-1200">-</span></span><span style="color:#669900"><span 
 class="ectt-1200">cpu</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-13076r14"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13079r13"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">policy_type</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">TargetTrackingScaling</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-13077r15"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13080r14"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">resource_id</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">aws_appautoscaling_target</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">todo</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">resource_id</span></span> 
 <span class="label"><a 
- id="x1-13078r16"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13081r15"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">scalable_dimension</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">aws_appautoscaling_target</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">todo</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">scalable_dimension</span></span> 
 <span class="label"><a 
- id="x1-13079r17"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13082r16"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">service_namespace</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">aws_appautoscaling_target</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
-class="ectt-1200">todo</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">service_namespace</span></span> 
 <span class="label"><a 
- id="x1-13080r18"></a></span> 
+ id="x1-13083r17"></a></span> 
 <span class="label"><a 
- id="x1-13081r19"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13084r18"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">target_tracking_scaling_policy_configuration</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-13082r20"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13085r19"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">predefined_metric_specification</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-13083r21"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13086r20"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">predefined_metric_type</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">ECSServiceAverageCPUUtilization</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-13084r22"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13087r21"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-13085r23"></a></span> 
-<span class="label"><a 
- id="x1-13086r24"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13088r22"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">target_value</span></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">20</span></span> 
 <span class="label"><a 
- id="x1-13087r25"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+ id="x1-13089r23"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-13088r26"></a></span><span style="color:#000000"><span 
+ id="x1-13090r24"></a></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-13089r27"></a></span></pre>
+ id="x1-13091r25"></a></span></pre>
    </div>
-<!--l. 327--><p class="indent" >   This auto scaling policy looks at the average CPU utilization of the service and scales up if it is above 20% and
+<!--l. 343--><p class="indent" >   This auto scaling policy looks at the average CPU utilization of the service and scales up if it is above 20% and
 scales down if it is below 20%. This is a very simple policy but it is a good starting point. We can now deploy our
 service and see it scale up and down.
-</p><!--l. 336--><p class="indent" >   The next section describes how to send multiple requests to our service to generate traffic to trigger
-scaling.
+</p><!--l. 352--><p class="indent" >   The next section describes how to send multiple requests to our service to generate traffic to trigger scaling.
+This means we need to know the IP address or DNS name of our service. We could look this up in the AWS
+console but, in most environments (including the cloud infrastructure assignment), you will want to retrieve this
+data automatically. The first Terraform practical described how to output the IP address of an EC2 instance <span class="cite">[<a 
+href="#Xprac-week4">3</a>]</span>.
+Similarly, we can output the DNS name of our load balancer.
+</p><!--l. 360--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 360--><p class="indent" >   <span 
+class="ectt-1200">» cat lb.tf</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 360--><pre class="listings" id="listing-6"><span class="label"><a 
+ id="x1-13092r1"></a></span><span style="color:#006699"><span 
+class="ectt-1200">output</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">taskoverflow_dns_name</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span> 
+<span class="label"><a 
+ id="x1-13093r2"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">value</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">aws_lb</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">dns_name</span></span> 
+<span class="label"><a 
+ id="x1-13094r3"></a></span><span style="color:#000000"> </span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">description</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
+class="ectt-1200">DNS</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">name</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">of</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">the</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">TaskOverflow</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">load</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">balancer</span></span><span style="color:#669900"><span 
+class="ectt-1200">.</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span> 
+<span class="label"><a 
+ id="x1-13095r4"></a></span><span style="color:#000000"><span 
+class="ectt-1200">}</span></span>
+ 
+<span class="label"><a 
+ id="x1-13096r5"></a></span></pre>
+   </div>
    
-</p>
    <h4 class="subsectionHead"><span class="titlemark">4.2    </span> <a 
  id="x1-140004.2"></a>Producing Load with k6</h4>
-<!--l. 340--><p class="noindent" >We have a service but just visiting it in a web browser is not going to be enough load for our scaling policies to
+<!--l. 373--><p class="noindent" >We have a service but just visiting it in a web browser is not going to be enough load for our scaling policies to
 trigger. To test the scaling policies, we will employ the help of a tool called k6, which is a load testing tool. To install
 k6 visit <a 
 href="https://k6.io/docs/get-started/installation/" class="url" ><span 
 class="ectt-1200">https://k6.io/docs/get-started/installation/</span></a>. It can be installed in the code spaces
 environment or locally.
-</p><!--l. 345--><p class="indent" >   We have provided an example k6 file, which is JavaScript code that creates 1000 to 5000 users to call the list
+</p><!--l. 378--><p class="indent" >   We have provided an example k6 file, which is JavaScript code that creates 1000 to 5000 users to call the list
 endpoint of our service.
-</p><!--l. 348--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 348--><p class="indent" >   <span 
-class="ectt-1200">» cat k6.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 348--><pre class="listings" id="listing-6"><span class="label"><a 
+</p><!--l. 381--><p class="indent" >   </p><div class="framedenv" id="code-1">
+<!--l. 381--><p class="indent" >   <span 
+class="ectt-1200">» cat k6.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 381--><pre class="listings" id="listing-7"><span class="label"><a 
  id="x1-14001r1"></a></span><span style="color:#404040"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">http</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1072,11 +1130,11 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-14016r16"></a></span></pre>
    </div>
-<!--l. 366--><p class="indent" >   We can then run this file using the following command.
+<!--l. 399--><p class="indent" >   We can then run this file using the following command.
 </p>
    <div class="framedenv" id="shaded*-1">
-   <!--l. 368-->
-<pre class="lstlisting" id="listing-7"><span class="label"><a 
+   <!--l. 401-->
+<pre class="lstlisting" id="listing-8"><span class="label"><a 
  id="x1-14017r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">k6</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1087,7 +1145,9 @@ class="ectt-1200">js</span></span><span
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
    <div class="framedenv" id="code-1">
-<!--l. 370--><pre class="listings" id="listing-8"><span class="label"><a 
+                                                                                                    
+                                                                                                    
+<!--l. 403--><pre class="listings" id="listing-9"><span class="label"><a 
  id="x1-14018r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">execution</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
@@ -1197,11 +1257,9 @@ class="ectt-1200">s</span></span>
  id="x1-14030r13"></a></span></pre>
    </div>
    
-                                                                                                    
-                                                                                                    
    <h5 class="subsubsectionHead"><span class="titlemark">4.2.1    </span> <a 
  id="x1-150004.2.1"></a>ECS Auto Scaling</h5>
-<!--l. 386--><p class="noindent" >With all the pieces together we can now see if our efforts have paid off. While the k6 code from above is running,
+<!--l. 419--><p class="noindent" >With all the pieces together we can now see if our efforts have paid off. While the k6 code from above is running,
 let&#8217;s go to the ECS console and see if we can see any scaling events. Navigate to <span 
 class="ectt-1200">ECS </span>-&#x003E; <span 
 class="ectt-1200">Clusters </span>-&#x003E;
@@ -1209,7 +1267,7 @@ class="ectt-1200">Clusters </span>-&#x003E;
 class="ectt-1200">taskoverflow </span>-&#x003E; <span 
 class="ectt-1200">Services </span>-&#x003E; <span 
 class="ectt-1200">taskoverflow </span>-&#x003E; <span 
-class="ectt-1200">Configuration and tasks</span>.
+class="ectt-1200">Configuration</span>.
 </p>
    <hr class="figure" /><div class="figure" 
 >
@@ -1219,14 +1277,13 @@ class="ectt-1200">Configuration and tasks</span>.
                                                                                                     
 <div class="center" 
 >
-<!--l. 391--><p class="noindent" >
-</p><!--l. 392--><p class="noindent" ><img 
-src="images/ecs1.png" alt="PIC"  
+<!--l. 424--><p class="noindent" >
+</p><!--l. 425--><p class="noindent" ><img 
+src="images/ecs-panel.png" alt="PIC"  
 width="525" height="525"  /></p></div>
 </div><hr class="endfigure" />
-<!--l. 396--><p class="indent" >   In this panel we can see our Auto Scaling configuration which lists the desired, minimum and maximum
-number of tasks. The policies are listed further down and we can view the alarm which is a graphical
-representation of the CPU utilization vs. the target value.
+<!--l. 429--><p class="indent" >   In this panel we can see our Auto Scaling configuration which lists the desired, minimum and maximum
+number of tasks. The policies describing the auto scaling rules are listed just below.
 </p>
    <hr class="figure" /><div class="figure" 
 >
@@ -1236,14 +1293,13 @@ representation of the CPU utilization vs. the target value.
                                                                                                     
 <div class="center" 
 >
-<!--l. 401--><p class="noindent" >
-</p><!--l. 402--><p class="noindent" ><img 
-src="images/ecs2.png" alt="PIC"  
+<!--l. 434--><p class="noindent" >
+</p><!--l. 435--><p class="noindent" ><img 
+src="images/ecs-panel-auto-scaling-policies.png" alt="PIC"  
 width="525" height="525"  /></p></div>
 </div><hr class="endfigure" />
-<!--l. 406--><p class="indent" >   In the CloudWatch Alarm panel you will notice that we have two different alarms. These are for the scaling up
-and down of the service. Selecting the alarm you can view the status, where &#8220;in alarm&#8221; is when the auto scaling
-configuration needs to action increasing/decreasing the number of instances.
+<!--l. 439--><p class="indent" >   The <span 
+class="ectt-1200">Health and metrics </span>tab displays CPU and memory utilization.
 </p>
    <hr class="figure" /><div class="figure" 
 >
@@ -1253,9 +1309,46 @@ configuration needs to action increasing/decreasing the number of instances.
                                                                                                     
 <div class="center" 
 >
-<!--l. 412--><p class="noindent" >
-</p><!--l. 413--><p class="noindent" ><img 
-src="images/ecs3.png" alt="PIC"  
+<!--l. 442--><p class="noindent" >
+</p><!--l. 443--><p class="noindent" ><img 
+src="images/ecs-panel-health.png" alt="PIC"  
+width="525" height="525"  /></p></div>
+</div><hr class="endfigure" />
+<!--l. 447--><p class="indent" >
+                                                                                                    
+                                                                                                    
+</p><!--l. 448--><p class="indent" >   The <span 
+class="ectt-1200">Tasks </span>tab displays a log of tasks with their last and desired status.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<div class="center" 
+>
+<!--l. 451--><p class="noindent" >
+</p><!--l. 452--><p class="noindent" ><img 
+src="images/ecs-panel-tasks.png" alt="PIC"  
+width="525" height="525"  /></p></div>
+</div><hr class="endfigure" />
+<!--l. 456--><p class="indent" >   Open the CloudWatch Alarm panel. You will notice that we have two different alarms. These are for
+the scaling up and down of the service. Select an alarm and you can view its status. The &#8220;In alarm&#8221;
+status is when the auto scaling configuration needs to action increasing/decreasing the number of
+instances.
+</p>
+   <hr class="figure" /><div class="figure" 
+>
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<div class="center" 
+>
+<!--l. 464--><p class="noindent" >
+</p><!--l. 465--><p class="noindent" ><img 
+src="images/cloudwatch-in-alarm.png" alt="PIC"  
 width="525" height="525"  /></p></div>
 </div><hr class="endfigure" />
    
@@ -1263,8 +1356,8 @@ width="525" height="525"  /></p></div>
  id="x1-160004.3"></a>EC2 Deployment</h4>
    <div class="tcolorbox tcolorbox" id="tcolobox-2">     
 <div class="tcolorbox-title">
-<!--l. 423--><p class="indent" >   Aside</p></div> 
-<div class="tcolorbox-content"><!--l. 423--><p class="noindent" >The deployment diagram below is what it would look like, if we wanted to use a load balancer with
+<!--l. 475--><p class="indent" >   Aside</p></div> 
+<div class="tcolorbox-content"><!--l. 475--><p class="noindent" >The deployment diagram below is what it would look like, if we wanted to use a load balancer with
 the TaskOverflow application deployed on EC2 instances. The main difference still being the features
 that ECS provides to manage services and tasks for us.  </p> 
 </div> 
@@ -1275,7 +1368,7 @@ that ECS provides to manage services and tasks for us.  </p>
                                                                                                     
                                                                                                     
                                                                                                     
-<!--l. 426--><p class="noindent" ><img 
+<!--l. 478--><p class="noindent" ><img 
 src="diagrams/ec2deployment.png" alt="PIC"  
 width="525" height="-1152"  />
                                                                                                     
@@ -1285,13 +1378,13 @@ width="525" height="-1152"  />
    
    <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
  id="x1-170005"></a>Conclusion</h3>
-<!--l. 431--><p class="noindent" >You have now deployed a scalable stateless service. You should experiment
+<!--l. 483--><p class="noindent" >You have now deployed a scalable stateless service. You should experiment
 with generating different loads for the service, please read through the   <a 
 href="https://k6.io/docs/" >k6
 documentation</a><span class="footnote-mark"><a 
 href="#fn5x0" id="fn5x0-bk"><sup class="textsuperscript">5</sup></a></span><a 
  id="x1-17001f5"></a>.
-</p><!--l. 435--><p class="indent" >   In the <a 
+</p><!--l. 487--><p class="indent" >   In the <a 
 href="https://csse6400.uqcloud.net/assessment/cloud.pdf" >cloud infrastructure assignment</a><span class="footnote-mark"><a 
 href="#fn6x0" id="fn6x0-bk"><sup class="textsuperscript">6</sup></a></span><a 
  id="x1-17003f6"></a>,
@@ -1311,6 +1404,22 @@ implementation.
 <a 
 href="https://csse6400.uqcloud.net/slides/distributed2.pdf" class="url" ><span 
 class="ectt-1200">https://csse6400.uqcloud.net/slides/distributed2.pdf</span></a>.
+   </p>
+   <p class="bibitem" ><span class="biblabel">
+ [2]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xdistributed2-notes"></a>B.&#x00A0;Webb       and       R.&#x00A0;Thomas,       &#8220;Distributed       systems       II,&#8221;       March       2024.                        
+<a 
+href="https://csse6400.uqcloud.net/handouts/distributed2.pdf" class="url" ><span 
+class="ectt-1200">https://csse6400.uqcloud.net/handouts/distributed2.pdf</span></a>.
+   </p>
+   <p class="bibitem" ><span class="biblabel">
+ [3]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xprac-week4"></a>E.&#x00A0;Hughes,                                      R.&#x00A0;Thomas,                                      and                                      B.&#x00A0;Webb,
+   &#8220;Getting started with the cloud,&#8221; vol.&#x00A0;5 of <span 
+class="Cabin-Italic-tlf-t1-x-x-120">CSSE6400 Practicals</span>, The University of Queensland, March
+   2025. <a 
+href="https://csse6400.uqcloud.net/practicals/week04.pdf" class="url" ><span 
+class="ectt-1200">https://csse6400.uqcloud.net/practicals/week04.pdf</span></a>.
 </p>
    </div>
    <div class="footnotes"><a 
@@ -1329,7 +1438,7 @@ class="Cabin-Regular-tlf-t1-">Elastic, in a cloud computing context, refers to t
 <span 
 class="Cabin-Regular-tlf-t1-">services to meet demand.</span></p><a 
  id="x1-11002x4"></a>
-<!--l. 171--><p class="indent" >        <span class="footnote-mark"><a 
+<!--l. 172--><p class="indent" >        <span class="footnote-mark"><a 
 href="#fn4x0-bk" id="fn4x0"><sup class="textsuperscript">4</sup></a></span><span 
 class="Cabin-Regular-tlf-t1-">We will not explore scaling persistent data in the practicals. If you wish to try in your assignment, please see some of the</span>
 <span 
@@ -1337,15 +1446,20 @@ class="Cabin-Regular-tlf-t1-">concepts presented in the Distributed Systems II l
 class="Cabin-Regular-tlf-t1-">[</span><a 
 href="#Xdistributed2-slides"><span 
 class="Cabin-Regular-tlf-t1-">1</span></a><span 
+class="Cabin-Regular-tlf-t1-">]</span></span> <span 
+class="Cabin-Regular-tlf-t1-">and notes </span><span class="cite"><span 
+class="Cabin-Regular-tlf-t1-">[</span><a 
+href="#Xdistributed2-notes"><span 
+class="Cabin-Regular-tlf-t1-">2</span></a><span 
 class="Cabin-Regular-tlf-t1-">]</span></span><span 
 class="Cabin-Regular-tlf-t1-">.</span></p><a 
  id="x1-17002x5"></a>
-<!--l. 433--><p class="indent" >        <span class="footnote-mark"><a 
+<!--l. 485--><p class="indent" >        <span class="footnote-mark"><a 
 href="#fn5x0-bk" id="fn5x0"><sup class="textsuperscript">5</sup></a></span><a 
 href="https://k6.io/docs/" class="url" ><span 
 class="ectt-1000">https://k6.io/docs/</span></a></p><a 
  id="x1-17004x5"></a>
-<!--l. 435--><p class="indent" >   <span class="footnote-mark"><a 
+<!--l. 487--><p class="indent" >   <span class="footnote-mark"><a 
 href="#fn6x0-bk" id="fn6x0"><sup class="textsuperscript">6</sup></a></span><a 
 href="https://csse6400.uqcloud.net/assessment/cloud.pdf" class="url" ><span 
 class="ectt-1000">https://csse6400.uqcloud.net/assessment/cloud.pdf</span></a></p>                                           </div>
