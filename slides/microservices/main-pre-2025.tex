@@ -15,114 +15,6 @@
 
 \maketitle
 
-\point[\Large History]{
-    \begin{itemize}
-        \vspace{2mm}
-        \item Service Oriented Architecture (SOA)
-        \vspace{2mm}
-        \item Enterprise Service Bus (ESB)
-        \vspace{2mm}
-        \item RESTful APIs
-        \vspace{2mm}
-        \item Microservices
-    \end{itemize}
-}
-\note{
-    REST -- REpresentational State Transfer
-}
-
-\begin{frame}
-    \begin{adjustwidth}{-10mm}{-10mm}
-        \centering
-        \includegraphics[trim=80 25 100 0,clip,height=0.98\paperheight]{diagrams/overview/soa}
-    \end{adjustwidth}
-	\begin{tikzpicture}[overlay,remember picture]
-	\node[rectangle,shift={(1.8,3.6)},
-		  text width=3cm,above] at (current page.west) {\color{primary}\Large SOA};
-	\end{tikzpicture}   
-\end{frame}
-
-\begin{frame}{SOA Circumvented}
-    \begin{adjustwidth}{-10mm}{-10mm}
-        \centering
-        \includegraphics[trim=10 15 15 10,clip,width=0.98\paperwidth]{diagrams/overview/soa-circumvented}
-    \end{adjustwidth}
-\end{frame}
-
-{
-\usebackgroundtemplate{\includegraphics[trim=0 0 0 -41,clip,width=1.0055\paperwidth]{diagrams/overview/soa-circumvented}}
-\begin{frame}{SOA Circumvented}
-	\centering
-	\includegraphics[height=.65\textheight]{../../shared/images/fear.png}
-\end{frame}
-}
-
-\begin{frame}
-    \begin{adjustwidth}{-10mm}{-10mm}
-        \centering
-        \includegraphics[trim=80 25 100 0,clip,height=0.98\paperheight]{diagrams/overview/esb}
-    \end{adjustwidth}
-	\begin{tikzpicture}[overlay,remember picture]
-	\node[rectangle,shift={(1.8,3.6)},
-		  text width=3cm,above] at (current page.west) {\color{primary}\Large ESB};
-	\end{tikzpicture}   
-\end{frame}
-
-\begin{frame}{ESB Circumvented}
-    \begin{adjustwidth}{-10mm}{-10mm}
-        \centering
-        \includegraphics[trim=10 15 15 10,clip,width=0.9\paperwidth]{diagrams/overview/esb-circumvented}
-    \end{adjustwidth}
-\end{frame}
-
-{
-\usebackgroundtemplate{\includegraphics[trim=-42 0 0 -47,clip,width=0.965\paperwidth]{diagrams/overview/esb-circumvented}}
-\begin{frame}{ESB Circumvented}
-	\centering
-	\includegraphics[height=.65\textheight]{../../shared/images/fear.png}
-\end{frame}
-}
-
-\begin{frame}
-    \begin{adjustwidth}{-10mm}{-10mm}
-        \centering
-        \includegraphics[trim=80 25 100 0,clip,height=0.98\paperheight]{diagrams/overview/microservices}
-    \end{adjustwidth}
-	\begin{tikzpicture}[overlay,remember picture]
-	\node[rectangle,shift={(3.4,3.6)},
-		  text width=6cm,above] at (current page.west) {\color{primary}\Large REST-based Microservices};
-	\end{tikzpicture}   
-\end{frame}
-
-\begin{frame}{REST-based Microservices Circumvented}
-    \begin{adjustwidth}{-10mm}{-10mm}
-        \centering
-        \includegraphics[trim=50 25 25 0,clip,width=\paperwidth]{diagrams/overview/microservices-circumvented}
-    \end{adjustwidth}
-\end{frame}
-
-{
-\usebackgroundtemplate{\includegraphics[trim=50 0 0 -47,clip,width=1.028\paperwidth]{diagrams/overview/microservices-circumvented}}
-\begin{frame}{REST-based Microservices Circumvented}
-	\centering
-	\includegraphics[height=.65\textheight]{../../shared/images/fear.png}
-\end{frame}
-}
-
-\questionanswer{Why does it go wrong?}{Getting caught up in the technology!}
-
-\begin{frame}
-    \centering
-    \includegraphics[width=0.62\paperwidth]{images/container-ship}\\
-    \huge{
-        If you haven't shipped \highlight{one} service.\\
-        How will you ship a \highlight{dozen}?
-    }
-\end{frame}
-
-
-\section{Microservices}
-
 \begin{frame}{}
 	\centering
 	\includegraphics[trim=45 45 45 45,clip,height=\textheight]{diagrams/general-topology-deployment.png}
@@ -165,76 +57,13 @@
     \item Can still have multiple UIs (e.g. web, mobile, ...).
 }
 
-\begin{frame}{Entity Service Anti-Pattern}
-    \centering
-    \includegraphics[trim=30 50 20 50,clip,width=0.8\paperwidth]{diagrams/esa-anti-pattern-classes}
-\end{frame}
-\note{
-OO Modelling -- Identify entities in the problem domain
-\begin{itemize}
-    \item \large Tend to be stabler / longer-lived parts of the problem domain
-\end{itemize}
+\point[DDD Influence]{%
+Services are \highlight{bounded contexts}.
+
+Bounded contexts are not necessarily \highlight{services}.
 }
 
-\begin{frame}{Entity Service Anti-Pattern}
-    \centering
-    \includegraphics[trim=-25 5 5 5,clip,width=0.85\paperwidth]{diagrams/esa-anti-pattern}
-\end{frame}
-\note[itemize]{
-    \item Intuitive approach -- Design services around main entities
-    \item Usually introduces synchronous flow of logic between services
-    \begin{enumerate}
-        \item \large Customer places an Order
-        \item \large Order calls Product to get details
-        \item \large Product calls Pricing to determine price
-    \end{enumerate}
-}
-
-\begin{frame}{Problem with Synchronous Logic}
-    \vspace{1mm}
-    \begin{columns}[t]
-    \begin{column}{0.5\textwidth}
-    {\LARGE
-    \begin{itemize}
-        \vspace{0.2em}
-        \item Potential chain of failure
-        \vspace{0.2em}
-        \item Failures are multiplied
-        \vspace{0.2em}
-        \item Latency is multiplied
-        \vspace{0.2em}
-        \item Deployment is hard
-        \vspace{0.2em}
-        \item Scaling is hard
-        \vspace{0.2em}
-        \item Lazy design
-    \end{itemize}
-    }
-    \end{column}
-    \begin{column}{0.5\textwidth}
-    {
-    \centering
-    \includegraphics[trim=185 5 25 -20,clip,width=0.62\paperwidth]{diagrams/overview/synchronous}
-    }
-    \end{column}
-    \end{columns}
-	\begin{tikzpicture}[overlay,remember picture]
-	\node[rectangle,shift={(-0.8,2.9)},
-		  text width=3cm,above] at (current page.east) {
-		      \includegraphics[width=20mm]{images/tired}
-		  };
-	\end{tikzpicture}   
-\end{frame}
-\note{
-    Chains of request (synchronous logical flow) don't scale.
-}
-
-\section{Domain Driven Design}
-
-\definition{Bounded Context}
-{
-    Logical boundary of a domain where particular terms and rules apply consistently.
-}
+\definition{Bounded Context}{Logical boundary of a domain where particular terms and rules apply consistently.}
 
 \begin{frame}{}
 	\centering
@@ -246,83 +75,29 @@ OO Modelling -- Identify entities in the problem domain
 \end{frame}
 
 \definition{Service Cohesion Principle}{
-    Services are cohesive business processes.
+Services are cohesive business processes.
+
+They are a bounded context.
 }
 
-\point[\Large DDD Consideration]{
-    \vspace{0.5em}
-    Services are \highlight{bounded contexts}.
+\begin{frame}{Large Bounded Contexts}
+\LARGE
+A bounded context may be too large to be a single service.
+\\~\\
+Split it into services that are \highlight{independent} sub-processes.
+\end{frame}
 
-    \vspace{0.5em}
-    Bounded contexts are not necessarily \highlight{services}.
-}
+\definition{Service Independence Principle}{Services should not depend on the implementation of other services.}
 
-\point[\Large Large Bounded Contexts]{
-    \vspace{0.5em}
-    Bounded context may be too large to be a single service.
-
-    \vspace{0.5em}
-    Split it into services that are \highlight{independent} sub-processes.
-}
-
-\definition{Service Independence Principle}
-{
-    Services should not depend on the implementation of other services.
-}
-
-\corollary{Low Coupling}
-{
-    There should be minimal coupling between services.
-}
+\corollary{Low Coupling}{There should be minimal coupling between services.}
 
 \corollary{No Reuse}{
-    Avoid dependencies between services.
+Avoid dependencies between services.
 
-    \vspace{0.3em}
-    Do not reuse components between services.
+Do not reuse components between services.
 }
 
-\point[\Large Restaurant Examples]{
-    \vspace{0.5em}
-    Bad Restaurant
-
-    \pause
-    \vspace{0.5em}
-    Good Restaurant
-}
-
-\point[\Large Lessons Learnt]{
-    \vspace{0.5em}
-    Chains of request don't \highlight{scale}.
-    
-    \vspace{0.5em}
-    People who have the \highlight{information} to do their job are more effective.
-    
-    \vspace{0.5em}
-    Service boundaries that follow these \highlight{principles} work better.
-}
-
-\point[\Large Human Shaped Microservices]{
-    \vspace{0.5em}
-    Look at \highlight{behaviour} rather than entities.
-    \begin{itemize}
-        \LARGE
-        \item Who \& How
-        \item Not the Thing
-    \end{itemize}
-
-    \vspace{0.5em}
-    What would people \highlight{do}?
-
-    \vspace{0.5em}
-    How would they \highlight{communicate}?
-}
-\note{
-    From Damian McLennan
-}
-
-\point[\Large Bounded Domains Implications]{
-    \vspace{0.75em}
+\begin{frame}{Bounded Domains Implications}
     \LARGE
     \begin{itemize}
 		\item<1-> Duplication
@@ -345,9 +120,7 @@ OO Modelling -- Identify entities in the problem domain
 			\Large\item Services can use different implementation technologies
 		\end{itemize}
     \end{itemize}
-}
-
-\section{Microservices Design Options}
+\end{frame}
 
 \begin{frame}{Service Plane}
 	\centering
@@ -379,11 +152,9 @@ OO Modelling -- Identify entities in the problem domain
 \end{frame}
 }
 
-\point[\Large Choreography \& Orchestration]{
+\point[Choreography \& Orchestration]{
 \begin{description}
-    \vspace{0.5em}
     \item[Choreography] Similar to event-driven \highlight{broker}
-    \vspace{0.5em}
     \item[Orchestration] Similar to event-driven \highlight{mediator}
 \end{description}
 }
@@ -406,7 +177,7 @@ OO Modelling -- Identify entities in the problem domain
 \begin{frame}
     \begin{adjustwidth}{-10mm}{-10mm}
         \centering
-        \includegraphics[trim=-80 45 45 40,clip,width=0.89\paperwidth]{diagrams/sahara-choreography-deployment.png}
+        \includegraphics[trim=-80 45 45 40,clip,width=0.88\paperwidth]{diagrams/sahara-choreography-deployment.png}
     \end{adjustwidth}
 	\begin{tikzpicture}[overlay,remember picture]
 	\node[rectangle,shift={(0.9,1.4)},
@@ -435,23 +206,12 @@ OO Modelling -- Identify entities in the problem domain
 	\begin{tikzpicture}[overlay,remember picture]
 	\node[rectangle,shift={(-4.6,0)},
 		  text width=6.5cm,above] at (current page.south) {\color{primary}\tiny From \textit{Fundamentals of Software Architecture}};
-	\end{tikzpicture}
+	\end{tikzpicture}   
 \end{frame}
 
-\questionanswer{How bad is coupling with choreography or orchestration?}
+\questionanswer{How bad is the coupling with choreography or orchestration?}
 {For a large system, \highlight{very bad}.}
 \note{In 2017, Uber had over 1400 services ... consider how bad coupling would be with either approach.}
-
-\questionanswer{
-    How do we scale large microservices-based systems?
-}
-{
-    Combine architectural patterns
-    \begin{itemize}
-        \LARGE
-        \item Event-Driven Microservices
-    \end{itemize}
-}
 
 \begin{frame}{}
 	\centering
@@ -462,10 +222,9 @@ OO Modelling -- Identify entities in the problem domain
 	\end{tikzpicture}   
 \end{frame}
 \note[itemize]{
-    \item Use the tried and true \highlight{Observer} pattern, with the \highlight{Event-Driven Architecture} pattern.
-    \item Clients send \highlight{commands} telling services to do something
-    \item Services \highlight{publish events} indicating what they have been done.
-    \item Services \highlight{listen for events} to decide how to coordinate their part of the system behaviour.
+    \item Use the tried and true Observer pattern, with the Event-Driven Architecture pattern.
+    \item Services publish events indicating what they have been done.
+    \item Services listen for events to decide how to coordinate their part of the system behaviour.
 }
 
 \begin{frame}{Service 1 Components with Event Queue}
@@ -509,17 +268,6 @@ OO Modelling -- Identify entities in the problem domain
     \item What about \highlight{inventory management} and \highlight{browse}?
     \item How do they maintain a consistent product database?
 \end{itemize}
-}
-
-\point[\Large Model Behaviour]{
-    \begin{itemize}
-        \vspace{0.5em}
-        \item \highlight{Commands} \& \highlight{Events} describe \highlight{behaviour}
-        \vspace{0.5em}
-        \item They will help you better model your \highlight{domain}
-        \vspace{0.5em}
-        \item Leading to \highlight{independent}, \highlight{scalable} services
-    \end{itemize}
 }
 
 \begin{frame}{Pros \& Cons}
