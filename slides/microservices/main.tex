@@ -130,7 +130,7 @@
 \end{frame}
 
 
-\section{Microservices}
+\section{Microservices Architecture}
 
 \begin{frame}{}
 	\centering
@@ -142,6 +142,7 @@
 \end{frame}
 \note[itemize]{
     \item Multiple clients demonstrates common scenario of multiple interfaces to system (e.g. mobile, web).
+    \vspace{0.2em}
     \item Client UIs may be monolithic to provide a rich interface.
 }
 
@@ -150,10 +151,18 @@
     \includegraphics[trim=45 45 45 45,clip,width=0.9\textwidth]{diagrams/general-topology-api-component.png}
 \end{frame}
 \note[itemize]{
-    \item Each client may use a different combination of services.
-    \item API layer provides reverse proxy or gateway services, see Service-Based Architecture notes \& slides.
-    \item Typically Service APIs in this layer have a one-to-one relationship with Services and are designed by the Service teams.
-    \item Routing behaviour may not be required.
+    \item Each client may use a \highlight{different} combination of services
+    \vspace{0.5em}
+    \item API layer provides reverse proxy or gateway services
+    \begin{itemize}
+        \large
+        \item See Service-Based Architecture notes \& slides
+    \end{itemize}
+    \vspace{0.2em}
+    \item Typically, Service APIs in the API layer have a one-to-one relationship with Services
+          and are \highlight{designed} by the Service teams
+    \vspace{0.2em}
+    \item Routing behaviour may not be required
 }
 
 \begin{frame}{Service 1 Components}
@@ -169,9 +178,19 @@
     \includegraphics[trim=45 45 45 45,clip,width=0.9\textwidth]{diagrams/monolithic-ui-client1-component.png}
 \end{frame}
 \note[itemize]{
-    \item Purist Microservices architecture -- each service development team builds their service's UI(s).
-    \item Typically needs some coordinating activity in the UI.
-    \item Can still have multiple UIs (e.g. web, mobile, ...).
+    \item Purist Microservices architecture
+    \begin{itemize}
+        \large
+        \item Each service development team builds their service's UI(s)
+    \end{itemize}
+    \vspace{0.5em}
+    \item Typically needs some \highlight{coordinating activity} in the UI
+    \begin{itemize}
+        \large
+        \item Shown as \highlight{Client 1 Integrated UI} in model
+    \end{itemize}
+    \vspace{0.2em}
+    \item Can still have multiple UIs (e.g. web, mobile, ...)
 }
 
 \begin{frame}{Entity Service Anti-Pattern}
@@ -191,7 +210,8 @@ OO Modelling -- Identify entities in the problem domain
 \end{frame}
 \note[itemize]{
     \item Intuitive approach -- Design services around main entities
-    \item Usually introduces synchronous flow of logic between services
+    \vspace{0.5em}
+    \item Usually introduces \highlight{synchronous} flow of logic between services
     \begin{enumerate}
         \item \large Customer places an Order
         \item \large Order calls Product to get details
@@ -299,10 +319,32 @@ OO Modelling -- Identify entities in the problem domain
 \point[\Large Restaurant Examples]{
     \vspace{0.5em}
     Bad Restaurant
+    \note<1>{
+        \begin{itemize}
+            \item Arrive: Wait in queue to be seated
+            \item Wait for menu: Server has to go get board with menu
+            \item Ask about special: Server has to go ask chef
+            \item Order items: Server takes order to kitchen
+            \item Server returns, an item is not available
+            \item Change order: Server takes order to kitchen
+            \item Server waits for order -- constantly asking if its ready
+            \item Server brings everything to table together
+            \begin{itemize}
+                \large
+                \item Drinks, Entrée, Main, Dessert, ...
+            \end{itemize}
+            \item ...
+        	\end{itemize}
+    }
 
     \pause
     \vspace{0.5em}
     Good Restaurant
+    \note<2>{
+        \begin{itemize}
+            \item Describe normal experience at a restaurant
+        	\end{itemize}
+    }
 }
 
 \point[\Large Lessons Learnt]{
