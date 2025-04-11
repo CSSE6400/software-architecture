@@ -131,6 +131,7 @@ Furthermore, ElastiCache also offers support for Memcached, another popular open
 
 \aside{Not available in the lab environments.}
 
+
 \section{Talking to the Simple Queue Service (SQS)}
 
 \info{
@@ -147,7 +148,7 @@ The Terraform code below can be used to create these two queues.
   Though the FIFO name needs to have \texttt{.fifo} at the end, make sure to mention this.
 }
 
-\begin{code}[language=terraform, numbers=none]{sqs.tf}
+\begin{code}[language=terraform, numbers=none]{q-demo.tf}
 terraform {
   required_providers {
     aws = {
@@ -203,14 +204,17 @@ we can browse the queue configurations and metrics.
   \end{itemize}
 }
 
-\subsection{Queue Command-line Interface}
+\subsection{Queue Command-line Interface}\label{sec:q-cli}
 
 We have provided a small Docker container to demonstrate the difference between the implementations.
 First we must retrieve our AWS credentials and setup our environment.
 
-Grab the AWS credentials from the Learner Lab but instead of creating a credentials file we will be using environment variables.
+Grab the AWS credentials from the Learner Lab,
+but instead of creating a credentials file we will use environment variables.
 
-Now we need to create an environment file for our docker container to read so that it can access AWS. Create a ``.env'' file in the current directory and edit the contents so that it looks similar to the below: The AWS keys will be from the credentials shown in your lab environment.
+To do this, we need to create an environment file for our Docker container to read so that it can access AWS.
+Create an \texttt{aws.env} file in the current directory and edit the contents so that it looks similar to the example below.
+The AWS keys will be from the credentials shown in your Learner Lab environment.
 
 \begin{code}[numbers=none]{}
 TERM=xterm-256color
@@ -277,7 +281,7 @@ On the subscriber we will be able to see the messages being received, an example
 \end{figure}
 
 Hopefully, like our example, you can see that some of the messages arrive out of order.
-Next, add more publishers and subscribers and experiment with the different configurations.
+Next, add more publishers and subscribers and experiment with different configurations.
 
 \info{
   When making multiple publishers you may want to change the client-name CLI parameter,
@@ -515,15 +519,15 @@ Finally, we will run Celery inside a new container.
 For this we will modify our \texttt{docker-compose.yml} file.
 %
 \begin{code}[numbers=none]{docker-compose.yml}
-worker:
-  build:
-    context: .
-    dockerfile: Dockerfile.dev
-  restart: always
-  environment:
-    CELERY_BROKER_URL: redis://redis:6379
-    CELERY_RESULT_BACKEND: redis://redis:6379
-  command: poetry run celery --app todo.tasks.ical worker --loglevel=info
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    restart: always
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379
+      CELERY_RESULT_BACKEND: redis://redis:6379
+    command: poetry run celery --app todo.tasks.ical worker --loglevel=info
 \end{code}
 
 Note that we are re-using the same image development image as the Flask server.
@@ -651,12 +655,25 @@ Now you should be able to test your application.
 
 First we will modify our worker so that it can run locally and connect to an SQS queue.
 We need to create an appropriate SQS queue.
-
+%
 \begin{code}[language=terraform,numbers=none]{sqs.tf}
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "us-east-1"
+  shared_credentials_files = ["./credentials"]
+}
+
 resource "aws_sqs_queue" "ical_queue" {
     name = "ical"
-}
-\end{code}
+}\end{code}
 
 \info{
     Celery will automatically create a queue if it does not exist,
@@ -667,19 +684,38 @@ Now we need to tell our worker to use our SQS queue.
 To do this we will use the \texttt{sqs://} broker URL.
 This tells Celery to use SQS.
 Celery will then attempt to find appropriate AWS credentials to use to authenticate.
-We could pass these in as environment variables.
-However, for convinence we will mount the \texttt{credentials} file that already exists within our container.
 
+\subsection{Environment Variables}
+
+We can pass the credentials in as environment variables,
+using the \texttt{aws.env} file we created in section \ref{sec:q-cli}.
+
+\vspace{-1.5em}
 \begin{code}[numbers=none]{docker-compose.yml}
-volumes:
-  - ./todo:/app/todo
-  - ./credentials:/root/.aws/credentials
-environment:
-  CELERY_BROKER_URL: sqs://
+    volumes:
+      - ./todo:/app/todo
+    env_file: "aws.env"
+    environment:
+      CELERY_BROKER_URL: sqs://
 \end{code}
 
-Ensure that you update both the worker and the server.
+Ensure that you update both the worker and the server (app).
+
+\subsection{Credentials File}
+
+It is also possible to mount the \texttt{credentials} file that already exists within our container.
+%
+\begin{code}[numbers=none]{docker-compose.yml}
+    volumes:
+      - ./todo:/app/todo
+      - ./credentials:/root/.aws/credentials
+    environment:
+      CELERY_BROKER_URL: sqs://
+\end{code}
+
 Note that we are using \texttt{/root} since the container is run as the root user and Celery will therefore look at \texttt{\textasciitilde/.aws/credentials}.
+
+\subsection{Tracking Jobs}
 
 We can use the SQS queue in this state to create tasks and our workers will pick it up.
 This is often sufficient,
@@ -691,36 +727,41 @@ To work around this issue,
 we will use our existing PostgreSQL database as our persistent store to track tasks.
 
 We can update our \texttt{docker-compose.yml} as below to allow Celery to use our PostgreSQL database.
-
+%
 \begin{code}[numbers=none]{docker-compose.yml}
-environment:
-    CELERY_RESULT_BACKEND: db+postgresql://administrator:verySecretPassword@database:5432/todo
+    environment:
+      CELERY_RESULT_BACKEND: db+postgresql://administrator:verySecretPassword@database:5432/todo
 \end{code}
 
-This is the same as the \texttt{SQLALCHEMY\_DATABASE\_URI} except for \texttt{db+} at the start to help Celery identify the type of data store.
+This is the same as the \texttt{SQLALCHEMY\_DATABASE\_URI},
+except for \texttt{db+} at the start to help Celery identify the type of data store.
+
 
 \section{Deploying with ECS}
 
-Now we have;
+Now we have a
 \begin{enumerate}
-    \item an SQS queue on AWS,
-    \item a worker Celery container running locally,
-    \item a server Flask container running locally, and
-    \item a PostgreSQL database running locally.
+    \item SQS queue on AWS,
+    \item Celery worker container running locally,
+    \item Flask server container running locally, and
+    \item PostgreSQL database running locally.
 \end{enumerate}
 
-Earlier in the practical we showed how to host a container on ECR.
-In previous practicals we used a hosted image to deploy containers on ECS or EC2.
-In previous practicals we also deployed a PostgreSQL database on RDS.
+In the week 5 practical we demonstrated how to host a container on ECR,
+and how to use that hosted image to deploy containers on ECS.
+In that practical we also deployed a PostgreSQL database on RDS \cite{prac-week5}.
 
-We would strongly encourage you to try and deploy all components of our application on AWS infrastructure.
-This will be excellent practice for the cloud assignment.
+We strongly encourage you to try and deploy all components of the TaskOverflow application on AWS infrastructure.
+This will be excellent practice for the final stage of the cloud infrastructure assignment.
 
 \paragraph{Hints}
 \begin{enumerate}
-    \item ECS/EC2 containers will automatically authenticate with your AWS account (so \texttt{credentials} isn't required).
-    \item Attempt to test each component is deployed correctly individually, e.g. deploy RDS and ensure the system works, then deploy the server and ensure the system works, etc.
+    \item ECS/EC2 containers will automatically authenticate with your AWS account,
+          so the \texttt{credentials} file is not required.
+    \item Attempt to test each component is deployed correctly individually,
+          e.g. deploy RDS and ensure the system works, then deploy the server and ensure the system works, etc.
 \end{enumerate}
+
 
 \bibliographystyle{ieeetr}
 \bibliography{books,ours}
