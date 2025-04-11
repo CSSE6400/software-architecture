@@ -35,7 +35,7 @@ Our goal is to:
 \section{Event Processing}
 
 As we saw in Event-Driven Architectures \cite{events-notes},
-event processing enable us to build highly scalable and extensible systems.
+event processing enables us to build highly scalable and extensible systems.
 In this practical we will get our hands dirty with event processing using AWS SQS.
 AWS SQS is a service which acts as an event broker.
 
@@ -69,14 +69,16 @@ your publisher systems can fanout messages to a large number of subscriber syste
 including Amazon SQS queues, AWS Lambda functions,
 HTTPS endpoints, and Amazon Kinesis Data Firehose,
 for parallel processing.
-The A2P functionality enables you to send messages to users at scale via SMS, mobile push, and email.
+The A2P functionality enables you to send messages to users at scale via SMS, mobile push, and email.%
+\footnote{Please do not try to create a spam service in your AWS account.}
 
 \raggedleft -- AWS
 \end{oldquote}
 
 \subsubsection{AWS MQ / Apache ActiveMQ / RabbitMQ}
 \begin{oldquote}
-Amazon MQ is a managed message broker service for Apache ActiveMQ and RabbitMQ that makes it easy to set up and operate message brokers on AWS.
+Amazon MQ is a managed message broker service for \link{Apache ActiveMQ}{https://activemq.apache.org/} and
+\link{RabbitMQ}{https://www.rabbitmq.com/} that makes it easy to set up and operate message brokers on AWS.
 Amazon MQ reduces your operational responsibilities by managing the provisioning, setup, and maintenance of message brokers for you.
 Because Amazon MQ connects to your current applications with industry-standard APIs and protocols,
 you can easily migrate to AWS without having to rewrite code.
@@ -84,11 +86,12 @@ you can easily migrate to AWS without having to rewrite code.
 \raggedleft -- AWS
 \end{oldquote}
 
-\aside{Not available in the lab environments.}
+\aside{Not available in the Learner Lab environment.}
 
 \subsubsection{AWS MSK ( Managed Streaming for Apache Kafka )}
 \begin{oldquote}
-Amazon Managed Streaming for Apache Kafka (Amazon MSK) is a fully managed service that enables you to build and run applications that use Apache Kafka to process streaming data.
+Amazon Managed Streaming for \link{Apache Kafka}{https://kafka.apache.org/} (Amazon MSK) is a fully managed service
+that enables you to build and run applications that use Apache Kafka to process streaming data.
 Amazon MSK provides the control-plane operations, such as those for creating, updating, and deleting clusters.
 It lets you use Apache Kafka data-plane operations,
 such as those for producing and consuming data
@@ -140,11 +143,11 @@ A standard queue, named \texttt{csse6400\_prac} and a FIFO queue, named \texttt{
 The Terraform code below can be used to create these two queues.
 
 \teacher{
-  In the below terraform it is pretty simple and relies a lot on defaults.
-  Though the FIFO name needs to have .fifo at the end, make sure to mention this.
+  The Terraform code below is pretty simple and relies a lot on defaults.
+  Though the FIFO name needs to have \texttt{.fifo} at the end, make sure to mention this.
 }
 
-\begin{code}[language=terraform, numbers=none]{}
+\begin{code}[language=terraform, numbers=none]{sqs.tf}
 terraform {
   required_providers {
     aws = {
@@ -178,7 +181,7 @@ output "fifo" {
 }
 \end{code}
 
-Now that we have provisioned the queues we can have a look at them in the AWS Console.
+Now that we have provisioned the queues, we can have a look at them in the AWS Console.
 In the main AWS dashboard you can search for ``SQS'' to find these queues.
 You should reach a page like this:
 
@@ -194,14 +197,15 @@ we can browse the queue configurations and metrics.
 
   \begin{itemize}
     \item Monitoring: Messages Sent/Received
-    \item Monitoring: Empty Receives - This is the receiver getting nothing from polling. Costs \$ in the real world.
-    \item Policy: Not covering today but SQS is a public service, it is protected via AWS credentials. In real use cases you need to configure a Access Policy.
+    \item Monitoring: Empty Receives -- This is the receiver getting nothing from polling. Costs \$ in the real world.
+    \item Queue Policies: Not covered today but SQS is a public service, it is protected via AWS credentials.
+                          In real use cases you need to configure an Access Policy.
   \end{itemize}
 }
 
 \subsection{Queue Command-line Interface}
 
-We have provided a small docker container to demonstrate the differnce between the implementations.
+We have provided a small Docker container to demonstrate the difference between the implementations.
 First we must retrieve our AWS credentials and setup our environment.
 
 Grab the AWS credentials from the Learner Lab but instead of creating a credentials file we will be using environment variables.
@@ -216,7 +220,7 @@ AWS_SESSION_TOKEN=...
 \end{code}
 
 \begin{code}[numbers=none,keepspaces=true]{}
-> docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "test" --client-name "Client 1"
+$ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "test" --client-name "Client 1"
 
 
   __________
@@ -241,14 +245,15 @@ The ``standard'' offering of SQS does not guarantee order or ``only once deliver
 We will create a message publisher and a message subscriber.
 
 \info{
-  For the rest of this practical you will require multiple terminals. Make sure these are all in the same folder so we can reuse the .enf file. 
+  For the rest of this practical you will require multiple terminals.
+  Make sure these are all in the same folder so we can reuse the .enf file. 
 }
 
 To create the subscriber run the following command:
 
-\begin{code}[numbers=none,keepspaces=true]{}
-> docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1" --receive
-\end{code}
+\bash{
+docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1" --receive
+}
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/stacksub}
@@ -256,9 +261,9 @@ To create the subscriber run the following command:
 
 Now start a publisher in another terminal.
 
-\begin{code}[numbers=none,keepspaces=true]{}
-> docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1"
-\end{code}
+\bash{
+docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1"
+}
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/stackpub}
@@ -271,11 +276,11 @@ On the subscriber we will be able to see the messages being received, an example
   \includegraphics[width=\textwidth]{images/stacksubdata}
 \end{figure}
 
-Hopefully like our example you can see that some of the messages arrive out of order.
-Next add more publishers and subscribers and experiment with the different configurations.
+Hopefully, like our example, you can see that some of the messages arrive out of order.
+Next, add more publishers and subscribers and experiment with the different configurations.
 
 \info{
-  When making multiple publishers you may want to change the client-name CLI parameter
+  When making multiple publishers you may want to change the client-name CLI parameter,
   so you can keep track of when the messages arrived at the subscribers.
 }
 
@@ -284,32 +289,31 @@ Next add more publishers and subscribers and experiment with the different confi
 Now we will experiment with the FIFO based service offered by SQS.
 Like before, we will start a subscriber but make sure the name of the queue matches the FIFO queue we created in Terraform.
 
-\begin{code}[numbers=none,keepspaces=true]{}
-> docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1" --receive
-\end{code}
+\bash{
+docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1" --receive
+}
 
 Now start a publisher in another terminal.
 
-\begin{code}[numbers=none,keepspaces=true]{}
-> docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1"
-\end{code}
+\bash{
+docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1"
+}
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/fifopub}
 \end{figure}
 
-On the subscriber we now see the messages arriving in order which is to be expected.
+On the subscriber we now see the messages arriving in the order which is expected.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/fifosub}
 \end{figure}
 
-If we re-run the publisher though we may not see any new messages make it to the consumer.
-This is because we have asked AWS to de-dupe messages where it can.
-
-\teacher{
-  There is a CLI parameter which prepends to the message to allow you to rerun if needed. It is --prepend "abcdef"
-}
+If we re-run the publisher though, we may not see any new messages make it to the consumer.
+This is because we have asked AWS to de-duplicate messages where it can.
+You can see this in FIFO queue's dashboard Monitoring tab.
+The queue test code has a CLI parameter which prepends a string to the message.
+Re-run the test code using \texttt{--prepend "A-"} to send non-duplicate messages.
 
 As before try experimenting with different publisher / subscriber configurations to see how they behave.
 
@@ -319,22 +323,23 @@ As before try experimenting with different publisher / subscriber configurations
 }
 
 \warning{
-  \textbf{Please remember to \texttt{terraform destroy} to delete your resources}
+  \textbf{Please remember to \texttt{terraform destroy} to delete your resources!}
 }
 
 
 \section{Worker Queues}
 
 One good use case for queues is for distributing work to scale to demand.
-In this exercise we encourage you to have a look at these widly used libraries to see how you could integrate them into a distributed system.
+In this exercise we encourage you to have a look at these widely used libraries
+to see how you could integrate them into a distributed system.
 
 \begin{itemize}
-  \item Python: \href{https://docs.celeryq.dev/en/stable/}{Celery}
-  \item Java: \href{https://www.rabbitmq.com/tutorials/tutorial-one-java.html}{RabbitMQ}
+  \item Python: \link{Celery}{https://docs.celeryq.dev/en/stable/}
+  \item Java: \link{RabbitMQ}{https://www.rabbitmq.com/tutorials/tutorial-one-java}
 \end{itemize}
 
-The two above libraries are integrated into many popular application frameworks.
-Today we will be using the Python library Celery to create a simple worker queue for TaskOverflow.
+The two libraries above are integrated into many popular application frameworks.
+Today we will use Celery to create a simple worker queue for TaskOverflow.
 
 \subsection{Celery}
 
@@ -345,9 +350,10 @@ It is also relatively easy to use and has comprehensive documentation.
 
 \section{Task Calendar}
 
-TaskOverflow will use celery to distribute the work of generating a calendar view of tasks,
+TaskOverflow will use Celery to distribute the work of generating a calendar view of tasks,
 as this could be a time-intensive task.%
-\footnote{In reality it is not but this is an example of a common use case for asynchronous tasks --- file generation such as PDFs or videos which do take time.}
+\footnote{In reality it is not, but this is an example of a common use case for asynchronous tasks
+          --- file generation such as PDFs or videos which do take time.}
 This will be done by a worker which will run in a separate container.
 The TaskOverflow server will place job requests on the Celery queue.
 The worker will pick-up jobs and generate the calendar.
@@ -368,27 +374,28 @@ We will extend our existing API with the following endpoints.
     \item[GET /todos/ical/\{task\_id\}/result] Download the generated iCal file when it is ready.
 \end{description}
 
+\noindent
 An example interaction with the API might look like:
 
 \begin{code}[language=bash,numbers=none]{}
-> curl -X POST http://localhost:6400/api/v1/todos/ical
+$ curl -X POST http://localhost:6400/api/v1/todos/ical
 {
   "task_id": "2e80aefd-4a69-4a94-b23a-45f2b8110988",
   "task_url": "http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/status"
 }
-> curl -X GET http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/status
+$ curl -X GET http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/status
 {
   "result_url": "http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/result",
   "task_id": "2e80aefd-4a69-4a94-b23a-45f2b8110988",
   "task_status": "PENDING"
 }
-> curl -X GET http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/status
+$ curl -X GET http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/status
 {
   "result_url": "http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/result",
   "task_id": "2e80aefd-4a69-4a94-b23a-45f2b8110988",
   "task_status": "SUCCESS"
 }
-> curl -X GET http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/result
+$ curl -X GET http://localhost:6400/api/v1/todos/ical/2e80aefd-4a69-4a94-b23a-45f2b8110988/result
 BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Taskoverflow Calendar//mxm.dk//
@@ -401,8 +408,8 @@ END:VEVENT
 END:VCALENDAR
 \end{code}
 
-We will stub out the implementation of these endpoints.
-
+\noindent
+We will stub out the implementation of these endpoints for now.
 \begin{code}[language=python,numbers=none]{todo/views/routes.py}
 @api.route('/todos/ical', methods=['POST'])
 def create_ical():
@@ -420,9 +427,9 @@ def get_calendar(task_id):
 \subsection{Queue and Workers}
 
 Next we will modify our \texttt{docker-compose.yml} to include a local queuing service called Redis.
-We will later use AWS SQS but as Celery supports multiple queues,
+Later we will use AWS SQS, but as Celery supports multiple queues,
 we can use this to make the local development easier.
-
+%
 \begin{code}[numbers=none]{docker-compose.yml}
   redis:
     image: redis:latest
@@ -431,10 +438,11 @@ we can use this to make the local development easier.
       - "6379:6379"
 \end{code}
 
+\noindent
 Now that we have a queue,
 we will create the worker that accepts jobs from the queue.
 We will create this worker in \texttt{todo/tasks/ical.py}.
-
+%
 \begin{code}[language=python,numbers=none]{todo/tasks/ical.py}
 import os
 
@@ -453,58 +461,59 @@ def create_ical(tasks):
 \noindent
 Note that we are getting a URL from the environment variables:
 \texttt{CELERY\_BROKER\_URL} and \texttt{CELERY\_RESULT\_BACKEND}.
-We need to remember to set these variables in whichever environment the service is run in.
+We need to remember to set these variables in whichever environment the service is run.
 
 We need to install Celery.
-We will do this in the same poetry environment as the Flask server as we will later require our Flask server to use Celery to put jobs onto the task queue.
+We will do this in the same poetry environment as the Flask server,
+as we will later require our Flask server to use Celery to put jobs into the task queue.
 
 \bash{poetry add celery redis celery\[sqs\] boto3}
 
+\noindent
 The above will install the Celery core and Redis and AWS SQS drivers for communication.
 
 We will now start our local Redis queue and our worker to ensure that they can communicate.
 
-\bash{docker-compose up redis}
+\bash{docker compose up redis}
 
 \begin{code}[language=bash,numbers=none]{}
-> export CELERY_BROKER_URL=redis://localhost:6379
-> export CELERY_RESULT_BACKEND=redis://localhost:6379
-> poetry run python3 -m celery --app todo.tasks.ical worker --loglevel=info
+$ export CELERY_BROKER_URL=redis://localhost:6379
+$ export CELERY_RESULT_BACKEND=redis://localhost:6379
+$ poetry run python3 -m celery --app todo.tasks.ical worker --loglevel=info
 \end{code}
 
 You should see something like the below.
 This indicates that the worker has successfully subscribed to the queue and is ready to accept events.
-
+%
 \begin{code}[numbers=none]{}
-
- -------------- celery@uqbwebb2-6842 v5.2.7 (dawn-chorus)
+ -------------- celery@uqrthoxx-8811 v5.5.1 (immunity)
 --- ***** -----
--- ******* ---- macOS-12.6.1-x86_64-i386-64bit 2023-04-04 18:51:09
+-- ******* ---- Windows-11-10.0.26100-SP0 2025-04-11 14:02:30
 - *** --- * ---
 - ** ---------- [config]
-- ** ---------- .> app:         todo.tasks.ical:0x10432e7d0
+- ** ---------- .> app:         todo.tasks.ical:0x11c87792210
 - ** ---------- .> transport:   redis://localhost:6379//
 - ** ---------- .> results:     redis://localhost:6379/
 - *** --- * --- .> concurrency: 8 (prefork)
 -- ******* ---- .> task events: OFF (enable -E to monitor tasks in this worker)
 --- ***** -----
  -------------- [queues]
-                .> celery           exchange=celery(direct) key=celery
+                .> ical             exchange=ical(direct) key=celery
 
 
 [tasks]
   . ical
 
-[2023-04-04 18:51:10,059: INFO/MainProcess] Connected to redis://localhost:6379//
-[2023-04-04 18:51:10,065: INFO/MainProcess] mingle: searching for neighbors
-[2023-04-04 18:51:11,200: INFO/MainProcess] mingle: sync with 1 nodes
-[2023-04-04 18:51:11,201: INFO/MainProcess] mingle: sync complete
-[2023-04-04 18:51:11,240: INFO/MainProcess] celery@uqbwebb2-6842 ready.
+[2025-04-11 14:02:30,382: INFO/MainProcess] Connected to redis://localhost:6379//
+[2025-04-11 14:02:30,388: INFO/MainProcess] mingle: searching for neighbors
+[2025-04-11 14:02:31,428: INFO/MainProcess] mingle: all alone
+[2025-04-11 14:02:31,506: INFO/MainProcess] celery@uqrthoxx-8811 ready.
+...
 \end{code}
 
 Finally, we will run Celery inside a new container.
 For this we will modify our \texttt{docker-compose.yml} file.
-
+%
 \begin{code}[numbers=none]{docker-compose.yml}
 worker:
   build:
@@ -529,8 +538,8 @@ Earlier we were able to pretend it was because the redis port, 6379, was being f
 \subsection{Creating Tasks}
 
 We will now return to our Flask server.
-We can modify our new endpoints to use Celery to create tasks on the task queue.
-
+We will modify our new endpoints to use Celery to create tasks and add them to the task queue.
+%
 \begin{code}[language=python,numbers=none]{todo/views/routes.py}
 from celery.result import AsyncResult
 from todo.tasks import ical
@@ -577,19 +586,21 @@ It is then deserialized from JSON and passed as a variable to the \texttt{create
 Celery is able to create impressive abstractions so that message passing over a task queue looks almost like regular function calls.
 
 Before we can successfully use this endpoint to get our important ``Hello World'' result,
-we will also need to configure the server to talk to our Redis container.
-
+we need to configure the server to talk to our Redis container.
+Add the Celery environment variables to the \texttt{app}'s \texttt{environment} in \texttt{docker-compose.yml}.
+%
 \begin{code}[numbers=none]{docker-compose.yml}
   environment:
     CELERY_BROKER_URL: redis://redis:6379
     CELERY_RESULT_BACKEND: redis://redis:6379
 \end{code}
 
-You should now be able to start the server and worker with docker compose.
+You should now be able to start the server and worker with \texttt{docker compose}.
 
-\bash{docker-compose up}
+\bash{docker compose up}
 
-You can now send a POST request to the \texttt{/api/v1/todos/ical} endpoint to start a job and follow the subsequent URLs to see the result of the job.
+You can now send a POST request to the \texttt{/api/v1/todos/ical} endpoint
+to start a job and follow the subsequent URLs to see the result of the job.
 
 \subsection{Creating the Calendar}
 
@@ -599,6 +610,7 @@ We will use the \texttt{icalendar} library for this.
 
 \bash{poetry add icalendar}
 
+\vspace{-2em}
 \begin{code}[language=python,numbers=none]{todo/tasks/ical.py}
 import icalendar
 import time
@@ -628,11 +640,12 @@ def create_ical(tasks):
 
 Now you should be able to test your application.
 \begin{enumerate}
-    \item Start it with docker-compose.
-        \bash{docker-compose up --build}
+    \item Start it with \texttt{docker compose}.
+          \bash{docker compose up --build}
     \item Open the user interface on \url{http://localhost:6400} and create some tasks.
     \item Follow the cURL interaction from Section \ref{sect:apiext} to generate an appropriate iCal.
 \end{enumerate}
+
 
 \section{Deploying with SQS}
 
