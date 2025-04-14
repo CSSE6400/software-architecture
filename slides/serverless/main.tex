@@ -32,7 +32,7 @@
 \begin{frame}{BaaS Example}
     \begin{adjustwidth}{-12mm}{-12mm}
         \centering
-        \includegraphics[trim=195 195 195 195,clip,width=0.98\paperwidth]{diagrams/baas-example.png}
+        \includegraphics[trim=195 195 195 195,clip,width=0.99\paperwidth]{diagrams/baas-example.png}
     \end{adjustwidth}
 \end{frame}
 \note[itemize]{
@@ -83,6 +83,8 @@ Application logic that is triggered by an event and runs in a \highlight{transie
 
 % Need to duplicate following two slides to show all notes in presenter view.
 
+% Update Browse & Order diagram so that web app doesn't access DB directly, use Gateway and a lambda function.
+
 \begin{frame}{Sahara Browse \& Order --- Serverless}
     \begin{adjustwidth}{-12mm}{-12mm}
         \centering
@@ -100,19 +102,19 @@ Application logic that is triggered by an event and runs in a \highlight{transie
     \item Order Scenario 5-9: Notes continue on \highlight{next slide}.
 }
 
-%\begin{frame}{Sahara Browse \& Order --- Serverless}
-%    \begin{adjustwidth}{-12mm}{-12mm}
-%        \centering
-%        \includegraphics[trim=195 195 195 195,clip,width=0.99\paperwidth]{diagrams/sahara-deployment-1.png}
-%    \end{adjustwidth}
-%\end{frame}
-%\note[itemize]{
-%    \item Order Scenario 5: Payment success causes Payment Confirmed function to be invoked.
-%    \item Order Scenario 6: Payment Confirmed updates order in DB with payment status.
-%    \item Order Scenario 7: Payment Confirmed adds Payment Confirmation message to the Queue.
-%    \item Order Scenario 8: Payment Confirmation message is picked up by a fulfilment function to pack \& send order.
-%    \item Order Scenario 9: Once order is shipped, another message would trigger an `order sent' function.
-%}
+\begin{frame}{Sahara Browse \& Order --- Serverless}
+    \begin{adjustwidth}{-12mm}{-12mm}
+        \centering
+        \includegraphics[trim=195 195 195 195,clip,width=0.99\paperwidth]{diagrams/sahara-deployment-1.png}
+    \end{adjustwidth}
+\end{frame}
+\note[itemize]{
+    \item Order Scenario 5: Payment success causes Payment Confirmed function to be invoked.
+    \item Order Scenario 6: Payment Confirmed updates order in DB with payment status.
+    \item Order Scenario 7: Payment Confirmed adds Payment Confirmation message to the Queue.
+    \item Order Scenario 8: Payment Confirmation message is picked up by a fulfilment function to pack \& send order.
+    \item Order Scenario 9: Once order is shipped, another message would trigger an `order sent' function.
+}
 
 \begin{frame}{Sahara Fulfilment --- Serverless}
     \begin{adjustwidth}{-12mm}{-12mm}
@@ -130,20 +132,20 @@ Application logic that is triggered by an event and runs in a \highlight{transie
     \item Fulfilment Scenario 5-8: Notes continue on \highlight{next slide}.
 }
 
-%\begin{frame}{Sahara Fulfilment --- Serverless}
-%    \begin{adjustwidth}{-12mm}{-12mm}
-%        \centering
-%        \includegraphics[trim=195 195 195 195,clip,width=0.92\paperwidth]{diagrams/sahara-deployment-2.png}
-%    \end{adjustwidth}
-%\end{frame}
-%\note[itemize]{
-%    \item Fulfilment Scenario 5: Order Shipped sends email to customer and updates order status in DB.
-%    \item Fulfilment Scenario 5a: Simplification of order picking, packing and shipping steps.
-%    \item Fulfilment Scenario 5b: Each step sends messages to Queue to trigger other functions.
-%    \item Fulfilment Scenario 6: Customer queries order status in the web or mobile app.
-%    \item Fulfilment Scenario 7: App calls Order Status function via API Gateway.
-%    \item Fulfilment Scenario 8: Order Status queries Order DB and sends status back to customer via App.
-%}
+\begin{frame}{Sahara Fulfilment --- Serverless}
+    \begin{adjustwidth}{-12mm}{-12mm}
+        \centering
+        \includegraphics[trim=195 195 195 195,clip,width=0.92\paperwidth]{diagrams/sahara-deployment-2.png}
+    \end{adjustwidth}
+\end{frame}
+\note[itemize]{
+    \item Fulfilment Scenario 5: Order Shipped sends email to customer and updates order status in DB.
+    \item Fulfilment Scenario 5a: Simplification of order picking, packing and shipping steps.
+    \item Fulfilment Scenario 5b: Each step sends messages to Queue to trigger other functions.
+    \item Fulfilment Scenario 6: Customer queries order status in the web or mobile app.
+    \item Fulfilment Scenario 7: App calls Order Status function via API Gateway.
+    \item Fulfilment Scenario 8: Order Status queries Order DB and sends status back to customer via App.
+}
 
 
 \begin{frame}{Serverless Benefits}
@@ -323,7 +325,7 @@ Application logic that is triggered by an event and runs in a \highlight{transie
     \item Testability: Integration testing is harder.
     \item Maintainability: Backend modularity and independence should facilitate its maintenance.
     \item Maintainability: Frontend contains UI and application logic.
-    \item Security BaaS: Front-end access database directly. No server-side protection of db.
+    \item Security BaaS: Front-end access back-end directly. No server-side protection of db or other resources.
     \item Security FaaS: Every function needs its own security policy (e.g. IAM), which is easy to get wrong.
 }
 
