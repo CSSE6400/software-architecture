@@ -9,7 +9,7 @@ terraform {
 
 provider "aws" {
   region = "us-east-1"
-  shared_credentials_file = "./credentials"
+  shared_credentials_files = ["./credentials"]
 }
 
 resource "aws_sqs_queue" "our_first_mailbox" {

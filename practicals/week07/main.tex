@@ -153,14 +153,14 @@ terraform {
   required_providers {
     aws = {
       source = "hashicorp/aws"
-      version = "~> 3.0"
+      version = "~> 5.0"
     }
   }
 }
 
 provider "aws" {
   region = "us-east-1"
-  shared_credentials_file = "./credentials"
+  shared_credentials_files = ["./credentials"]
 }
 
 resource "aws_sqs_queue" "our_first_mailbox" {
@@ -212,9 +212,10 @@ First we must retrieve our AWS credentials and setup our environment.
 Grab the AWS credentials from the Learner Lab,
 but instead of creating a credentials file we will use environment variables.
 
-To do this, we need to create an environment file for our Docker container to read so that it can access AWS.
+To do this, create an environment file for our Docker container to read so that it can access AWS.
 Create an \texttt{aws.env} file in the current directory and edit the contents so that it looks similar to the example below.
-The AWS keys will be from the credentials shown in your Learner Lab environment.
+It is important that the environment variable names are capitalised.
+The AWS key values will be from the credentials shown in your Learner Lab environment.
 
 \begin{code}[numbers=none]{}
 TERM=xterm-256color
@@ -224,7 +225,7 @@ AWS_SESSION_TOKEN=...
 \end{code}
 
 \begin{code}[numbers=none,keepspaces=true]{}
-$ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "test" --client-name "Client 1"
+$ docker run --rm -it --env-file aws.env ghcr.io/csse6400/queue:main --name "test" --client-name "Client 1"
 
 
   __________
@@ -250,13 +251,13 @@ We will create a message publisher and a message subscriber.
 
 \info{
   For the rest of this practical you will require multiple terminals.
-  Make sure these are all in the same folder so we can reuse the .enf file. 
+  Make sure these are all in the same folder so we can reuse the \texttt{aws.env} file. 
 }
 
 To create the subscriber run the following command:
 
 \bash{
-docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1" --receive
+docker run --rm -it --env-file aws.env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1" --receive
 }
 
 \begin{figure}[H]
@@ -266,14 +267,14 @@ docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400
 Now start a publisher in another terminal.
 
 \bash{
-docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1"
+docker run --rm -it --env-file aws.env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1"
 }
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/stackpub}
 \end{figure}
 
-When the publisher connects to the queue it is going to put 100 messages of increasing increment into the queue.
+When the publisher connects to the queue it will put 100 messages of increasing increment into the queue.
 On the subscriber we will be able to see the messages being received, an example is provided below:
 
 \begin{figure}[H]
@@ -284,7 +285,7 @@ Hopefully, like our example, you can see that some of the messages arrive out of
 Next, add more publishers and subscribers and experiment with different configurations.
 
 \info{
-  When making multiple publishers you may want to change the client-name CLI parameter,
+  When making multiple publishers, you may want to change the client-name CLI parameter,
   so you can keep track of when the messages arrived at the subscribers.
 }
 
@@ -294,13 +295,13 @@ Now we will experiment with the FIFO based service offered by SQS.
 Like before, we will start a subscriber but make sure the name of the queue matches the FIFO queue we created in Terraform.
 
 \bash{
-docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1" --receive
+docker run --rm -it --env-file aws.env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1" --receive
 }
 
 Now start a publisher in another terminal.
 
 \bash{
-docker run --rm -it --env-file .env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1"
+docker run --rm -it --env-file aws.env ghcr.io/csse6400/queue:main --name "csse6400_prac.fifo" --client-name "Client 1"
 }
 
 \begin{figure}[H]
@@ -322,7 +323,7 @@ Re-run the test code using \texttt{--prepend "A-"} to send non-duplicate message
 As before try experimenting with different publisher / subscriber configurations to see how they behave.
 
 \info{
-  When making multiple publishers you may want to change the client-name CLI parameter
+  When making multiple publishers, you may want to change the client-name CLI parameter,
   so you can keep track of when the messages arrived at the subscribers.
 }
 
