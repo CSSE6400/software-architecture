@@ -69,7 +69,7 @@ export const options = {
             exec: 'indecisivePlanner',
             executor: "shared-iterations",
             vus: 20,
-            iterations: 200,
+            iterations: 400,
         },
     },
 };
