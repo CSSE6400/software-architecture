@@ -1,4 +1,4 @@
-Last Updated on 2024/04/23
+Last Updated on 2025/04/18
                                                                                                     
 
 <?xml version="1.0" encoding="iso-8859-1" ?> 
@@ -24,9 +24,9 @@ dl dd {text-align: left}</style>
  id="Q1-1-1"></a>
 _________________________________________________________________________________________________ <h2 class="titleHead">Load
 Testing &amp; Bottlenecks</h2>                                                                   Software Architecture
-   <div class="date" >April 29, 2025</div>                                                                                                                                                         <div class="author" >Brae
-Webb</div>
-______________________________________________________________________________________________
+   <div class="date" >April 29, 2025</div>                                                                                                                          <div class="author" >Brae Webb &amp; Richard
+Thomas</div>
+____________________________________________________________________________________________
    </div>
    <hr class="figure" /><div class="figure" 
 >
@@ -46,38 +46,47 @@ width="420" height="420"  />
 <!--l. 24--><p class="indent" >   Aside</p></div> 
 <div class="tcolorbox-content"><!--l. 24--><p class="noindent" >Github       Classroom       links       for       this       practical       can       be       found       on       Edstem       
 <a 
-href="https://edstem.org/au/courses/15375/discussion/1753712" class="url" ><span 
-class="ectt-1200">https://edstem.org/au/courses/15375/discussion/1753712</span></a> </p> 
+href="https://edstem.org/au/courses/21491/discussion/2429006" class="url" ><span 
+class="ectt-1200">https://edstem.org/au/courses/21491/discussion/2429006</span></a> </p> 
+</div> 
+</div>
+   <div class="tcolorbox tcolorbox" id="tcolobox-2"> 
+<div class="tcolorbox-title">
+<!--l. 30--><p class="indent" >   Warning</p></div> 
+<div class="tcolorbox-content"><!--l. 30--><p class="noindent" >This practical <span 
+class="Cabin-Bold-tlf-t1-x-x-120">cannot </span>be completed on Windows. The Docker provider for Terraform encounters an
+error when creating an image on Windows. You will need to use WSL instead of the native Windows
+environment.  </p> 
 </div> 
 </div>
    
    <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
  id="x1-10001"></a>This Week</h3>
-<!--l. 27--><p class="noindent" >Our goal is to: </p>
+<!--l. 34--><p class="noindent" >Our goal is to: </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 29--><p class="noindent" >Introduce structured logging to TaskOverflow.
+      <!--l. 36--><p class="noindent" >Introduce structured logging to TaskOverflow.
       </p></li>
       <li class="itemize">
-      <!--l. 30--><p class="noindent" >Deploy TaskOverflow to AWS.
+      <!--l. 37--><p class="noindent" >Re-deploy TaskOverflow to AWS.
       </p></li>
       <li class="itemize">
-      <!--l. 31--><p class="noindent" >Write k6 tests to ensure TaskOverflow can handle given scenarios.
+      <!--l. 38--><p class="noindent" >Write k6 tests to ensure TaskOverflow can handle given scenarios.
       </p></li>
       <li class="itemize">
-      <!--l. 32--><p class="noindent" >Uncover and fix bottlenecks in the TaskOverflow application using the logs.</p></li></ul>
+      <!--l. 39--><p class="noindent" >Uncover and fix bottlenecks in the TaskOverflow application using the logs.</p></li></ul>
    
    <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
  id="x1-20002"></a>Watchtower</h3>
-<!--l. 36--><p class="noindent" >In this course we have repeatedly claimed that there is value in montoring and logging. This week, we aim to prove
-it by using logging to help diagnose issues with a deployment of TaskOverflow. For this task, we have integrated
+<!--l. 44--><p class="noindent" >In this course we have repeatedly claimed that there is value in monitoring and logging. This week, we aim to prove it
+by using logging to help diagnose issues with a deployment of TaskOverflow. For this task, we have integrated
 <a 
 href="https://pypi.org/project/watchtower/" >Watchtower</a><span class="footnote-mark"><a 
 href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
  id="x1-2001f1"></a>
 into the project. Watchtower is a Python library that allows us to send logs to AWS CloudWatch, allowing us to
-monitor the application&#8217;s performance in real time.
-</p><!--l. 42--><p class="indent" >   Currently the project is configured to log API accesses made with Flask and to log database queries created by
+monitor an application&#8217;s performance in real time.
+</p><!--l. 50--><p class="indent" >   Currently the project is configured to log API accesses made with Flask and to log database queries created by
 SQL Alchemy. This results in an unstructured log stream as seen in Figure <a 
 href="#x1-2003r1">1<!--tex4ht:ref: fig:cloud-logs --></a>.
 </p>
@@ -90,7 +99,7 @@ href="#x1-2003r1">1<!--tex4ht:ref: fig:cloud-logs --></a>.
                                                                                                     
                                                                                                     
 <div class="ajdustwidth" style="margin-left:-1.77829em;margin-right:-1.77829em;">
-<!--l. 48--><p class="noindent" ><img 
+<!--l. 56--><p class="noindent" ><img 
 src="images/cloud-watch-log.png" alt="PIC"  
 width="567" height="567"  /> </p></div>
 <br /> <div class="caption" 
@@ -100,36 +109,34 @@ class="content">An example of logs made to AWS CloudWatch for a DELETE request i
                                                                                                     
    </div><hr class="endfigure" />
    
-<!--l. 54--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 62--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-3000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Getting Started</span></span>
       </p><ol  class="enumerate1" >
 <li 
   class="enumerate" id="x1-3002x1">
-      <!--l. 56--><p class="noindent" >Using  the  GitHub  Classroom  link  for  this  practical,  provided  by  your  tutor  on  edstem,  create  a
-      repository to work within.
+      <!--l. 64--><p class="noindent" >Using the GitHub Classroom link for this practical, provided on edstem, create a repository to work
+      within.
       </p></li>
 <li 
   class="enumerate" id="x1-3004x2">
-      <!--l. 57--><p class="noindent" >Install Terraform if not already installed, as it will be required again this week.
-      </p></li>
-<li 
-  class="enumerate" id="x1-3006x3">
-      <!--l. 58--><p class="noindent" >Start your learner lab and copy the AWS Learner Lab credentials into a credentials file in the root of
-      the repository.</p></li></ol>
+      <!--l. 65--><p class="noindent" >Start your Learner Lab and copy the AWS Learner Lab credentials into a credentials file in the root
+      of the repository.</p></li></ol>
    
-<!--l. 61--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 68--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-4000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">What&#8217;s New</span></span>
-   We are returning to TaskOverflow roughly from the state at the end of the last practical. The following notable
-changes have been made: </p>
+   We are returning to TaskOverflow roughly from the state at the end of the <span 
+class="Cabin-Italic-tlf-t1-x-x-120">Scaling Stateless Components</span>
+practical <span class="cite">[<a 
+href="#Xprac-week6">1</a>]</span>. The following notable changes have been made: </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 65--><p class="noindent" ><span 
+      <!--l. 73--><p class="noindent" ><span 
 class="ectt-1200">Watchtower </span>has been installed as a dependency.
       </p></li>
       <li class="itemize">
-      <!--l. 66--><p class="noindent" >In <span 
+      <!--l. 74--><p class="noindent" >In <span 
 class="ectt-1200">docker-compose.yml</span>, we mount the <span 
 class="ectt-1200">credentials </span>file to <span 
 class="ectt-1200">/root/.aws/credentials</span>. This allows
@@ -137,27 +144,25 @@ class="ectt-1200">/root/.aws/credentials</span>. This allows
 class="ectt-1200">watchtower </span>to log to AWS CloudWatch.
       </p></li>
       <li class="itemize">
-      <!--l. 68--><p class="noindent" >Logging has been introduced for Flask and SQL Alchemy.</p></li></ul>
-<!--l. 71--><p class="indent" >   Our first task will be to replicate the above logs in Figure <a 
+      <!--l. 76--><p class="noindent" >Logging has been introduced for Flask and SQL Alchemy.</p></li></ul>
+<!--l. 79--><p class="indent" >   Our first task will be to replicate the above logs in Figure <a 
 href="#x1-2003r1">1<!--tex4ht:ref: fig:cloud-logs --></a>. Once you have copied <span 
 class="ectt-1200">credentials </span>into the project
-root, start docker compose with:  </p><div class="framedenv" id="shaded*-1">
-   <!--l. 74-->
+root directory, start docker compose with:  </p><div class="framedenv" id="shaded*-1">
+   <!--l. 82-->
 <pre class="lstlisting" id="listing-1"><span class="label"><a 
  id="x1-4001r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">docker</span></span><span style="color:#000000"><span 
-class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">docker</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">compose</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">up</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
    <div class="framedenv" id="code-1">
-                                                                                                    
-                                                                                                    
-<!--l. 76--><pre class="listings" id="listing-2"><span class="label"><a 
+<!--l. 84--><pre class="listings" id="listing-2"><span class="label"><a 
  id="x1-4002r1"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Serving</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -168,7 +173,8 @@ class="ectt-1200">todo</span></span><span style="color:#000000"><span
 class="tctt-1200">'</span></span> 
 <span class="label"><a 
  id="x1-4003r2"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Debug</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -177,7 +183,8 @@ class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style
 class="ectt-1200">on</span></span> 
 <span class="label"><a 
  id="x1-4004r3"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
@@ -209,7 +216,8 @@ class="ectt-1200">instead</span></span><span style="color:#000000"><span
 class="ectt-1200">.</span></span> 
 <span class="label"><a 
  id="x1-4005r4"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Running</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -219,7 +227,8 @@ class="ectt-1200">addresses</span></span><span style="color:#000000"> </span><sp
 class="ectt-1200">(0.0.0.0)</span></span> 
 <span class="label"><a 
  id="x1-4006r5"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Running</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -228,16 +237,18 @@ class="ectt-1200">http</span></span><span style="color:#000000"><span
 class="ectt-1200">://127.0.0.1:6400</span></span> 
 <span class="label"><a 
  id="x1-4007r6"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Running</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">on</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">http</span></span><span style="color:#000000"><span 
-class="ectt-1200">://192.168.96.3:6400</span></span> 
+class="ectt-1200">://172.18.0.3:6400</span></span> 
 <span class="label"><a 
  id="x1-4008r7"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
@@ -251,7 +262,8 @@ class="ectt-1200">to</span></span><span style="color:#000000"> </span><span styl
 class="ectt-1200">quit</span></span> 
 <span class="label"><a 
  id="x1-4009r8"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
@@ -263,7 +275,8 @@ class="ectt-1200">with</span></span><span style="color:#000000"> </span><span st
 class="ectt-1200">stat</span></span> 
 <span class="label"><a 
  id="x1-4010r9"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
@@ -284,7 +297,8 @@ class="ectt-1200">/</span></span><span style="color:#000000"><span
 class="ectt-1200">credentials</span></span> 
 <span class="label"><a 
  id="x1-4011r10"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
@@ -301,7 +315,8 @@ class="ectt-1200">version</span></span><span style="color:#000000"><span
 class="ectt-1200">()</span></span> 
 <span class="label"><a 
  id="x1-4012r11"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
@@ -317,7 +332,8 @@ class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style
 class="ectt-1200">{}</span></span> 
 <span class="label"><a 
  id="x1-4013r12"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
@@ -332,7 +348,8 @@ class="ectt-1200">current_schema</span></span><span style="color:#000000"><span
 class="ectt-1200">()</span></span> 
 <span class="label"><a 
  id="x1-4014r13"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
@@ -348,7 +365,8 @@ class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style
 class="ectt-1200">{}</span></span> 
 <span class="label"><a 
  id="x1-4015r14"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
@@ -362,7 +380,8 @@ class="ectt-1200">show</span></span><span style="color:#000000"> </span><span st
 class="ectt-1200">standard_conforming_strings</span></span> 
 <span class="label"><a 
  id="x1-4016r15"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
@@ -378,7 +397,8 @@ class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style
 class="ectt-1200">{}</span></span> 
 <span class="label"><a 
  id="x1-4017r16"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
@@ -394,7 +414,8 @@ class="ectt-1200">implicit</span></span><span style="color:#000000"><span
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
  id="x1-4018r17"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
@@ -412,7 +433,8 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">relname</span></span> 
 <span class="label"><a 
  id="x1-4019r18"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">FROM</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">pg_catalog</span></span><span style="color:#000000"><span 
@@ -436,7 +458,8 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">relnamespace</span></span> 
 <span class="label"><a 
  id="x1-4020r19"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">WHERE</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">pg_catalog</span></span><span style="color:#000000"><span 
@@ -448,7 +471,9 @@ class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style
 class="ectt-1200">%(</span></span><span style="color:#000000"><span 
 class="ectt-1200">table_name</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
-class="ectt-1200">s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"><span 
+class="ectt-1200">::</span></span><span style="color:#000000"><span 
+class="ectt-1200">VARCHAR</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">AND</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">pg_catalog</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
@@ -463,26 +488,36 @@ class="ectt-1200">[%(</span></span><span style="color:#000000"><span
 class="ectt-1200">param_1</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">s</span></span><span style="color:#000000"><span 
+class="ectt-1200">::</span></span><span style="color:#000000"><span 
+class="ectt-1200">VARCHAR</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">%(</span></span><span style="color:#000000"><span 
 class="ectt-1200">param_2</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">s</span></span><span style="color:#000000"><span 
+class="ectt-1200">::</span></span><span style="color:#000000"><span 
+class="ectt-1200">VARCHAR</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">%(</span></span><span style="color:#000000"><span 
 class="ectt-1200">param_3</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">s</span></span><span style="color:#000000"><span 
+class="ectt-1200">::</span></span><span style="color:#000000"><span 
+class="ectt-1200">VARCHAR</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">%(</span></span><span style="color:#000000"><span 
 class="ectt-1200">param_4</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">s</span></span><span style="color:#000000"><span 
+class="ectt-1200">::</span></span><span style="color:#000000"><span 
+class="ectt-1200">VARCHAR</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">%(</span></span><span style="color:#000000"><span 
 class="ectt-1200">param_5</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">s</span></span><span style="color:#000000"><span 
+class="ectt-1200">::</span></span><span style="color:#000000"><span 
+class="ectt-1200">VARCHAR</span></span><span style="color:#000000"><span 
 class="ectt-1200">])</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">AND</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">pg_catalog</span></span><span style="color:#000000"><span 
@@ -505,10 +540,13 @@ class="ectt-1200">!=</span></span><span style="color:#000000"> </span><span styl
 class="ectt-1200">%(</span></span><span style="color:#000000"><span 
 class="ectt-1200">nspname_1</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
-class="ectt-1200">s</span></span> 
+class="ectt-1200">s</span></span><span style="color:#000000"><span 
+class="ectt-1200">::</span></span><span style="color:#000000"><span 
+class="ectt-1200">VARCHAR</span></span> 
 <span class="label"><a 
  id="x1-4021r20"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
@@ -520,7 +558,7 @@ class="ectt-1200">Engine</span></span><span style="color:#000000"><span
 class="ectt-1200">:[</span></span><span style="color:#000000"><span 
 class="ectt-1200">generated</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">in</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">0.00011</span></span><span style="color:#000000"><span 
+class="ectt-1200">0.00015</span></span><span style="color:#000000"><span 
 class="ectt-1200">s</span></span><span style="color:#000000"><span 
 class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span><span 
@@ -582,7 +620,8 @@ class="tctt-1200">'</span><span
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
  id="x1-4022r21"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
@@ -595,7 +634,8 @@ class="ectt-1200">:</span></span><span style="color:#000000"><span
 class="ectt-1200">COMMIT</span></span> 
 <span class="label"><a 
  id="x1-4023r22"></a></span><span style="color:#000000"><span 
-class="ectt-1200">app_1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">WARNING</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"><span 
@@ -605,40 +645,59 @@ class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style
 class="ectt-1200">Debugger</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">is</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">active</span></span><span style="color:#000000"><span 
-class="ectt-1200">!</span></span>
+class="ectt-1200">!</span></span> 
+<span class="label"><a 
+ id="x1-4024r23"></a></span><span style="color:#000000"><span 
+class="ectt-1200">app</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">|</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">INFO</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"><span 
+class="ectt-1200">werkzeug</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">*</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Debugger</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">PIN</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">123-456-789</span></span>
  
 <span class="label"><a 
- id="x1-4024r23"></a></span></pre>
+ id="x1-4025r24"></a></span></pre>
+                                                                                                    
+                                                                                                    
    </div>
-<!--l. 101--><p class="indent" >   You should see logs similar to the above. Notice that information about Flask is prefixed with <span 
+<!--l. 110--><p class="indent" >   You should see logs similar to the above. Notice that information about Flask is prefixed with <span 
 class="ectt-1200">INFO:werkzeug</span>
 and information about SQL Alchemy is prefixed with <span 
-class="ectt-1200">INFO:sqlalchemy.engine.Engine</span>. This prefix indicates
-which log stream they are put into.
-</p><!--l. 105--><p class="indent" >   Open the AWS CloudWatch console and go to <span 
-class="ectt-1200">Log groups </span>on the side panel. You should see a log group
-called <span 
-class="ectt-1200">taskoverflow</span>, if you click on that group you can see the two log streams.
+class="ectt-1200">INFO:sqlalchemy.engine.Engine</span>. These prefixes indicate
+into which stream the logs are put.
+</p><!--l. 114--><p class="indent" >   Open the AWS CloudWatch console and go to <span 
+class="ectt-1200">Logs &#x003E; Log groups </span>on the side panel. You should see a log
+group called <span 
+class="ectt-1200">taskoverflow</span>. If you click on that group you will see log streams associated with <span 
+class="ectt-1200">INFO:werkzeug</span>
+and <span 
+class="ectt-1200">INFO:sqlalchemy.engine.Engine</span>.
 </p>
 <div class="center" 
 >
-<!--l. 109--><p class="noindent" >
-</p><!--l. 110--><p class="noindent" ><img 
+<!--l. 119--><p class="noindent" >
+</p><!--l. 120--><p class="noindent" ><img 
 src="images/log-group.png" alt="PIC"  
-width="420" height="420"  /></p></div>
+width="525" height="525"  /></p></div>
    
    <h4 class="subsectionHead"><span class="titlemark">2.1    </span> <a 
  id="x1-50002.1"></a>Structured Logging</h4>
-<!--l. 115--><p class="noindent" >Our first task will be to convert the current logging into a structured logging format. As we saw in last week&#8217;s
-tutorial, structured logging can be as simple as logging a JSON object. This allows logging services to quickly filter
-through logs based on criteria of the object&#8217;s fields.
-</p><!--l. 119--><p class="indent" >   In <span 
+<!--l. 125--><p class="noindent" >Our first task will be to convert the current logging into a structured logging format. As we saw in logging lecture
+<span class="cite">[<a 
+href="#Xlogging-slides">2</a>]</span>, structured logging can be as simple as logging a JSON object. This allows logging services to quickly filter
+through logs based on criteria selected from the object&#8217;s fields.
+</p><!--l. 129--><p class="indent" >   In <span 
 class="ectt-1200">todo/__init__.py </span>we have the following code within the <span 
 class="ectt-1200">create_app </span>function. This code configures
-watchtower to log to AWS CloudWatch.
-</p><!--l. 122--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 122--><p class="indent" >   <span 
-class="ectt-1200">» cat todo/__init__.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 122--><pre class="listings" id="listing-3"><span class="label"><a 
+watchtower to log to AWS CloudWatch.    </p><div class="framedenv" id="code-1">
+<!--l. 132--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/__init__.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 132--><pre class="listings" id="listing-3"><span class="label"><a 
  id="x1-5001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">create_app</span></span><span style="color:#000000"><span 
@@ -735,13 +794,12 @@ class="ectt-1200">...</span></span>
 <span class="label"><a 
  id="x1-5009r9"></a></span></pre>
    </div>
-<!--l. 133--><p class="indent" >   We want to wrap all our logs in JSON objects and inject metadata into these objects. This makes it
-easier to search the logs. To do this, we will create a custom log formatter that is a subclass of
-<span 
-class="ectt-1200">watchtower.CloudWatchLogFormatter</span>.
-</p><!--l. 138--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 138--><p class="indent" >   <span 
-class="ectt-1200">» cat todo/__init__.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 138--><pre class="listings" id="listing-4"><span class="label"><a 
+<!--l. 143--><p class="indent" >   We want to wrap all our logs in JSON objects and inject metadata into these objects. This makes it easier to
+search the logs. To do this, we will create a custom log formatter that is a subclass of <br 
+class="newline" /><span 
+class="ectt-1200">watchtower.CloudWatchLogFormatter</span>.    </p><div class="framedenv" id="code-1">
+<!--l. 148--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/__init__.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 148--><pre class="listings" id="listing-4"><span class="label"><a 
  id="x1-5010r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">flask</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
@@ -1022,21 +1080,20 @@ class="ectt-1200">...</span></span>
 <span class="label"><a 
  id="x1-5031r22"></a></span></pre>
    </div>
-<!--l. 162--><p class="indent" >   These are just some metadata fields we might want to add to our logging. We may also consider
+<!--l. 172--><p class="indent" >   These are just some metadata fields we might want to add to our logging. We may also consider
 <span 
 class="ectt-1200">socket.gethostname() </span>to identify the instance handling a request, or other helpful information.
    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.2    </span> <a 
  id="x1-60002.2"></a>Correlation IDs</h4>
-<!--l. 167--><p class="noindent" >Correlation IDs are a mechanism to help understand the path of a request, event, message, etc. through a system.
+<!--l. 178--><p class="noindent" >Correlation IDs are a mechanism to help understand the path of a request, event, message, etc. through a system.
 When logging it is often helpful to be able to trace the execution of a particular request.
-</p><!--l. 170--><p class="indent" >   For our system we will generate a new random identifier for each incoming request. This identifier will be
+</p><!--l. 181--><p class="indent" >   For our system we will generate a new random identifier for each incoming request. This identifier will be
 included as part of the logging metadata. For a system with multiple API endpoints requests will often come with
-an established REQUEST_ID header.
-</p><!--l. 174--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 174--><p class="indent" >   <span 
-class="ectt-1200">» cat todo/__init__.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 174--><pre class="listings" id="listing-5"><span class="label"><a 
+an established REQUEST_ID header.    </p><div class="framedenv" id="code-1">
+<!--l. 185--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/__init__.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 185--><pre class="listings" id="listing-5"><span class="label"><a 
  id="x1-6001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">uuid</span></span> 
@@ -1112,6 +1169,7 @@ class="ectt-1200">&#x00A0;</span><span
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">request</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
@@ -1131,6 +1189,7 @@ class="ectt-1200">()</span></span><span style="color:#000000"><span
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
  id="x1-6012r12"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1172,6 +1231,7 @@ class="ectt-1200">&#x00A0;</span><span
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">requests</span></span><span style="color:#000000"><span 
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
@@ -1188,6 +1248,7 @@ class="ectt-1200">&#x00A0;</span><span
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
 class="ectt-1200">return</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">response</span></span> 
@@ -1200,25 +1261,23 @@ class="ectt-1200">...</span></span>
  
 <span class="label"><a 
  id="x1-6019r19"></a></span></pre>
-                                                                                                    
-                                                                                                    
    </div>
-<!--l. 195--><p class="indent" >   The code above in <span 
+<!--l. 206--><p class="indent" >   The code above in <span 
 class="ectt-1200">create_app </span>will generate a unique identifier for each incoming request. It will also log when
 a request starts being processed and when it finishes processing.
    
+                                                                                                    
+                                                                                                    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.3    </span> <a 
  id="x1-70002.3"></a>Verify and Refine</h4>
-<!--l. 200--><p class="noindent" >Ensure that the above modifications are working as expected by returning to the AWS CloudWatch logs. Launch
+<!--l. 210--><p class="noindent" >Ensure that the above modifications are working as expected by returning to the AWS CloudWatch logs. Launch
 the service locally and make some API requests.
-</p><!--l. 203--><p class="indent" >   You should now be able to go to the <span 
-class="Cabin-Italic-tlf-t1-x-x-120">Log Insights </span>interface from the sidebar. As we saw in the tutorial, this
-interface allows you to make queries about structured logging data. Try the following query to ensure that your
-logs seem sensible.
-</p>
-   <div class="framedenv" id="code-1">
-<!--l. 208--><pre class="listings" id="listing-6"><span class="label"><a 
+</p><!--l. 213--><p class="indent" >   You should now be able to go to the <span 
+class="ectt-1200">Log Insights </span>interface from the sidebar. This interface allows you
+to query structured logging data. Try the following query to ensure that your logs seem sensible.
+</p><div class="framedenv" id="code-1">
+<!--l. 217--><pre class="listings" id="listing-6"><span class="label"><a 
  id="x1-7001r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">fields</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">request_id</span></span><span style="color:#000000"><span 
@@ -1254,31 +1313,33 @@ class="ectt-1200">400</span></span>
 <span class="label"><a 
  id="x1-7004r4"></a></span></pre>
    </div>
-<!--l. 214--><p class="indent" >   Take the time to refine your logging now to produce logs that are easy to search through and understand the
+<!--l. 223--><p class="indent" >   Take the time to refine your logging now to produce logs that are easy to search through and understand the
 trace of your API requests.
    
 </p>
    <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
  id="x1-80003"></a>Load Testing</h3>
-<!--l. 220--><p class="noindent" >We will now generate some load on our API using <span 
+<!--l. 229--><p class="noindent" >We will now generate some load on our API using <span 
 class="ectt-1200">k6 </span>and see how it performs. We briefly saw <span 
 class="ectt-1200">k6 </span>at the end of the
-week 7 practical. To refresh, <span 
-class="ectt-1200">k6 </span>is a load testing tool that is written in Go but provides an interface using a
-JavaScript subset.
-</p><!--l. 224--><p class="indent" >   It will help us to generate a large number of concurrent API requests. Install <span 
-class="ectt-1200">k6 </span>from: 
-<a 
+<span 
+class="Cabin-Italic-tlf-t1-x-x-120">Scaling Stateless Components </span>practical <span class="cite">[<a 
+href="#Xprac-week6">1</a>]</span>. To review, <span 
+class="ectt-1200">k6 </span>is a load testing tool that is written in Go but provides an
+interface using a subset of JavaScript.
+</p><!--l. 233--><p class="indent" >   It will help us to generate a large number of concurrent API requests. If you have not already done so, install <span 
+class="ectt-1200">k6</span>
+from: <a 
 href="https://k6.io/docs/get-started/installation/" class="url" ><span 
 class="ectt-1200">https://k6.io/docs/get-started/installation/</span></a>
    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.1    </span> <a 
  id="x1-90003.1"></a>Scenario</h4>
-<!--l. 229--><p class="noindent" >We want to simulate the following scenario using our testing framework.
+<!--l. 238--><p class="noindent" >We want to simulate the following scenario using our testing framework.
    
 </p>
-<!--l. 231--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 240--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-10000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Indecisive planners and studious reviewers</span></span>
    Our TaskOverflow application is being used at a point in semester where most students have already setup
@@ -1286,21 +1347,21 @@ their tasks. These students are routinely visiting the website and listing the t
 same time, there are 40 very indecisive students who, quite late in semester, are trying to setup their tasks for the
 rest of semester. They continually create a task, realise that they have mis-typed, delete the task, and start
 over.
-</p><!--l. 242--><p class="indent" >   As the tasks are shared globally amongst all students, the indecisive planners are altering the list of task seen
+</p><!--l. 251--><p class="indent" >   As the tasks are shared globally amongst all students, the indecisive planners are altering the list of task seen
 by the organised students.
    
-                                                                                                    
-                                                                                                    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.2    </span> <a 
  id="x1-110003.2"></a>Setup</h4>
-<!--l. 246--><p class="noindent" >To get started, we will create a file called <span 
+<!--l. 255--><p class="noindent" >To get started, we will create a file called <span 
 class="ectt-1200">planners-and-studiers.js</span>. Most <span 
 class="ectt-1200">k6 </span>tests start with the following
-imports.
-</p><!--l. 250--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 250--><p class="indent" >   <span 
-class="ectt-1200">» cat planners-and-studiers.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 250--><pre class="listings" id="listing-7"><span class="label"><a 
+imports.    </p><div class="framedenv" id="code-1">
+<!--l. 259--><p class="indent" >   <span 
+class="ectt-1200">» cat planners-and-studiers.js</span> </p></div>   <div class="framedenv" id="code-1">
+                                                                                                    
+                                                                                                    
+<!--l. 259--><pre class="listings" id="listing-7"><span class="label"><a 
  id="x1-11001r1"></a></span><span style="color:#404040"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">http</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1341,28 +1402,28 @@ class="ectt-1200">;</span></span>
    </div>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 258--><p class="noindent" ><span 
+      <!--l. 267--><p class="noindent" ><span 
 class="ectt-1200">http </span>holds the methods used to make HTTP requests,
       </p></li>
       <li class="itemize">
-      <!--l. 259--><p class="noindent" ><span 
+      <!--l. 268--><p class="noindent" ><span 
 class="ectt-1200">check </span>allows us to assert the state of HTTP responses, and
       </p></li>
       <li class="itemize">
-      <!--l. 260--><p class="noindent" ><span 
+      <!--l. 269--><p class="noindent" ><span 
 class="ectt-1200">sleep </span>gives us the ability to put a simulated user to sleep rather than continuously spamming the
       service with requests.</p></li></ul>
-<!--l. 263--><p class="indent" >   The ENDPOINT line retrieves the endpoint URL from the ENDPOINT environment variable.
+<!--l. 272--><p class="indent" >   The ENDPOINT line retrieves the endpoint URL from the ENDPOINT environment variable.
    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.3    </span> <a 
  id="x1-120003.3"></a>User Simulation</h4>
-<!--l. 267--><p class="noindent" >The behaviour of our users will be defined by an exported JavaScript function. Our studying student will be listing
-out all of the tasks they have left to complete by using the <span 
+<!--l. 276--><p class="noindent" >The behaviour of our users will be defined by an exported JavaScript function. Our studying student
+will be listing out all of the tasks they have left to complete by using the <span 
 class="ectt-1200">/api/v1/todos </span>endpoint.
-</p><!--l. 270--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 270--><p class="indent" >   <span 
-class="ectt-1200">» cat planners-and-studiers.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 270--><pre class="listings" id="listing-8"><span class="label"><a 
+</p><div class="framedenv" id="code-1">
+<!--l. 280--><p class="indent" >   <span 
+class="ectt-1200">» cat planners-and-studiers.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 280--><pre class="listings" id="listing-8"><span class="label"><a 
  id="x1-12001r1"></a></span><span style="color:#404040"><span 
 class="ectt-1200">export</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
 class="ectt-1200">function</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1500,27 +1561,26 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12014r14"></a></span></pre>
    </div>
-<!--l. 286--><p class="indent" >   Of course, this test is very basic as it only ensures the response code is 200. There is no guarantee that the
+<!--l. 296--><p class="indent" >   Of course, this test is very basic as it only ensures the response code is 200. There is no guarantee that the
 returned data is sensible.
 </p>
-   <div class="tcolorbox tcolorbox" id="tcolobox-2">     
+   <div class="tcolorbox tcolorbox" id="tcolobox-3">     
 <div class="tcolorbox-title">
-<!--l. 295--><p class="indent" >   Info</p></div> 
-<div class="tcolorbox-content"><!--l. 295--><p class="noindent" >If  you  would  like  a  challenge,  you  can  use  the  <span 
+<!--l. 305--><p class="indent" >   Info</p></div> 
+<div class="tcolorbox-content"><!--l. 305--><p class="noindent" >If  you  would  like  a  challenge,  you  can  use  the  <span 
 class="ectt-1200">randomIntBetween </span>function  to  have  the  studier
 occasionally tick off tasks.
-</p><!--l. 295--><p class="noindent" ><a 
+</p><!--l. 305--><p class="noindent" ><a 
 href="https://k6.io/docs/javascript-api/jslib/utils/randomintbetween/" class="url" ><span 
 class="ectt-1200">https://k6.io/docs/javascript-api/jslib/utils/randomintbetween/</span></a> </p> 
 </div> 
 </div>
-<!--l. 297--><p class="indent" >   Next we need to handle our indecisive users. For them, we will need to make a POST request to the
+<!--l. 307--><p class="indent" >   Next we need to simulate our indecisive students. For them, we will need to make a POST request to the
 <span 
 class="ectt-1200">/api/v1/todos </span>endpoint to create a task. Then we will need to use the ID given by the POST response to
-DELETE the mis-typed task.
-</p><!--l. 301--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 301--><p class="indent" >   <span 
-class="ectt-1200">» cat planners-and-studiers.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 301--><pre class="listings" id="listing-9"><span class="label"><a 
+DELETE the mis-typed task.    </p><div class="framedenv" id="code-1">
+<!--l. 311--><p class="indent" >   <span 
+class="ectt-1200">» cat planners-and-studiers.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 311--><pre class="listings" id="listing-9"><span class="label"><a 
  id="x1-12015r1"></a></span><span style="color:#404040"><span 
 class="ectt-1200">export</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
 class="ectt-1200">function</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1636,8 +1696,8 @@ class="ectt-1200">deadline_at</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">2023-12-04</span></span><span style="color:#669900"><span 
-class="ectt-1200">T14</span></span><span style="color:#669900"><span 
+class="ectt-1200">2025-09-05</span></span><span style="color:#669900"><span 
+class="ectt-1200">T15</span></span><span style="color:#669900"><span 
 class="ectt-1200">:00:00</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
@@ -1911,19 +1971,18 @@ class="ectt-1200">}</span></span>
  id="x1-12051r37"></a></span></pre>
    </div>
    
-                                                                                                    
-                                                                                                    
    <h4 class="subsectionHead"><span class="titlemark">3.4    </span> <a 
  id="x1-130003.4"></a>Configure Behaviour</h4>
-<!--l. 342--><p class="noindent" >We have now outlined how our user agents will interact with our API. We can use the <span 
+                                                                                                    
+                                                                                                    
+<!--l. 352--><p class="noindent" >We have now outlined how our user agents will interact with our API. We can use the <span 
 class="ectt-1200">options </span>to
-configure how these interactions occur over time. To prevent overloading the API immediately, and
-allow any auto-scaling behaviour to be triggers, we will slowly increase the amount of studiers. We
-will have a consistent amount of planners, 20, who will perform a total of 200 corrections over the
-test.
-</p><!--l. 350--><p class="indent" >   </p><div class="framedenv" id="code-1">
-<!--l. 350--><p class="indent" >   <span 
-class="ectt-1200">» cat planners-and-studiers.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 350--><pre class="listings" id="listing-10"><span class="label"><a 
+configure how these interactions occur over time. To prevent overloading the API immediately, and allow
+any auto-scaling behaviour to be triggered, we will slowly increase the amount of studiers. We will
+have a consistent amount of planners, 20, who will perform a total of 200 corrections over the test.
+</p><div class="framedenv" id="code-1">
+<!--l. 360--><p class="indent" >   <span 
+class="ectt-1200">» cat planners-and-studiers.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 360--><pre class="listings" id="listing-10"><span class="label"><a 
  id="x1-13001r1"></a></span><span style="color:#404040"><span 
 class="ectt-1200">export</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">const</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2017,13 +2076,13 @@ class="ectt-1200">{</span></span><span style="color:#000000"> </span><span style
 class="ectt-1200">duration</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">2</span></span><span style="color:#669900"><span 
+class="ectt-1200">1</span></span><span style="color:#669900"><span 
 class="ectt-1200">m</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">target</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">1000</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">1500</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">},</span></span> 
 <span class="label"><a 
  id="x1-13008r8"></a></span><span 
@@ -2043,13 +2102,13 @@ class="ectt-1200">{</span></span><span style="color:#000000"> </span><span style
 class="ectt-1200">duration</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">2</span></span><span style="color:#669900"><span 
+class="ectt-1200">3</span></span><span style="color:#669900"><span 
 class="ectt-1200">m</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">target</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">2500</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">7500</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">},</span></span> 
 <span class="label"><a 
  id="x1-13009r9"></a></span><span 
@@ -2172,7 +2231,7 @@ class="ectt-1200">&#x00A0;</span><span
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">iterations</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">400,</span></span> 
+class="ectt-1200">200,</span></span> 
 <span class="label"><a 
  id="x1-13017r17"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2198,30 +2257,36 @@ class="ectt-1200">};</span></span>
    
    <h4 class="subsectionHead"><span class="titlemark">3.5    </span> <a 
  id="x1-140003.5"></a>Running the Tests</h4>
-<!--l. 374--><p class="noindent" >Now we have a completed load test. Deploy the service to AWS:
+<!--l. 384--><p class="noindent" >Now we have a completed load test. Deploy the service to AWS:
 </p>
    <div class="framedenv" id="shaded*-1">
-   <!--l. 377-->
+   <!--l. 387-->
 <pre class="lstlisting" id="listing-11"><span class="label"><a 
  id="x1-14001r1"></a></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">terraform</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">init</span></span><span 
+class="ectt-1200">&#x00A0;</span></pre>
+   </div> <div class="framedenv" id="shaded*-1">
+   <!--l. 388-->
+<pre class="lstlisting" id="listing-12"><span class="label"><a 
+ id="x1-14002r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">terraform</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">apply</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 379--><p class="indent" >   Once the deployment is finished, you should be given a URL where the endpoint is deployed. Use that
+<!--l. 390--><p class="indent" >   Once the deployment is finished, you should be given a URL where the endpoint is deployed. Use that
 endpoint to set the <span 
-class="ectt-1200">ENDPOINT </span>environment variable and run the tests.
-</p>
-   <div class="framedenv" id="code-1">
-<!--l. 383--><pre class="listings" id="listing-12"><span class="label"><a 
- id="x1-14002r1"></a></span><span style="color:#000000"><span 
+class="ectt-1200">ENDPOINT </span>environment variable and run the tests.       </p><div class="framedenv" id="code-1">
+<!--l. 394--><pre class="listings" id="listing-13"><span class="label"><a 
+ id="x1-14003r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
 class="ectt-1200">export</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">ENDPOINT</span></span><span style="color:#000000"><span 
 class="ectt-1200">=...</span></span> 
 <span class="label"><a 
- id="x1-14003r2"></a></span><span style="color:#000000"><span 
+ id="x1-14004r2"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">k6</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">run</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2234,14 +2299,12 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">js</span></span>
  
 <span class="label"><a 
- id="x1-14004r3"></a></span></pre>
+ id="x1-14005r3"></a></span></pre>
    </div>
-<!--l. 388--><p class="indent" >   These tests should take about 10 minutes to run. You should see that most of the tests pass but that there will
-be a few failures throughout, as seen below.
-</p>
-   <div class="framedenv" id="code-1">
-<!--l. 392--><pre class="listings" id="listing-13"><span class="label"><a 
- id="x1-14005r1"></a></span><span style="color:#000000"><span 
+<!--l. 399--><p class="indent" >   These tests should take about 10 minutes to run. You should see that most of the tests pass but that there will
+be a few failures throughout, as seen below.       </p><div class="framedenv" id="code-1">
+<!--l. 403--><pre class="listings" id="listing-14"><span class="label"><a 
+ id="x1-14006r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">WARN</span></span><span style="color:#000000"><span 
 class="ectt-1200">[0152]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Request</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2253,7 +2316,19 @@ class="ectt-1200">Get</span></span><span style="color:#669900"> </span><span sty
 class="ectt-1200">\</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">http</span></span><span style="color:#000000"><span 
-class="ectt-1200">://54.166.206.229:6400//</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
+class="ectt-1200">-451078826.</span></span><span style="color:#000000"><span 
+class="ectt-1200">us</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">east</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1.</span></span><span style="color:#000000"><span 
+class="ectt-1200">elb</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">amazonaws</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">com</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">api</span></span><span style="color:#000000"><span 
 class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">v1</span></span><span style="color:#000000"><span 
@@ -2266,7 +2341,7 @@ class="ectt-1200">request</span></span><span style="color:#669900"> </span><span
 class="ectt-1200">timeout</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-14006r2"></a></span><span style="color:#000000"><span 
+ id="x1-14007r2"></a></span><span style="color:#000000"><span 
 class="ectt-1200">WARN</span></span><span style="color:#000000"><span 
 class="ectt-1200">[0183]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Request</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2278,7 +2353,19 @@ class="ectt-1200">Get</span></span><span style="color:#669900"> </span><span sty
 class="ectt-1200">\</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">http</span></span><span style="color:#000000"><span 
-class="ectt-1200">://54.166.206.229:6400/</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
+class="ectt-1200">-451078826.</span></span><span style="color:#000000"><span 
+class="ectt-1200">us</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">east</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1.</span></span><span style="color:#000000"><span 
+class="ectt-1200">elb</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">amazonaws</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">com</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">api</span></span><span style="color:#000000"><span 
 class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">v1</span></span><span style="color:#000000"><span 
@@ -2291,7 +2378,7 @@ class="ectt-1200">request</span></span><span style="color:#669900"> </span><span
 class="ectt-1200">timeout</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-14007r3"></a></span><span style="color:#000000"><span 
+ id="x1-14008r3"></a></span><span style="color:#000000"><span 
 class="ectt-1200">WARN</span></span><span style="color:#000000"><span 
 class="ectt-1200">[0239]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Request</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2303,7 +2390,19 @@ class="ectt-1200">Get</span></span><span style="color:#669900"> </span><span sty
 class="ectt-1200">\</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">http</span></span><span style="color:#000000"><span 
-class="ectt-1200">://54.166.206.229:6400/</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
+class="ectt-1200">-451078826.</span></span><span style="color:#000000"><span 
+class="ectt-1200">us</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">east</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1.</span></span><span style="color:#000000"><span 
+class="ectt-1200">elb</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">amazonaws</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">com</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">api</span></span><span style="color:#000000"><span 
 class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">v1</span></span><span style="color:#000000"><span 
@@ -2316,7 +2415,7 @@ class="ectt-1200">request</span></span><span style="color:#669900"> </span><span
 class="ectt-1200">timeout</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-14008r4"></a></span><span style="color:#000000"><span 
+ id="x1-14009r4"></a></span><span style="color:#000000"><span 
 class="ectt-1200">WARN</span></span><span style="color:#000000"><span 
 class="ectt-1200">[0241]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Request</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2324,24 +2423,33 @@ class="ectt-1200">Failed</span></span><span style="color:#000000"> </span><span 
 class="ectt-1200">error</span></span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">Get</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">Delete</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
 class="ectt-1200">\</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
-class="ectt-1200">http</span></span><span style="color:#000000"><span 
-class="ectt-1200">://54.166.206.229:6400/</span></span><span style="color:#000000"><span 
-class="ectt-1200">api</span></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"><span 
+class="ectt-1200">%7</span></span><span style="color:#000000"><span 
+class="ectt-1200">Burl</span></span><span style="color:#000000"><span 
+class="ectt-1200">%7</span></span><span style="color:#000000"><span 
+class="ectt-1200">D</span></span><span style="color:#000000"><span 
 class="ectt-1200">/</span></span><span style="color:#000000"><span 
-class="ectt-1200">v1</span></span><span style="color:#000000"><span 
-class="ectt-1200">/</span></span><span style="color:#000000"><span 
-class="ectt-1200">todos</span></span><span style="color:#000000"><span 
+class="ectt-1200">$</span></span><span style="color:#000000"><span 
+class="ectt-1200">%7</span></span><span style="color:#000000"><span 
+class="ectt-1200">BwrongId</span></span><span style="color:#000000"><span 
+class="ectt-1200">%7</span></span><span style="color:#000000"><span 
+class="ectt-1200">D</span></span><span style="color:#000000"><span 
 class="ectt-1200">\</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">:</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
-class="ectt-1200">request</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
-class="ectt-1200">timeout</span></span><span style="color:#669900"><span 
+class="ectt-1200">unsupported</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">protocol</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">scheme</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
+class="ectt-1200">\</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#000000"><span 
+class="ectt-1200">\</span></span><span style="color:#669900"><span 
+class="ectt-1200">"</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-14009r5"></a></span><span style="color:#000000"><span 
+ id="x1-14010r5"></a></span><span style="color:#000000"><span 
 class="ectt-1200">WARN</span></span><span style="color:#000000"><span 
 class="ectt-1200">[0272]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Request</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2353,7 +2461,19 @@ class="ectt-1200">Get</span></span><span style="color:#669900"> </span><span sty
 class="ectt-1200">\</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">http</span></span><span style="color:#000000"><span 
-class="ectt-1200">://54.166.206.229:6400/</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
+class="ectt-1200">-451078826.</span></span><span style="color:#000000"><span 
+class="ectt-1200">us</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">east</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1.</span></span><span style="color:#000000"><span 
+class="ectt-1200">elb</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">amazonaws</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">com</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">api</span></span><span style="color:#000000"><span 
 class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">v1</span></span><span style="color:#000000"><span 
@@ -2366,7 +2486,7 @@ class="ectt-1200">request</span></span><span style="color:#669900"> </span><span
 class="ectt-1200">timeout</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-14010r6"></a></span><span style="color:#000000"><span 
+ id="x1-14011r6"></a></span><span style="color:#000000"><span 
 class="ectt-1200">WARN</span></span><span style="color:#000000"><span 
 class="ectt-1200">[0330]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Request</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2378,7 +2498,19 @@ class="ectt-1200">Get</span></span><span style="color:#669900"> </span><span sty
 class="ectt-1200">\</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">http</span></span><span style="color:#000000"><span 
-class="ectt-1200">://54.166.206.229:6400/</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
+class="ectt-1200">-451078826.</span></span><span style="color:#000000"><span 
+class="ectt-1200">us</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">east</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1.</span></span><span style="color:#000000"><span 
+class="ectt-1200">elb</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">amazonaws</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">com</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">api</span></span><span style="color:#000000"><span 
 class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">v1</span></span><span style="color:#000000"><span 
@@ -2391,7 +2523,7 @@ class="ectt-1200">request</span></span><span style="color:#669900"> </span><span
 class="ectt-1200">timeout</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-14011r7"></a></span><span style="color:#000000"><span 
+ id="x1-14012r7"></a></span><span style="color:#000000"><span 
 class="ectt-1200">WARN</span></span><span style="color:#000000"><span 
 class="ectt-1200">[0339]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Request</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2403,7 +2535,19 @@ class="ectt-1200">Get</span></span><span style="color:#669900"> </span><span sty
 class="ectt-1200">\</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">http</span></span><span style="color:#000000"><span 
-class="ectt-1200">://54.166.206.229:6400/</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
+class="ectt-1200">-451078826.</span></span><span style="color:#000000"><span 
+class="ectt-1200">us</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">east</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1.</span></span><span style="color:#000000"><span 
+class="ectt-1200">elb</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">amazonaws</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">com</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">api</span></span><span style="color:#000000"><span 
 class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">v1</span></span><span style="color:#000000"><span 
@@ -2416,7 +2560,7 @@ class="ectt-1200">request</span></span><span style="color:#669900"> </span><span
 class="ectt-1200">timeout</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-14012r8"></a></span><span style="color:#000000"><span 
+ id="x1-14013r8"></a></span><span style="color:#000000"><span 
 class="ectt-1200">WARN</span></span><span style="color:#000000"><span 
 class="ectt-1200">[0371]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Request</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2428,7 +2572,19 @@ class="ectt-1200">Get</span></span><span style="color:#669900"> </span><span sty
 class="ectt-1200">\</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">http</span></span><span style="color:#000000"><span 
-class="ectt-1200">://54.166.206.229:6400/</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
+class="ectt-1200">-451078826.</span></span><span style="color:#000000"><span 
+class="ectt-1200">us</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">east</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1.</span></span><span style="color:#000000"><span 
+class="ectt-1200">elb</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">amazonaws</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">com</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">api</span></span><span style="color:#000000"><span 
 class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">v1</span></span><span style="color:#000000"><span 
@@ -2441,7 +2597,7 @@ class="ectt-1200">request</span></span><span style="color:#669900"> </span><span
 class="ectt-1200">timeout</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-14013r9"></a></span><span style="color:#000000"><span 
+ id="x1-14014r9"></a></span><span style="color:#000000"><span 
 class="ectt-1200">WARN</span></span><span style="color:#000000"><span 
 class="ectt-1200">[0412]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">Request</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2453,7 +2609,19 @@ class="ectt-1200">Get</span></span><span style="color:#669900"> </span><span sty
 class="ectt-1200">\</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">http</span></span><span style="color:#000000"><span 
-class="ectt-1200">://54.166.206.229:6400/</span></span><span style="color:#000000"><span 
+class="ectt-1200">://</span></span><span style="color:#000000"><span 
+class="ectt-1200">taskoverflow</span></span><span style="color:#000000"><span 
+class="ectt-1200">-451078826.</span></span><span style="color:#000000"><span 
+class="ectt-1200">us</span></span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"><span 
+class="ectt-1200">east</span></span><span style="color:#000000"><span 
+class="ectt-1200">-1.</span></span><span style="color:#000000"><span 
+class="ectt-1200">elb</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">amazonaws</span></span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">com</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">api</span></span><span style="color:#000000"><span 
 class="ectt-1200">/</span></span><span style="color:#000000"><span 
 class="ectt-1200">v1</span></span><span style="color:#000000"><span 
@@ -2466,106 +2634,54 @@ class="ectt-1200">request</span></span><span style="color:#669900"> </span><span
 class="ectt-1200">timeout</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-14014r10"></a></span><span style="color:#000000"><span 
-class="ectt-1200">WARN</span></span><span style="color:#000000"><span 
-class="ectt-1200">[0412]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">Request</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">Failed</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">error</span></span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">Get</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
-class="ectt-1200">\</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#000000"><span 
-class="ectt-1200">http</span></span><span style="color:#000000"><span 
-class="ectt-1200">://54.166.206.229:6400/</span></span><span style="color:#000000"><span 
-class="ectt-1200">api</span></span><span style="color:#000000"><span 
-class="ectt-1200">/</span></span><span style="color:#000000"><span 
-class="ectt-1200">v1</span></span><span style="color:#000000"><span 
-class="ectt-1200">/</span></span><span style="color:#000000"><span 
-class="ectt-1200">todos</span></span><span style="color:#000000"><span 
-class="ectt-1200">\</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">:</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
-class="ectt-1200">request</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
-class="ectt-1200">timeout</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span> 
+ id="x1-14015r10"></a></span> 
 <span class="label"><a 
- id="x1-14015r11"></a></span><span style="color:#000000"><span 
-class="ectt-1200">WARN</span></span><span style="color:#000000"><span 
-class="ectt-1200">[0467]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">Request</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">Failed</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">error</span></span><span style="color:#000000"><span 
-class="ectt-1200">=</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">Get</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
-class="ectt-1200">\</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#000000"><span 
-class="ectt-1200">http</span></span><span style="color:#000000"><span 
-class="ectt-1200">://54.166.206.229:6400/</span></span><span style="color:#000000"><span 
-class="ectt-1200">api</span></span><span style="color:#000000"><span 
-class="ectt-1200">/</span></span><span style="color:#000000"><span 
-class="ectt-1200">v1</span></span><span style="color:#000000"><span 
-class="ectt-1200">/</span></span><span style="color:#000000"><span 
-class="ectt-1200">todos</span></span><span style="color:#000000"><span 
-class="ectt-1200">\</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span><span style="color:#669900"><span 
-class="ectt-1200">:</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
-class="ectt-1200">request</span></span><span style="color:#669900"> </span><span style="color:#669900"><span 
-class="ectt-1200">timeout</span></span><span style="color:#669900"><span 
-class="ectt-1200">"</span></span> 
+ id="x1-14016r11"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">TOTAL</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">RESULTS</span></span> 
 <span class="label"><a 
- id="x1-14016r12"></a></span> 
+ id="x1-14017r12"></a></span> 
 <span class="label"><a 
- id="x1-14017r13"></a></span><span style="color:#000000"><span 
-class="ectt-1200">running</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">(09</span></span><span style="color:#000000"><span 
-class="ectt-1200">m30</span></span><span style="color:#000000"><span 
-class="ectt-1200">.0</span></span><span style="color:#000000"><span 
-class="ectt-1200">s</span></span><span style="color:#000000"><span 
-class="ectt-1200">)</span></span><span style="color:#000000"><span 
-class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">0000/2520</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">VUs</span></span><span style="color:#000000"><span 
-class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">4914</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
-class="ectt-1200">complete</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">and</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">1947</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">interrupted</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">iterations</span></span> 
+ id="x1-14018r13"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">checks_total</span></span><span style="color:#000000"><span 
+class="ectt-1200">...................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">16498</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">32.852733/</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span> 
 <span class="label"><a 
- id="x1-14018r14"></a></span><span style="color:#000000"><span 
-class="ectt-1200">planner</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">[</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">100%</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">20</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">VUs</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">07</span></span><span style="color:#000000"><span 
-class="ectt-1200">m09</span></span><span style="color:#000000"><span 
-class="ectt-1200">.0</span></span><span style="color:#000000"><span 
-class="ectt-1200">s</span></span><span style="color:#000000"><span 
-class="ectt-1200">/10</span></span><span style="color:#000000"><span 
-class="ectt-1200">m0s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">400/400</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">shared</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">iters</span></span> 
+ id="x1-14019r14"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">checks_succeeded</span></span><span style="color:#000000"><span 
+class="ectt-1200">...............:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">92.47%</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">15257</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">out</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">of</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">16498</span></span> 
 <span class="label"><a 
- id="x1-14019r15"></a></span><span style="color:#000000"><span 
-class="ectt-1200">studier</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">[</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">100%</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">0000/2500</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">VUs</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">9</span></span><span style="color:#000000"><span 
-class="ectt-1200">m0s</span></span> 
+ id="x1-14020r15"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">checks_failed</span></span><span style="color:#000000"><span 
+class="ectt-1200">..................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">7.52%</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">1241</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">out</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">of</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">16498</span></span> 
 <span class="label"><a 
- id="x1-14020r16"></a></span> 
+ id="x1-14021r16"></a></span> 
 <span class="label"><a 
- id="x1-14021r17"></a></span><span 
+ id="x1-14022r17"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -2574,120 +2690,311 @@ class="ectt-1200">is</span></span><span style="color:#000000"> </span><span styl
 class="ectt-1200">status</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">200</span></span> 
 <span class="label"><a 
- id="x1-14022r18"></a></span><span 
+ id="x1-14023r18"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">94%</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">6646</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">92%</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">-</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">15257</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">/</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">411</span></span> 
+class="ectt-1200">1241</span></span> 
 <span class="label"><a 
- id="x1-14023r19"></a></span> 
+ id="x1-14024r19"></a></span> 
 <span class="label"><a 
- id="x1-14024r20"></a></span><span 
+ id="x1-14025r20"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">checks</span></span><span style="color:#000000"><span 
-class="ectt-1200">.........................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">94.17%</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">6646</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">411</span></span> 
+class="ectt-1200">HTTP</span></span> 
 <span class="label"><a 
- id="x1-14025r21"></a></span><span 
+ id="x1-14026r21"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">data_received</span></span><span style="color:#000000"><span 
-class="ectt-1200">..................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">166</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">MB</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">292</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">kB</span></span><span style="color:#000000"><span 
-class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">http_req_duration</span></span><span style="color:#000000"><span 
+class="ectt-1200">...........................................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">avg</span></span><span style="color:#000000"><span 
+class="ectt-1200">=14.05</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">min</span></span><span style="color:#000000"><span 
+class="ectt-1200">=0</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">med</span></span><span style="color:#000000"><span 
+class="ectt-1200">=3.82</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">max</span></span><span style="color:#000000"><span 
+class="ectt-1200">=59.99</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">p</span></span><span style="color:#000000"><span 
+class="ectt-1200">(90)</span></span><span style="color:#000000"><span 
+class="ectt-1200">=49.14</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">p</span></span><span style="color:#000000"><span 
+class="ectt-1200">(95)</span></span><span style="color:#000000"><span 
+class="ectt-1200">=51.71</span></span><span style="color:#000000"><span 
 class="ectt-1200">s</span></span> 
 <span class="label"><a 
- id="x1-14026r22"></a></span><span 
+ id="x1-14027r22"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
-class="ectt-1200">data_sent</span></span><span style="color:#000000"><span 
-class="ectt-1200">......................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">727</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">kB</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">1.3</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">kB</span></span><span style="color:#000000"><span 
-class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">{</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">expected_response</span></span><span style="color:#000000"><span 
+class="ectt-1200">:</span></span><span style="color:#006699"><span 
+class="ectt-1200">true</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">}................................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">avg</span></span><span style="color:#000000"><span 
+class="ectt-1200">=14.32</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">min</span></span><span style="color:#000000"><span 
+class="ectt-1200">=227.64</span></span><span style="color:#000000"><span 
+class="ectt-1200">ms</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">med</span></span><span style="color:#000000"><span 
+class="ectt-1200">=3.81</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">max</span></span><span style="color:#000000"><span 
+class="ectt-1200">=59.72</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">p</span></span><span style="color:#000000"><span 
+class="ectt-1200">(90)</span></span><span style="color:#000000"><span 
+class="ectt-1200">=49.3</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">p</span></span><span style="color:#000000"><span 
+class="ectt-1200">(95)</span></span><span style="color:#000000"><span 
+class="ectt-1200">=51.7</span></span><span style="color:#000000"><span 
 class="ectt-1200">s</span></span> 
 <span class="label"><a 
- id="x1-14027r23"></a></span><span 
+ id="x1-14028r23"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">http_req_failed</span></span><span style="color:#000000"><span 
+class="ectt-1200">.............................................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">5.13%</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">847</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">out</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">of</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">16498</span></span> 
+<span class="label"><a 
+ id="x1-14029r24"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">http_reqs</span></span><span style="color:#000000"><span 
+class="ectt-1200">...................................................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">16498</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">32.852733/</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span> 
+<span class="label"><a 
+ id="x1-14030r25"></a></span> 
+<span class="label"><a 
+ id="x1-14031r26"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">EXECUTION</span></span> 
+<span class="label"><a 
+ id="x1-14032r27"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">iteration_duration</span></span><span style="color:#000000"><span 
+class="ectt-1200">..........................................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">avg</span></span><span style="color:#000000"><span 
+class="ectt-1200">=2</span></span><span style="color:#000000"><span 
+class="ectt-1200">m0s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">min</span></span><span style="color:#000000"><span 
+class="ectt-1200">=20.22</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">med</span></span><span style="color:#000000"><span 
+class="ectt-1200">=2</span></span><span style="color:#000000"><span 
+class="ectt-1200">m3s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">max</span></span><span style="color:#000000"><span 
+class="ectt-1200">=2</span></span><span style="color:#000000"><span 
+class="ectt-1200">m38s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">p</span></span><span style="color:#000000"><span 
+class="ectt-1200">(90)</span></span><span style="color:#000000"><span 
+class="ectt-1200">=2</span></span><span style="color:#000000"><span 
+class="ectt-1200">m10s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">p</span></span><span style="color:#000000"><span 
+class="ectt-1200">(95)</span></span><span style="color:#000000"><span 
+class="ectt-1200">=2</span></span><span style="color:#000000"><span 
+class="ectt-1200">m20s</span></span> 
+<span class="label"><a 
+ id="x1-14033r28"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">iterations</span></span><span style="color:#000000"><span 
-class="ectt-1200">.....................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">4914</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">8.620734/</span></span><span style="color:#000000"><span 
+class="ectt-1200">..................................................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">10422</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">20.753496/</span></span><span style="color:#000000"><span 
 class="ectt-1200">s</span></span> 
 <span class="label"><a 
- id="x1-14028r24"></a></span><span 
+ id="x1-14034r29"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">vus</span></span><span style="color:#000000"><span 
-class="ectt-1200">............................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">.........................................................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">3</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">min</span></span><span style="color:#000000"><span 
-class="ectt-1200">=1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=3</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">max</span></span><span style="color:#000000"><span 
-class="ectt-1200">=2520</span></span> 
+class="ectt-1200">=7520</span></span> 
 <span class="label"><a 
- id="x1-14029r25"></a></span><span 
+ id="x1-14035r30"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">vus_max</span></span><span style="color:#000000"><span 
-class="ectt-1200">........................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
-class="ectt-1200">2520</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">.....................................................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">7520</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">min</span></span><span style="color:#000000"><span 
-class="ectt-1200">=2520</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">=7520</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">max</span></span><span style="color:#000000"><span 
-class="ectt-1200">=2520</span></span>
+class="ectt-1200">=7520</span></span> 
+<span class="label"><a 
+ id="x1-14036r31"></a></span> 
+<span class="label"><a 
+ id="x1-14037r32"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">NETWORK</span></span> 
+<span class="label"><a 
+ id="x1-14038r33"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">data_received</span></span><span style="color:#000000"><span 
+class="ectt-1200">...............................................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">1.5</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">GB</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">3.1</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">MB</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span> 
+<span class="label"><a 
+ id="x1-14039r34"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
+class="ectt-1200">data_sent</span></span><span style="color:#000000"><span 
+class="ectt-1200">...................................................:</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">2.3</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">MB</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">4.5</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">kB</span></span><span style="color:#000000"><span 
+class="ectt-1200">/</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span> 
+<span class="label"><a 
+ id="x1-14040r35"></a></span> 
+<span class="label"><a 
+ id="x1-14041r36"></a></span> 
+<span class="label"><a 
+ id="x1-14042r37"></a></span> 
+<span class="label"><a 
+ id="x1-14043r38"></a></span> 
+<span class="label"><a 
+ id="x1-14044r39"></a></span><span style="color:#000000"><span 
+class="ectt-1200">running</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">(08</span></span><span style="color:#000000"><span 
+class="ectt-1200">m22</span></span><span style="color:#000000"><span 
+class="ectt-1200">.2</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"><span 
+class="ectt-1200">)</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">0000/7520</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">VUs</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">10422</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">complete</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">and</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">6329</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">interrupted</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">iterations</span></span> 
+<span class="label"><a 
+ id="x1-14045r40"></a></span><span style="color:#000000"><span 
+class="ectt-1200">planner</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[======================================]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">20</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">VUs</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">08</span></span><span style="color:#000000"><span 
+class="ectt-1200">m22</span></span><span style="color:#000000"><span 
+class="ectt-1200">.2</span></span><span style="color:#000000"><span 
+class="ectt-1200">s</span></span><span style="color:#000000"><span 
+class="ectt-1200">/10</span></span><span style="color:#000000"><span 
+class="ectt-1200">m0s</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">400/400</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">shared</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">iters</span></span> 
+<span class="label"><a 
+ id="x1-14046r41"></a></span><span style="color:#000000"><span 
+class="ectt-1200">studier</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">[======================================]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">0000/7500</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">VUs</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">7</span></span><span style="color:#000000"><span 
+class="ectt-1200">m0s</span></span>
  
 <span class="label"><a 
- id="x1-14030r26"></a></span></pre>
+ id="x1-14047r42"></a></span></pre>
    </div>
    
    <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
  id="x1-150004"></a>Debugging</h3>
-<!--l. 422--><p class="noindent" >Now we can start to debug our service. We desire to not only increase our 94% pass rate to 100% but also to
+<!--l. 450--><p class="noindent" >Now we can start to debug our service. We desire to not only increase our 92% pass rate to 100%, but also to
 increase the amount of studiers and planners.
    
-                                                                                                    
-                                                                                                    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.1    </span> <a 
  id="x1-160004.1"></a>Tips</h4>
    
-<!--l. 427--><p class="noindent" ><span class="paragraphHead"><a 
+                                                                                                    
+                                                                                                    
+<!--l. 456--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-17000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Open TaskOverflow</span></span>
    If you open TaskOverflow, you should find it has been left in an unusual state after the tests. See if you can find
 out from the logs how this occurred.
    
 </p>
-<!--l. 432--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 461--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-18000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Follow an Interaction</span></span>
    Use the correlation IDs that we have included to see where potential bottlenecks may be occurring. You can
-introduce more fine-grained logs to find where time is being spent.
+introduce more fine-grained logs to identify where time is being spent.
+   
 </p>
+   <h3 class="likesectionHead"><a 
+ id="x1-19000"></a>References</h3>
+<!--l. 1--><p class="noindent" >
+   </p><div class="thebibliography">
+   <p class="bibitem" ><span class="biblabel">
+ [1]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xprac-week6"></a>E.&#x00A0;Hughes,                        A.&#x00A0;Truffet,                        B.&#x00A0;Webb,                        and                        R.&#x00A0;Thomas,
+   &#8220;Scaling stateless components,&#8221; vol.&#x00A0;6 of <span 
+class="Cabin-Italic-tlf-t1-x-x-120">CSSE6400 Practicals</span>, The University of Queensland, April
+   2025. <a 
+href="https://csse6400.uqcloud.net/practicals/week06.pdf" class="url" ><span 
+class="ectt-1200">https://csse6400.uqcloud.net/practicals/week06.pdf</span></a>.
+   </p>
+   <p class="bibitem" ><span class="biblabel">
+ [2]<span class="bibsp">&#x00A0;&#x00A0;&#x00A0;</span></span><a 
+ id="Xlogging-slides"></a>L.&#x00A0;Le&#x00A0;Gassick, &#8220;Logging slides,&#8221; April 2024. <a 
+href="https://bit.ly/csse6400-logging-sem1-2024" class="url" ><span 
+class="ectt-1200">https://bit.ly/csse6400-logging-sem1-2024</span></a>.
+</p>
+   </div>
    <div class="footnotes"><a 
  id="x1-2002x2"></a>
-<!--l. 38--><p class="indent" >       <span class="footnote-mark"><a 
+<!--l. 46--><p class="indent" >       <span class="footnote-mark"><a 
 href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span><a 
 href="https://pypi.org/project/watchtower/" class="url" ><span 
 class="ectt-1000">https://pypi.org/project/watchtower/</span></a></p>                                                        </div>
