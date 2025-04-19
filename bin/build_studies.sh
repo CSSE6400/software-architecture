@@ -27,7 +27,7 @@ for folder in ${REPO_ROOT}/studies/*; do
 		else
             cp ./out/main.pdf "${DIST_DIR}/$(basename $folder)-instructor.pdf";
 		fi
-        cp ./out/main.pdf "${DIST_DIR}/$(basename $folder)-instructor.pdf"
+#        cp ./out/main.pdf "${DIST_DIR}/$(basename $folder)-instructor.pdf"
 		# If the writeup of the sample solution exists, copy it as well.
 		if [ -f ./out/writeup.pdf ]; then
 			cp ./out/writeup.pdf "${DIST_DIR}/$(basename $folder)-writeup.pdf"
