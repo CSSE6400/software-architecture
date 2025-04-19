@@ -17,6 +17,15 @@ for folder in ${REPO_ROOT}/studies/*; do
             exit 1
         fi
         cp ./out/main.pdf "${DIST_DIR}/$(basename $folder).pdf"
+        # Cleanup build artifacts
+        latexmk -c
+        # Build instructor version with flags enabled
+        latexmk -halt-on-error -usepretex 
+        if [ $? -ne 0 ]; then
+            echo "error: $(basename $folder) case study failed to build instructor version"
+            exit 1
+        fi
+        cp ./out/main.pdf "${DIST_DIR}/$(basename $folder)-instructor.pdf"
 		# If the writeup of the sample solution exists, copy it as well.
 		if [ -f ./out/writeup.pdf ]; then
 			cp ./out/writeup.pdf "${DIST_DIR}/$(basename $folder)-writeup.pdf"
