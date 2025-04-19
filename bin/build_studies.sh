@@ -24,6 +24,8 @@ for folder in ${REPO_ROOT}/studies/*; do
         if [ $? -ne 0 ]; then
             echo "warning: $(basename $folder) case study failed to build instructor version";
 #            exit 1
+# Fix why the instructor case study notes are not being generated.
+# See build_practical.sh as example.
 		else
             cp ./out/main.pdf "${DIST_DIR}/$(basename $folder)-instructor.pdf";
 		fi
