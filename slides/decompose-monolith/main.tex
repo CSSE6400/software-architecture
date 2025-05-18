@@ -5,10 +5,11 @@
 %\usepackage{pgfpages}
 %\setbeameroption{show notes on second screen}
 
+
 \title{Decomposing Monoliths}
 \subtitle{CSSE6400}
 \author{Richard Thomas}
-\date{\week{13}}
+\date{\week{12}}
 \titlegraphic {
     \begin{tikzpicture}[overlay,remember picture]
     \node[left=0.1cm] at (current page.-3){
@@ -40,7 +41,7 @@
 
 \questionanswer{What can be done if a monolith architecture is no longer suitable?}{
     \begin{itemize}[<+(1)->]
-        \item Greenfields replacement
+        \item Greenfield replacement
         \note<2>{Replacement
 					 \begin{itemize}
         			     \item Pro: Can choose any suitable architecture.
@@ -51,7 +52,8 @@
         \note<3>{Migration
 					 \begin{itemize}
         			     \item Adaptive maintenance, changing architecture slowly.
-        				 \item Some limitation on choice of architecture, but most sophisticated architectures can be used.
+        				 \item Some limitation on choice of architecture,
+        				       but most sophisticated architectures can be used.
         			 \end{itemize}
         			}
     \end{itemize}
@@ -60,7 +62,7 @@
 \questionanswer{How do I migrate a monolith to a new architecture?}{Decompose the monolith into services.}
 \note{Implies a service-based or micro-services architecture.}
 
-\begin{frame}{Strangler Fig Pattern}
+\begin{frame}{Strangler Fig Pattern \cite{fowler-strangler-fig}}
     \vspace{1pt}
     \begin{columns}
     \column{0.65\textwidth}
@@ -83,10 +85,10 @@
             \item Progressively replace monolith
             \item Shadow \& Blue-Green Deployment
             \note<6>{\begin{itemize}
-        			        \item Shadow deployment to test service with application.
-        				    \item Blue-Green deployment to switch over to using service.
-        	             \end{itemize}
-        	            }
+        		        \item Shadow deployment to test service with application.
+        			    \item Blue-Green deployment to switch over to using service.
+                     \end{itemize}
+                    }
         \end{itemize}
       }
     \column{0.35\textwidth}
@@ -118,6 +120,10 @@
         \includegraphics[trim=195 195 195 195,clip,width=0.97\paperwidth]{diagrams/decompose3.png}
     \end{adjustwidth}
 \end{frame}
+\note{
+    May leave some stable functionality in monolith,
+    if there is little benefit of creating services for that functionality.
+}
 
 \begin{frame}{Decomposition Process}
 \vspace{1pt}
@@ -136,18 +142,18 @@
         \LARGE\item Monolith may use services
     \end{itemize}
     \note<3>{\begin{itemize}
-    	             \item Monolith decomposition will continue.
+                 \item Monolith decomposition will continue.
                  \begin{itemize}
-    	                 \Large\item Don't want to have to refactor service once functionality is removed from monolith.
-    	                 \Large\item Don't want services to end up depending on each other.
+                     \Large\item Don't want to have to refactor service once functionality is removed from monolith.
+                     \Large\item Don't want services to end up depending on each other.
                  \end{itemize}
                  \vspace{3mm}
         	         \item Minimise changes required in monolith.
                  \begin{itemize}
-    	                 \Large\item But expect a fair bit of work removing features from monolith.
+                     \Large\item But expect a fair bit of work removing features from monolith.
                  \end{itemize}
-        	     \end{itemize}
-        	    }
+             \end{itemize}
+            }
 \end{itemize}
 }
 \end{frame}
@@ -161,10 +167,11 @@
     \begin{itemize}[<1->]
         \LARGE\item e.g. Customer account management
         \begin{itemize}[<1->]
-            \Large\item Profile, Wish List, Payment Preferences -- separate services
+            \Large\item Profile, Wish List, Payment Preferences \\~~ -- Separate Services
         \end{itemize}
     \end{itemize}
-    \note<1>{Account management may be tightly coupled in monolith.\\ Separate each aspect (context), one at a time.}
+    \note<1>{Account management may be tightly coupled in monolith.\\
+             Separate each aspect (context), one at a time.}
     \vspace{3mm}
     \item Decouple vertically
     \vspace{1mm}
@@ -174,19 +181,27 @@
             \Large\item Data is decoupled from monolith
         \end{itemize}
     \end{itemize}
+    \begin{tikzpicture}[remember picture, overlay]
+        \node[left] at (current page.-14) {
+            \includegraphics[width=0.2\textwidth]{images/cake-slice.jpg}
+            % cake-slice.jpg is copyright 2012 by Richard Thomas.
+            % It is distributed under CC BY-NC-ND 4.0 (https://creativecommons.org/licenses/by-nc-nd/4.0/).
+            % Educational use is granted by Richard Thomas, within the constraints of non-commercial usage.
+        };
+\end{tikzpicture}
     \note<2>{\begin{itemize}
-    	             \item Do not focus only on UI or internal components.
+                 \item Do not focus only on UI or internal components.
                  \begin{itemize}
-    	                 \Large\item Service needs to implement \textit{all} parts of the business process.
+                     \Large\item Service needs to implement \highlight{all} parts of the business process.
                      \begin{itemize}
                          \Large\item Slice of cake analogy, you want a vertical slice containing all layers,
                                      not just the icing on top.
                      \end{itemize}
                  \end{itemize}
                  \vspace{3mm}
-        	         \item Data management needs to be decentralised.
-        	     \end{itemize}
-        	    }
+                 \item Data management needs to be decentralised.
+             \end{itemize}
+            }
 \end{itemize}
 }
 \end{frame}
@@ -201,13 +216,13 @@
         \LARGE\item Frequently changing behaviour
     \end{itemize}
     \note<1>{\begin{itemize}
-    	             \item Extract services that deliver highest value.
+                 \item Extract services that deliver highest value.
                  \begin{itemize}
-    	                 \Large\item What contexts may need to scale more than others?
-    	                 \Large\item What contexts change more frequently and benefit from separate deployment?
+                     \Large\item What contexts may need to scale more than others?
+                     \Large\item What contexts change more frequently and benefit from separate deployment?
                  \end{itemize}
-        	     \end{itemize}
-        	    }
+             \end{itemize}
+       	    }
     \vspace{3mm}
     \item Rewrite, don't reuse
     \begin{itemize}[<2->]
@@ -220,13 +235,13 @@
         \end{itemize}
     \end{itemize}
     \note<2>{\begin{itemize}
-    	             \item Services deliver capabilities provided by monolith.
+   	             \item Services deliver capabilities provided by monolith.
                  \begin{itemize}
-    	                 \Large\item Usually it is better to rewrite the capability to take advantage of new infrastructure.
+                     \Large\item Usually it is better to rewrite the capability to take advantage of new infrastructure.
                  \end{itemize}
-    	             \item Only reuse code that has complex logic that will be difficult to duplicate and test fully.
-        	     \end{itemize}
-        	    }
+                 \item Only reuse code that has complex logic that will be difficult to duplicate and test fully.
+             \end{itemize}
+            }
 \end{itemize}
 }
 \end{frame}
@@ -266,16 +281,20 @@
 
 \definition{Macroservice}{Separate service, but may span more than one domain or share a database with the monolith or other services.}
 \note[itemize]{
-    \item Similar scalability and deployment issues to a monolith, but grouped by clusters of macroservices if they share a database.
+    \item Similar scalability and deployment issues to a monolith,
+          but grouped by clusters of macroservices if they share a database.
     \vspace{2mm}
     \item Interim step to build microservices.
 }
 
-\definition{Nanoservice}{Service that depends on other services and cannot be deployed independently -- its context is too small.}
+\definition{Nanoservice}{Service that depends on other services and cannot be deployed independently
+                         -- its context is too small.}
 \note[itemize]{
     \item Anti-pattern where services are too fine grained and need to be coupled to deliver business processes.
     \vspace{2mm}
     \item Some use the term ``nanoservice'' to refer to independently deployable functions, similar to serverless architecture.
 }
+
+\references{articles}
 
 \end{document}
