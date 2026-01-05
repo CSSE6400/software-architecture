@@ -1,6 +1,3 @@
-Last Updated on 2024/04/21
-                                                                                                    
-
 <?xml version="1.0" encoding="iso-8859-1" ?> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
@@ -23,11 +20,12 @@ dl dd {text-align: left}</style>
    <div class="maketitle"><a 
  id="Q1-1-1"></a>
 _________________________________________________________________________________________________
-<h2 class="titleHead">Distributed Systems II</h2>                                                                  Software Architecture
-   <div class="date" >March 31, 2025</div>                                                                                                                        <div class="author" >Brae Webb &amp; Richard
+<h1 class="titleHead">Distributed Systems II</h1>                                                                  Software Architecture
+   <div class="date" >March 30, 2026</div>                                                                                                                       <div class="author" >Brae Webb &amp; Richard
 Thomas</div>
 ____________________________________________________________________________________________
-   </div>
+   <span 
+class="Cabin-Regular-tlf-t1-">Last Updated on 2024/04/21 </span></div>
    
    <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
  id="x1-10001"></a>Introduction</h3>
@@ -89,12 +87,14 @@ database copies, called replicas, that reduce the load on any single replica.
 <!--l. 46--><p class="noindent" >The most common implementation of replication is leader-follower replication. Fortunately, it is also the
 simplest.
 </p><!--l. 49--><p class="indent" >
-      </p><dl class="description"><dt class="description">
+      </p><dl class="description"><dt class="description"><a 
+ id="x1-3001x2.1"></a>
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Leader</span> </dt><dd 
 class="description">
       <!--l. 50--><p class="noindent" >a replica that accepts write operations and defines the order in which writes are applied.
-      </p></dd><dt class="description">
+      </p></dd><dt class="description"><a 
+ id="x1-3002x2.1"></a>
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Follower</span> </dt><dd 
 class="description">
@@ -106,16 +106,16 @@ service is likely to primarily perform read queries, it may send those requests 
 operations, which are likely to be the majority for the product purchasing service, must still be sent to the lead
 replica<span class="footnote-mark"><a 
 href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
- id="x1-3001f1"></a>.
+ id="x1-3003f1"></a>.
 The resulting system might look like Figure <a 
-href="#x1-3003r2">2<!--tex4ht:ref: fig:sahara-leader-follower --></a>.
+href="#x1-3005r2">2<!--tex4ht:ref: fig:sahara-leader-follower --></a>.
 </p>
    <hr class="figure" /><div class="figure" 
 >
                                                                                                     
                                                                                                     
 <a 
- id="x1-3003r2"></a>
+ id="x1-3005r2"></a>
                                                                                                     
                                                                                                     
 <div class="center" 
@@ -126,7 +126,7 @@ src="diagrams/LeaderFollowerSpread.png" alt="PIC"
 width="472" height="472"  /></p></div>
 <br /> <div class="caption" 
 ><span class="id">Figure&#x00A0;2: </span><span  
-class="content">A leader-follower replication of the Sahara database.</span></div><!--tex4ht:label?: x1-3003r2 -->
+class="content">A leader-follower replication of the Sahara database.</span></div><!--tex4ht:label?: x1-3005r2 -->
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
@@ -151,20 +151,23 @@ number of hours or even days to propagate through? Despite our increased exposur
 systems, there are a few common practices to keep in mind when implementing such a system to preserve your
 users sanity.
 </p><!--l. 95--><p class="indent" >
-      </p><dl class="description"><dt class="description">
+      </p><dl class="description"><dt class="description"><a 
+ id="x1-4003x"></a>
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Read-your-writes Consistency</span> </dt><dd 
 class="description">
       <!--l. 96--><p class="noindent" >Ensures that the user who wrote the database change will always see their update reflected, though
       other users will still have to wait for the change to be propagated. This type of consistency avoids
       upsetting users and making them think they must redo their write.
-      </p></dd><dt class="description">
+      </p></dd><dt class="description"><a 
+ id="x1-4004x"></a>
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Monotonic Reads</span> </dt><dd 
 class="description">
       <!--l. 97--><p class="noindent" >Ensures that once a user reads the updated data, they do not later see the older version of the data,
       i.e. they do not travel back in time.
-      </p></dd><dt class="description">
+      </p></dd><dt class="description"><a 
+ id="x1-4005x"></a>
 <span 
 class="Cabin-Bold-tlf-t1-x-x-120">Consistent Prefix Reads</span> </dt><dd 
 class="description">
@@ -207,7 +210,7 @@ beneficial to have a separate database replica in the warehouse which can be int
 service. Such a system would isolate the warehouse operations team from the potential latency of the external
 customer load.
 </p><!--l. 129--><p class="indent" >   However, we now have a system where writes can occur in parallel. This can cause several problems. Consider
-a situation where the fulfillment center has noticed a defective  <a 
+a situation where the fulfillment center has noticed a defective <a 
 href="https://www.amazon.com.au/dp/B09LYDDDR1" >Nicholas Cage Reversible Pillow</a>. They promptly
 update their system to reflect the decreased stock. However, at around the same time, the CSSE6400 tutors
 placed a bulk order for all of Sahara&#8217;s remaining stock. Both write operations appear successful to the fulfillment
@@ -506,28 +509,32 @@ class="Cabin-Italic-tlf-t1-x-x-120">maintainable systems</span>. O&#8217;Reilly 
                                                                                                     
 </p>
    </div>
-   <div class="footnotes"><a 
- id="x1-3002x2.1"></a>
-<!--l. 66--><p class="indent" >       <span class="footnote-mark"><a 
+   <div class="footnotes">       <aside role="doc-footnote" class="footnotetext">
+<!--l. 66--><p class="noindent" ><a 
+ id="x1-3004x2.1"></a><span class="footnote-mark"><a 
 href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span><span 
-class="Cabin-Regular-tlf-t1-">Realistically, queries would be forwarded based on their type rather than their service of origin.</span></p><a 
- id="x1-4002x"></a>
-<!--l. 81--><p class="indent" >        <span class="footnote-mark"><a 
+class="Cabin-Regular-tlf-t1-">Realistically, queries would be forwarded based on their type rather than their service of origin.</span></p></aside> 
+ <aside role="doc-footnote" class="footnotetext">
+<!--l. 81--><p class="noindent" ><a 
+ id="x1-4002x"></a><span class="footnote-mark"><a 
 href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span><span 
-class="Cabin-Regular-tlf-t1-">We need not wait for writes to propagate to all followers before accepting that a write has succeeded</span></p><a 
- id="x1-8002x"></a>
-<!--l. 212--><p class="indent" >        <span class="footnote-mark"><a 
+class="Cabin-Regular-tlf-t1-">We need not wait for writes to propagate to all followers before accepting that a write has succeeded</span></p></aside> 
+ <aside role="doc-footnote" class="footnotetext">
+<!--l. 212--><p class="noindent" ><a 
+ id="x1-8002x"></a><span class="footnote-mark"><a 
 href="#fn3x0-bk" id="fn3x0"><sup class="textsuperscript">3</sup></a></span><span 
 class="Cabin-Regular-tlf-t1-">The cases where stale data can still be read are enumerated in M. Kleppmann </span><span class="cite"><span 
 class="Cabin-Regular-tlf-t1-">[</span><a 
 href="#Xdata-intensive"><span 
 class="Cabin-Regular-tlf-t1-">3</span></a><span 
 class="Cabin-Regular-tlf-t1-">]</span></span><span 
-class="Cabin-Regular-tlf-t1-">.</span></p><a 
- id="x1-11002x"></a>
-<!--l. 252--><p class="indent" >        <span class="footnote-mark"><a 
+class="Cabin-Regular-tlf-t1-">.</span></p></aside> 
+ <aside role="doc-footnote" class="footnotetext">
+<!--l. 252--><p class="noindent" ><a 
+ id="x1-11002x"></a><span class="footnote-mark"><a 
 href="#fn4x0-bk" id="fn4x0"><sup class="textsuperscript">4</sup></a></span><span 
-class="Cabin-Regular-tlf-t1-">Databases such as Cassandra use compound primary keys to help resolve this issue.</span></p>                                                              </div>
+class="Cabin-Regular-tlf-t1-">Databases such as Cassandra use compound primary keys to help resolve this issue.</span></p></aside> 
+                                                                      </div>
  
 </body></html> 
 
