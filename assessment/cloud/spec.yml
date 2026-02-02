@@ -1,37 +1,30 @@
-openapi: 3.0.4
+openapi: 3.1.0
 info:
-  title: CoughOverflow
+  title: AgeOverflow
   description: |
-    A service to analyse images of saliva samples to identify if a patient has COVID-19 or avian influenza (H5N1).
-
-    Updates in **v1.0.1**:
-    Timestamps in examples have been corrected to include seconds.
-
-    Updates in **v1.0.2**:
-    Description of the `/labs` endpoint has been updated to clarify its expected behaviour.
+    An API service for analysing photo sets to determine the users generational cohort and estimated age range.
   contact:
     name: CSSE6400
     url: https://csse6400.uqcloud.net
     email: noreply@uq.edu.au
-  version: 1.0.2
+  version: 1.1.0
 servers:
-- url: http://analysis.coughoverflow.com/api/v1
+- url: http://analysis.csse6400.uqcloud.net/api/v1
 tags:
-- name: pas
-  description: Pathogen Analysis Service
+- name: email
+  description: Age verification status
 paths:
   /health:
     get:
-      operationId: getHealth
       tags:
-      - pas
+      - analysis
       summary: Query the health of the service.
       description: |
         The health endpoint is useful for determining whether an instance is still healthy.
         This can help if you are configuring auto-scaling groups or load balancers.
 
-        We do not specify the response payload for this endpoint.
-        However, you may find it useful to return a more detailed status of your system.
+        We do not specify the response payload for this endpoint,
+        however you may find it useful to return a more detailed status of your system.
         For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
       responses:
         200:
@@ -43,642 +36,411 @@ paths:
         503:
           description: Service is not healthy.
           content: {}
-
-  /analysis:
+  /analysis/{customer_id}/requests:
     get:
-      operationId: getResult
       tags:
-      - pas
-      summary: Returns the result or current status of the specified analysis request.
-      parameters:
-      - name: request_id
-        in: query
-        description: The analysis request identifier is a UUIDv4.
-        required: true
-        schema:
-          type: string
-          example: "a8adfe49-d88f-4656-bb8c-7c2272358ccd"
-      responses:
-        200:
-          description: Get the result or current status of the analysis job.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Result'
-        404:
-          description: |
-            Analysis request identifier does not correspond to any submitted analysis requests.
-
-            Invalid request identifiers will also return 404 errors.
-            Return value is not specified but should not leak any internal system data structure information.
-          content: {}
-        500:
-          description: |
-            An unknown error occurred trying to process the request.
-
-            Return value is not specified but should describe the error.
-          content: {}
-    post:
-      operationId: submitRequest
-      tags:
-      - pas
-      summary: Request analysis of a sample.
-      description: Submits a request to process an image and classify the sample as indicative of the patient being healthy, or having COVID-19 or H5N1.
-      parameters:
-      - name: patient_id
-        in: query
-        description: |
-          The patient identifier is a Medicare number.
-
-          A valid Medicare number **must** be 11 digits in length.
-        required: true
-        schema:
-          type: string
-          example: "36295831522"
-      - name: lab_id
-        in: query
-        description: The lab identifier **must** be one from the definitive list of labs (https://csse6400.uqcloud.net/resources/labs.csv).
-        required: true
-        schema:
-          type: string
-          example: "QML40671"
-      - name: urgent
-        in: query
-        description: Flag to indicate whether this analysis has higher processing priority than a standard request.
-        required: false
-        schema:
-          type: boolean
-          example: true
-      requestBody:
-        description: |
-          Image to be analysed.
-
-          Image is a base64 encoded jpeg. The jpeg image **must** be greater than 4KB and less than 150KB in size.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Image'
-        required: true
-      responses:
-        201:
-          description: Analysis job has been successfully created.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AnalysisResponse'
-        400:
-          description: Request data was malformed or invalid.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: |
-            An unknown error occurred trying to process the request.
-
-            Return value is not specified but should describe the error.
-          content: {}
-    put:
-      operationId: updateRequest
-      tags:
-      - pas
-      summary: Update the lab associated with an analysis job.
-      description: Change the lab identifier for an analysis job to another lab's identifier.
-      parameters:
-      - name: request_id
-        in: query
-        description: |
-          The identifier of the analysis job that is to be updated.
-
-          This is a UUIDv4 that was generated by the analysis service when the analysis request was received.
-        required: true
-        schema:
-          type: string
-          example: "a8adfe49-d88f-4656-bb8c-7c2272358ccd"
-      - name: lab_id
-        in: query
-        description: |
-          The new lab identifier.
-
-          The lab identifier **must** be one from the definitive list of labs (https://csse6400.uqcloud.net/resources/labs.csv).
-        required: true
-        schema:
-          type: string
-          example: "QML40671"
-      responses:
-        200:
-          description: |
-            Analysis job has been successfully updated with the new lab identifier.
-
-            If the new and old lab identifiers are identical, it is still a valid update.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Result'
-        400:
-          description: |
-            New lab identifier is invalid.
-
-            The new lab identifier is not one from the definitive list of labs (https://csse6400.uqcloud.net/resources/labs.csv).
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: "Invalid lab identifier."
-        404:
-          description: |
-            Analysis request identifier does not correspond to any submitted analysis requests.
-
-            Invalid request identifiers will also return 404 errors.
-            Return value is not specified but should not leak any internal system data structure information.
-          content: {}
-        500:
-          description: |
-            An unknown error occurred trying to process the request.
-
-            Return value is not specified but should describe the error.
-          content: {}
-      x-codegen-request-body-name: body
-
-  /labs:
-    get:
-      operationId: getLabs
-      tags:
-      - pas
-      summary: List all labs that have submitted analysis jobs to this service.
+      - analysis
+      summary: List all submitted requests for a given customer.
       description: |
-        Returns a list of lab identifiers for all labs that have submitted analysis jobs to this service.
+        Returns a list of all requests submitted for the given customer id with the optional filters applied. The limit and offset parameters are used for stepping through blocks of users / paging through the results. If the offset is greater than the amount of entries that exist then an empty array should be returned.
+        
+        If there are no requests associated with the given customer id, an empty array should be returned.
 
-        The definitive list of lab identifiers that are allowed to use this service is available in the file that can be retrieved from
-        https://csse6400.uqcloud.net/resources/labs.csv
-      responses:
-        200:
-          description: List of lab identifiers for all labs with permission to use this service.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-                  description: Lab identifier
-                example: ["4CT24811", "4CT41221", "ACL42151", "ACL42163", "QML40671", "QML41203", "SNP40011", "SNP4570"]
-        500:
-          description: |
-            An unknown error occurred trying to process the request.
+        All other parameters are used to filter the results and should be applied before the limit and offset parameters. e.g. if 300 results exists and 200 are labelled as generation X then a request of limit=100 and generation="X" should return 100 results. If limit=100, generation="X", and offset=200 then the response should be 0 results (an empty array).
 
-            Return value is not specified but should describe the error.
-          content: {}
-      x-codegen-request-body-name: body
-
-  /labs/results/{lab_id}:
-    get:
-      operationId: getLabResults
-      tags:
-      - pas
-      summary: List all analysis jobs associated with a lab.
-      description: |
-        Returns a list of the results of all analysis jobs associated with the provided lab identifier, with the optional filters applied.
-        The `limit` and `offset` parameters are used to page through the results.
-        If the offset is greater than the amount of analysis jobs associated with that lab identifier, then an empty array should be returned.
-
-        If there are no analysis jobs associated with the lab identifier, an empty array should be returned.
-
-        All other parameters are used to filter the results and should be applied before the `limit` and `offset` parameters.
-        (e.g. If 300 analysis jobs exist and 20 have a h5n1 result, then a request of `limit=10` and `status="h5n1"` should return 10 results.
-        If `limit=10`, `status="h5n1"`, and `offset=25` then the response should be 0 results (an empty array).)
-
-        **The filters are additive, and as such, if the filter is not in the request then it should not be applied.
-        (e.g. If the `status` parameter is not in the request, then the results of all analysis jobs should be returned regardless of their status.
-        The exception to this is the `limit` and `offset` parameters. They have defaults which are applied if they are not in the request.)**
+        The filters are additive and as such if the filter is not in the request then it should not be applied. e.g. if generation="X" is not in the request then all requests should be returned regardless of their malicious status. The exception to this is the limit and offset parameters which have defaults which are applied if they are not in the request.
       parameters:
-      - name: lab_id
+      - name: customer_id
         in: path
-        description: The lab identifier **must** be one from the definitive list of labs (https://csse6400.uqcloud.net/resources/labs.csv).
+        description: The customer identifier is a UUIDv4.
         required: true
         schema:
           type: string
-          example: "QML40671"
       - name: limit
         in: query
-        description: Returns up to a maximum of the specified number of results, 0 < limit <= 1000. **Default is 100**.
-        required: false
+        description: Returns only this many results, 0 < limit <= 1000. Default is 100.
         schema:
           type: integer
           minimum: 1
           maximum: 1000
           default: 100
-          example: 20
+        example: 20
       - name: offset
         in: query
-        description: Skip this many results before returning, 0 <= offset. **Default is 0**.
-        required: false
+        description: Skip this many results before returning, 0 <= offset. Default is 0.
         schema:
           type: integer
           minimum: 0
           default: 0
-          example: 10
+        example: 0
       - name: start
         in: query
         description: |
-          Only return analysis jobs submitted from this date.
-          The date **must** be in RFC3339 format.
-        required: false
+          Only return results submitted from this date.
+          The date should be in RFC3339 format.
         schema:
           type: string
           format: date-time
-          example: 2025-03-12T13:00:01Z
+          example: 2026-02-21T13:10:05Z
       - name: end
         in: query
         description: |
-          Only return analysis jobs submitted before this date.
-          The date **must** be in RFC3339 format.
-        required: false
+          Only return results submitted before this date.
+          The date should be in RFC3339 format.
         schema:
           type: string
           format: date-time
-          example: 2025-03-12T14:00:01Z
-      - name: patient_id
+          example: 2026-02-21T14:10:05Z
+      - name: user_id
         in: query
         description: |
-          Only return analysis jobs for this patient identifier.
-          The patient identifier **must** be an eleven digit Medicare number.
-        required: false
+          Only return results submitted with this user identifier. The user identifier is a UUID.
         schema:
           type: string
-          example: "36295831522"
-      - name: status
+      - name: state
         in: query
         description: |
-          Only return analysis jobs with this status.
-          The state **must** be one of 'pending', 'covid', 'h5n1', 'healthy', or 'failed'.
-        required: false
+          Only return requests with this state.
+          The state should be one of 'pending', 'scanned', 'failed'.
         schema:
           type: string
           enum:
             - pending
-            - covid
-            - h5n1
-            - healthy
+            - scanned
             - failed
-          example: 'h5n1'
-      - name: urgent
+        example: 'scanned'
+      - name: generation
         in: query
-        description: Only return analysis jobs that were flagged as being urgent.
-        required: false
+        description: |
+          Only return requests that have the highest chance of this generation.
         schema:
-          type: boolean
-          example: true
+          type: string
+          enum:
+            - 'GENERATION_SILENT'
+            - 'GENERATION_BABY_BOOMERS'
+            - 'GENERATION_X'
+            - 'GENERATION_Y'
+            - 'GENERATION_Z'
+            - 'GENERATION_ALPHA'
+            - 'GENERATION_BETA'
       responses:
         200:
-          description: |
-            List of results of all analysis jobs for this lab.
-
-            After applying the specified filters.
+          description: List of all results, with the filters applied.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Result'
+                  $ref: '#/components/schemas/Analysis'
         400:
           description: |
-            Invalid query parameters.
+            Invalid customer_id or query parameters.
 
             Return value is not specified but should describe the error.
-          content: {}
-        404:
-          description: |
-            Lab identifier does not correspond to a known lab.
-
-            Return value is not specified but should not leak any internal system data structure information.
-          content: {}
         500:
           description: |
             An unknown error occurred trying to process the request.
 
             Return value is not specified but should describe the error.
-          content: {}
-      x-codegen-request-body-name: body
-
-  /labs/results/{lab_id}/summary:
-    get:
-      operationId: getLabResultsSummary
+    post:
       tags:
-      - pas
-      summary: Summary of analysis jobs associated with this lab.
+      - analysis
+      summary: Post a new analysis request.
       description: |
-        Returns how many analysis jobs are associated with this lab.
-        This includes analysis jobs updated to be associated with this lab.
-
-        Data is summarised by each status type.
+        If the customer account does not exist, it will be created.
       parameters:
-      - name: lab_id
+      - name: customer_id
         in: path
-        description: The lab identifier **must** be one from the definitive list of labs (https://csse6400.uqcloud.net/resources/labs.csv).
+        description: The customer identifier is a UUID.
         required: true
         schema:
           type: string
-          example: "QML40671"
-      - name: start
-        in: query
-        description: |
-          Only return the number of analysis jobs submitted from this date.
-          The date **must** be in RFC3339 format.
-
-          If the start date is not provided, the report should start from the earliest accepted analysis job.
-        required: false
-        schema:
-          type: string
-          format: date-time
-          example: 2025-03-12T08:00:01Z
-      - name: end
-        in: query
-        description: |
-          Only return the number of analysis jobs submitted before this date.
-          The date **must** be in RFC3339 format.
-
-          If the end date is not provided, the report should finish with the most recently accepted analysis job.
-        required: false
-        schema:
-          type: string
-          format: date-time
-          example: 2025-03-15T18:00:01Z
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalysisCreate'
+        required: true
       responses:
-        200:
-          description: Summary of the number of analysis jobs submitted.
+        201:
+          description: The analysis request has been successfully created.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Summary'
+                $ref: '#/components/schemas/Analysis'
         400:
           description: |
-            Invalid query parameters.
+            Body/Path parameter was malformed or invalid.
 
-            Return value is not specified but should describe the error
-            (e.g. "13 is not a valid month").
-          content: {}
-        404:
-          description: |
-            Lab identifier does not correspond to a known lab.
-
-            Return value is not specified but should not leak any internal system data structure information.
+            Return value is not specified but should describe the error.
           content: {}
         500:
           description: |
             An unknown error occurred trying to process the request.
 
             Return value is not specified but should describe the error.
-          content: {}
       x-codegen-request-body-name: body
-
-  /patients/results:
+  /analysis/{customer_id}/requests/{request_id}:
     get:
-      operationId: getPatientResults
       tags:
-      - pas
-      summary: List all analysis jobs associated with a patient.
+      - analysis
+      summary: Get request by identifier.
       description: |
-        Returns a list of the results of all analysis jobs associated with the provided patient identifier, with the optional filters applied.
-
-        **The filters are additive, and as such, if the filter is not in the request then it should not be applied.
-        (e.g. If `status` parameter is not in the request, then the results of all analysis jobs should be returned regardless of their status.)**
+        Returns a individual result by its ID.
       parameters:
-      - name: patient_id
-        in: query
-        description: The patient identifier **must** be an eleven digit Medicare number.
+      - name: customer_id
+        in: path
+        description: The customer identifier. 
         required: true
         schema:
           type: string
-          example: "36295831522"
-      - name: start
-        in: query
-        description: |
-          Only return results of analysis jobs submitted from this date.
-          The date **must** be in RFC3339 format.
-        required: false
+      - name: request_id
+        in: path
+        description: The requests identifier.
+        required: true
         schema:
           type: string
-          format: date-time
-          example: 2025-03-12T13:00:01Z
-      - name: end
-        in: query
-        description: |
-          Only return results of analysis jobs submitted before this date.
-          The date **must** be in RFC3339 format.
-        required: false
-        schema:
-          type: string
-          format: date-time
-          example: 2025-03-12T14:00:01Z
-      - name: status
-        in: query
-        description: |
-          Only return results of analysis jobs with this status.
-          The state **must** be one of 'pending', 'covid', 'h5n1', 'healthy', or 'failed'.
-        required: false
-        schema:
-          type: string
-          enum:
-            - pending
-            - covid
-            - h5n1
-            - healthy
-            - failed
-          example: 'h5n1'
-      - name: urgent
-        in: query
-        description: Only return results of analysis jobs that were flagged as being urgent.
-        required: false
-        schema:
-          type: boolean
-          example: true
       responses:
         200:
+          description: List of all recipients, who are associated with this customer, who have received malicious email.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Analysis'
+        500:
           description: |
-            List of results of all analysis jobs for this patient.
+            An unknown error occurred trying to process the request.
 
-            After applying the specified filters.
+            Return value is not specified but should describe the error.
+  /analysis/{customer_id}/users:
+    get:
+      tags:
+      - analysis
+      summary: List all users for a given customer.
+      description: |
+        Returns a list of all users for the given customer id with the optional filters applied. The limit and offset parameters are used for stepping through blocks of users / paging through the results. If the offset is greater than the amount of entries that exist then an empty array should be returned.
+        
+        If there are no users associated with the given customer id, an empty array should be returned.
+      parameters:
+      - name: customer_id
+        in: path
+        description: The customer identifier is a UUID.
+        required: true
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Returns only this many results, 0 < limit <= 1000. Default is 100.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 1000
+          default: 100
+        example: 20
+      - name: offset
+        in: query
+        description: Skip this many results before returning, 0 <= offset. Default is 0.
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+        example: 0
+      responses:
+        200:
+          description: List of all results, with the filters applied.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Result'
+                  $ref: '#/components/schemas/User'
         400:
           description: |
-            Invalid query parameters.
+            Invalid customer_id or query parameters.
 
             Return value is not specified but should describe the error.
-          content: {}
-        404:
-          description: |
-            Patient identifier does not correspond to a known patient.
-
-            Invalid patient identifiers will also return 404 errors.
-            Return value is not specified but should not leak any internal system data structure information.
-          content: {}
         500:
           description: |
             An unknown error occurred trying to process the request.
 
             Return value is not specified but should describe the error.
-          content: {}
-      x-codegen-request-body-name: body
+  /analysis/{customer_id}/users/{user_id}:
+    get:
+      tags:
+      - analysis
+      summary: Get user by identifier.
+      description: |
+        Returns a individual user by its ID.
+      parameters:
+      - name: customer_id
+        in: path
+        description: The customer identifier. 
+        required: true
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        description: The users identifier.
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Individual user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        500:
+          description: |
+            An unknown error occurred trying to process the request.
 
+            Return value is not specified but should describe the error.
+  /analysis/{customer_id}/statistics:
+    get:
+      tags:
+      - analysis
+      summary: Get statistics for this client.
+      description: |
+        Returns a report of general statistics of the client. This report should be kept up-to-date with a maximum of five minutes delay.
+      parameters:
+      - name: customer_id
+        in: path
+        description: The customer identifier is a UUID.
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: A report consisting of key statistics of the client
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Statistics'
+        500:
+          description: |
+            An unknown error occurred trying to process the request.
+
+            Return value is not specified but should describe the error.
 components:
   schemas:
-    AnalysisResponse:
+    User:
       type: object
       properties:
         id:
           type: string
-          description: |
-            The analysis job's unique identifier.
-            This is a UUIDv4 that is generated by the analysis service when the analysis request is received.
-          example: "a8adfe49-d88f-4656-bb8c-7c2272358ccd"
+          description: The users unique identifier.
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: The requests unique identifier
+              status:
+                type: string
+                enum:
+                  - success
+                  - failed
+                description: The status of the analysis for those in a finished state.
+                example: "success"
+              checksum:
+                type: string
+                description: Checksum to check for internal CSSE6400 validation.
+              generation:
+                type: string
+                description: The primary generation of the request if success.
+              age:
+                type: number
+                description: The age of the user via the given request.
+    Analysis:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The requests unique identifier.
+        user_id:
+          type: string
+          description: The user identifier that this request is associated to.
         created_at:
           type: string
           format: date-time
-          description: The date and time the analysis request was received.
-          example: 2025-03-12T13:10:05Z
+          description: The date and time the request was submitted.
+          example: 2024-02-21T13:10:05Z
         updated_at:
           type: string
           format: date-time
-          description: The date and time the analysis job was last updated, including creation and completion of analysis.
-          example: 2025-02-12T13:10:05Z
+          description: The date and time the request was updated including its creation.
+          example: 2024-02-21T13:10:05Z
+        checksum:
+          type: string
+        generations:
+          type: object
+          properties:
+            generation_silent:
+              type: number
+            generation_baby_boomers:
+              type: number
+            generation_x:
+              type: number
+            generation_y:
+              type: number
+            generation_z:
+              type: number
+            generation_alpha:
+              type: number
+            generation_beta:
+              type: number
+        primary_generation:
+          type: string
+          enum:
+            - 'GENERATION_SILENT'
+            - 'GENERATION_BABY_BOOMERS'
+            - 'GENERATION_X'
+            - 'GENERATION_Y'
+            - 'GENERATION_Z'
+            - 'GENERATION_ALPHA'
+            - 'GENERATION_BETA'
+        age:
+          type: number
         status:
           type: string
           enum:
             - pending
-            - covid
-            - h5n1
-            - healthy
+            - success
             - failed
-          description: The status of the analysis job.
+          description: The status of the analysis.
           default: "pending"
-          example: "pending"
-        
-    Image:
-     type: object
-     properties:
-       image:
-         type: string
-         description: Base64 encoding of the image to be analysed.
-         example: "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAVAB0DASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9NoPG+i3MtnFDeCV7qQxxqsbZyOPm4+UHIwT1yCMjmvFP2hNLvfiIttNcfETUPh38PPDsk1/r8+kSvb3N9FGuFXz0IZIw+SQudwA7kYzdG8QpovjZby1tRLDbIZhbyuyM8eJAo+7yQMfN0yB61teKNcs/C+kXaa7bGfRSZLPVS1qLqOOI5DNJDtbfGSADgHGc4wCR+C4zjXFV54WlKPLGVf2dRQdm48miUpNJc8nJqzTtFK6e/wBJLLo01Jxd3y3V+9+y7K33nP8Ajjwz4M8YeHNG8Map4+1DQbfW5Et9P1TSLtrW81CQQswBkjUFeBvYHaMqAeCVPrnww1O/8LeEdP8AD3i3XV1nW9Jt47SfWXj8s37INplZcnDnbluepz3rwe4+Ofweih06OylOuzaZIsml2tr4eLeVMo2x+QJIwiMM4UrjHQcV31tpGueLLG0kaArqSQpJexxNuCSuMsM9+Q3PeuPB4nFcKSwuCwGHnz1alZum5xneC5nBrllLlcY8t2rXaabeg54aVa88RorKzs12vuldHq6/DXw3Hqo1FdMVLoEEbZpBHwcj93u24B7YxVbxv4Ugu4Z9UhkNvcon70BdyzAccj1xxn09eMFFfsuZZLluNwVXC16EXCWrVrapaPSzv57ni0sRVhUjJSd0eIeDfAegXHjITWOjafpt7I20XMVuCUJ6lRkAH6Yr6O0LQrbw/Yi2twWydzyP96RvU0UV8B4eZbhY4WePcL1ruHM22+VWslduy9N+p6+cYmtVqKE5NqyP/9k="
-# Metadata not used in the 2025 scalability assignment.
-#        metadata:
-#          type: object
-#          properties:
-#            engine:
-#              type: string
-#              description: Analysis engine metadata for this image.
-#              example: "1|14"
-
-    Result:
+          example: "success"
+    AnalysisCreate:
       type: object
       properties:
-        request_id:
-          type: string
-          description: |
-            The analysis job's unique identifier.
-            This is a UUIDv4 that was generated by the analysis service when the analysis request was received.
-          example: "a8adfe49-d88f-4656-bb8c-7c2272358ccd"
-        lab_id:
-          type: string
-          description: The lab identifier associated with this analysis job.
-          example: "QML40671"
-        patient_id:
-          type: string
-          description: The Medicare number of the patient associated with this analysis job.
-          example: "36295831522"
-        result:
-          type: string
-          enum:
-            - pending
-            - covid
-            - h5n1
-            - healthy
-            - failed
-          description: The result or status of the analysis job.
-          example: "covid"
-        urgent:
-          type: boolean
-          description: Whether the request was flagged as being urgent.
-          example: true
-        created_at:
-          type: string
-          format: date-time
-          description: The date and time the analysis request was received.
-          example: 2025-03-12T13:10:05Z
-        updated_at:
-          type: string
-          format: date-time
-          description: The date and time the analysis job was last updated, including creation and completion of analysis.
-          example: 2025-03-12T13:17:23Z
-
-    Summary:
+        contents:
+          type: object
+          description: ....
+          properties:
+            urgent:
+              type: boolean
+              description: Flag to indicate whether this analysis has higher processing priority than a standard request.
+    AnalysisGeneration:
       type: object
       properties:
-        lab_id:
-          type: string
-          description: The lab identifier of the lab who's data is being summarised.
-          example: "QML40671"
-        pending:
-          type: integer
-          description: The number of analysis jobs that are currently still pending.
-          minimum: 0
-          example: 5
-        covid:
-          type: integer
-          description: The number of COVID-19 cases that have been identified.
-          minimum: 0
-          example: 150
-        h5n1:
-          type: integer
-          description: The number of H5N1 cases that have been identified.
-          minimum: 0
-          example: 65
-        healthy:
-          type: integer
-          description: The number of tests that reported that the patient was healthy.
-          minimum: 0
-          example: 355
-        failed:
-          type: integer
-          description: The number of analysis jobs that failed.
-          minimum: 0
-          example: 15
-        urgent:
-          type: integer
-          description: The number of analysis jobs that were flagged as being urgent.
-          minimum: 0
-          example: 50
+        percentage:
+          type: number
+          description: ..
+    Statistics:
+      type: object
+      properties:
         generated_at:
           type: string
           format: date-time
-          description: The date and time that this summary was created.
-          example: 2025-03-20T17:10:00Z
-
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          enum:
-            - missing_patient_id
-            - invalid_patient_id
-            - missing_lab_id
-            - invalid_lab_id
-            - no_image
-            - invalid_image
-            - image_size
-            - unknown_error
-          description: Error code indicating the problem with the request data.
-          example: "image_size"
-        detail:
-          type: string
-          description: |
-            Additional information about the error.
-
-            No specific information is required but informative error messages are beneficial in debugging.
-          example: "Image was too large (>150KB). Uploaded image size was 4528764 bytes."
+          description: The date and time these statistics are valid for (or the current time if statistics are always live)
+          example: 2024-02-21T13:10:05Z
+        contents:
+          type: object
+          description: ... Total num of users, count of users per generation, normalised bucket of age ranges per 5 years
+          properties:
+            placeholder:
+              type: string
