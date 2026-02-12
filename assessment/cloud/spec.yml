@@ -1,4 +1,4 @@
-openapi: 3.1.0
+openapi: 3.1.1
 info:
   title: AgeOverflow
   description: |
@@ -7,7 +7,7 @@ info:
     name: CSSE6400
     url: https://csse6400.uqcloud.net
     email: noreply@uq.edu.au
-  version: 1.1.0
+  version: 0.9
 servers:
 - url: http://analysis.csse6400.uqcloud.net/api/v1
 tags:
@@ -46,9 +46,9 @@ paths:
         
         If there are no requests associated with the given customer id, an empty array should be returned.
 
-        All other parameters are used to filter the results and should be applied before the limit and offset parameters. e.g. if 300 results exists and 200 are labelled as generation X then a request of limit=100 and generation="X" should return 100 results. If limit=100, generation="X", and offset=200 then the response should be 0 results (an empty array).
+        All other parameters are used to filter the results and should be applied before the limit and offset parameters. e.g. if 300 results exists and 200 are labelled as generation X then a request of limit=100 and generation="GENERATION_X" should return 100 results. If limit=100, generation="GENERATION_X", and offset=200 then the response should be 0 results (an empty array).
 
-        The filters are additive and as such if the filter is not in the request then it should not be applied. e.g. if generation="X" is not in the request then all requests should be returned regardless of their malicious status. The exception to this is the limit and offset parameters which have defaults which are applied if they are not in the request.
+        The filters are additive and as such if the filter is not in the request then it should not be applied. e.g. if generation="GENERATION_X" is not in the request then all requests should be returned regardless of their status. The exception to this is the limit and offset parameters which have defaults which are applied if they are not in the request.
       parameters:
       - name: customer_id
         in: path
@@ -58,7 +58,10 @@ paths:
           type: string
       - name: limit
         in: query
-        description: Returns only this many results, 0 < limit <= 1000. Default is 100.
+        description: |
+          Return only this many results.
+          0 < limit <= 1000.
+          Default is 100.
         schema:
           type: integer
           minimum: 1
@@ -67,7 +70,10 @@ paths:
         example: 20
       - name: offset
         in: query
-        description: Skip this many results before returning, 0 <= offset. Default is 0.
+        description: |
+          Skip this many results before returning.
+          0 <= offset.
+          Default is 0.
         schema:
           type: integer
           minimum: 0
@@ -94,9 +100,11 @@ paths:
       - name: user_id
         in: query
         description: |
-          Only return results submitted with this user identifier. The user identifier is a UUID.
+          Only return results submitted with this user identifier.
+          The user identifier is a UUIDv4.
         schema:
           type: string
+        example: 'b6a6671c-f04c-47f8-a4d3-11374f0d75cb'
       - name: state
         in: query
         description: |
@@ -112,7 +120,7 @@ paths:
       - name: generation
         in: query
         description: |
-          Only return requests that have the highest chance of this generation.
+          Only return requests that have the highest chance of being from this generation.
         schema:
           type: string
           enum:
@@ -123,6 +131,7 @@ paths:
             - 'GENERATION_Z'
             - 'GENERATION_ALPHA'
             - 'GENERATION_BETA'
+          example: 'GENERATION_ALPHA'
       responses:
         200:
           description: List of all results, with the filters applied.
@@ -151,7 +160,7 @@ paths:
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier is a UUID.
+        description: The customer identifier is a UUIDv4.
         required: true
         schema:
           type: string
@@ -196,17 +205,29 @@ paths:
           type: string
       - name: request_id
         in: path
-        description: The requests identifier.
+        description: The request identifier.
         required: true
         schema:
           type: string
       responses:
         200:
-          description: List of all recipients, who are associated with this customer, who have received malicious email.
+          description: Details of the request and its current status are returned.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Analysis'
+        400:
+          description: |
+            Path parameters were malformed or invalid.
+
+            Return value is not specified but should describe the error.
+          content: {}
+        404:
+          description: |
+            customer_id or request_id are not found in the database.
+
+            Return value is not specified but should describe the error.
+          content: {}
         500:
           description: |
             An unknown error occurred trying to process the request.
@@ -224,13 +245,16 @@ paths:
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier is a UUID.
+        description: The customer identifier is a UUIDv4.
         required: true
         schema:
           type: string
       - name: limit
         in: query
-        description: Returns only this many results, 0 < limit <= 1000. Default is 100.
+        description: |
+          Return only this many results.
+          0 < limit <= 1000.
+          Default is 100.
         schema:
           type: integer
           minimum: 1
@@ -239,12 +263,15 @@ paths:
         example: 20
       - name: offset
         in: query
-        description: Skip this many results before returning, 0 <= offset. Default is 0.
+        description: |
+          Skip this many results before returning.
+          0 <= offset.
+          Default is 0.
         schema:
           type: integer
           minimum: 0
           default: 0
-        example: 0
+        example: 40
       responses:
         200:
           description: List of all results, with the filters applied.
@@ -270,17 +297,17 @@ paths:
       - analysis
       summary: Get user by identifier.
       description: |
-        Returns a individual user by its ID.
+        Return an individual user by their ID.
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier. 
+        description: The customer identifier is a UUIDv4. 
         required: true
         schema:
           type: string
       - name: user_id
         in: path
-        description: The users identifier.
+        description: The user's identifier is a UUIDv4.
         required: true
         schema:
           type: string
@@ -291,6 +318,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        400:
+          description: |
+            Path parameters were malformed or invalid.
+
+            Return value is not specified but should describe the error.
+          content: {}
+        404:
+          description: |
+            customer_id or user_id are not found in the database.
+
+            Return value is not specified but should describe the error.
+          content: {}
         500:
           description: |
             An unknown error occurred trying to process the request.
@@ -306,7 +345,7 @@ paths:
       parameters:
       - name: customer_id
         in: path
-        description: The customer identifier is a UUID.
+        description: The customer identifier is a UUIDv4.
         required: true
         schema:
           type: string
@@ -318,6 +357,18 @@ paths:
               schema:
                 type: object
                 $ref: '#/components/schemas/Statistics'
+        400:
+          description: |
+            Path parameter was malformed or invalid.
+
+            Return value is not specified but should describe the error.
+          content: {}
+        404:
+          description: |
+            customer_id is not found in the database.
+
+            Return value is not specified but should describe the error.
+          content: {}
         500:
           description: |
             An unknown error occurred trying to process the request.
@@ -330,7 +381,8 @@ components:
       properties:
         id:
           type: string
-          description: The users unique identifier.
+          description: The user's unique identifier.
+          example: "b6a6671c-f04c-47f8-a4d3-11374f0d75cb"
         results:
           type: array
           items:
@@ -338,20 +390,22 @@ components:
             properties:
               id:
                 type: string
-                description: The requests unique identifier
+                description: The request's unique identifier
+                example: "7635bd23-ced9-4f6f-9fae-afe52625d699"
               status:
                 type: string
                 enum:
+                  - pending
                   - success
                   - failed
-                description: The status of the analysis for those in a finished state.
+                description: The status of the analysis.
                 example: "success"
               checksum:
                 type: string
                 description: Checksum to check for internal CSSE6400 validation.
               generation:
                 type: string
-                description: The primary generation of the request if success.
+                description: The primary generation of the request, if success.
               age:
                 type: number
                 description: The age of the user via the given request.
@@ -360,10 +414,12 @@ components:
       properties:
         id:
           type: string
-          description: The requests unique identifier.
+          description: The request's unique identifier.
+          example: "7635bd23-ced9-4f6f-9fae-afe52625d699"
         user_id:
           type: string
-          description: The user identifier that this request is associated to.
+          description: The user identifier to which this request is associated.
+          example: "b6a6671c-f04c-47f8-a4d3-11374f0d75cb"
         created_at:
           type: string
           format: date-time
@@ -372,7 +428,7 @@ components:
         updated_at:
           type: string
           format: date-time
-          description: The date and time the request was updated including its creation.
+          description: The date and time the request was updated, including its creation.
           example: 2024-02-21T13:10:05Z
         checksum:
           type: string
@@ -423,15 +479,18 @@ components:
           properties:
             user_id:
               type: string
-              description: The user identifier that this request is associated to.
+              description: The user identifier to which this request is associated.
+              example: "b6a6671c-f04c-47f8-a4d3-11374f0d75cb"
             urgent:
               type: boolean
-              description: Flag to indicate whether this analysis has higher processing priority than a standard request.
+              description: Flag to indicate whether this analysis request has higher processing priority than a standard request.
+              default: false
+              example: true
             photos:
               type: array
               items:
                 type: string
-              description: Post processed images encoded in base64 (for the purpose of this assignment these are not real images)
+              description: Post processed images encoded in base64 (for the purpose of this assignment these are not real images).
     Statistics:
       type: object
       properties:
