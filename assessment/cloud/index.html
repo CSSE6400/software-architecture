@@ -849,11 +849,13 @@
   "properties" : {
     "id" : {
       "type" : "string",
-      "description" : "The requests unique identifier."
+      "description" : "The request's unique identifier.",
+      "example" : "7635bd23-ced9-4f6f-9fae-afe52625d699"
     },
     "user_id" : {
       "type" : "string",
-      "description" : "The user identifier that this request is associated to."
+      "description" : "The user identifier to which this request is associated.",
+      "example" : "b6a6671c-f04c-47f8-a4d3-11374f0d75cb"
     },
     "created_at" : {
       "type" : "string",
@@ -863,7 +865,7 @@
     },
     "updated_at" : {
       "type" : "string",
-      "description" : "The date and time the request was updated including its creation.",
+      "description" : "The date and time the request was updated, including its creation.",
       "format" : "date-time",
       "example" : "2024-02-21T13:10:05.000+00:00"
     },
@@ -900,15 +902,18 @@
   "properties" : {
     "user_id" : {
       "type" : "string",
-      "description" : "The user identifier that this request is associated to."
+      "description" : "The user identifier to which this request is associated.",
+      "example" : "b6a6671c-f04c-47f8-a4d3-11374f0d75cb"
     },
     "urgent" : {
       "type" : "boolean",
-      "description" : "Flag to indicate whether this analysis has higher processing priority than a standard request."
+      "description" : "Flag to indicate whether this analysis request has higher processing priority than a standard request.",
+      "example" : true,
+      "default" : false
     },
     "photos" : {
       "type" : "array",
-      "description" : "Post processed images encoded in base64 (for the purpose of this assignment these are not real images)",
+      "description" : "Post processed images encoded in base64 (for the purpose of this assignment these are not real images).",
       "items" : {
         "type" : "string"
       }
@@ -966,7 +971,8 @@
   "properties" : {
     "id" : {
       "type" : "string",
-      "description" : "The users unique identifier."
+      "description" : "The user's unique identifier.",
+      "example" : "b6a6671c-f04c-47f8-a4d3-11374f0d75cb"
     },
     "results" : {
       "type" : "array",
@@ -980,13 +986,14 @@
   "properties" : {
     "id" : {
       "type" : "string",
-      "description" : "The requests unique identifier"
+      "description" : "The request's unique identifier",
+      "example" : "7635bd23-ced9-4f6f-9fae-afe52625d699"
     },
     "status" : {
       "type" : "string",
-      "description" : "The status of the analysis for those in a finished state.",
+      "description" : "The status of the analysis.",
       "example" : "success",
-      "enum" : [ "success", "failed" ]
+      "enum" : [ "pending", "success", "failed" ]
     },
     "checksum" : {
       "type" : "string",
@@ -994,7 +1001,7 @@
     },
     "generation" : {
       "type" : "string",
-      "description" : "The primary generation of the request if success."
+      "description" : "The primary generation of the request, if success."
     },
     "age" : {
       "type" : "number",
@@ -1055,7 +1062,7 @@
         <div id="header">
           <div id="api-_">
             <!-- <h2 id="welcome-to-apidoc">API and SDK Documentation</h2> -->
-              <div class="app-desc">Version: 1.1.0</div>
+              <div class="app-desc">Version: 0.9</div>
             <hr>
             <div id="app-description" class="app-desc">
                 An API service for analysing photo sets to determine the users generational cohort and estimated age range.
@@ -1079,9 +1086,9 @@
 
 If there are no requests associated with the given customer id, an empty array should be returned.
 
-All other parameters are used to filter the results and should be applied before the limit and offset parameters. e.g. if 300 results exists and 200 are labelled as generation X then a request of limit&#x3D;100 and generation&#x3D;&quot;X&quot; should return 100 results. If limit&#x3D;100, generation&#x3D;&quot;X&quot;, and offset&#x3D;200 then the response should be 0 results (an empty array).
+All other parameters are used to filter the results and should be applied before the limit and offset parameters. e.g. if 300 results exists and 200 are labelled as generation X then a request of limit&#x3D;100 and generation&#x3D;&quot;GENERATION_X&quot; should return 100 results. If limit&#x3D;100, generation&#x3D;&quot;GENERATION_X&quot;, and offset&#x3D;200 then the response should be 0 results (an empty array).
 
-The filters are additive and as such if the filter is not in the request then it should not be applied. e.g. if generation&#x3D;&quot;X&quot; is not in the request then all requests should be returned regardless of their malicious status. The exception to this is the limit and offset parameters which have defaults which are applied if they are not in the request.
+The filters are additive and as such if the filter is not in the request then it should not be applied. e.g. if generation&#x3D;&quot;GENERATION_X&quot; is not in the request then all requests should be returned regardless of their status. The exception to this is the limit and offset parameters which have defaults which are applied if they are not in the request.
 </p>
                         <p></p>
                         <br />
@@ -1089,7 +1096,7 @@ The filters are additive and as such if the filter is not in the request then it
                         <h3>Curl Request Example</h3>
                         <pre class="prettyprint"><code class="language-bsh">curl -X GET \
  -H "Accept: application/json" \
- "http://analysis.csse6400.uqcloud.net/api/v1/analysis/{customer_id}/requests?limit=20&offset=0&start=2026-02-21T13:10:05Z&end=2026-02-21T14:10:05Z&user_id=userId_example&state=scanned&generation=generation_example"
+ "http://analysis.csse6400.uqcloud.net/api/v1/analysis/{customer_id}/requests?limit=20&offset=0&start=2026-02-21T13:10:05Z&end=2026-02-21T14:10:05Z&user_id=b6a6671c-f04c-47f8-a4d3-11374f0d75cb&state=scanned&generation=GENERATION_ALPHA"
 </code></pre>
 
                           <h2 class="methodsubtabletitle">Path parameters</h2>
@@ -1143,7 +1150,10 @@ The filters are additive and as such if the filter is not in the request then it
                                                 </span>
                                 
                                                     <div class="inner description marked">
-                                Returns only this many results, 0 &lt; limit &lt;&#x3D; 1000. Default is 100.
+                                Return only this many results.
+0 &lt; limit &lt;&#x3D; 1000.
+Default is 100.
+
                                                     </div>
                                             </div>
                                                                         </div>
@@ -1162,7 +1172,10 @@ The filters are additive and as such if the filter is not in the request then it
                                                 </span>
                                 
                                                     <div class="inner description marked">
-                                Skip this many results before returning, 0 &lt;&#x3D; offset. Default is 0.
+                                Skip this many results before returning.
+0 &lt;&#x3D; offset.
+Default is 0.
+
                                                     </div>
                                             </div>
                                                                         </div>
@@ -1229,7 +1242,8 @@ The date should be in RFC3339 format.
                                                 </span>
                                 
                                                     <div class="inner description marked">
-                                Only return results submitted with this user identifier. The user identifier is a UUID.
+                                Only return results submitted with this user identifier.
+The user identifier is a UUIDv4.
 
                                                     </div>
                                             </div>
@@ -1270,7 +1284,7 @@ The state should be one of &#39;pending&#39;, &#39;scanned&#39;, &#39;failed&#39
                                                 </span>
                                 
                                                     <div class="inner description marked">
-                                Only return requests that have the highest chance of this generation.
+                                Only return requests that have the highest chance of being from this generation.
 
                                                     </div>
                                             </div>
@@ -1495,7 +1509,7 @@ Return value is not specified but should describe the error.
  "http://analysis.csse6400.uqcloud.net/api/v1/analysis/{customer_id}/requests" \
  -d '{
   &quot;contents&quot; : {
-    &quot;user_id&quot; : &quot;user_id&quot;,
+    &quot;user_id&quot; : &quot;b6a6671c-f04c-47f8-a4d3-11374f0d75cb&quot;,
     &quot;urgent&quot; : true,
     &quot;photos&quot; : [ &quot;photos&quot;, &quot;photos&quot; ]
   }
@@ -1520,7 +1534,7 @@ Return value is not specified but should describe the error.
                                                 </span>
                                 
                                                     <div class="inner description marked">
-                                The customer identifier is a UUID.
+                                The customer identifier is a UUIDv4.
                                                     </div>
                                             </div>
                                                                                 <div class="inner required">
@@ -1833,7 +1847,7 @@ Return value is not specified but should describe the error.
                                                 </span>
                                 
                                                     <div class="inner description marked">
-                                The requests identifier.
+                                The request identifier.
                                                     </div>
                                             </div>
                                                                                 <div class="inner required">
@@ -1853,7 +1867,7 @@ Return value is not specified but should describe the error.
                             <h3 id="examples-Analysis-analysisCustomerIdRequestsRequestIdGet-title-200"></h3>
                             <p id="examples-Analysis-analysisCustomerIdRequestsRequestIdGet-description-200" class="marked"></p>
                             <script>
-                              var responseAnalysis200_description = `List of all recipients, who are associated with this customer, who have received malicious email.`;
+                              var responseAnalysis200_description = `Details of the request and its current status are returned.`;
                               var responseAnalysis200_description_break = responseAnalysis200_description.indexOf('\n');
                               if (responseAnalysis200_description_break == -1) {
                                 $("#examples-Analysis-analysisCustomerIdRequestsRequestIdGet-title-200").text("Status Code: 200 - " + responseAnalysis200_description);
@@ -1881,7 +1895,7 @@ Return value is not specified but should describe the error.
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "List of all recipients, who are associated with this customer, who have received malicious email.",
+  "description" : "Details of the request and its current status are returned.",
   "content" : {
     "application/json" : {
       "schema" : {
@@ -1917,6 +1931,124 @@ Return value is not specified but should describe the error.
                                 </div>
                                 <div class="tab-pane" id="examples-Analysis-analysisCustomerIdRequestsRequestIdGet-200-example">
                                   <pre class="prettyprint"><code class="json"></code></pre>
+                                </div>
+                            </div>
+                            
+                            <h3 id="examples-Analysis-analysisCustomerIdRequestsRequestIdGet-title-400"></h3>
+                            <p id="examples-Analysis-analysisCustomerIdRequestsRequestIdGet-description-400" class="marked"></p>
+                            <script>
+                              var responseAnalysis400_description = `Path parameters were malformed or invalid.
+
+Return value is not specified but should describe the error.
+`;
+                              var responseAnalysis400_description_break = responseAnalysis400_description.indexOf('\n');
+                              if (responseAnalysis400_description_break == -1) {
+                                $("#examples-Analysis-analysisCustomerIdRequestsRequestIdGet-title-400").text("Status Code: 400 - " + responseAnalysis400_description);
+                              } else {
+                                $("#examples-Analysis-analysisCustomerIdRequestsRequestIdGet-title-400").text("Status Code: 400 - " + responseAnalysis400_description.substring(0, responseAnalysis400_description_break));
+                                $("#examples-Analysis-analysisCustomerIdRequestsRequestIdGet-description-400").html(responseAnalysis400_description.substring(responseAnalysis400_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Analysis-analysisCustomerIdRequestsRequestIdGet-400" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Analysis-analysisCustomerIdRequestsRequestIdGet-400-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Analysis-analysisCustomerIdRequestsRequestIdGet-400-schema">
+                                  <div id="responses-Analysis-analysisCustomerIdRequestsRequestIdGet-schema-400" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Path parameters were malformed or invalid.\n\nReturn value is not specified but should describe the error.\n",
+  "content" : { }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Analysis-analysisCustomerIdRequestsRequestIdGet-400-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Analysis-analysisCustomerIdRequestsRequestIdGet-schema-400');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Analysis-analysisCustomerIdRequestsRequestIdGet-400-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+                            
+                            <h3 id="examples-Analysis-analysisCustomerIdRequestsRequestIdGet-title-404"></h3>
+                            <p id="examples-Analysis-analysisCustomerIdRequestsRequestIdGet-description-404" class="marked"></p>
+                            <script>
+                              var responseAnalysis404_description = `customer_id or request_id are not found in the database.
+
+Return value is not specified but should describe the error.
+`;
+                              var responseAnalysis404_description_break = responseAnalysis404_description.indexOf('\n');
+                              if (responseAnalysis404_description_break == -1) {
+                                $("#examples-Analysis-analysisCustomerIdRequestsRequestIdGet-title-404").text("Status Code: 404 - " + responseAnalysis404_description);
+                              } else {
+                                $("#examples-Analysis-analysisCustomerIdRequestsRequestIdGet-title-404").text("Status Code: 404 - " + responseAnalysis404_description.substring(0, responseAnalysis404_description_break));
+                                $("#examples-Analysis-analysisCustomerIdRequestsRequestIdGet-description-404").html(responseAnalysis404_description.substring(responseAnalysis404_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Analysis-analysisCustomerIdRequestsRequestIdGet-404" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Analysis-analysisCustomerIdRequestsRequestIdGet-404-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Analysis-analysisCustomerIdRequestsRequestIdGet-404-schema">
+                                  <div id="responses-Analysis-analysisCustomerIdRequestsRequestIdGet-schema-404" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "customer_id or request_id are not found in the database.\n\nReturn value is not specified but should describe the error.\n",
+  "content" : { }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Analysis-analysisCustomerIdRequestsRequestIdGet-404-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Analysis-analysisCustomerIdRequestsRequestIdGet-schema-404');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Analysis-analysisCustomerIdRequestsRequestIdGet-404-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
                             
@@ -2020,7 +2152,7 @@ Return value is not specified but should describe the error.
                                                 </span>
                                 
                                                     <div class="inner description marked">
-                                The customer identifier is a UUID.
+                                The customer identifier is a UUIDv4.
                                                     </div>
                                             </div>
                                                                                 <div class="inner required">
@@ -2107,6 +2239,124 @@ Return value is not specified but should describe the error.
                                 </div>
                             </div>
                             
+                            <h3 id="examples-Analysis-analysisCustomerIdStatisticsGet-title-400"></h3>
+                            <p id="examples-Analysis-analysisCustomerIdStatisticsGet-description-400" class="marked"></p>
+                            <script>
+                              var responseAnalysis400_description = `Path parameter was malformed or invalid.
+
+Return value is not specified but should describe the error.
+`;
+                              var responseAnalysis400_description_break = responseAnalysis400_description.indexOf('\n');
+                              if (responseAnalysis400_description_break == -1) {
+                                $("#examples-Analysis-analysisCustomerIdStatisticsGet-title-400").text("Status Code: 400 - " + responseAnalysis400_description);
+                              } else {
+                                $("#examples-Analysis-analysisCustomerIdStatisticsGet-title-400").text("Status Code: 400 - " + responseAnalysis400_description.substring(0, responseAnalysis400_description_break));
+                                $("#examples-Analysis-analysisCustomerIdStatisticsGet-description-400").html(responseAnalysis400_description.substring(responseAnalysis400_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Analysis-analysisCustomerIdStatisticsGet-400" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Analysis-analysisCustomerIdStatisticsGet-400-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Analysis-analysisCustomerIdStatisticsGet-400-schema">
+                                  <div id="responses-Analysis-analysisCustomerIdStatisticsGet-schema-400" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Path parameter was malformed or invalid.\n\nReturn value is not specified but should describe the error.\n",
+  "content" : { }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Analysis-analysisCustomerIdStatisticsGet-400-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Analysis-analysisCustomerIdStatisticsGet-schema-400');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Analysis-analysisCustomerIdStatisticsGet-400-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+                            
+                            <h3 id="examples-Analysis-analysisCustomerIdStatisticsGet-title-404"></h3>
+                            <p id="examples-Analysis-analysisCustomerIdStatisticsGet-description-404" class="marked"></p>
+                            <script>
+                              var responseAnalysis404_description = `customer_id is not found in the database.
+
+Return value is not specified but should describe the error.
+`;
+                              var responseAnalysis404_description_break = responseAnalysis404_description.indexOf('\n');
+                              if (responseAnalysis404_description_break == -1) {
+                                $("#examples-Analysis-analysisCustomerIdStatisticsGet-title-404").text("Status Code: 404 - " + responseAnalysis404_description);
+                              } else {
+                                $("#examples-Analysis-analysisCustomerIdStatisticsGet-title-404").text("Status Code: 404 - " + responseAnalysis404_description.substring(0, responseAnalysis404_description_break));
+                                $("#examples-Analysis-analysisCustomerIdStatisticsGet-description-404").html(responseAnalysis404_description.substring(responseAnalysis404_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Analysis-analysisCustomerIdStatisticsGet-404" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Analysis-analysisCustomerIdStatisticsGet-404-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Analysis-analysisCustomerIdStatisticsGet-404-schema">
+                                  <div id="responses-Analysis-analysisCustomerIdStatisticsGet-schema-404" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "customer_id is not found in the database.\n\nReturn value is not specified but should describe the error.\n",
+  "content" : { }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Analysis-analysisCustomerIdStatisticsGet-404-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Analysis-analysisCustomerIdStatisticsGet-schema-404');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Analysis-analysisCustomerIdStatisticsGet-404-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+                            
                             <h3 id="examples-Analysis-analysisCustomerIdStatisticsGet-title-500"></h3>
                             <p id="examples-Analysis-analysisCustomerIdStatisticsGet-description-500" class="marked"></p>
                             <script>
@@ -2188,7 +2438,7 @@ If there are no users associated with the given customer id, an empty array shou
                         <h3>Curl Request Example</h3>
                         <pre class="prettyprint"><code class="language-bsh">curl -X GET \
  -H "Accept: application/json" \
- "http://analysis.csse6400.uqcloud.net/api/v1/analysis/{customer_id}/users?limit=20&offset=0"
+ "http://analysis.csse6400.uqcloud.net/api/v1/analysis/{customer_id}/users?limit=20&offset=40"
 </code></pre>
 
                           <h2 class="methodsubtabletitle">Path parameters</h2>
@@ -2209,7 +2459,7 @@ If there are no users associated with the given customer id, an empty array shou
                                                 </span>
                                 
                                                     <div class="inner description marked">
-                                The customer identifier is a UUID.
+                                The customer identifier is a UUIDv4.
                                                     </div>
                                             </div>
                                                                                 <div class="inner required">
@@ -2242,7 +2492,10 @@ If there are no users associated with the given customer id, an empty array shou
                                                 </span>
                                 
                                                     <div class="inner description marked">
-                                Returns only this many results, 0 &lt; limit &lt;&#x3D; 1000. Default is 100.
+                                Return only this many results.
+0 &lt; limit &lt;&#x3D; 1000.
+Default is 100.
+
                                                     </div>
                                             </div>
                                                                         </div>
@@ -2261,7 +2514,10 @@ If there are no users associated with the given customer id, an empty array shou
                                                 </span>
                                 
                                                     <div class="inner description marked">
-                                Skip this many results before returning, 0 &lt;&#x3D; offset. Default is 0.
+                                Skip this many results before returning.
+0 &lt;&#x3D; offset.
+Default is 0.
+
                                                     </div>
                                             </div>
                                                                         </div>
@@ -2473,7 +2729,7 @@ Return value is not specified but should describe the error.
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked">Returns a individual user by its ID.
+                        <p class="marked">Return an individual user by their ID.
 </p>
                         <p></p>
                         <br />
@@ -2502,7 +2758,7 @@ Return value is not specified but should describe the error.
                                                 </span>
                                 
                                                     <div class="inner description marked">
-                                The customer identifier.
+                                The customer identifier is a UUIDv4.
                                                     </div>
                                             </div>
                                                                                 <div class="inner required">
@@ -2524,7 +2780,7 @@ Return value is not specified but should describe the error.
                                                 </span>
                                 
                                                     <div class="inner description marked">
-                                The users identifier.
+                                The user&#39;s identifier is a UUIDv4.
                                                     </div>
                                             </div>
                                                                                 <div class="inner required">
@@ -2608,6 +2864,124 @@ Return value is not specified but should describe the error.
                                 </div>
                                 <div class="tab-pane" id="examples-Analysis-analysisCustomerIdUsersUserIdGet-200-example">
                                   <pre class="prettyprint"><code class="json"></code></pre>
+                                </div>
+                            </div>
+                            
+                            <h3 id="examples-Analysis-analysisCustomerIdUsersUserIdGet-title-400"></h3>
+                            <p id="examples-Analysis-analysisCustomerIdUsersUserIdGet-description-400" class="marked"></p>
+                            <script>
+                              var responseAnalysis400_description = `Path parameters were malformed or invalid.
+
+Return value is not specified but should describe the error.
+`;
+                              var responseAnalysis400_description_break = responseAnalysis400_description.indexOf('\n');
+                              if (responseAnalysis400_description_break == -1) {
+                                $("#examples-Analysis-analysisCustomerIdUsersUserIdGet-title-400").text("Status Code: 400 - " + responseAnalysis400_description);
+                              } else {
+                                $("#examples-Analysis-analysisCustomerIdUsersUserIdGet-title-400").text("Status Code: 400 - " + responseAnalysis400_description.substring(0, responseAnalysis400_description_break));
+                                $("#examples-Analysis-analysisCustomerIdUsersUserIdGet-description-400").html(responseAnalysis400_description.substring(responseAnalysis400_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Analysis-analysisCustomerIdUsersUserIdGet-400" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Analysis-analysisCustomerIdUsersUserIdGet-400-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Analysis-analysisCustomerIdUsersUserIdGet-400-schema">
+                                  <div id="responses-Analysis-analysisCustomerIdUsersUserIdGet-schema-400" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Path parameters were malformed or invalid.\n\nReturn value is not specified but should describe the error.\n",
+  "content" : { }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Analysis-analysisCustomerIdUsersUserIdGet-400-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Analysis-analysisCustomerIdUsersUserIdGet-schema-400');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Analysis-analysisCustomerIdUsersUserIdGet-400-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+                            
+                            <h3 id="examples-Analysis-analysisCustomerIdUsersUserIdGet-title-404"></h3>
+                            <p id="examples-Analysis-analysisCustomerIdUsersUserIdGet-description-404" class="marked"></p>
+                            <script>
+                              var responseAnalysis404_description = `customer_id or user_id are not found in the database.
+
+Return value is not specified but should describe the error.
+`;
+                              var responseAnalysis404_description_break = responseAnalysis404_description.indexOf('\n');
+                              if (responseAnalysis404_description_break == -1) {
+                                $("#examples-Analysis-analysisCustomerIdUsersUserIdGet-title-404").text("Status Code: 404 - " + responseAnalysis404_description);
+                              } else {
+                                $("#examples-Analysis-analysisCustomerIdUsersUserIdGet-title-404").text("Status Code: 404 - " + responseAnalysis404_description.substring(0, responseAnalysis404_description_break));
+                                $("#examples-Analysis-analysisCustomerIdUsersUserIdGet-description-404").html(responseAnalysis404_description.substring(responseAnalysis404_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Analysis-analysisCustomerIdUsersUserIdGet-404" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Analysis-analysisCustomerIdUsersUserIdGet-404-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Analysis-analysisCustomerIdUsersUserIdGet-404-schema">
+                                  <div id="responses-Analysis-analysisCustomerIdUsersUserIdGet-schema-404" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "customer_id or user_id are not found in the database.\n\nReturn value is not specified but should describe the error.\n",
+  "content" : { }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Analysis-analysisCustomerIdUsersUserIdGet-404-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Analysis-analysisCustomerIdUsersUserIdGet-schema-404');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Analysis-analysisCustomerIdUsersUserIdGet-404-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
                             
