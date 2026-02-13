@@ -47,19 +47,19 @@ Your service will be deployed to AWS and will undergo automated correctness and 
 For this assignment, you are working for AgeOverlow, a new UQ start-up.
 AgeOverlow uses (fictional) machine learning techniques.
 The analysis is able to identify percentage certainty of the given assets to their generational cohort,
-with an estimated age approximation.
+with an age approximation.
 
 \paragraph{Task}
 AgeOverlow uses a microservices architecture to implement their analysis platform.
 The CTO saw on your resume that you are taking Software Architecture
 and has assigned you to design and implement the generation cohort analysis service.
-This service must scale to cope with the anticipated large number of tests.
+This service must scale to cope with the anticipated large number of requests.
 
 \paragraph{Requirements}
 Automated identification of generational cohorts is an important service to ensure legal compliance in Australia.
 Manual verification by personale is labour intensive and time consuming.
-Automated tests provide faster responses with varying degree of certainty to allow manual review when its required.
-This is critical as tens or hundreds of thousands of tests need to be performed daily for users of new services.
+Automated analysis provide faster responses with varying degrees of certainty, to allow manual review only when its required.
+This is critical as tens or hundreds of thousands of analyses need to be performed daily for users of new services.
 
 AgeOverflow's Generation Cohort Analysis Service (GCAS) needs to be designed to scale to match demand.
 Clients will obtain photographic documentation from users.
@@ -88,7 +88,7 @@ They have been developing their services based on this specification so you must
 
 The interface specification is available to all service owners online: 
 
-\url{https://csse6400.uqcloud.net/assessment/ageoverflow}
+\url{https://csse6400.uqcloud.net/assessment/cloud/}
 
 
 \section{Implementation}
@@ -96,18 +96,19 @@ The following constraints apply to the implementation of your assignment solutio
 
 \subsection{Analysis Engine}
 
-You have been provided with a command line tool called \texttt{AgeOverflow Engine} that must be used to analyse sample image sets.
+You have been provided with a command line tool called \texttt{AgeOverflow-Engine} that must be used to analyse sample image sets.
 The tool has varying performance, due to the difficulty of identifying cohorts.
 You will have to work around this bottleneck in the design and development of the GCAS.
 
-Your service \textbf{must} utilise the \texttt{engine} command line tool provided for this assignment.
+Your service \textbf{must} utilise the provided \texttt{AgeOverflow-Engine} command line tool provided for this assignment.
 The compiled binaries are available in the tool's GitHub repository:
 
 \url{https://github.com/CSSE6400/AgeOverflow-Engine}.
 
 \warning{You are \textbf{not} allowed to reimplement or modify this tool.}
 
-The analysis engine requires pre-processing of the images this is done by an upstream service.
+The analysis engine requires pre-processing of the images.
+This is done by an upstream service.
 For testing purposes, you \textbf{must} use the sample images provided in the \link{analysis engine's repository}
 {https://github.com/CSSE6400/AgeOverflow-Engine}.
 If you try to generate your own images, they are likely to fail analysis or give false results.
@@ -215,18 +216,16 @@ You may re-create the process yourself.
   \item We will run automated functionality and load-testing on the URL provided in the \texttt{api.txt} file.
 \end{enumerate}
 
-\noindent
-\textbf{Important Note:} Ensure your service does not exceed the resource limits of AWS Learner Labs.
+\warning{Ensure your service does not exceed the resource limits of AWS Learner Labs.
 For example, AWS will \textbf{deactivate} your account if more than fifteen EC2 instances are running.
-If you use up your allocated budget in the Learner Lab, you will not be able to run any services.
+If you use up your allocated budget in the Learner Lab, you will not be able to run any services.}
 
 \subsection{GitHub Repository}\label{sec:github}
-You will be provisioned with a private repository on GitHub for this assignment, via GitHub Classroom.
-You must click on the link below and associate your GitHub username with your UQ student ID in the Classroom.
+You will be provisioned with a private repository on GitHub for this assignment, via 
+\link{GitHub Classroom.}{https://classroom.github.com/a/_o6vwSxE}
+You must click on the link below and associate your GitHub username with your UQ student ID in the 
+\link{Classroom}{https://classroom.github.com/a/_o6vwSxE}.
 
-%\url{https://classroom.github.com/a/o7GwUHX6}
-
-\noindent
 Associating your GitHub username with another student's ID,
 or getting someone else to associate their GitHub username with your student ID, is \link{academic misconduct}
 {https://my.uq.edu.au/information-and-services/manage-my-program/student-integrity-and-conduct/academic-integrity-and-student-conduct}.
@@ -247,6 +246,7 @@ Your Github repository should look similar to the following, at a minimum:
 .2 README.md.
 .2 refs.md.
 .2 AI.md.
+.2 AI-log.md.
 .2 local.sh.
 .2 deploy.sh.
 .2 ....
@@ -261,7 +261,10 @@ If your \texttt{terraform plan} or \texttt{terraform apply} command hangs withou
 Your AWS Learner Lab can be reset using the reset button in the toolbar.
 
 \noindent
-\includegraphics[width=0.9\textwidth]{images/reset-button.png}
+\vspace{-3mm}
+\begin{center}
+  \includegraphics[trim=0 13 0 15,clip,width=0.85\textwidth]{images/reset-button.png}
+\end{center}
 
 \noindent
 To ensure that you are not accidentally depending on anything specific to your Learner Lab environment,
@@ -281,7 +284,7 @@ Testing is divided into functionality, deployment, and scalability testing,
 corresponding to the three submission stages of the assignment.
 Functionality testing is to ensure that your backend software and API
 meet the MVP requirements by satisfying the API specification without any excessive load.
-Deployment is to ensure that this MVP can then be hosted in the target cloud provider.
+Deployment is to ensure that this MVP can then be hosted on the target cloud provider.
 Scalability testing is based upon several likely usage scenarios.
 The scenarios create different scaling requirements.
 
@@ -311,7 +314,7 @@ Queries for results are also distributed fairly evenly over the day.
 
 \paragraph{Curiosity Killed the Server}
 A client creates a web portal allowing an auditor to view results for their users.
-Tens of thousands of requests will try to access their users results in a short period of time.
+Tens of thousands of requests will try to access their users' results in a short period of time.
 
 \paragraph{Compliance Early Stages}
 There is a significant increase in the number of analysis request submitted by a few clients.
@@ -335,24 +338,24 @@ If it does not, the risk is that clients will start to make all requests urgent.
 Due to the high volume of analysis requests, there will be a high volume of queries for results.
 Any results that are still pending analysis jobs, will be repeated.
 Auditors make a moderate number of requests for batches of results from almost all clients.
-Clients start querying batches of results for individual patients.
+Clients start querying batches of results for individual users.
 
 \paragraph{Compliance Tail}
 Almost all clients submit a large volume of analysis requests, but timing may be variable.
 Up to 10\% of the requests may be given an urgent status.
 Due to the high volume of analysis requests, there will be a high volume of queries for results.
-Most results that are still pending analysis jobs, will be repeated.
+Most requests for results that are still pending analysis jobs, will be repeated.
 Auditors make a moderate number of requests for batches of results from almost all clients.
-Clients query batches of results for a moderate number of patients.
+Clients query batches of results for a moderate number of users.
 
 \paragraph{Auditing and BAU}
 Some clients submit a large volume of analysis requests due to influx of new users or backlog.
 Up to 5\% of the requests may be given an urgent status.
 Other clients are back to operating as per normal circumstances.
 There will be a moderate volume of queries for results.
-Most results that are still pending analysis jobs, will be repeated.
-Health authorities make a large number of requests for batches of results from almost all clients.
-Clients query batches of results for a large number of patients.
+Most requests for results that are still pending analysis jobs, will be repeated.
+Auditors make a large number of requests for batches of results from almost all clients.
+Clients query batches of results for a large number of users.
 
 \paragraph{Research Project}
 An internal researcher wants to analyse the results of the analysis against a false positive database provided by the clients.
@@ -365,7 +368,7 @@ Your grade for the assignment will be capped at \textbf{4}, if your implementati
 \begin{itemize}[topsep=2pt,partopsep=0pt,itemsep=1pt,parsep=1pt]
     \item analysis requests, with their associated images, or 
     \item analysis results to persistent storage.
-\end{itemize}.
+\end{itemize}
 
 Your persistence mechanism must be robust, so that it can cope with catastrophic failure of your service.
 If all running instances of your services are terminated,
@@ -414,7 +417,7 @@ Please refer to the marking criteria at the end of this document.
 As this is a higher-level course, you are expected to be familiar with the importance of academic integrity in general,
 and the details of UQ's rules.
 If you need a reminder, review the \link{Academic Integrity Modules}
-{https://web.library.uq.edu.au/library-services/it/learnuq-blackboard-help/academic-integrity-modules}.
+{https://web.library.uq.edu.au/study-and-learning-support/coursework/academic-integrity-modules}.
 Submissions will be checked to ensure that the work submitted is not plagiarised or of no academic merit.
 
 This is an \textit{individual} assignment.
@@ -434,7 +437,7 @@ i.e. You may not discuss how to
 All code that you submit \textbf{must} be your own work.
 You may \textbf{not} directly copy code that you have found on-line to solve parts of the assignment.
 If you find ideas from on-line sources (e.g. Stack Overflow),
-you must \link{cite and reference}{https://web.library.uq.edu.au/node/4221/2} these sources.
+you must \link{cite and reference}{https://guides.library.uq.edu.au/referencing} these sources.
 Use the \link{IEEE referencing style}{https://libraryguides.vu.edu.au/ieeereferencing/gettingstarted}
 for citations and references.
 Citations must be included in a comment at the location where the idea is used in your code.
@@ -442,14 +445,19 @@ All references for citations \textbf{must} be included in a file called \texttt{
 This file must be in the root directory of your repository.
 
 \subsection{AI Usage}
-You may use generative AI tools (e.g. Copilot) to assist you in writing code to implement your solutions.
-You may also use generative AI tools to help you test your implementations.
+You are developing a moderately complex software system.
+It is expected that you will make use of generative AI tools (e.g. Copilot) to assist you in implementing and testing your solutions.
+
 You \textbf{must} include, in the root directory of your repository,
 a file called \texttt{AI.md} that indicates the generative AI tools that you used,
 how you used them, and the extent of their use.
 (e.g. All code was written by providing Copilot with class descriptions and then revising the generated code.
 Classes A and B were produced by the following prompts to ChatGPT
 and were then adapted to work in the assignment's context.)
+
+You \textbf{must} also include, in the root directory of your repository,
+a file called \texttt{AI-log.md} that contains a log of the history of your interaction with the AI tool(s)
+that you used while developing your solution.
 
 Uncited or unreferenced material, or unacknowledged use of generative AI tools,
 will be treated as not being your own work.
