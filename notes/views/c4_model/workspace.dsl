@@ -3,7 +3,7 @@ workspace "Sahara eCommerce" "An example C4 model of an on-line shopping system.
         customer = person "Customer" "Someone who shops at the Sahara on-line store."
 		
 		# Software systems, containers and components for the Sahara eCommerce enterprise-wide system.
-		enterprise "Sahara eCommerce" {
+		group "Sahara eCommerce" {
 			onlineStore = softwareSystem "On-line Store" "Allows customers to browse and search for items and to order them." {
 				!docs docs
 				!adrs adrs
@@ -84,24 +84,24 @@ workspace "Sahara eCommerce" "An example C4 model of an on-line shopping system.
             }
 
             deploymentNode "Sahara" "" "Sahara eCommerce Data Centre" {
-                deploymentNode "Web Server" "" "Ubuntu 20.04 LTS" "" 4 {
-                    deploymentNode "Apache TomEE" "" "Apache TomEE 8.0" {
+                deploymentNode "Web Server" "" "Ubuntu 24.04 LTS" "" 1..N {
+                    deploymentNode "Apache TomEE" "" "Apache TomEE 10.1" {
                         liveWebAppInstance = containerInstance webApp
                     }
                 }
 				
-                deploymentNode "Application Server" "" "Ubuntu 20.04 LTS & Java 17 LTS" "" 8 {
+                deploymentNode "Application Server" "" "Ubuntu 24.04 LTS & Java 25 LTS" "" 1..N {
                     liveAppServerInstance = containerInstance appBackend
                 }
 
-                deploymentNode "Application Database Server" "" "Ubuntu 20.04 LTS" {
-                    primaryDatabaseServer = deploymentNode "MySQL Primary" "" "MySQL 8.0" {
+                deploymentNode "Application Database Server" "" "Ubuntu 24.04 LTS" {
+                    primaryDatabaseServer = deploymentNode "MySQL Primary" "" "MySQL 8.4" {
                         liveAppDatabaseInstance = containerInstance appDB
                     }
                 }
 
-                deploymentNode "Secondary Database Server" "" "Ubuntu 20.04 LTS" "failover" {
-                    secondaryDatabaseServer = deploymentNode "MySQL Secondary" "" "MySQL 8.0" "failover" {
+                deploymentNode "Secondary Database Server" "" "Ubuntu 24.04 LTS" "failover" {
+                    secondaryDatabaseServer = deploymentNode "MySQL Secondary" "" "MySQL 8.4" "failover" {
                         liveSeondaryDatabaseInstance = containerInstance appDB
                     }
                 }
