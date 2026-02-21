@@ -2,7 +2,11 @@ openapi: 3.1.1
 info:
   title: AgeOverflow
   description: |
+    **DRAFT** This Specification is currently in **DRAFT**.
+
     An API service for analysing photo sets to determine the users generational cohort and estimated age range.
+
+    **DRAFT** This Specification is currently in **DRAFT**.
   contact:
     name: CSSE6400
     url: https://csse6400.uqcloud.net
@@ -124,14 +128,13 @@ paths:
         schema:
           type: string
           enum:
-            - 'GENERATION_SILENT'
-            - 'GENERATION_BABY_BOOMERS'
-            - 'GENERATION_X'
-            - 'GENERATION_Y'
-            - 'GENERATION_Z'
-            - 'GENERATION_ALPHA'
-            - 'GENERATION_BETA'
-          example: 'GENERATION_ALPHA'
+            - 'silent'
+            - 'baby_boomers'
+            - 'x'
+            - 'y'
+            - 'z'
+            - 'alpha'
+          example: 'z'
       responses:
         200:
           description: List of all results, with the filters applied.
@@ -423,44 +426,13 @@ components:
         created_at:
           type: string
           format: date-time
-          description: The date and time the request was submitted.
+          description: The date and time the request was submitted as a RFC3339.
           example: 2024-02-21T13:10:05Z
         updated_at:
           type: string
           format: date-time
-          description: The date and time the request was updated, including its creation.
+          description: The date and time the request was updated as a RFC3339, including its creation.
           example: 2024-02-21T13:10:05Z
-        checksum:
-          type: string
-        generations:
-          type: object
-          properties:
-            generation_silent:
-              type: number
-            generation_baby_boomers:
-              type: number
-            generation_x:
-              type: number
-            generation_y:
-              type: number
-            generation_z:
-              type: number
-            generation_alpha:
-              type: number
-            generation_beta:
-              type: number
-        primary_generation:
-          type: string
-          enum:
-            - 'GENERATION_SILENT'
-            - 'GENERATION_BABY_BOOMERS'
-            - 'GENERATION_X'
-            - 'GENERATION_Y'
-            - 'GENERATION_Z'
-            - 'GENERATION_ALPHA'
-            - 'GENERATION_BETA'
-        age:
-          type: number
         status:
           type: string
           enum:
@@ -470,6 +442,38 @@ components:
           description: The status of the analysis.
           default: "pending"
           example: "success"
+        result:
+          type: object
+          description: The results of the analysis, only populated (or the values are only well defined) if-and-only-if the status == 'success'
+          properties:
+            checksum:
+              type: string
+            generations:
+              type: object
+              properties:
+                silent:
+                  type: number
+                baby_boomers:
+                  type: number
+                x:
+                  type: number
+                y:
+                  type: number
+                z:
+                  type: number
+                alpha:
+                  type: number
+            primary_generation:
+              type: string
+              enum:
+                - 'silent'
+                - 'baby_boomers'
+                - 'x'
+                - 'y'
+                - 'z'
+                - 'alpha'
+            age:
+              type: number
     AnalysisCreate:
       type: object
       properties:
