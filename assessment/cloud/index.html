@@ -859,28 +859,15 @@
     },
     "created_at" : {
       "type" : "string",
-      "description" : "The date and time the request was submitted.",
+      "description" : "The date and time the request was submitted as a RFC3339.",
       "format" : "date-time",
       "example" : "2024-02-21T13:10:05.000+00:00"
     },
     "updated_at" : {
       "type" : "string",
-      "description" : "The date and time the request was updated, including its creation.",
+      "description" : "The date and time the request was updated as a RFC3339, including its creation.",
       "format" : "date-time",
       "example" : "2024-02-21T13:10:05.000+00:00"
-    },
-    "checksum" : {
-      "type" : "string"
-    },
-    "generations" : {
-      "$ref" : "#/components/schemas/Analysis_generations"
-    },
-    "primary_generation" : {
-      "type" : "string",
-      "enum" : [ "GENERATION_SILENT", "GENERATION_BABY_BOOMERS", "GENERATION_X", "GENERATION_Y", "GENERATION_Z", "GENERATION_ALPHA", "GENERATION_BETA" ]
-    },
-    "age" : {
-      "type" : "number"
     },
     "status" : {
       "type" : "string",
@@ -888,6 +875,9 @@
       "example" : "success",
       "default" : "pending",
       "enum" : [ "pending", "success", "failed" ]
+    },
+    "result" : {
+      "$ref" : "#/components/schemas/Analysis_result"
     }
   }
 };
@@ -921,27 +911,42 @@
   },
   "description" : "...."
 };
-    defs["Analysis_generations"] = {
+    defs["Analysis_result"] = {
   "properties" : {
-    "generation_silent" : {
+    "checksum" : {
+      "type" : "string"
+    },
+    "generations" : {
+      "$ref" : "#/components/schemas/Analysis_result_generations"
+    },
+    "primary_generation" : {
+      "type" : "string",
+      "enum" : [ "silent", "baby_boomers", "x", "y", "z", "alpha" ]
+    },
+    "age" : {
+      "type" : "number"
+    }
+  },
+  "description" : "The results of the analysis, only populated (or the values are only well defined) if-and-only-if the status == 'success'"
+};
+    defs["Analysis_result_generations"] = {
+  "properties" : {
+    "silent" : {
       "type" : "number"
     },
-    "generation_baby_boomers" : {
+    "baby_boomers" : {
       "type" : "number"
     },
-    "generation_x" : {
+    "x" : {
       "type" : "number"
     },
-    "generation_y" : {
+    "y" : {
       "type" : "number"
     },
-    "generation_z" : {
+    "z" : {
       "type" : "number"
     },
-    "generation_alpha" : {
-      "type" : "number"
-    },
-    "generation_beta" : {
+    "alpha" : {
       "type" : "number"
     }
   }
@@ -1065,7 +1070,10 @@
               <div class="app-desc">Version: 0.9</div>
             <hr>
             <div id="app-description" class="app-desc">
-                An API service for analysing photo sets to determine the users generational cohort and estimated age range.
+                <p><strong>DRAFT</strong> This Specification is currently in <strong>DRAFT</strong>.</p>
+<p>An API service for analysing photo sets to determine the users generational cohort and estimated age range.</p>
+<p><strong>DRAFT</strong> This Specification is currently in <strong>DRAFT</strong>.</p>
+
             </div>
           </div>
         </div>
@@ -1096,7 +1104,7 @@ The filters are additive and as such if the filter is not in the request then it
                         <h3>Curl Request Example</h3>
                         <pre class="prettyprint"><code class="language-bsh">curl -X GET \
  -H "Accept: application/json" \
- "http://analysis.csse6400.uqcloud.net/api/v1/analysis/{customer_id}/requests?limit=20&offset=0&start=2026-02-21T13:10:05Z&end=2026-02-21T14:10:05Z&user_id=b6a6671c-f04c-47f8-a4d3-11374f0d75cb&state=scanned&generation=GENERATION_ALPHA"
+ "http://analysis.csse6400.uqcloud.net/api/v1/analysis/{customer_id}/requests?limit=20&offset=0&start=2026-02-21T13:10:05Z&end=2026-02-21T14:10:05Z&user_id=b6a6671c-f04c-47f8-a4d3-11374f0d75cb&state=scanned&generation=z"
 </code></pre>
 
                           <h2 class="methodsubtabletitle">Path parameters</h2>
