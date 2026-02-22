@@ -508,7 +508,41 @@ components:
           example: 2026-02-21T13:10:05Z
         contents:
           type: object
-          description: ... Total num of users, count of users per generation, normalised bucket of age ranges per 5 years.
+          description: Statistics of an individual customer.
           properties:
-            placeholder:
-              type: string
+            total_users:
+              type: int
+              description: Number of all users for this customer.
+            total_requests:
+              type: int
+              description: Number of all requests for this customer.
+            mean:
+              type: number
+              description: Either the mean age of all the requests by being the average of all the data set **or** an approximation defined by _mean += eta * (sample - mean)_ where eta is 0.01. The initial value of the mean is 0, until the first request result is processed then it is set to the age value of that result.
+            medium:
+              type: number
+              description: Either the medium age of all the requests by being the central point of all the data set **or** a stochastic approximation defined by _median += eta * sgn(sample - median)_ where eta is 0.01 and sgn is a function which outputs -1, 0, 1 depending on whether (sample-median) is negative, zero or positive. The initial value of the medium is 0, until the first request result is processed then it is set to the age value of that result.
+            buckets:
+              type: object
+              properties:
+                20:
+                  type: number
+                  description: Number of requests where the age is age <= 29.
+                30:
+                  type: number
+                  description: Number of requests where the age is 30 <= age <= 39.
+                40:
+                  type: number
+                  description: Number of requests where the age is 40 <= age <= 49.
+                50:
+                  type: number 
+                  description: Number of requests where the age is 50 <= age <= 59.
+                60:
+                  type: number
+                  description: Number of requests where the age is 60 <= age <= 69.
+                70:
+                  type: number
+                  description: Number of requests where the age is 70 <= age <= 79.
+                80:
+                  type: number
+                  description: Number of requests where the age is 80 >= age.
