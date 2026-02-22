@@ -29,7 +29,7 @@ paths:
 
         We do not specify the response payload for this endpoint,
         however you may find it useful to return a more detailed status of your system.
-        For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
+        See, for example, https://eloquentcode.com/rest-api-design-health-check-endpoint.
       responses:
         200:
           description: Service is healthy.
@@ -46,13 +46,13 @@ paths:
       - analysis
       summary: List all submitted requests for a given customer.
       description: |
-        Returns a list of all requests submitted for the given customer id with the optional filters applied. The limit and offset parameters are used for stepping through blocks of users / paging through the results. If the offset is greater than the amount of entries that exist then an empty array should be returned.
+        Returns a list of all requests submitted for the given customer id with the optional filters applied. The limit and offset parameters are used to step through blocks of users / page through the results. If the offset is greater than the amount of entries that exist, then an empty array should be returned.
         
         If there are no requests associated with the given customer id, an empty array should be returned.
 
-        All other parameters are used to filter the results and should be applied before the limit and offset parameters. e.g. if 300 results exists and 200 are labelled as generation X then a request of limit=100 and generation="GENERATION_X" should return 100 results. If limit=100, generation="GENERATION_X", and offset=200 then the response should be 0 results (an empty array).
+        All other parameters are used to filter the results and should be applied before the limit and offset parameters. e.g. If 300 results exists and 200 are labelled as generation X then a request of limit=100 and generation="x" should return 100 results. If limit=100, generation="x", and offset=200 then the response should be 0 results (an empty array).
 
-        The filters are additive and as such if the filter is not in the request then it should not be applied. e.g. if generation="GENERATION_X" is not in the request then all requests should be returned regardless of their status. The exception to this is the limit and offset parameters which have defaults which are applied if they are not in the request.
+        The filters are additive and as such if the filter is not in the request then it should not be applied. e.g. If generation="x" is not in the request then all requests should be returned regardless of their status. The exception to this is the limit and offset parameters which have defaults which are applied if they are not in the request.
       parameters:
       - name: customer_id
         in: path
@@ -112,8 +112,8 @@ paths:
       - name: status
         in: query
         description: |
-          Only return requests with this state.
-          The state should be one of 'pending', 'scanned', 'failed'.
+          Only return requests with this status.
+          The status should be one of 'pending', 'scanned', or 'failed'.
         schema:
           type: string
           enum:
@@ -198,7 +198,7 @@ paths:
       - analysis
       summary: Get request by identifier.
       description: |
-        Returns a individual result by its ID.
+        Returns an individual result by its ID.
       parameters:
       - name: customer_id
         in: path
@@ -242,7 +242,7 @@ paths:
       - analysis
       summary: List all users for a given customer.
       description: |
-        Returns a list of all users for the given customer id with the optional filters applied. The limit and offset parameters are used for stepping through blocks of users / paging through the results. If the offset is greater than the amount of entries that exist then an empty array should be returned.
+        Returns a list of all users for the given customer id with the optional filters applied. The limit and offset parameters are used to step through blocks of users / page through the results. If the offset is greater than the amount of entries that exist, then an empty array should be returned.
         
         If there are no users associated with the given customer id, an empty array should be returned.
       parameters:
@@ -393,7 +393,7 @@ components:
             properties:
               id:
                 type: string
-                description: The request's unique identifier
+                description: The request's unique identifier.
                 example: "7635bd23-ced9-4f6f-9fae-afe52625d699"
               status:
                 type: string
@@ -406,12 +406,19 @@ components:
               checksum:
                 type: string
                 description: Checksum to check for internal CSSE6400 validation.
-              generation:
+              primary_generation:
                 type: string
                 description: The primary generation of the request, if success.
+                enum:
+                  - 'silent'
+                  - 'baby_boomers'
+                  - 'x'
+                  - 'y'
+                  - 'z'
+                  - 'alpha'
               age:
                 type: number
-                description: The age of the user via the given request.
+                description: The age of the user via the given request, if success.
     Analysis:
       type: object
       properties:
@@ -426,13 +433,13 @@ components:
         created_at:
           type: string
           format: date-time
-          description: The date and time the request was submitted as a RFC3339.
-          example: 2024-02-21T13:10:05Z
+          description: The date and time the request was submitted, as a RFC3339.
+          example: 2026-02-21T13:10:05Z
         updated_at:
           type: string
           format: date-time
-          description: The date and time the request was updated as a RFC3339, including its creation.
-          example: 2024-02-21T13:10:05Z
+          description: The date and time the request was updated, as a RFC3339, including its creation.
+          example: 2026-02-21T13:10:05Z
         status:
           type: string
           enum:
@@ -490,18 +497,18 @@ components:
           type: array
           items:
             type: string
-          description: Post processed images encoded in base64 (for the purpose of this assignment these are not real images).
+          description: Post processed images encoded in base64. (For the purpose of this assignment these are not real images.)
     Statistics:
       type: object
       properties:
         generated_at:
           type: string
           format: date-time
-          description: The date and time these statistics are valid for (or the current time if statistics are always live)
-          example: 2024-02-21T13:10:05Z
+          description: The date and time these statistics are valid for (or the current time if statistics are always live).
+          example: 2026-02-21T13:10:05Z
         contents:
           type: object
-          description: ... Total num of users, count of users per generation, normalised bucket of age ranges per 5 years
+          description: ... Total num of users, count of users per generation, normalised bucket of age ranges per 5 years.
           properties:
             placeholder:
               type: string
