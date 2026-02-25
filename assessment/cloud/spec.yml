@@ -227,7 +227,7 @@ paths:
           content: {}
         404:
           description: |
-            customer_id or request_id are not found in the database.
+            The service cannot find a matching customer_id or user_id.
 
             Return value is not specified but should describe the error.
           content: {}
@@ -329,7 +329,7 @@ paths:
           content: {}
         404:
           description: |
-            customer_id or user_id are not found in the database.
+            The service cannot find a matching customer_id or user_id.
 
             Return value is not specified but should describe the error.
           content: {}
@@ -344,7 +344,8 @@ paths:
       - analysis
       summary: Get statistics for this client.
       description: |
-        Returns a report of general statistics of the client. This report should be kept up-to-date with a maximum of five minutes delay.
+        Returns a report of general statistics about the client's requests to this service.
+        This report should be kept up-to-date, with a **maximum** of five minutes delay.
       parameters:
       - name: customer_id
         in: path
@@ -368,7 +369,7 @@ paths:
           content: {}
         404:
           description: |
-            customer_id is not found in the database.
+            The service cannot find a matching customer_id.
 
             Return value is not specified but should describe the error.
           content: {}
@@ -451,7 +452,9 @@ components:
           example: "success"
         result:
           type: object
-          description: The results of the analysis, only populated (or the values are only well defined) if-and-only-if the status == 'success'
+          description: |
+            The results of the analysis, as returned from [ageoverflow-engine](https://github.com/CSSE6400/AgeOverflow-Engine).
+            Only populated (or the values are only well defined) if-and-only-if status == 'success'
           properties:
             checksum:
               type: string
@@ -497,14 +500,17 @@ components:
           type: array
           items:
             type: string
-          description: Post processed images encoded in base64. (For the purpose of this assignment these are not real images.)
+          description: Post-processed images encoded in base64. (For the purpose of this assignment these are not real images.)
     Statistics:
       type: object
       properties:
         generated_at:
           type: string
           format: date-time
-          description: The date and time these statistics are valid for (or the current time if statistics are always live).
+          description: |
+            The date and time for which these statistics are valid
+            (i.e. 4 minutes in the past, if that is the last set of data that was included in the statistics calculations).
+            Or the current time, if statistics are always live.
           example: 2026-02-21T13:10:05Z
         contents:
           type: object
@@ -518,31 +524,38 @@ components:
               description: Number of all requests for this customer.
             mean:
               type: number
-              description: Either the mean age of all the requests by being the average of all the data set **or** an approximation defined by _mean += eta * (sample - mean)_ where eta is 0.01. The initial value of the mean is 0, until the first request result is processed then it is set to the age value of that result.
-            medium:
+              description: |
+                Either the mean age of all the requests, by being the average of all the data sets, **or** 
+                an approximation defined by _mean += eta * (sample - mean)_, where eta is 0.01.
+                The initial value of the mean is 0, until the first request result is processed, then it is set to the age value of that result.
+            median:
               type: number
-              description: Either the medium age of all the requests by being the central point of all the data set **or** a stochastic approximation defined by _median += eta * sgn(sample - median)_ where eta is 0.01 and sgn is a function which outputs -1, 0, 1 depending on whether (sample-median) is negative, zero or positive. The initial value of the medium is 0, until the first request result is processed then it is set to the age value of that result.
+              description: |
+                Either the median age of all the requests, by being the central point of all the data sets, **or** 
+                a stochastic approximation defined by _median += eta * sgn(sample - median)_,
+                where eta is 0.01 and sgn is a function which outputs -1, 0, 1 depending on whether (sample-median) is negative, zero, or positive.
+                The initial value of the median is 0, until the first request result is processed, then it is set to the age value of that result.
             buckets:
               type: object
               properties:
                 20:
                   type: number
-                  description: Number of requests where the age is age <= 29.
+                  description: Number of requests where age <= 29.
                 30:
                   type: number
-                  description: Number of requests where the age is 30 <= age <= 39.
+                  description: Number of requests where 30 <= age <= 39.
                 40:
                   type: number
-                  description: Number of requests where the age is 40 <= age <= 49.
+                  description: Number of requests where 40 <= age <= 49.
                 50:
                   type: number 
-                  description: Number of requests where the age is 50 <= age <= 59.
+                  description: Number of requests where 50 <= age <= 59.
                 60:
                   type: number
-                  description: Number of requests where the age is 60 <= age <= 69.
+                  description: Number of requests where 60 <= age <= 69.
                 70:
                   type: number
-                  description: Number of requests where the age is 70 <= age <= 79.
+                  description: Number of requests where 70 <= age <= 79.
                 80:
                   type: number
-                  description: Number of requests where the age is 80 >= age.
+                  description: Number of requests where 80 >= age.
