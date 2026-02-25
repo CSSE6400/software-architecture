@@ -190,14 +190,14 @@
 }
 
 % Warning
-\definecolor{warning}{RGB}{255, 204, 0}
+\definecolor{warning}{RGB}{255, 164, 0}
 \newcommand\warning[1]{
     \begin{tcolorbox}[title=Warning,colframe=warning]
     #1
     \end{tcolorbox}
 }
 
-% Defintion
+% Definition
 \newcounter{definition}[part]
 \newenvironment{definition}[1][]
     {\refstepcounter{definition}
