@@ -896,7 +896,7 @@
     },
     "photos" : {
       "type" : "array",
-      "description" : "Post processed images encoded in base64. (For the purpose of this assignment these are not real images.)",
+      "description" : "Post-processed images encoded in base64. (For the purpose of this assignment these are not real images.)",
       "items" : {
         "type" : "string"
       }
@@ -919,7 +919,7 @@
       "type" : "number"
     }
   },
-  "description" : "The results of the analysis, only populated (or the values are only well defined) if-and-only-if the status == 'success'"
+  "description" : "The results of the analysis, as returned from [ageoverflow-engine](https://github.com/CSSE6400/AgeOverflow-Engine).\nOnly populated (or the values are only well defined) if-and-only-if status == 'success'\n"
 };
     defs["Analysis_result_generations"] = {
   "properties" : {
@@ -947,7 +947,7 @@
   "properties" : {
     "generated_at" : {
       "type" : "string",
-      "description" : "The date and time these statistics are valid for (or the current time if statistics are always live).",
+      "description" : "The date and time for which these statistics are valid\n(i.e. 4 minutes in the past, if that is the last set of data that was included in the statistics calculations).\nOr the current time, if statistics are always live.\n",
       "format" : "date-time",
       "example" : "2026-02-21T13:10:05.000+00:00"
     },
@@ -968,11 +968,11 @@
     },
     "mean" : {
       "type" : "number",
-      "description" : "Either the mean age of all the requests by being the average of all the data set **or** an approximation defined by _mean += eta * (sample - mean)_ where eta is 0.01. The initial value of the mean is 0, until the first request result is processed then it is set to the age value of that result."
+      "description" : "Either the mean age of all the requests, by being the average of all the data sets, **or** \nan approximation defined by _mean += eta * (sample - mean)_, where eta is 0.01.\nThe initial value of the mean is 0, until the first request result is processed, then it is set to the age value of that result.\n"
     },
-    "medium" : {
+    "median" : {
       "type" : "number",
-      "description" : "Either the medium age of all the requests by being the central point of all the data set **or** a stochastic approximation defined by _median += eta * sgn(sample - median)_ where eta is 0.01 and sgn is a function which outputs -1, 0, 1 depending on whether (sample-median) is negative, zero or positive. The initial value of the medium is 0, until the first request result is processed then it is set to the age value of that result."
+      "description" : "Either the median age of all the requests, by being the central point of all the data sets, **or** \na stochastic approximation defined by _median += eta * sgn(sample - median)_,\nwhere eta is 0.01 and sgn is a function which outputs -1, 0, 1 depending on whether (sample-median) is negative, zero, or positive.\nThe initial value of the median is 0, until the first request result is processed, then it is set to the age value of that result.\n"
     },
     "buckets" : {
       "$ref" : "#/components/schemas/Statistics_contents_buckets"
@@ -984,31 +984,31 @@
   "properties" : {
     "20" : {
       "type" : "number",
-      "description" : "Number of requests where the age is age <= 29."
+      "description" : "Number of requests where age <= 29."
     },
     "30" : {
       "type" : "number",
-      "description" : "Number of requests where the age is 30 <= age <= 39."
+      "description" : "Number of requests where 30 <= age <= 39."
     },
     "40" : {
       "type" : "number",
-      "description" : "Number of requests where the age is 40 <= age <= 49."
+      "description" : "Number of requests where 40 <= age <= 49."
     },
     "50" : {
       "type" : "number",
-      "description" : "Number of requests where the age is 50 <= age <= 59."
+      "description" : "Number of requests where 50 <= age <= 59."
     },
     "60" : {
       "type" : "number",
-      "description" : "Number of requests where the age is 60 <= age <= 69."
+      "description" : "Number of requests where 60 <= age <= 69."
     },
     "70" : {
       "type" : "number",
-      "description" : "Number of requests where the age is 70 <= age <= 79."
+      "description" : "Number of requests where 70 <= age <= 79."
     },
     "80" : {
       "type" : "number",
-      "description" : "Number of requests where the age is 80 >= age."
+      "description" : "Number of requests where 80 >= age."
     }
   }
 };
@@ -2043,7 +2043,7 @@ Return value is not specified but should describe the error.
                             <h3 id="examples-Analysis-analysisCustomerIdRequestsRequestIdGet-title-404"></h3>
                             <p id="examples-Analysis-analysisCustomerIdRequestsRequestIdGet-description-404" class="marked"></p>
                             <script>
-                              var responseAnalysis404_description = `customer_id or request_id are not found in the database.
+                              var responseAnalysis404_description = `The service cannot find a matching customer_id or user_id.
 
 Return value is not specified but should describe the error.
 `;
@@ -2069,7 +2069,7 @@ Return value is not specified but should describe the error.
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "customer_id or request_id are not found in the database.\n\nReturn value is not specified but should describe the error.\n",
+  "description" : "The service cannot find a matching customer_id or user_id.\n\nReturn value is not specified but should describe the error.\n",
   "content" : { }
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
@@ -2170,7 +2170,8 @@ Return value is not specified but should describe the error.
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked">Returns a report of general statistics of the client. This report should be kept up-to-date with a maximum of five minutes delay.
+                        <p class="marked">Returns a report of general statistics about the client&#39;s requests to this service.
+This report should be kept up-to-date, with a **maximum** of five minutes delay.
 </p>
                         <p></p>
                         <br />
@@ -2348,7 +2349,7 @@ Return value is not specified but should describe the error.
                             <h3 id="examples-Analysis-analysisCustomerIdStatisticsGet-title-404"></h3>
                             <p id="examples-Analysis-analysisCustomerIdStatisticsGet-description-404" class="marked"></p>
                             <script>
-                              var responseAnalysis404_description = `customer_id is not found in the database.
+                              var responseAnalysis404_description = `The service cannot find a matching customer_id.
 
 Return value is not specified but should describe the error.
 `;
@@ -2374,7 +2375,7 @@ Return value is not specified but should describe the error.
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "customer_id is not found in the database.\n\nReturn value is not specified but should describe the error.\n",
+  "description" : "The service cannot find a matching customer_id.\n\nReturn value is not specified but should describe the error.\n",
   "content" : { }
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
@@ -2976,7 +2977,7 @@ Return value is not specified but should describe the error.
                             <h3 id="examples-Analysis-analysisCustomerIdUsersUserIdGet-title-404"></h3>
                             <p id="examples-Analysis-analysisCustomerIdUsersUserIdGet-description-404" class="marked"></p>
                             <script>
-                              var responseAnalysis404_description = `customer_id or user_id are not found in the database.
+                              var responseAnalysis404_description = `The service cannot find a matching customer_id or user_id.
 
 Return value is not specified but should describe the error.
 `;
@@ -3002,7 +3003,7 @@ Return value is not specified but should describe the error.
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "customer_id or user_id are not found in the database.\n\nReturn value is not specified but should describe the error.\n",
+  "description" : "The service cannot find a matching customer_id or user_id.\n\nReturn value is not specified but should describe the error.\n",
   "content" : { }
 };
                                         var schema = findNode('schema',schemaWrapper).schema;
