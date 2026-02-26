@@ -2,13 +2,13 @@
 
 \usepackage[T1]{fontenc}  % Suddenly required to compile using GH Actions.
 \usepackage{pgfpages}
-%\setbeameroption{show notes on second screen}
-
 \usepackage{languages}
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 \usetikzlibrary{arrows}
 \usetikzlibrary{fit}
+
+%\setbeameroption{show notes on second screen}
 
 \title{Pipeline Architecture}
 \subtitle{Software Architecture}
@@ -20,19 +20,24 @@
 
 \maketitle
 
-\point[So far\dots]{Layered architectures reduce the impact of changing a layer}
-\note{Emphasizing idea that pipeline architecture is a layered architecture taken to an extreme,
-      minus the ability to have upward notifications.}
 
-\questionanswer{Why does the layer order matter?\note{A consequence is layers have order.}}
+\point[So far\dots]{Layered architectures reduce the impact of changing a layer}
+\note{Emphasising idea that pipeline architecture is a layered architecture taken to an extreme,
+      minus the ability to have upward notifications}
+
+
+\questionanswer{Why does the layer order matter?\note{A consequence is layers have order}}
                {Each layer implements a different interface.}
 
 \point[So\dots]{If every layer implements the same interface?}
-\note{We essentially have a pipeline architecture.}
+\note{We essentially have a pipeline architecture}
+
 
 \point[Extreme layered architecture]{Pipeline Architectures\footnote{sorta}}
 
-\definition{Pipeline Architecture}{Components connected in such a way that the output of one component is the input of another.}
+
+\definition{Pipeline Architecture}{Components connected in such a way that the output of one component is the input of another}
+
 
 \questionanswer{Can you think of a \highlight{pipeline architecture}?}
                {How about \highlight{bash}?}
@@ -43,14 +48,15 @@
     \item ??
 }
 
+
 \begin{frame}[fragile]
 \begin{code}[language=shell,mathescape]{}
 $>>$ cat assignment.py | grep "hack" | wc -l | tee code-quality.txt
 \end{code}
-\only<2-3>{Notice:
+\only<2-3>{\Large Notice:
 \begin{itemize}
-    \item Each program performs a small well-defined task.
-    \item<3-> Each program implements the same interface (i.e. raw text).
+    \item Each program performs a small well-defined task
+    \item<3-> Each program implements the same interface (i.e. raw text)
 \end{itemize}}
 \only<4->{
     \centering
@@ -71,6 +77,7 @@ $>>$ cat assignment.py | grep "hack" | wc -l | tee code-quality.txt
 }
 \end{frame}
 
+
 \begin{frame}[c]
 \only<1->{{\large\par\bigskip
 \begin{center}
@@ -89,7 +96,7 @@ $>>$ cat assignment.py | grep "hack" | wc -l | tee code-quality.txt
 \end{center}
 }
 }
-\note{Note the simplicity and modularity.}
+\note{Note the simplicity and modularity}
 
 \only<2->{
     \par\bigskip{\normalsize\color{primary}Filters}
@@ -100,9 +107,10 @@ $>>$ cat assignment.py | grep "hack" | wc -l | tee code-quality.txt
 \only<3->{
     \par\bigskip{\normalsize\color{primary}Pipes}
 
-    \huge The flow of data between filters
+    \huge Flow of data between filters
 }
 \end{frame}
+
 
 \begin{frame}{Types of Filters}
 \begin{minipage}{0.45\textwidth}
@@ -136,6 +144,7 @@ $>>$ cat assignment.py | grep "hack" | wc -l | tee code-quality.txt
 
 \point[Exercise]{Label the bash pipeline}
 
+
 \begin{frame}
 \centering
 \begin{tikzpicture}[>=latex']
@@ -154,48 +163,60 @@ $>>$ cat assignment.py | grep "hack" | wc -l | tee code-quality.txt
 \end{tikzpicture}
 \end{frame}
 
-\definition{One Direction Principle}{Data should flow in one direction --- \highlight{downstream}.}
-\note{This makes pipeline architectures bad for interactivity.}
 
-\definition{Independent Filter Principle}{Filters should not rely on specific upstream or downstream components.}
+\definition{One Direction Principle}{Data should flow in one direction --- \highlight{downstream}}
+\note{Consequence: Pipeline architectures do not suit interactivity}
+
+
+\definition{Independent Filter Principle}{Filters should not rely on specific upstream or downstream components}
 \note[itemize]{
-    \item This is not required but is strongly encouraged as it helps in designing good architectures.
-    \item Note that producers and consumers can assume they don't have an upstream or downstream respectively.
+    \item This is not required but is strongly encouraged as it helps in designing good architectures
+    \item Note that producers and consumers can assume they don't have an upstream or downstream respectively
 }
 
-\corollary{Generic Interface}{The interface between filters should be generic.}
-\note{This follows from independent filters.}
 
-\corollary{Composable Filters}{Filters (i.e. Transformers \& Testers) can be applied in any order.}
+\corollary{Generic Interface}{The interface between filters should be generic}
+\note{Follows from independent filters}
+
+
+\corollary{Composable Filters}{Filters (i.e. \highlight{Transformers} \& \highlight{Testers}) can be applied in any order}
 \note[itemize]{
-    \item This follows from independent filters.
-    \item The meaning of the process is determined by the designer who composes how filters are applied.
+    \item Follows from independent filters
+    \item The meaning of the process is determined by the designer who composes how filters are applied
 }
+
 
 \point[The Case Study]{Bash}
 \note{Quick discussion about how the bash philosophy enables many small components which work well together.}
+
 
 \begin{frame}
 \centering
 \includegraphics[width=0.9\textwidth]{bashcomponents.jpg}
 \end{frame}
 
+
 \question{Who has heard of \highlight{literate programming}?}
-\note{We're now going on a quick tangent about how the pipeline architecture of bash allowed McIlroy to best Knuth.}
+\note{We're now going on a quick tangent about how the pipeline architecture of bash allowed McIlroy to best Knuth}
+
 
 \point[The Challenge --- set by Jon Bently]{
     \begin{enumerate}
-        \item Read a file of text.
-        \item Determine the $n$ most frequently used words.
-        \item Print out a sorted list of those words along with their frequencies.
+        \item Read a file of text
+        \item Determine the $n$ most frequently used words
+        \item Print out a sorted list of those words along with their frequencies
     \end{enumerate}
 }
-\point[Knuth's Solution]{\highlight{17 pages} of elegant and descriptive code.}
+
+
+\point[Knuth's Solution]{\highlight{17 pages} of elegant and descriptive code}
+
 
 \begin{frame}
 \includegraphics[page=1,width=0.45\textwidth]{perls.pdf}
 \includegraphics[page=2,width=0.45\textwidth]{perls.pdf}
 \end{frame}
+
 
 \begin{frame}[fragile]
     \par\bigskip
@@ -218,14 +239,17 @@ tr -cs A-Za-z '\n' | \
     \item Pass through a stream editor; quit (q) after printing the number of lines designated by the script’s first parameter (\${1})
 }
 
-\questionanswer{Is literate programming bad?}{No, the Unix philosophy is just good.}
+
+\questionanswer{Is literate programming bad?}{No, the Unix philosophy is just good}
+
 
 \point[Unix Philosophy]{
 \begin{itemize}
-\item Write programs that do one thing and do it well.
-\item<2-> Write programs to work together.
-\item<3-> Write programs to handle text streams, because that is a universal interface.
+\item Write programs that do one thing and do it well
+\item<2-> Write programs to work together
+\item<3-> Write programs to handle text streams, because that is a universal interface
 \end{itemize}}
+
 
 \begin{frame}{Bash itself is a pipeline}
 \centering
@@ -252,7 +276,7 @@ tr -cs A-Za-z '\n' | \
                 ;
 \end{tikzpicture}
 \end{frame}
-\note{Just an aside looking at it more practically rather than philosophically.}
+\note{Just an aside, looking at it more practically rather than philosophically}
 
 
 %\point[Case Study]{Compilers}
@@ -269,6 +293,7 @@ tr -cs A-Za-z '\n' | \
 
 
 \point[Reading...]{``Pipeline Architecture'' Notes \cite{pipeline-notes}}
+
 
 \references{articles,books,ours}
 
