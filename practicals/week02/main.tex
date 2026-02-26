@@ -28,11 +28,11 @@
 
 
 \section{This Week}
-This week our goal is to:
+This week our goal is to
 \begin{itemize}
   \item explore the various techniques developers use to store data; and
   %\item investigate the storage options implementing these techniques on the AWS platform;
-  \item upgrade our todo application to use a local sqlite relational database.
+  \item upgrade our todo application to use a local SQLite relational database.
 \end{itemize}
 
 \clearpage
@@ -213,7 +213,7 @@ Now that our dependencies are installed,
 navigate to the cloned practical directory and create a new folder within the \texttt{todo} folder called \texttt{models}.
 Inside this folder create a new file called \texttt{todo.py} and a new file called \texttt{\_\_init\_\_.py}.
 
-Inside the \texttt{\_\_init\_\_.py} file add the following code:
+Inside the \texttt{\_\_init\_\_.py} file add the following code.
 
 \begin{code}[language=python,numbers=none]{}
   from flask_sqlalchemy import SQLAlchemy
@@ -222,7 +222,7 @@ Inside the \texttt{\_\_init\_\_.py} file add the following code:
 \end{code}
 
 All this file does is setup a new SQLAlchemy object which we will use to interact with our database.
-In the \texttt{models/todo.py} file add the following code:
+In the \texttt{models/todo.py} file add the following code.
 
 \begin{code}[language=python,numbers=none]{}
 import datetime
@@ -271,7 +271,7 @@ Look at the comments in the code to see what each line is doing.
 
 Now that we have defined our database schema using an ORM,
 we need to configure our application to use the database.
-Open the \texttt{todo/\_\_init\_\_.py} file and change the code to the following:
+Open the \texttt{todo/\_\_init\_\_.py} file and change the code to the following.
 
 \begin{code}[language=python,numbers=none]{}
 from flask import Flask
@@ -341,7 +341,7 @@ Your project structure should at least have the follow structure (there may be a
 
 We can use the \texttt{sqlite3} command line tool to inspect the database.
 Open a terminal and navigate to the root of your project.
-Then run the following command:
+Then run the following command.
 
 \bash{sqlite3 instance/db.sqlite}
 
@@ -350,28 +350,28 @@ Then run the following command:
 }
 
 This will open the SQLite command line tool and connect to the database file.
-We can then run the following command to see the tables in our database:
+We can then run the following command to see the tables in our database.
 
 \begin{code}[language=sql,numbers=none]{}
   .tables
 \end{code}
 
 This will show us the tables in our database.
-We can then run the following command to see the schema of our table:
+We can then run the following command to see the schema of our table.
 
 \begin{code}[language=sql,numbers=none]{}
   .schema todos
 \end{code}
 
 This will show us the columns in our table.
-We can then run the following command to see the data in our table:
+We can then run the following command to see the data in our table.
 
 \begin{code}[language=sql,numbers=none]{}
   SELECT * FROM todos;
 \end{code}
 
 This should initially show us no output, indicating that the table is currently empty.
-We can then run the following command to exit the SQLite command line tool:
+We can then run the following command to exit the SQLite command line tool.
 
 \begin{code}[language=sql,numbers=none]{}
   .exit
@@ -399,7 +399,6 @@ Now change the \texttt{get\_todos} endpoint to the following.
 \begin{code}[language=python,numbers=none]{}
 @api.route('/todos', methods=['GET'])
 def get_todos():
-    """Return the list of todo items"""
     todos = Todo.query.all()
     result = []
     for todo in todos:
@@ -413,7 +412,6 @@ We can then change the \texttt{get\_todo} endpoint to the following.
 \begin{code}[language=python,numbers=none]{}
 @api.route('/todos/<int:todo_id>', methods=['GET'])
 def get_todo(todo_id):
-    """Return the details of a todo item"""
     todo = db.session.get(Todo, todo_id)
     if todo is None:
         return jsonify({'error': 'Todo not found'}), 404
@@ -435,7 +433,6 @@ In the \texttt{todo/views/routes.py} file, change the \texttt{create\_todo} endp
 \begin{code}[language=python,numbers=none]{}
 @api.route('/todos', methods=['POST'])
 def create_todo():
-    """Create a new todo item and return the created item"""
     todo = Todo(
         title = request.json.get('title'),
         description = request.json.get('description'),
@@ -536,7 +533,7 @@ def delete_todo(todo_id):
     return jsonify(todo.to_dict()), 200
 \end{code}
 
-We now have a set of endpoints that can perform the CRUD\footnote{Create, Read, Update, Delete}}
+We now have a set of endpoints that can perform the CRUD\footnote{Create, Read, Update, Delete}
 operations of our API but some functionality is missing.
 We are going to add that functionality after setting up some tests to help us do
 \link{\textbf{Test Driven Development}}{https://agilealliance.org/glossary/tdd/}.
@@ -550,7 +547,8 @@ In the project, you have a \texttt{tests} folder.
 This contains \texttt{test\_todo.py} which has a range of provided tests for the todo endpoints.
 However, we need to setup a few components to make it work.
 
-Inside the \texttt{tests} folder create a \texttt{base.py} file. Inside the \texttt{base.py} file add the following code:
+Inside the \texttt{tests} folder create a \texttt{base.py} file.
+Add the following code to \texttt{base.py}.
 
 \begin{code}[language=python,numbers=none]{}
   from todo import create_app
@@ -582,7 +580,7 @@ This allows us to override the config values for the testing environment.
 
 \subsection{Prepping the config for testing}
 
-Open the \texttt{todo/\_\_init\_\_.py} file and adjust the \texttt{create\_app} function to the following:
+Open the \texttt{todo/\_\_init\_\_.py} file and update the \texttt{create\_app} function to be as follows.
 
 \begin{code}[language=python,numbers=none]{}
   def create_app(config_overrides=None):
@@ -613,7 +611,7 @@ Open the \texttt{todo/\_\_init\_\_.py} file and adjust the \texttt{create\_app} 
 
 Now we will write our first tests.
 In the \texttt{tests} folder and create a \texttt{test\_health.py} file.
-Add the following code:
+Add the following code.
 
 \begin{code}[language=python,numbers=none]{}
   from tests.base import TodoTest
@@ -631,7 +629,7 @@ This test will make a GET request to the \texttt{/api/v1/health} endpoint and ch
   \item JSON object with the key \texttt{status} and the value \texttt{ok}.
 \end{itemize}
 
-To run this test stop your server, if it is running, and run the following command:
+To run this test stop your server, if it is running, and run the following command.
 
 \bash{poetry run python3 -m unittest tests/test_health.py}
 
@@ -649,7 +647,7 @@ You should see the following output.
 \subsection{Test Driven Development}
 
 You have created a test for the health endpoint and run it.
-To run the suite of provided tests, use the following command:
+To run the suite of provided tests, use the following command.
 
 \bash{poetry run python3 -m unittest discover -s tests}
 
@@ -660,9 +658,9 @@ We would like you to change your API to make the tests pass.
 
 \hint{
   To retrieve the value of a request parameter, you can use 
-  \link{\texttt{request.args.get()}.}{https://tedboy.github.io/flask/interface_api.incoming_request_data.html#flask.Request.args}
+  \link{\texttt{request.args.get()}}{https://tedboy.github.io/flask/interface_api.incoming_request_data.html\#flask.Request.args}.
   To check if the request is a JSON request, you can use the 
-  \link{\texttt{request.is\_json}}{https://tedboy.github.io/flask/interface_api.incoming_request_data.html#flask.Request.is_json} attribute.
+  \link{\texttt{request.is\_json}}{https://tedboy.github.io/flask/interface_api.incoming_request_data.html\#flask.Request.is_json} attribute.
 }
 
 If you get stuck feel free to ask your peers / staff for help.
@@ -671,12 +669,13 @@ If you get stuck feel free to ask your peers / staff for help.
 \section{Finishing Up}
 
 We now have a working API which we can use to create, read, update, and delete todo items.
-We can also use the API to:
+We can also use the API to
 \begin{itemize}
   \item mark todo items as completed;
-  \item filter todo items by whether they are completed or not (a query parameter of completed in the list get query); and
-  \item filter todo items by whether they are within the next \textit{N} days.
-        In the tests this is exposed by a query parameter \texttt{window}.
+  \item filter todo items by whether they are completed or not,
+        using the \texttt{completed} query parameter in the list get query); and
+  \item filter todo items by whether they are within the next \textit{N} days,
+        using the \texttt{window} query parameter.
 \end{itemize}
 
 Next week we will Dockerise our API and use \texttt{docker compose} to run our API and a database within containers.
