@@ -198,9 +198,9 @@ The second and third submissions \textbf{must} include all of the following in y
         \footnote{If you use external libraries,
                   ensure that you pin the versions to avoid external changes breaking your application.}
   \item Terraform code that provisions your service in a fresh AWS environment.
-  \item A \texttt{deploy.sh} script that uses your Terraform code to deploy your application.
-        This script \textbf{must} be in the \emph{root} directory of your repository.
-        This script may perform other tasks as required by your implementation.
+%  \item A \texttt{deploy.sh} script that uses your Terraform code to deploy your application.
+%        This script \textbf{must} be in the \emph{root} directory of your repository.
+%        This script may perform other tasks as required by your implementation.
 \end{itemize}
 \end{samepage}
 
@@ -211,10 +211,12 @@ You may re-create the process yourself.
 \begin{enumerate}
   \item Your Git repository will be cloned locally.
   \item The submission branch will be checked out.
-  \item The script \texttt{deploy.sh} in the \textbf{\emph{root} directory} will be run.
-  \item The \texttt{deploy.sh} script \textbf{must} create a file named \texttt{api.txt},
-        which contains the URL at which your API is deployed,
-        e.g. \texttt{http://my-api.com/api/v1/} or \texttt{http://123.231.213.012/api/v1/}.
+  \item If a \texttt{before.sh} file exists in the root directory, it will be run.
+  \item We will run \texttt{terraform init}, \texttt{terraform plan}, and \texttt{terraform apply -auto-approve}
+        in the root directory of your project.
+  \item Your deployment \textbf{must} create a file named \texttt{api.txt},
+        which contains the URL at which your API is deployed.
+        (e.g. \texttt{http://my-api.com/api/v1/} or \texttt{http://123.231.213.012/api/v1/})
   \item We will run automated functionality and load-testing on the URL provided in the \texttt{api.txt} file.
 \end{enumerate}
 
