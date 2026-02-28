@@ -214,10 +214,13 @@ You may re-create the process yourself.
   \item If a \texttt{before.sh} file exists in the root directory, it will be run.
   \item We will run \texttt{terraform init}, \texttt{terraform plan}, and \texttt{terraform apply -auto-approve}
         in the root directory of your project.
-  \item Your deployment \textbf{must} create a file named \texttt{api.txt},
-        which contains the URL at which your API is deployed.
-        (e.g. \texttt{http://my-api.com/api/v1/} or \texttt{http://123.231.213.012/api/v1/})
-  \item We will run automated functionality and load-testing on the URL provided in the \texttt{api.txt} file.
+  \item We will then run \texttt{terraform output -raw api > api.txt}.
+        The result of this must be that \texttt{api.txt} contains the URL at which your API is deployed
+        (e.g. \texttt{http://my-api.com/api/v1/} or \\
+        \texttt{http://123.231.213.012/api/v1/}).
+        The \texttt{api.txt} file must \textbf{only} contain the URL.
+        Do not include \textbf{\textit{any}} other text in the output.
+  \item Automated functionality and load tests will be run against the URL discovered in the \texttt{api.txt} file.
 \end{enumerate}
 
 \warning{
