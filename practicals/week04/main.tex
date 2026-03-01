@@ -17,7 +17,7 @@
 \end{figure}
 
 \aside{
-  Github Classroom links for this practical can be found on Edstem \url{https://edstem.org/au/courses/21491/discussion/2429006}
+  Github Classroom links for this practical can be found on Edstem \url{https://edstem.org/au/courses/33564/discussion/3127162}
 }
 
 
@@ -275,16 +275,17 @@ You will need to keep your lab running for the next steps.
 \includegraphics[width=1.02\textwidth]{images/aws-details}
 
 \item Click on the first `Show' button next to `AWS CLI'. This will display a text block starting with \texttt{[default]}.
-\item Within your repository create a \texttt{credentials} file and copy the contents of the text block into the file.
-\textbf{Do \underline{not} share this file contents --- do \underline{not} commit it}.
-This file is added to the \texttt{.gitignore} of your repository by default.
+\item In the root directory of your repository,
+      create a \texttt{credentials} file and copy the contents of the text block into the file.
+      \textbf{Do \underline{not} share this file contents --- do \underline{not} commit it}.
+      This file is already in the \texttt{.gitignore} of your practical repository.
 \item Create a \texttt{main.tf} file in the same directory with the following contents:
 \begin{code}[language=terraform,numbers=none]{main.tf}
 terraform {
     required_providers {
         aws = {
             source  = "hashicorp/aws"
-            version = "~> 5.0"
+            version = "~> 6.0"
         }
     }
 }
@@ -302,7 +303,7 @@ provider "aws" {
 }
 \end{code}
 
-The \texttt{terraform} block specifies the required external dependencies, here we need to use the AWS provider above version 5.0.
+The \texttt{terraform} block specifies the required external dependencies, here we need to use the AWS provider above version 6.0.
 The \texttt{provider} block configures the AWS provider, instructing it which region to use and how to authenticate (using the credentials file we created).
 We also include some \texttt{tags} to add to any resource made by this provider, these are useful for keeping track of resources in the console.
 
@@ -397,8 +398,9 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 You can now check in the AWS Console that another EC2 instance with the name \texttt{hextris} has been created.
 Now that we have a server, we should try to configure it to serve Hextris.
 We will use the \texttt{user\_data} field, which configures commands to run when launching the instance.
-First we need a script to provision the server, if we combine all our commands from section \ref{sec:installHextris}, we will produce this script:
+First we need a script to provision the server, if we combine all our commands from section \ref{sec:installHextris}, we will produce the following script.
 
+\vspace{-1em}
 \begin{code}[language=bash,numbers=none]{serve-hextris.sh}
 #!/bin/bash
 yum install -y httpd
@@ -429,6 +431,8 @@ Where possible, Terraform will try to update a resource in-place
 but since this changes how an instance is started, it needs to be replaced.
 Go ahead and apply the changes.
 
+\subsection{Terraform Output}
+
 Now, in theory, we should have deployed Hextris to an EC2 instance.
 But how do we access that instance?
 We \textit{could} go to the AWS Console and find the public IP address.
@@ -442,6 +446,7 @@ We can specify certain attributes as `output' attributes.
 Output attributes are printed to the terminal when the module is invoked directly
 but as we will see later, they can also be used by other Terraform configuration files.
 
+\vspace{-1em}
 \begin{code}[language=terraform,numbers=none]{main.tf}
 output "hextris-url" {
   value = aws_instance.hextris-server.public_ip
@@ -463,8 +468,29 @@ Outputs:
 hextris-url = "3.82.225.65"
 \end{code}
 
-You can apply this plan to save these new output values to the Terraform state, without changing any real infrastructure.  
+The output can be formatted using Terraform's string interpolation.
+We can use this to output the Hextris server's URL, rather than just its IP address.
 
+\vspace{-1em}
+\begin{code}[language=terraform,numbers=none]{main.tf}
+output "hextris-url" {
+  value = "http://${aws_instance.hextris-server.public_ip}/"
+}
+\end{code}
+
+You can apply this plan to save these new output values to the Terraform state, without changing any real infrastructure.
+
+We can use the \texttt{terraform output} command to return the value of output variables.
+We can specify which variable(s) to return and the format in which they are returned.
+We can use this to obtain the Hextris server URL in a format that can be pasted directly into a browser.
+This can be run anytime after applying the plan.
+
+\begin{code}[numbers=none]{}
+$ terraform output -raw hextris-url
+http://52.23.187.96/
+\end{code}
+
+Here we have specified to return the value of the \texttt{hextris-url} variable, without any formatting.
 So let's try and access that URL, hmm.
 That is strange. Something has gone wrong.
 
@@ -480,7 +506,7 @@ as is normally quicker, \href{https://www.google.com/search?q=terraform+aws+secu
 First, let us create an appropriate security group.
 Recall that in the AWS Console configuration,
 ingress SSH access (port 22) and all egress%
-\footnote{Ingress and egress in networking just means incoming and outgoing respectively.}
+\footnote{Ingress and egress in networking just mean incoming and outgoing respectively.}
 traffic were automatically configured and we just added ingress port 80.
 In Terraform the whole state must be configured so we specify two \texttt{ingress} blocks,
 one for HTTP (port 80) and one for SSH access (port 22).%
@@ -516,33 +542,34 @@ resource "aws_security_group" "hextris-server" {
 }
 \end{code}
 
+\begin{minipage}{\textwidth}
 Note the following:
 \begin{itemize}
   \item \texttt{from\_port} and \texttt{to\_port} are the start and end of a range of ports rather than incoming or outgoing. In this example our range is 80-80.
   \item \texttt{protocol} set to ``-1'' is a special flag to indicate all protocols.
   \item Explaining \texttt{cidr} is outside the scope of the course, but the specified block above means to apply to all IP addresses.
 \end{itemize}
+\end{minipage}
 
+\vspace{1em}
 You may now \texttt{apply} the changes to create this new security group resource.
 
 Next, we will attach the security group to the EC2 instance.
-Return to the \texttt{aws\_instance.hextrix-server} resource
-and include the following line:
+In the \texttt{aws\_instance.hextrix-server} resource, include the following line.
 
 \begin{code}[language=terraform,numbers=none]{}
 security_groups = [aws_security_group.hextris-server.name]
 \end{code}
 
 Note that EC2 instances can have multiple security groups.
-Once again notice the structure of resource identifiers in AWS.
+Once again, notice the structure of resource identifiers in AWS.
 
 % Now if we try to apply or plan these changes,
 % we will notice that the change of security group forces replacement.
 % TODO: I don't actually know why it does this.
 
 Now \texttt{apply} the changes.
-If you now try to access via the IP address
-(the IP address may have changed),
+If you paste the URL into a web browser (the IP address may have changed),
 you should be able to view the Hextris website.
 
 
@@ -554,7 +581,7 @@ It also means that if we want to redeploy Hextris at any point,
 we can easily just run the IaC to deploy it.
 
 To try this out, let us first take everything down.
-We can do this with:
+We do this with:
 \bash{terraform destroy}
 
 You should be prompted to confirm that you want to destroy all of the resources in the state.
@@ -568,7 +595,10 @@ Confirm that this brings the website back exactly as before (with a different IP
 You can now start any lab you want and almost instantly spin back up the website you have configured.
 That is the beauty of Infrastructure as Code!
 
-\textbf{Hint:} Destroy everything again before you finish.
+\notice{
+  Destroy everything again before you finish and close your Learner Lab.
+  Anything left running in your lab may continue to consume your credit.
+}
 
 
 \section{Automated Testing}
@@ -592,13 +622,13 @@ we may reach out to ensure that you are not being left behind in the content.
 
 \info{This section is for students who have completed the practical and want to extend their knowledge.}
 
-Since CSSE6400 runs this practical every year, sometimes the AMI that we were using is out of date or does not exist any more.
+Since CSSE6400 runs this practical every year, sometimes the AMI that we are using is out of date or does not exist any more.
 For this practical, we could instead query AWS for the latest AMI and use that in our Terraform.
 
 To do this we introduce a new data source, \texttt{aws\_ami}.
 Data sources fetch or query data from the provider, rather than creating something.
 
-Add the following to your \texttt{main.tf} file:
+Add the following to your \texttt{main.tf} file.
 
 \begin{code}[language=terraform,numbers=none]{}
 data "aws_ami" "latest" {
@@ -636,8 +666,8 @@ resource "aws_instance" "hextris-server" {
   ami           = data.aws_ami.latest.id
   instance_type = "t2.micro"
   key_name      = "vockey"
-  security_groups = [aws_security_group.hextris-server.name]
   user_data = file("./serve-hextris.sh")
+  security_groups = [aws_security_group.hextris-server.name]
 
   tags = {
     Name = "hextris"
