@@ -104,8 +104,9 @@ File "./program.py", line 9
 SyntaxError: invalid syntax
     \end{code}
     \pause
-    f-strings aren't supported in Python 3.5!
-    Have to upgrade to Python 3.6.
+    \texttt{f-strings} aren't supported in Python 3.5!
+    
+    Have to upgrade to Python 3.6+.
 \end{frame}
 
 \begin{frame}[fragile]
@@ -118,6 +119,7 @@ ModuleNotFoundError: No module named 'numpy'
     \end{code}
     \pause
     A Python dependency used by our code isn't installed.
+    
     Have to install numpy (hopefully the right version...).
 \end{frame}
 
@@ -127,7 +129,8 @@ ModuleNotFoundError: No module named 'numpy'
 9
     \end{code}
     \pause
-    ???
+    \vspace{1em}
+    \LARGE ???
 \end{frame}
 
 \question{Not so easy... what do we need?}
@@ -136,12 +139,12 @@ ModuleNotFoundError: No module named 'numpy'
     \vspace{-2em}
     \begin{columns}
     \begin{column}{0.4\textwidth}
-    {\color{primary}\huge A wall}
+    {\color{primary}\huge A Wall}
     \vspace{1em}
 
     \Large{
     A big wall around our environment so that we
-    \highlight{know what software} we are actually depending upon.
+    \highlight{know what software} we are actually depending upon
     }
     \end{column}
     \begin{column}{0.6\textwidth}
@@ -162,19 +165,21 @@ ModuleNotFoundError: No module named 'numpy'
     \end{column}
 
     \begin{column}{0.4\textwidth}
-    {\color{primary}\huge A package}
+    {\color{primary}\huge A Package}
     \vspace{1em}
 
     \Large{
     A way to box up all your software and dependencies
-    so it can be \highlight{transferred} and \highlight{run} in a different environment.
+    so it can be \highlight{transferred} and \highlight{run} in a different environment
     }
     \end{column}
     \end{columns}
 \end{frame}
 
+
 \section{A History of Containers %
 \footnote{This is a very Linux focused history --- container technology also exists in the Windows world.}}
+
 
 \begin{frame}{1979}
     \vspace{-3em}
@@ -193,7 +198,9 @@ ModuleNotFoundError: No module named 'numpy'
     \end{columns}
 \end{frame}
 
+
 \point[demo]{Exploring \highlight{chroot}}
+
 
 \begin{frame}[fragile]{Exploring \highlight{chroot}}
     \begin{code}[numbers=none]{}
@@ -209,8 +216,9 @@ chroot: failed to run command '/bin/ls': No such file or directory
 \end{frame}
 \note[itemize]{
     \item First chroot -- Doesn't exist from our new root.
-    \item Second chroot -- Exists but it can't find files on which ls depends.
+    \item Second chroot -- Exists but it can't find files on which \texttt{ls} depends.
 }
+
 
 \begin{frame}[fragile]{Exploring \highlight{chroot}}
     \vspace{-0.5em}
@@ -227,6 +235,12 @@ bin  lib  lib64
 libc.so.6  libpcre2-8.so.0  libselinux.so.1
     \end{code}
 \end{frame}
+\note[itemize]{
+    \item \texttt{ldd} -- Lists dependencies
+    \item \texttt{cp} -- Copy dependencies
+    \item \texttt{ls} -- Show that these are now within our directory
+}
+
 
 \begin{frame}[fragile]{Exploring \highlight{chroot}}
     \begin{code}[numbers=none]{}
@@ -241,10 +255,11 @@ ls
     \end{code}
 \end{frame}
 \note[itemize]{
-    \item ldd -- Lists dependencies
-    \item cp -- Copy dependencies
-    \item ls -- Show that these are now within our directory.
+    \item Can now run \texttt{chroot . /bin/ls} -- Everything is available from new root
+    \item Second chroot -- Shows that it considers our directory to be the root
+    \item Third chroot -- Shows we can't go to a parent directory
 }
+
 
 \begin{frame}[fragile]{Chroot Limitations}
     {\LARGE
@@ -259,11 +274,6 @@ ls
     \end{itemize}
     }
 \end{frame}
-\note[itemize]{
-    \item Can now run chroot . /bin/ls -- Everything is available from new root.
-    \item Second chroot -- Shows that it considers our directory to be the root.
-    \item Third chroot -- Shows we can't go to a parent directory.
-}
 
 
 \begin{frame}{1992}
@@ -271,8 +281,8 @@ ls
     \begin{column}{0.8\textwidth}
     \begin{center}
     \href{https://www.bell-labs.com/institute/blog/plan-9-bell-labs-cyberspace/}{
-    \includegraphics[width=\textwidth]{images/plan9}
-}
+        \includegraphics[width=\textwidth]{images/plan9}
+	}
 \note[itemize]{
     \item Image shows members of the Bell Labs Computing Techniques Research Department, which developed Plan 9:
     \item (foreground, from left) Dennis Ritchie, Dave Presotto, Rob Pike,
@@ -291,12 +301,14 @@ ls
 
 \end{frame}
 
+
 \point[\huge Layered filesystem]{
     \begin{itemize}
         \item Projection on \highlight{read}
         \item Copy on \highlight{write}
     \end{itemize}
 }
+
 
 \begin{frame}[fragile]{Projection on \highlight{read}}
     \begin{center}
@@ -326,9 +338,7 @@ passwords.txt help.md diary.md
     \item Two layers, and a projection giving us the perspective of a single merged layer.
     \item Lower layer is \textbf{\textit{read}} only.
 }
-\note{
-    
-}
+
 
 \begin{frame}[fragile]{Copy on \highlight{write}}
 \begin{code}[numbers=none]{}
@@ -357,11 +367,13 @@ passwords.txt help.md diary.md
 \end{frame}
 \note[itemize]{
     \item Two layers:
-    \item ~~Write to `passwords.txt' in the upper layer.
-    \item ~~Leave `passwords.txt' in the lower layer unchanged.
+    \item ~~~Write to `passwords.txt' in the upper layer.
+    \item ~~~Leave `passwords.txt' in the lower layer unchanged.
 }
 
+
 \point[demo]{Exploring a \highlight{layered filesystem}}
+
 
 \begin{frame}[fragile]{Exploring a \highlight{layered filesystem}}
     \begin{code}[numbers=none]{}
@@ -371,6 +383,7 @@ passwords.txt help.md diary.md
 > mount -t overlay -o lowerdir=lower,upperdir=upper,workdir=worker none merged
     \end{code}
 \end{frame}
+
 
 \begin{frame}[fragile]{Exploring a \highlight{layered filesystem}}
     \vspace{-0.5em}
@@ -393,6 +406,7 @@ password1234
     \end{code}
 \end{frame}
 
+
 \begin{frame}{2002}
     \begin{columns}
     \begin{column}{0.45\textwidth}
@@ -410,6 +424,7 @@ password1234
 
 \end{frame}
 
+
 \begin{frame}{Linux Namespaces}
     {\LARGE
     \begin{description}
@@ -424,6 +439,7 @@ password1234
     }
 \end{frame}
 
+
 \begin{frame}{2008}
     \begin{columns}
     \begin{column}{0.4\textwidth}
@@ -437,13 +453,14 @@ password1234
 \end{frame}
 \note{First to utilize namespaces, didn't require Linux patches}
 
+
 \begin{frame}{2013}
     \begin{columns}
     \begin{column}{0.8\textwidth}
     \begin{center}
     \href{https://youtu.be/wW9CAH9nSLs}{
-    \includegraphics[height=0.8\textheight]{images/docker-release}
-}
+        \includegraphics[height=0.8\textheight]{images/docker-release}
+    }
     \end{center}
     \end{column}
      \begin{column}{0.3\textwidth}
@@ -457,6 +474,7 @@ password1234
 
 \end{frame}
 
+
 \quote[Nigel Poulton]{
     \highlight{Docker} was the magic that made Linux containers usable for mere mortals.
 }
@@ -464,10 +482,12 @@ password1234
 
 \section{The Language of Containers}
 
+
 \definition{Container}{
     A \highlight{running process} created from a container image.
     Typically isolated from the host system.
 }
+
 
 \definition{Container Image}{
     A set of files that can be used to \highlight{create a container}.
@@ -478,6 +498,7 @@ password1234
     i.e. lower, and upper, repeatedly stacked on top of themselves.\\
     In LXC it is just one layer.
 }
+
 
 \begin{frame}[fragile]{Container Image}
     \begin{columns}
@@ -502,10 +523,12 @@ bin   dev  home  lib64  mnt  proc  run   srv
     \end{columns}
 \end{frame}
 
+
 \definition{Container Engine}{
     A tool to \highlight{create} and \highlight{manage} containers.\\
     Often also manages container images.
 }
+
 
 \point[\huge Container Engines]{
     \begin{itemize}
@@ -519,22 +542,25 @@ bin   dev  home  lib64  mnt  proc  run   srv
     \end{itemize}
 }
 
+
 \point[\huge Creating a Container Image]{
     \vspace{3mm}
     To create a container image,
-    we need to \highlight{create a collection of image layers}.
+    we need to \highlight{create a collection of image layers}
 
     \vspace{3mm}
     Fortunately, this is no longer a manual process...
 
     \pause
     \vspace{3mm}
-    Instead we use a \highlight{build file}, or image blueprints.
+    Instead we use a \highlight{build file}, or image blueprints
 }
+
 
 \definition{Build File}{
     File containing the \highlight{instructions} for \highlight{creating a container image}.
 }
+
 
 \begin{frame}[fragile]{Build File}
 \begin{code}[language=docker]{Dockerfile}
@@ -555,6 +581,7 @@ CMD ["/usr/games/cowsay", "Hello World"]
 \end{code}
 \end{frame}
 
+
 \begin{frame}[fragile]
 \begin{verbatim}
 
@@ -568,6 +595,7 @@ CMD ["/usr/games/cowsay", "Hello World"]
                 ||     ||
 \end{verbatim}
 \end{frame}
+
 
 \begin{frame}[fragile]
     \begin{columns}
@@ -593,6 +621,7 @@ CMD ["/usr/games/cowsay", "Hello World"]
     \end{column}
     \end{columns}
 \end{frame}
+
 
 \begin{frame}[fragile]
     \begin{columns}
@@ -620,6 +649,7 @@ CMD ["/usr/games/cowsay", "Hello World"]
     \end{column}
     \end{columns}
 \end{frame}
+
 
 \begin{frame}[fragile]
     \begin{columns}
@@ -657,6 +687,7 @@ CMD ["/usr/games/cowsay", "Hello World"]
 
 
 \section{Virtual Machines}
+
 
 \begin{frame}
     \begin{columns}
@@ -715,6 +746,7 @@ CMD ["/usr/games/cowsay", "Hello World"]
 \end{columns}
 \end{frame}
 
+
 \point[\huge Isolation]{
     \vspace{0.5em}
     Virtual machines are used for \highlight{machine isolation}
@@ -723,14 +755,15 @@ CMD ["/usr/games/cowsay", "Hello World"]
     Containers are used for \highlight{process isolation}
 }
 
+
 \begin{frame}{Size Comparison}
 
-    I want \highlight{10} Flask servers running on Ubuntu 24.
+    I want \highlight{10} Flask servers running on Ubuntu 26
 
     \normalsize
     \begin{align*}
-        \text{Ubuntu 24} &\simeq 5.9GB \\
-        \text{Python 3.13.2} &\simeq 649MB \\
+        \text{Ubuntu 26} &\simeq 5.9GB \\
+        \text{Python 3.13.12} &\simeq 649MB \\
         \text{Flask} &\simeq 12MB \\
         \text{My App} &\simeq 12K 
     \end{align*}
@@ -740,7 +773,7 @@ CMD ["/usr/games/cowsay", "Hello World"]
     {\color{primary} Virtual Machine}
     \begin{align*}
         \text{Image Size} &= 5.9GB + 649MB \\
-                          &+ 12MB + 12K\\
+                          &~~~+ 12MB + 12K\\
         &= 6.56GB \\
         \text{Total Space} &= 6.56GB * 10 \\
         &= 65.6GB
@@ -759,25 +792,25 @@ CMD ["/usr/games/cowsay", "Hello World"]
 \end{columns}
 \end{frame}
 
+
 \questionanswer{When would I want a \highlight{virtual machine}?}{
     \begin{itemize}
-        \item Running a \highlight{different operating system}.
-        \item \highlight{Unique hardware requirements} such as emulating old computer hardware.
-        \item Where \highlight{security} is crucial, virtual machines can offer greater isolation.
+        \item Running a \highlight{different operating system}
+        \item \highlight{Unique hardware requirements} such as emulating old computer hardware
+        \item Where \highlight{security} is crucial, virtual machines can offer greater isolation
     \end{itemize}
 }
 
 \questionanswer{When would I want a \highlight{container}?}{
     \begin{itemize}
-        \item Running a \highlight{single application}.
-        \item \highlight{Lightweight} and \highlight{fast} to startup.
-        \item Running \highlight{many containers} on the same system.
+        \item Running a \highlight{single application}
+        \item \highlight{Lightweight} and \highlight{fast} to startup
+        \item Running \highlight{many containers} on the same system
     \end{itemize}
 }
 
 \point[Combined Use Cases]{
-%    \Large
-    Often virtual machines and containers are \highlight{combined}.
+    Often virtual machines and containers are \highlight{combined}
 
     \vspace{1em}
     e.g. If you deploy containers on Google Kubernetes Engine, the containers run inside of virtual machines on Google's hardware.
@@ -790,40 +823,40 @@ CMD ["/usr/games/cowsay", "Hello World"]
 \vspace{2mm}
 Containers provide a reliable,
 if brute force,
-way to \highlight{manage dependencies}.
+way to \highlight{manage dependencies}
 
 \vspace{4mm}
-Wrap the whole machine state up and ship it.
+Wrap the whole machine state up and ship it
 }
 
 \point[\huge Continuous Integration]{
 \vspace{2mm}
 Containers allow developers to locally
 \highlight{replicate the same test environment}
-as the CI system.
+as the CI system
 }
 
 \point[\huge Continuous Delivery]{
 \vspace{2mm}
-Containers allow teams to package, deploy, and manage applications more efficiently.
+Containers allow teams to package, deploy, and manage applications more efficiently
 
 \vspace{4mm}
-Containers can be used to \highlight{deploy} on cloud platforms or on-premise servers with \highlight{minimal manual configuration}.
+Containers can be used to \highlight{deploy} on cloud platforms or on-premise servers with \highlight{minimal manual configuration}
 }
 
 \point[\huge Scaling]{
 \vspace{2mm}
-Containers allow applications to be \highlight{scaled up or down quickly and efficiently}.
+Containers allow applications to be \highlight{scaled up or down quickly and efficiently}
 }
 
 \point[\huge Microservices]{
 \vspace{2mm}
-Containers make it easy to deploy and manage \highlight{individual services independently}.
+Containers make it easy to deploy and manage \highlight{individual services independently}
 }
 
 \point[\huge Serverless]{
 \vspace{2mm}
-Containers are the basis for \highlight{serverless computing}.
+Containers are the basis for \highlight{serverless computing}
 }
 
 
@@ -941,17 +974,19 @@ Password: password
 
 \point[\huge Exercise]{
     \vspace{2mm}
-    We want to create \highlight{multiple} containers that \highlight{work together}.
+    We want to create \highlight{multiple} containers that \highlight{work together}
     \pause
 
     \vspace{4mm}
     But we don't want to remember all the \highlight{commands to start and manage} the containers and get them to talk to each other\dots
 }
 
+
 \point[\huge When faced with tedium]{
     \vspace{2mm}
     Script it!
 }
+
 
 \begin{frame}[fragile]
     \begin{code}[language=bash]{start.sh}
@@ -964,12 +999,14 @@ docker run -p 80:80 -v ./nginx.conf:/etc/nginx/nginx.conf -d nginx
     \end{code}
 \end{frame}
 
+
 \point{This turns out to be very common\dots
 
 \pause
 \vspace{4mm}
 Introducing\dots \highlight{Docker Compose}
 }
+
 
 \definecolor{Aquamarine}{HTML}{00B5BE}
 \definecolor{Peach}{HTML}{F7965A}
@@ -1026,9 +1063,9 @@ services:
     \end{columns}
 \end{frame}
 \note[itemize]{
-    \item \texttt{docker-compose}, a Python app, is deprecated.
-    \item \texttt{docker compose} is a Go plug-in for Docker.
-    \item First line of a version number higher than the Python version is no longer required.
+    \item \texttt{docker-compose}, a Python app, is deprecated
+    \item \texttt{docker compose} is a Go plug-in for Docker
+    \item First line of a version number higher than the Python version is no longer required
 }
 
 \command{docker compose up}{
