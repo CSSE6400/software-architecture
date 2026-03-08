@@ -474,14 +474,15 @@ Again, Docker volumes are a much more complex beast but host mounting is all we 
 \subsection{Creating a Practical Repository}
 Navigate to the GitHub Classroom link for this practical provided on edstem.
 As with last week, this will create a new repository for you in the course organisation.
-You can now clone this repository to your local machine or work directly in the browser with GitHub Codespaces.
-This repository will be populated with our solution to last week's practical exercise.
+Clone this repository to your local machine or work directly in the browser with GitHub Codespaces.
+(Note that some students encounter issues with \texttt{docker compose} when using Codespaces.)
+This repository contains our solution to last week's practical exercise.
 You may modify this solution or replace it with your own.
 
 \subsection{Creating a Dockerfile}
 
 Now that we have covered the basics of Docker we can Dockerise our Todo App to prepare it for deployment.
-Inside our practical folder we will create a new file called \texttt{Dockerfile}.
+Inside the practical folder create a new file called \texttt{Dockerfile}.
 To start, we will use the following \texttt{Dockerfile}.
 \begin{code}[language=docker,numbers=none]{Dockerfile}
 FROM python:3.13-slim
@@ -567,7 +568,7 @@ CMD ["pipx", "run", "poetry", "run", "flask", "--app", "todo", "run", \
 \subsection{Building our Docker Image}
 
 Now that we have created our \texttt{Dockerfile}, we can build our Docker image.
-To do this we will use the following command.
+Use the following command to do this.
 
 \begin{code}[language=bash,numbers=none]{}
 > docker build -t todo .
@@ -620,9 +621,18 @@ We will be using a Postgresql database which will eventually be a managed databa
 
 \subsection{Moving to a Postgresql Database}
 
-This week we have made a small change to our application so that it can receive the SQLAlchemy database URI as an environment variable.
-This means that we can now use \texttt{docker compose} to run our application and database together.
-To do this create a new file called \texttt{docker-compose.yml} and add the following content.
+This week we have made a small change to our application
+so that it can receive the SQLAlchemy database URI as an environment variable.
+Look at the following code in the \texttt{todo/\_\_init\_\_.py} file.
+
+\begin{code}[language=python,numbers=none]{}
+  app.config['SQLALCHEMY_DATABASE_URI'] = environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///db.sqlite")
+  if config_overrides: 
+      app.config.update(config_overrides)
+\end{code}
+
+This means that we can use \texttt{docker compose} to run our application and database together.
+To do this, create a new file called \texttt{docker-compose.yml} and add the following content.
 
 \begin{code}[numbers=none]{}
   services:
@@ -678,13 +688,13 @@ so that we do not have to keep using the build command.
 % \section{Packaging our Application on Commit}
 
 % \teacher{
-%   Here we will describe the basics of CI for building our container, we teach this here so that next week we can start using it for the AWS deployment.
+%   Here we will describe the basics of CI for building our container,
+%   we teach this here so that next week we can start using it for the AWS deployment.
 % }
 
 % \todo{Running out of time so potentially cut this and move it to the week that we deploy our container}
 
 % \subsection{Intro to Continuous Integration}
-
 
 % \subsection{Intro to GitHub Actions}
 
@@ -693,13 +703,17 @@ so that we do not have to keep using the build command.
 
 \section{Conclusion}
 
-Over the past couple of weeks we have built a full todo app API that is ready to be deployed to a remote production environment.
-We started with a Flask API returning static responses and now we have a dynamic API that is running in a containerised environment with an external database.
+Over the past three weeks we have built a full todo app API
+that is ready to be deployed to a remote production environment.
+We started with a Flask API returning static responses and
+now we have a dynamic API that is running in a containerised environment with an external database.
 
 We have cheated with our Docker deployment by using the Flask development server.
-For a production environment you will want to use a production webserver such as \texttt{gunicorn} or \texttt{uwsgi}.
-These web servers are designed to handle multiple requests at the same time and are much more efficient than the Flask development server.
-We recommend you have a look at how to prepare a Flask application for production as it may help you in your future projects if you choose to use Flask.
+For a production environment you should use a production webserver such as \texttt{gunicorn} or \texttt{uwsgi}.
+These web servers are designed to handle multiple requests at the same time and
+are much more efficient than the Flask development server.
+We recommend you have a look at how to prepare a Flask application for production,
+as it may help you in your future projects if you choose to use Flask.
 
 
 \bibliographystyle{ieeetr}
