@@ -135,8 +135,13 @@ The only dependency on the core system is through the plug-in interface.}
 \definition{Standard Interface Principle}{There should be a single interface that defines how the core system uses plug-ins.}
 
 
-\questionanswer{Does a plug-in architecture equate to a microkernel architecture?}{What about \highlight{IntelliJ}?}
-\note{Not really a microkernel, just a large IDE that allows plug-ins}
+\questionanswer{Does a plug-in architecture equate to a microkernel architecture?}
+{What about the \highlight{Linux kernel}?}
+\note[itemize]{
+    \item Not a microkernel -- kernel has a lot of complex logic
+    \vspace{0.5em}
+    \item Core of a microkernel provides a framework in which plug-ins deliver functionality
+}
 
 
 \begin{frame}{Plug-ins with Separate Databases}
@@ -245,8 +250,6 @@ The only dependency on the core system is through the plug-in interface.}
 \note{Comment on additional complexity}
 
 
-\section{Media Server Example}
-
 \questionanswer{What types of systems could use a \highlight{microkernel architecture}?}
 {
 \begin{itemize}
@@ -255,6 +258,9 @@ The only dependency on the core system is through the plug-in interface.}
     \item Media server
 \end{itemize}
 }
+
+
+\section{Media Server Example}
 
 
 \begin{frame}{Media Server \& Renderer}
@@ -274,7 +280,7 @@ The only dependency on the core system is through the plug-in interface.}
     \item Key showing colours of different domains
     \item Rectangular boxes for Software Systems
     \item Rounded boxes for Containers
-    \item Plug icons for Components
+    \item Plug icons for Components (shown on later slides)
 }
 
 
@@ -299,19 +305,30 @@ The only dependency on the core system is through the plug-in interface.}
 
 \begin{frame}{Media Server}
     \vspace{2mm}
-    \begin{adjustwidth}{-7.5mm}{-7.5mm}
+    \begin{adjustwidth}{-8mm}{-8mm}
         \centering
         \includegraphics[trim=195 197 195 195,clip,width=0.96\paperwidth]{diagrams/media_server_container.png}
     \end{adjustwidth}
 \end{frame}
 \note[itemize]{
     \item Renderer uses server to allow consumer to browse and watch content on the server
-    \item Core Media Server is the Media Server's core
-    \item Four types of plug-Ins deliver customised behaviour
-    \item Each type of plug-in corresponds to a domain of the media server
+    \vspace{1em}
+    \item Core Media Server simply coordinates how the plug-ins deliver behaviour
+    \begin{itemize}
+        \Large
+        \item \highlight{Simplicity} quality attribute
+        \item Example of why it is a \highlight{micro}kernel
+    \end{itemize}
+    \vspace{1em}
+    \item Four types of plug-ins deliver customised behaviour
+    \begin{itemize}
+        \Large
+        \item Each corresponding to a media server \highlight{domain}
+    \end{itemize}
 }
 
 
+%TODO Fix diagram: Plug-ins are containers. They should be outside of Core Media Server Container.
 \begin{frame}{Core Media Server Components}
     \includegraphics[trim=195 197 195 195,clip,width=\textwidth]{diagrams/media_server_core_component.png}
 \end{frame}
@@ -321,13 +338,13 @@ The only dependency on the core system is through the plug-in interface.}
 }
 
 
-\begin{frame}{Media Library Management Components}
+\begin{frame}{Library Management Plug-ins Components}
     \centering
     \includegraphics[trim=195 197 195 195,clip,width=0.9\textwidth]{diagrams/libmgt_component.png}
 \end{frame}
 \note[itemize]{
     \item Components scrape metadata from different sources
-    \item Scrape Metadata would be an interface implemented by the plug-ins
+    \item \highlight{Scrape Metadata} is the interface implemented by the plug-ins
 }
 
 
@@ -337,20 +354,30 @@ The only dependency on the core system is through the plug-in interface.}
 \end{frame}
 \note[itemize]{
     \item Simplified interface for library management scrapers
-    \item MetaData \& MediaData classes to pass standardised data structures to each scraper
-    \item One option is to extract data as JSON
+    \vspace{0.5em}
+    \item MediaData \& MetaData classes pass standardised data structures to and from each scraper
+    \begin{itemize}
+        \Large
+        \item One option is to extract data as JSON
+    \end{itemize}
 }
 
 
+%TODO Fix diagram: Library Managemetn Plug-Ins should Scan Media Files in File System.
 \begin{frame}{System Deployment}
     \includegraphics[trim=195 197 195 195,clip,width=0.98\textwidth]{diagrams/deployment.png}
 \end{frame}
 \note[itemize]{
     \item Renderer uses Media Server to browse library and play media
+    \vspace{0.2em}
     \item Renderer could run on its own platform
+    \vspace{0.5em}
     \item Core Media Server uses plug-ins for each domain to deliver customised behaviour
-    \item They use the library metadata stored in the Library Database
-    \item They use the media files stored on the File System
+    \begin{itemize}
+        \Large
+        \item Plug-ins use the metadata stored in the Library Database
+        \item Plug-ins use the media files stored on the File System
+    \end{itemize}
 }
 
 % End Media Server Example
