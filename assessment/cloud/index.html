@@ -1108,7 +1108,7 @@
         <div id="header">
           <div id="api-_">
             <!-- <h2 id="welcome-to-apidoc">API and SDK Documentation</h2> -->
-              <div class="app-desc">Version: 1.0.0</div>
+              <div class="app-desc">Version: 1.0.1</div>
             <hr>
             <div id="app-description" class="app-desc">
                 An API service for analysing photo sets to determine the users generational cohort and estimated age range.
@@ -1128,13 +1128,15 @@
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked">Returns a list of all requests submitted for the given customer id with the optional filters applied. The limit and offset parameters are used to step through blocks of users / page through the results. If the offset is greater than the amount of entries that exist, then an empty array should be returned.
+                        <p class="marked">Returns a list of all requests submitted for the given customer id with the optional filters applied. The limit and offset parameters are used to step through blocks of requests / page through the results. If the offset is greater than the amount of entries that exist, then an empty array should be returned.
 
 If there are no requests associated with the given customer id, an empty array should be returned.
 
 All other parameters are used to filter the results and should be applied before the limit and offset parameters. e.g. If 300 results exists and 200 are labelled as generation X then a request of limit&#x3D;100 and generation&#x3D;&quot;x&quot; should return 100 results. If limit&#x3D;100, generation&#x3D;&quot;x&quot;, and offset&#x3D;200 then the response should be 0 results (an empty array).
 
 The filters are additive and as such if the filter is not in the request then it should not be applied. e.g. If generation&#x3D;&quot;x&quot; is not in the request then all requests should be returned regardless of their status. The exception to this is the limit and offset parameters which have defaults which are applied if they are not in the request.
+
+Requests are returned in creation date time-order, from earliest to latest.
 </p>
                         <p></p>
                         <br />
@@ -1344,7 +1346,7 @@ The status should be one of &#39;pending&#39;, &#39;success&#39;, or &#39;failed
                             <h3 id="examples-Analysis-analysisCustomerIdRequestsGet-title-200"></h3>
                             <p id="examples-Analysis-analysisCustomerIdRequestsGet-description-200" class="marked"></p>
                             <script>
-                              var responseAnalysis200_description = `List of all results, with the filters applied.`;
+                              var responseAnalysis200_description = `List of all results, with the filters applied, in creation date time-order, from earliest to latest.`;
                               var responseAnalysis200_description_break = responseAnalysis200_description.indexOf('\n');
                               if (responseAnalysis200_description_break == -1) {
                                 $("#examples-Analysis-analysisCustomerIdRequestsGet-title-200").text("Status Code: 200 - " + responseAnalysis200_description);
@@ -1372,7 +1374,7 @@ The status should be one of &#39;pending&#39;, &#39;success&#39;, or &#39;failed
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "List of all results, with the filters applied.",
+  "description" : "List of all results, with the filters applied, in creation date time-order, from earliest to latest.",
   "content" : {
     "application/json" : {
       "schema" : {
@@ -2475,6 +2477,8 @@ Return value is not specified but should describe the error.
                         <p></p>
                         <p class="marked">Returns a list of all users for the given customer id with the optional filters applied. The limit and offset parameters are used to step through blocks of users / page through the results. If the offset is greater than the amount of entries that exist, then an empty array should be returned.
 
+No ordering is specified for the returned users. Assignment tests will evaluate correctness as if the list of users was a set.
+
 If there are no users associated with the given customer id, an empty array should be returned.
 </p>
                         <p></p>
@@ -2575,7 +2579,7 @@ Default is 0.
                             <h3 id="examples-Analysis-analysisCustomerIdUsersGet-title-200"></h3>
                             <p id="examples-Analysis-analysisCustomerIdUsersGet-description-200" class="marked"></p>
                             <script>
-                              var responseAnalysis200_description = `List of all results, with the filters applied.`;
+                              var responseAnalysis200_description = `List of all of the specified customer's users, with the filters applied.`;
                               var responseAnalysis200_description_break = responseAnalysis200_description.indexOf('\n');
                               if (responseAnalysis200_description_break == -1) {
                                 $("#examples-Analysis-analysisCustomerIdUsersGet-title-200").text("Status Code: 200 - " + responseAnalysis200_description);
@@ -2603,7 +2607,7 @@ Default is 0.
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
-  "description" : "List of all results, with the filters applied.",
+  "description" : "List of all of the specified customer's users, with the filters applied.",
   "content" : {
     "application/json" : {
       "schema" : {
@@ -2775,6 +2779,8 @@ Return value is not specified but should describe the error.
                         <div class="clearfix"></div>
                         <p></p>
                         <p class="marked">Return an individual user by their ID.
+
+No ordering is specified for the user&#39;s results. Assignment tests will evaluate correctness as if the list of results was a set.
 </p>
                         <p></p>
                         <br />
