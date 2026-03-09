@@ -7,7 +7,7 @@ info:
     name: CSSE6400
     url: https://csse6400.uqcloud.net
     email: noreply@uq.edu.au
-  version: 1.0.0
+  version: 1.0.1
 servers:
 - url: http://analysis.csse6400.uqcloud.net/api/v1
 tags:
@@ -42,13 +42,15 @@ paths:
       - analysis
       summary: List all submitted requests for a given customer.
       description: |
-        Returns a list of all requests submitted for the given customer id with the optional filters applied. The limit and offset parameters are used to step through blocks of users / page through the results. If the offset is greater than the amount of entries that exist, then an empty array should be returned.
-        
+        Returns a list of all requests submitted for the given customer id with the optional filters applied. The limit and offset parameters are used to step through blocks of requests / page through the results. If the offset is greater than the amount of entries that exist, then an empty array should be returned.
+
         If there are no requests associated with the given customer id, an empty array should be returned.
 
         All other parameters are used to filter the results and should be applied before the limit and offset parameters. e.g. If 300 results exists and 200 are labelled as generation X then a request of limit=100 and generation="x" should return 100 results. If limit=100, generation="x", and offset=200 then the response should be 0 results (an empty array).
 
         The filters are additive and as such if the filter is not in the request then it should not be applied. e.g. If generation="x" is not in the request then all requests should be returned regardless of their status. The exception to this is the limit and offset parameters which have defaults which are applied if they are not in the request.
+
+        Requests are returned in creation date time-order, from earliest to latest.
       parameters:
       - name: customer_id
         in: path
@@ -133,7 +135,7 @@ paths:
           example: 'z'
       responses:
         200:
-          description: List of all results, with the filters applied.
+          description: List of all results, with the filters applied, in creation date time-order, from earliest to latest.
           content:
             application/json:
               schema:
@@ -239,6 +241,8 @@ paths:
       summary: List all users for a given customer.
       description: |
         Returns a list of all users for the given customer id with the optional filters applied. The limit and offset parameters are used to step through blocks of users / page through the results. If the offset is greater than the amount of entries that exist, then an empty array should be returned.
+
+        No ordering is specified for the returned users. Assignment tests will evaluate correctness as if the list of users was a set.
         
         If there are no users associated with the given customer id, an empty array should be returned.
       parameters:
@@ -273,7 +277,7 @@ paths:
         example: 40
       responses:
         200:
-          description: List of all results, with the filters applied.
+          description: List of all of the specified customer's users, with the filters applied.
           content:
             application/json:
               schema:
@@ -297,6 +301,8 @@ paths:
       summary: Get user by identifier.
       description: |
         Return an individual user by their ID.
+        
+        No ordering is specified for the user's results. Assignment tests will evaluate correctness as if the list of results was a set.
       parameters:
       - name: customer_id
         in: path
