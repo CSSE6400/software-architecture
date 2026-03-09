@@ -44,7 +44,7 @@ workspace "Media Server" "Example microkernel architecture for a simple media se
 
         # System Relationships
 		consumer -> renderer "Watch Media"
-		renderer -> mediaServer "Obtains Media to Play"
+		renderer -> mediaServer "Obtain Media to Play"
 		mediaServer -> db "Store and Retrieve Library Metadata"
 		mediaServer -> files "Access Media Files"
 
@@ -65,11 +65,12 @@ workspace "Media Server" "Example microkernel architecture for a simple media se
 		libMgt -> tmdb "Scrape Metadata"
 		libMgt -> musicBrainz "Scrape Metadata"
 		nav -> navPlugins "Navigate"
-		videoStream -> videoStreamPlugins "Obtain video data stream."
-		audioStream -> audioStreamPlugins "Obtain audio data stream."
-		videoStreamPlugins -> files "Load video data stream."
-		audioStreamPlugins -> files "Load audio data stream."
+		videoStream -> videoStreamPlugins "Obtain Video Data Stream"
+		audioStream -> audioStreamPlugins "Obtain Audio Data Stream"
+		videoStreamPlugins -> files "Load Video Data Stream"
+		audioStreamPlugins -> files "Load Audio Data Stream"
 		libMgtPlugins -> db "Update Metadata"
+		libMgtPlugins -> files "Extract Identifying Characteristics"
 		navPlugins -> db "Retrieve Metadata"
 
         deploymentEnvironment "Media Server" {
