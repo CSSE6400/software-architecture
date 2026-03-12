@@ -21,18 +21,18 @@ dl dd {text-align: left}</style>
  id="Q1-1-1"></a>
 _________________________________________________________________________________________________
 <h1 class="titleHead">Infrastructure as Code</h1>                                                                  Software Architecture
-   <div class="date" >March 16, 2026</div>                                                                                                                                                       <div class="author" >Brae
-Webb</div>
-______________________________________________________________________________________________
+   <div class="date" >March 16, 2026</div>                                                                                                                        <div class="author" >Brae Webb &amp; Richard
+Thomas</div>
+____________________________________________________________________________________________
    <span 
-class="Cabin-Regular-tlf-t1-">Last Updated on 2023/02/17 </span></div>
+class="Cabin-Regular-tlf-t1-">Last Updated on 2026/03/12 </span></div>
    
    <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
  id="x1-10001"></a>Introduction</h3>
 <!--l. 8--><p class="noindent" >Configuration management can be one of the more challenging aspects of software development. In
-sophisticated architectures there are roughly two layers of configuration management: machine configuration; and
-stack configuration.
-</p><!--l. 12--><p class="indent" >
+sophisticated architectures there are generally two layers of configuration management, machine configuration
+and stack configuration.
+</p><!--l. 13--><p class="indent" >
       </p><dl class="description"><dt class="description"><a 
  id="x1-1001x1"></a>
 <span 
@@ -50,19 +50,19 @@ class="description">
 <!--l. 19--><p class="indent" >   In a sense, machine configuration is a subset of the stack configuration, however, stack configuration tends to
 be focussed on a higher level of abstraction. In this course, our focus when looking at Infrastructure as Code (IaC) is
 <span 
-class="Cabin-Italic-tlf-t1-x-x-120">stack configuration</span>. We rely on containerization tools, such as Docker, to fill the hole left by the lack of treatment of
+class="Cabin-Italic-tlf-t1-x-x-120">stack configuration</span>. We rely on containerisation tools, such as Docker, to fill the hole left by the lack of treatment of
 machine configuration.
    
 </p>
    <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
  id="x1-20002"></a>Brief History</h3>
-<!--l. 25--><p class="noindent" >In the &#8216;Iron Age&#8217; of computing, installing a new server was rate limited by how quickly you could shop for and order
+<!--l. 26--><p class="noindent" >In the &#8216;Iron Age&#8217; of computing, installing a new server was rate limited by how quickly you could shop for and order
 a new physical machine. Once the machine arrived at your company, some number of weeks after the purchase,
 someone was tasked with setting it up, configuring it to talk to other machines, and installing all the software it
 needed. Compared to the weeks it takes to acquire the machine, a day of configuration is not so bad. Furthermore,
 because so much physical effort was needed to provision a new machine, a single developer would only be
 responsible for a few machines.
-</p><!--l. 36--><p class="indent" >   With virtualization one physical machine can be the home of numerous virtual machines. Each one of these
+</p><!--l. 37--><p class="indent" >   With virtualisation one physical machine can be the home of numerous virtual machines. Each one of these
 machines requires configuration. Now, with new machines available within minutes and no physical
 labour involved, spending a day of configuring is out of the question &#8212; introducing: <span 
 class="Cabin-Italic-tlf-t1-x-x-120">infrastructure</span>
@@ -74,40 +74,51 @@ class="Cabin-Italic-tlf-t1-x-x-120">code</span>.
 </p>
    <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
  id="x1-30003"></a>Infrastructure Code</h3>
-<!--l. 44--><p class="noindent" >Infrastructure code arose to ease the burden of the increased complexity where each developer
+<!--l. 46--><p class="noindent" >Infrastructure code arose to ease the burden of the increased complexity where each developer
 configured and maintained many more machines. Infrastructure code encompasses any code that
-helps manage our infrastructure. Infrastructure code can often be quite simple. A shell script which
-installs dependencies is infrastructure code. There&#8217;s an assortment of infrastructure code out in the
-world today, ranging from simple shell scripts up to more sophisticated tools such as Ansible and
-Terraform.
+helps manage our infrastructure. Infrastructure code can often be quite simple. A shell script
+which installs dependencies is infrastructure code. There is an assortment of infrastructure code
+out in the world today, ranging from simple shell scripts up to more sophisticated tools such as
 <a 
- id="x1-3001r1"></a>
+href="https://docs.ansible.com/" >Ansible</a><span class="footnote-mark"><a 
+href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a 
+ id="x1-3001f1"></a>,
+<a 
+href="https://opentofu.org/" >OpenTofu</a><span class="footnote-mark"><a 
+href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
+ id="x1-3003f2"></a>, and
+<a 
+href="https://developer.hashicorp.com/terraform" >Terraform</a><span class="footnote-mark"><a 
+href="#fn3x0" id="fn3x0-bk"><sup class="textsuperscript">3</sup></a></span><a 
+ id="x1-3005f3"></a>.
+<a 
+ id="x1-3007r1"></a>
 </p>
    <div class="tcolorbox tcolorbox" id="tcolobox-1">     
-<div class="tcolorbox-content"><!--l. 50--><p class="noindent" ><span 
+<div class="tcolorbox-content"><!--l. 54--><p class="noindent" ><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Definition</span><span 
 class="Cabin-Bold-tlf-t1-x-x-120">&#x00A0;1. Infrastructure Code</span>
-</p><!--l. 51--><p class="noindent" >Code that provisions and manages infrastructure resources. </p> 
+</p><!--l. 55--><p class="noindent" >Code that provisions and manages infrastructure resources. </p> 
 </div> 
 </div>
 <a 
- id="x1-3002r2"></a>
+ id="x1-3008r2"></a>
    <div class="tcolorbox tcolorbox" id="tcolobox-2">     
-<div class="tcolorbox-content"><!--l. 54--><p class="noindent" ><span 
+<div class="tcolorbox-content"><!--l. 58--><p class="noindent" ><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Definition</span><span 
 class="Cabin-Bold-tlf-t1-x-x-120">&#x00A0;2. Infrastructure Resources</span>
-</p><!--l. 55--><p class="noindent" >Compute resources, networking resources, and storage resources. </p> 
+</p><!--l. 59--><p class="noindent" >Compute resources, networking resources, and storage resources. </p> 
 </div> 
 </div>
-<!--l. 58--><p class="indent" >   To explore the range of infrastructure code available, skim the below examples of infrastructure code in BASH,
-Python, and Terraform. Each snippet performs the same functionality. Infrastructure Code does not have to be
-strictly tools such as Terraform, although the two are often conflated. One thing which should be noted is that
-Infrastructure Code specific languages, unlike most traditional software, is tending towards a declarative
-paradigm.
+<!--l. 62--><p class="indent" >   To explore an example of the range of infrastructure code available, skim the examples below of infrastructure
+code in BASH, Python, and Terraform. Each snippet performs the same functionality. Infrastructure Code does not
+have to use strictly tools such as Terraform, although the two are often conflated. One thing which should be
+noted is that Infrastructure Code specific languages, unlike most traditional software, is tending towards a
+declarative paradigm.
 </p>
    <div class="framedenv" id="code-1">
-<!--l. 66--><pre class="listings" id="listing-1"><span class="label"><a 
- id="x1-3003r1"></a><span 
+<!--l. 71--><pre class="listings" id="listing-1"><span class="label"><a 
+ id="x1-3009r1"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#33997E"><span 
 class="ectt-1200">#</span></span><span style="color:#33997E"><span 
 class="ectt-1200">!/</span></span><span style="color:#33997E"><span 
@@ -115,9 +126,9 @@ class="ectt-1200">bin</span></span><span style="color:#33997E"><span
 class="ectt-1200">/</span></span><span style="color:#33997E"><span 
 class="ectt-1200">bash</span></span> 
 <span class="label"><a 
- id="x1-3004r2"></a></span> 
+ id="x1-3010r2"></a></span> 
 <span class="label"><a 
- id="x1-3005r3"></a><span 
+ id="x1-3011r3"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span style="color:#000000"><span 
 class="ectt-1200">SG</span></span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"><span 
@@ -132,9 +143,9 @@ class="ectt-1200">-</span></span><span style="color:#000000"><span
 class="ectt-1200">group</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">...)</span></span> 
 <span class="label"><a 
- id="x1-3006r4"></a></span> 
+ id="x1-3012r4"></a></span> 
 <span class="label"><a 
- id="x1-3007r5"></a><span 
+ id="x1-3013r5"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">5</span></span><span style="color:#000000"><span 
 class="ectt-1200">aws</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">ec2</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -153,9 +164,9 @@ class="ectt-1200">"</span></span><span style="color:#669900"><span
 class="ectt-1200">$SG</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-3008r6"></a></span> 
+ id="x1-3014r6"></a></span> 
 <span class="label"><a 
- id="x1-3009r7"></a><span 
+ id="x1-3015r7"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">7</span></span><span style="color:#000000"><span 
 class="ectt-1200">INST</span></span><span style="color:#000000"><span 
 class="ectt-1200">=</span></span><span style="color:#000000"><span 
@@ -177,7 +188,7 @@ class="ectt-1200">$SG</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">\</span></span> 
 <span class="label"><a 
- id="x1-3010r8"></a><span 
+ id="x1-3016r8"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">8</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -198,26 +209,26 @@ class="ectt-1200">micro</span></span><span style="color:#000000"><span
 class="ectt-1200">)</span></span>
  
 <span class="label"><a 
- id="x1-3011r9"></a><span 
+ id="x1-3017r9"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">9 </span></span></pre>
    </div>
    <div class="framedenv" id="code-1">
-<!--l. 77--><pre class="listings" id="listing-2"><span class="label"><a 
- id="x1-3012r1"></a><span 
+<!--l. 82--><pre class="listings" id="listing-2"><span class="label"><a 
+ id="x1-3018r1"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#006699"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">boto3</span></span> 
 <span class="label"><a 
- id="x1-3013r2"></a></span> 
+ id="x1-3019r2"></a></span> 
 <span class="label"><a 
- id="x1-3014r3"></a><span 
+ id="x1-3020r3"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span style="color:#006699"><span 
 class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">create_instance</span></span><span style="color:#000000"><span 
 class="ectt-1200">()</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-3015r4"></a><span 
+ id="x1-3021r4"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">4</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -242,7 +253,7 @@ class="ectt-1200">-1</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-3016r5"></a><span 
+ id="x1-3022r5"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">5</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -254,7 +265,7 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">create_security_group</span></span><span style="color:#000000"><span 
 class="ectt-1200">(...)</span></span> 
 <span class="label"><a 
- id="x1-3017r6"></a><span 
+ id="x1-3023r6"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">6</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -268,9 +279,9 @@ class="ectt-1200">GroupId</span></span><span style="color:#669900"><span
 class="tctt-1200">'</span></span><span style="color:#000000"><span 
 class="ectt-1200">]</span></span> 
 <span class="label"><a 
- id="x1-3018r7"></a></span> 
+ id="x1-3024r7"></a></span> 
 <span class="label"><a 
- id="x1-3019r8"></a><span 
+ id="x1-3025r8"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">8</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -282,9 +293,9 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">authorize_security_group_ingress</span></span><span style="color:#000000"><span 
 class="ectt-1200">(...)</span></span> 
 <span class="label"><a 
- id="x1-3020r9"></a></span> 
+ id="x1-3026r9"></a></span> 
 <span class="label"><a 
- id="x1-3021r10"></a><span 
+ id="x1-3027r10"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">10</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -296,7 +307,7 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">run_instances</span></span><span style="color:#000000"><span 
 class="ectt-1200">(</span></span> 
 <span class="label"><a 
- id="x1-3022r11"></a><span 
+ id="x1-3028r11"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">11</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -309,7 +320,7 @@ class="ectt-1200">=[</span></span><span style="color:#000000"><span
 class="ectt-1200">security_group_id</span></span><span style="color:#000000"><span 
 class="ectt-1200">],</span></span> 
 <span class="label"><a 
- id="x1-3023r12"></a><span 
+ id="x1-3029r12"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">12</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -326,7 +337,7 @@ class="ectt-1200">micro</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-3024r13"></a><span 
+ id="x1-3030r13"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">13</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -336,7 +347,7 @@ class="ectt-1200">&#x00A0;</span><span
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">...</span></span> 
 <span class="label"><a 
- id="x1-3025r14"></a><span 
+ id="x1-3031r14"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">14</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -344,12 +355,12 @@ class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span
 class="ectt-1200">)</span></span>
  
 <span class="label"><a 
- id="x1-3026r15"></a><span 
+ id="x1-3032r15"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">15 </span></span></pre>
    </div>
    <div class="framedenv" id="code-1">
-<!--l. 94--><pre class="listings" id="listing-3"><span class="label"><a 
- id="x1-3027r1"></a><span 
+<!--l. 99--><pre class="listings" id="listing-3"><span class="label"><a 
+ id="x1-3033r1"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">1</span></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -362,7 +373,7 @@ class="ectt-1200">server</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-3028r2"></a><span 
+ id="x1-3034r2"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">2</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -375,7 +386,7 @@ class="ectt-1200">.</span></span><span style="color:#669900"><span
 class="ectt-1200">micro</span></span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span> 
 <span class="label"><a 
- id="x1-3029r3"></a><span 
+ id="x1-3035r3"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">3</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -392,20 +403,20 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">name</span></span><span style="color:#000000"><span 
 class="ectt-1200">]</span></span> 
 <span class="label"><a 
- id="x1-3030r4"></a><span 
+ id="x1-3036r4"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">4</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">...</span></span> 
 <span class="label"><a 
- id="x1-3031r5"></a><span 
+ id="x1-3037r5"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">5</span></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-3032r6"></a></span> 
+ id="x1-3038r6"></a></span> 
 <span class="label"><a 
- id="x1-3033r7"></a><span 
+ id="x1-3039r7"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">7</span></span><span style="color:#006699"><span 
 class="ectt-1200">resource</span></span><span style="color:#000000"> </span><span style="color:#669900"><span 
 class="ectt-1200">"</span></span><span style="color:#669900"><span 
@@ -418,7 +429,7 @@ class="ectt-1200">server</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-3034r8"></a><span 
+ id="x1-3040r8"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">8</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -426,7 +437,7 @@ class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span
 class="ectt-1200">ingress</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-3035r9"></a><span 
+ id="x1-3041r9"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">9</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -438,7 +449,7 @@ class="ectt-1200">from_port</span></span><span style="color:#000000"> </span><sp
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">80</span></span> 
 <span class="label"><a 
- id="x1-3036r10"></a><span 
+ id="x1-3042r10"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">10</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -450,7 +461,7 @@ class="ectt-1200">to_port</span></span><span style="color:#000000"> </span><span
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">80</span></span> 
 <span class="label"><a 
- id="x1-3037r11"></a><span 
+ id="x1-3043r11"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">11</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -460,32 +471,32 @@ class="ectt-1200">&#x00A0;</span><span
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">...</span></span> 
 <span class="label"><a 
- id="x1-3038r12"></a><span 
+ id="x1-3044r12"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">12</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-3039r13"></a><span 
+ id="x1-3045r13"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">13</span></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">...</span></span> 
 <span class="label"><a 
- id="x1-3040r14"></a><span 
+ id="x1-3046r14"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">14</span></span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span>
  
 <span class="label"><a 
- id="x1-3041r15"></a><span 
+ id="x1-3047r15"></a><span 
 class="Cabin-Regular-tlf-t1-x-x-60">15 </span></span></pre>
    </div>
    
    <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
  id="x1-40004"></a>Infrastructure as Code</h3>
-<!--l. 136--><p class="noindent" >In this course, we have chosen to make a distinction between <span 
+<!--l. 143--><p class="noindent" >In this course, we have chosen to make a distinction between <span 
 class="Cabin-Italic-tlf-t1-x-x-120">Infrastructure Code </span>and <span 
 class="Cabin-Italic-tlf-t1-x-x-120">Infrastructure as Code</span>. We
 define <span 
@@ -499,28 +510,28 @@ important.
 <a 
  id="x1-4001r3"></a>
 </p>
+                                                                                                    
+                                                                                                    
    <div class="tcolorbox tcolorbox" id="tcolobox-3">     
-<div class="tcolorbox-content"><!--l. 143--><p class="noindent" ><span 
+<div class="tcolorbox-content"><!--l. 150--><p class="noindent" ><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Definition</span><span 
 class="Cabin-Bold-tlf-t1-x-x-120">&#x00A0;3. Infrastructure as Code</span>
-</p><!--l. 144--><p class="noindent" >Following the same good coding practices to manage Infrastructure Code as standard code. </p> 
+</p><!--l. 151--><p class="noindent" >Following the same good coding practices to manage Infrastructure Code as standard code. </p> 
 </div> 
 </div>
-                                                                                                    
-                                                                                                    
-<!--l. 147--><p class="indent" >   Given the above definition of IaC, the natural follow-up question is &#8216;what are good coding practices?&#8217;. Before
-reading further, pause for a moment and consider what coding practices you follow when developing software
-that you would consider good practice. Got some ideas? Good, let&#8217;s enumerate a few that we think are
+<!--l. 154--><p class="indent" >   Given this definition of IaC, the natural follow-up question is &#8220;what are good coding practices?&#8221; Before reading
+further, pause for a moment and consider what coding practices you follow when developing software that
+you would consider good practice. Got some ideas? Good, let&#8217;s enumerate a few that we think are
 important.
    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.1    </span> <a 
  id="x1-50004.1"></a>Everything as Code</h4>
-<!--l. 155--><p class="noindent" >Everything as Code is a good coding practice which seems so obvious in regular programming that it is rarely
+<!--l. 162--><p class="noindent" >Everything as Code is a good coding practice which seems so obvious in regular programming that it is rarely
 discussed. The idea is to ensure that your code does not depend on manual tasks being performed. Unfortunately,
 as developers are already familiar with their cloud platform&#8217;s UI, it can be easy to take the easy way and to quickly
 provision a resource in the UI.
-</p><!--l. 160--><p class="indent" >   Introducing manual changes outside of your Infrastructure Code creates <span 
+</p><!--l. 167--><p class="indent" >   Introducing manual changes outside of your Infrastructure Code creates <span 
 class="Cabin-Italic-tlf-t1-x-x-120">configuration drift</span>, infrastructure
 configuration which has diverged from your Infrastructure Code. Configuration drift can produce <span 
 class="Cabin-Italic-tlf-t1-x-x-120">snowflake</span>
@@ -531,43 +542,48 @@ lost.
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.2    </span> <a 
  id="x1-60004.2"></a>Version Control</h4>
-<!--l. 167--><p class="noindent" >We hope that everyone can agree that version control in regular code is a luxury we would not wish to live without.
+<!--l. 174--><p class="noindent" >We hope that everyone can agree that version control in regular code is a luxury we would not wish to live without.
 It should then be common sense to apply the benefits of version control; restorable code, accountable code, and
 working collaboratively to Infrastructure Code.
-</p><!--l. 171--><p class="indent" >   There is however, one significant catch with versioning infrastructure code: <span 
+</p><!--l. 178--><p class="indent" >   There is however, one significant catch with versioning infrastructure code: <span 
 class="Cabin-Italic-tlf-t1-x-x-120">state</span>. Most Infrastructure Code
-tools utilize some form of state. In Terraform, applying changing updates a file called <span 
-class="Cabin-Italic-tlf-t1-x-x-120">terraform.tfstate</span>. The state is
-important to map the resources specified in Infrastructure Code to their real-world counterparts. However, the
-state is updated frequently and needs to be kept in live-sync between all developers. These requirements make
-version controlling state a generally bad idea. The solution is counter-intuitively a remote state which
-exists outside of Terraform controlled infrastructure and out of reach of version control. A remote
-state might exist on an S3 bucket which all developers can access and update in real time. An non
-version controlled file such as this might seem like a step backwards, however, if you consider it as
-a cache sitting between your Infrastructure Code and your infrastructure it is a <span 
+tools utilise some form of state. In Terraform, applying changes to infrastructure updates a file called
+<span 
+class="Cabin-Italic-tlf-t1-x-x-120">terraform.tfstate</span>. The state is important to map the resources specified in Infrastructure Code to their real-world
+counterparts. However, the state is updated frequently and needs to be kept in live-sync between all developers.
+These requirements make version controlling state a generally bad idea. The solution is counter-intuitively a
+remote state which exists outside of Terraform controlled infrastructure and out of reach of version control. A
+remote state might exist on an S3 bucket which all developers can access and update in real time. An
+non-version controlled file such as this might seem like a step backwards, however, if you consider it as a
+cache sitting between your Infrastructure Code and your infrastructure, it is a <span 
 class="Cabin-Italic-tlf-t1-x-x-120">slightly </span>nicer pill to
 swallow.
    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.3    </span> <a 
  id="x1-70004.3"></a>Automation</h4>
-<!--l. 183--><p class="noindent" >The goal of Infrastructure Code is to help developers manage the complexity of resource management via
-automation. In order to maximize our confidence that Infrastructure Code is reflected in reality, it is important that
+<!--l. 191--><p class="noindent" >The goal of Infrastructure Code is to help developers manage the complexity of resource management via
+automation. In order to maximise our confidence that Infrastructure Code is reflected in reality, it is important that
 our build pipelines provide an assurance of consistency.
-</p><!--l. 187--><p class="indent" >   There are two methods for achieving consistency through automation: fail the pipeline if the Infrastructure
-Code would change the reality; or make changes to reality in our pipeline. Either of these options would ensure
-that the checked-in Infrastructure Code is an accurate reflection of reality that developers can safely build
-atop.
+</p><!--l. 195--><p class="indent" >   There are two methods for achieving consistency through automation: </p>
+      <ul class="itemize1">
+      <li class="itemize">
+                                                                                                    
+                                                                                                    
+      <!--l. 197--><p class="noindent" >fail the pipeline if the Infrastructure Code would change the reality; or
+      </p></li>
+      <li class="itemize">
+      <!--l. 198--><p class="noindent" >make changes to reality in our pipeline.</p></li></ul>
+<!--l. 200--><p class="noindent" >Either of these options would ensure that the checked-in Infrastructure Code is an accurate reflection of reality that
+developers can safely build atop.
    
-                                                                                                    
-                                                                                                    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.4    </span> <a 
  id="x1-80004.4"></a>Code Reuse</h4>
-<!--l. 191--><p class="noindent" >A good developer should embody the practice of working smarter not harder &#8212; it&#8217;s the core practice of our
+<!--l. 203--><p class="noindent" >A good developer should embody the practice of working smarter not harder &#8212; it is the core practice of our
 industry. When developing Infrastructure Code it is important to remember that you are (likely) not the first to
-solve this problem. You&#8217;re not the first person to connect a public EC2 instance to an S3 bucket. A
-good coding practice that happens to be a win-win for everyone is code reuse. You can&#8217;t copy and
+solve this problem. You are not the first person to connect a public EC2 instance to an S3 bucket. A
+good coding practice that happens to be a win-win for everyone is code reuse. You cannot copy and
 paste another developer&#8217;s mouse clicks to configure their server via a UI, but you can, and in most
 cases should, import the Terraform module they published to configure servers in just the way you
 needed.
@@ -575,29 +591,50 @@ needed.
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.5    </span> <a 
  id="x1-90004.5"></a>Testing</h4>
-<!--l. 201--><p class="noindent" >We&#8217;ll cover testing in the lecture :)
+<!--l. 213--><p class="noindent" >We will cover testing in the lecture :)
    
 </p>
    <h3 class="sectionHead"><span class="titlemark">5    </span> <a 
  id="x1-100005"></a>Conclusion</h3>
-<!--l. 204--><p class="noindent" >We have looked at Infrastructure Code which enables developers to manage the vast amount of
-infrastructure resources necessitated by the Cloud Age. Then we explored the benefits of applying the good
-coding practices we know and love from regular programming to Infrastructure Code. We termed this
-practice Infrastructure as Code despite the tools (Infrastructure Code) and practices (Infrastructure as
-Code) being combined in the real world as Infrastructure as Code. It is important to note that IaC
-is still in relatively early stages, there are a number of issues which need to be addressed, such as:
-importing existing infrastructure; improving state management; and enabling proper refactoring.
-Despite these issues, it is the best system we have to date and a significant improvement on manual
+<!--l. 217--><p class="noindent" >We have looked at Infrastructure Code which enables developers to manage the vast amount of infrastructure
+resources necessitated by the Cloud Age. Then we explored the benefits of applying the good coding
+practices we know and love from regular programming to Infrastructure Code. We termed this practice
+Infrastructure as Code, despite the tools (Infrastructure Code) and practices (Infrastructure as Code) being
+combined in the real world as Infrastructure as Code. It is important to note that IaC is still in relatively
+early stages of development. There are a number of issues which need to be addressed, such as
+importing existing infrastructure, improving state management, and enabling proper refactoring.
+Despite these issues, it is the best system we have to date, and a significant improvement on manual
 management.
-</p><!--l. 212--><p class="indent" >
-      Infrastructure as Code is the worst form of infrastructure management except for all those
+</p><!--l. 226--><p class="indent" >
+      Infrastructure as Code is the worst form of infrastructure management, except for all those
       other forms that have been tried from time to time.
-                                                                                             </p><!--l. 215--><p class="noindent" >&#8211;
+                                                                                             </p><!--l. 229--><p class="noindent" >&#8211;
                                                                                    Paraphrased
                                                                                       Winston
                                                                                       Churchill
+                                                                                                    
+                                                                                                    
 </p>
-    
+   <div class="footnotes">       <aside role="doc-footnote" class="footnotetext">
+<!--l. 51--><p class="noindent" ><a 
+ id="x1-3002x3"></a><span class="footnote-mark"><a 
+href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span><a 
+href="https://docs.ansible.com/" class="url" ><span 
+class="ectt-1000">https://docs.ansible.com/</span></a></p></aside> 
+ <aside role="doc-footnote" class="footnotetext">
+<!--l. 52--><p class="noindent" ><a 
+ id="x1-3004x3"></a><span class="footnote-mark"><a 
+href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span><a 
+href="https://opentofu.org/" class="url" ><span 
+class="ectt-1000">https://opentofu.org/</span></a></p></aside> 
+ <aside role="doc-footnote" class="footnotetext">
+<!--l. 52--><p class="noindent" ><a 
+ id="x1-3006x3"></a><span class="footnote-mark"><a 
+href="#fn3x0-bk" id="fn3x0"><sup class="textsuperscript">3</sup></a></span><a 
+href="https://developer.hashicorp.com/terraform" class="url" ><span 
+class="ectt-1000">https://developer.hashicorp.com/terraform</span></a></p></aside> 
+                                                      </div>
+ 
 </body></html> 
 
                                                                                                     
