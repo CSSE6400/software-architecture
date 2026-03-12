@@ -1,13 +1,13 @@
 \title{Infrastructure as Code}
-\author{Brae Webb}
+\author{Brae Webb \& Richard Thomas}
 \date{\week{4}}
 
 \maketitle
 
 \section{Introduction}
 Configuration management can be one of the more challenging aspects of software development.
-In sophisticated architectures there are roughly two layers of configuration management:
-machine configuration; and stack configuration.
+In sophisticated architectures there are generally two layers of configuration management,
+machine configuration and stack configuration.
 
 \begin{description}
     \item[Machine configuration] encompasses software dependencies, operating system configuration, environment variables,
@@ -18,8 +18,9 @@ machine configuration; and stack configuration.
 
 In a sense, machine configuration is a subset of the stack configuration, however,
 stack configuration tends to be focussed on a higher level of abstraction.
-In this course, our focus when looking at Infrastructure as Code (IaC) is \textsl{stack configuration}.
-We rely on containerization tools, such as Docker, to fill the hole left by the lack of treatment of machine configuration.
+In this course, our focus when looking at Infrastructure as Code (IaC) is \textit{stack configuration}.
+We rely on containerisation tools, such as Docker, to fill the hole left by the lack of treatment of machine configuration.
+
 
 \section{Brief History}
 In the `Iron Age' of computing, installing a new server was rate limited by how quickly you could shop for and order a new physical machine.
@@ -33,11 +34,12 @@ a day of configuration is not so bad.
 Furthermore, because so much physical effort was needed to provision a new machine,
 a single developer would only be responsible for a few machines.
 
-With virtualization one physical machine can be the home of numerous virtual machines.
+With virtualisation one physical machine can be the home of numerous virtual machines.
 Each one of these machines requires configuration.
 Now, with new machines available within minutes and no physical labour involved,
 spending a day of configuring is out of the question
 --- introducing: \textsl{infrastructure code}.
+
 
 \section{Infrastructure Code}
 
@@ -45,7 +47,9 @@ Infrastructure code arose to ease the burden of the increased complexity where e
 Infrastructure code encompasses any code that helps manage our infrastructure.
 Infrastructure code can often be quite simple.
 A shell script which installs dependencies is infrastructure code.
-There's an assortment of infrastructure code out in the world today, ranging from simple shell scripts up to more sophisticated tools such as Ansible and Terraform.
+There is an assortment of infrastructure code out in the world today,
+ranging from simple shell scripts up to more sophisticated tools such as \link{Ansible}{https://docs.ansible.com/},
+\link{OpenTofu}{https://opentofu.org/}, and \link{Terraform}{https://developer.hashicorp.com/terraform}.
 
 \begin{definition}[Infrastructure Code]
 Code that provisions and manages infrastructure resources.
@@ -55,9 +59,10 @@ Code that provisions and manages infrastructure resources.
 Compute resources, networking resources, and storage resources.
 \end{definition}
 
-To explore the range of infrastructure code available, skim the below examples of infrastructure code in BASH, Python, and Terraform.
+To explore an example of the range of infrastructure code available,
+skim the examples below of infrastructure code in BASH, Python, and Terraform.
 Each snippet performs the same functionality.
-Infrastructure Code does not have to be strictly tools such as Terraform,
+Infrastructure Code does not have to use strictly tools such as Terraform,
 although the two are often conflated.
 One thing which should be noted is that Infrastructure Code specific languages,
 unlike most traditional software,
@@ -108,6 +113,8 @@ resource "aws_security_group" "hextris-server" {
 }
 \end{code}
 
+
+% Diagram to visualise the extent of automation supported by different languages and tools.
 % \begin{figure}[ht]
 %     \centering
 %     \begin{tikzpicture}[
@@ -117,9 +124,9 @@ resource "aws_security_group" "hextris-server" {
 %       \draw[snake] (2,0) -- (4,0);
 %       \draw (4,0) -- (5,0);
 %       \draw[snake] (5,0) -- (7,0);
-  
+%  
 %       \foreach \x in {0,1,5,7} \draw (\x cm,3pt) -- (\x cm,-3pt);
-  
+%  
 %        \draw (0,0) node[below=3pt] {Shell scripts} node[above=3pt] {};
 %        \draw (1,0) node[below=3pt] {} node[above=3pt] {Python scripts};
 %        \draw (3,0) node[below=3pt] {} node[above=3pt] {};
@@ -144,9 +151,9 @@ We now introduce \textsl{Infrastructure as Code} and clarify why this distinctio
 Following the same good coding practices to manage Infrastructure Code as standard code.
 \end{definition}
 
-Given the above definition of IaC,
+Given this definition of IaC,
 the natural follow-up question is 
-`what are good coding practices?'.
+``what are good coding practices?''
 Before reading further,
 pause for a moment and consider what coding practices you follow when developing software that you would consider good practice.
 Got some ideas? Good, let's enumerate a few that we think are important.
@@ -168,51 +175,58 @@ We hope that everyone can agree that version control in regular code is a luxury
 It should then be common sense to apply the benefits of version control;
 restorable code, accountable code, and working collaboratively to Infrastructure Code.
 
-There is however, one significant catch with versioning infrastructure code: \textsl{state}.
-Most Infrastructure Code tools utilize some form of state.
-In Terraform, applying changing updates a file called \textsl{terraform.tfstate}.
+There is however, one significant catch with versioning infrastructure code: \textit{state}.
+Most Infrastructure Code tools utilise some form of state.
+In Terraform, applying changes to infrastructure updates a file called \textit{terraform.tfstate}.
 The state is important to map the resources specified in Infrastructure Code to their real-world counterparts.
 However, the state is updated frequently and needs to be kept in live-sync between all developers.
 These requirements make version controlling state a generally bad idea.
 The solution is counter-intuitively a remote state which exists outside of Terraform controlled infrastructure and out of reach of version control.
 A remote state might exist on an S3 bucket which all developers can access and update in real time.
-An non version controlled file such as this might seem like a step backwards,
-however, if you consider it as a cache sitting between your Infrastructure Code and your infrastructure it is a \textsl{slightly} nicer pill to swallow.
+An non-version controlled file such as this might seem like a step backwards, however,
+if you consider it as a cache sitting between your Infrastructure Code and your infrastructure,
+it is a \textit{slightly} nicer pill to swallow.
 
 \subsection{Automation}
 The goal of Infrastructure Code is to help developers manage the complexity of resource management via automation.
-In order to maximize our confidence that Infrastructure Code is reflected in reality,
+In order to maximise our confidence that Infrastructure Code is reflected in reality,
 it is important that our build pipelines provide an assurance of consistency.
 
-There are two methods for achieving consistency through automation: fail the pipeline if the Infrastructure Code would change the reality; or make changes to reality in our pipeline.
+There are two methods for achieving consistency through automation:
+\begin{itemize}[topsep=5pt,partopsep=2pt,itemsep=3pt,parsep=4pt]
+    \item fail the pipeline if the Infrastructure Code would change the reality; or
+    \item make changes to reality in our pipeline.
+\end{itemize}
 Either of these options would ensure that the checked-in Infrastructure Code is an accurate reflection of reality that developers can safely build atop.
 
 \subsection{Code Reuse}
 A good developer should embody the practice of working smarter not harder ---
-it's the core practice of our industry.
+it is the core practice of our industry.
 When developing Infrastructure Code it is important to remember that you are (likely) not the first to solve this problem.
-You're not the first person to connect a public EC2 instance to an S3 bucket.
+You are not the first person to connect a public EC2 instance to an S3 bucket.
 A good coding practice that happens to be a win-win for everyone is code reuse.
-You can't copy and paste another developer's mouse clicks to configure their server via a UI,
+You cannot copy and paste another developer's mouse clicks to configure their server via a UI,
 but you can, and in most cases should,
 import the Terraform module they published to configure servers in just the way you needed.
 
 \subsection{Testing}
-We'll cover testing in the lecture :)
+We will cover testing in the lecture :)
+
 
 \section{Conclusion}
 We have looked at Infrastructure Code which enables developers to manage the vast amount of infrastructure resources necessitated by the Cloud Age.
 Then we explored the benefits of applying the good coding practices we know and love from regular programming to Infrastructure Code.
-We termed this practice Infrastructure as Code despite the tools (Infrastructure Code) and practices (Infrastructure as Code) being combined in the real world as Infrastructure as Code.
-It is important to note that IaC is still in relatively early stages,
-there are a number of issues which need to be addressed, such as: importing existing infrastructure; improving state management; and enabling proper refactoring.
-Despite these issues,
-it is the best system we have to date and a significant improvement on manual management.
+We termed this practice Infrastructure as Code, despite the tools (Infrastructure Code) and practices (Infrastructure as Code)
+being combined in the real world as Infrastructure as Code.
+It is important to note that IaC is still in relatively early stages of development.
+There are a number of issues which need to be addressed, such as importing existing infrastructure,
+improving state management, and enabling proper refactoring.
+Despite these issues, it is the best system we have to date, and a significant improvement on manual management.
 
 \begin{oldquote}
-Infrastructure as Code is the worst form of infrastructure management except for all those other forms that have been tried from time to time.
+Infrastructure as Code is the worst form of infrastructure management, except for all those other forms that have been tried from time to time.
 
 \raggedleft -- Paraphrased Winston Churchill
 \end{oldquote}
-% Our distinction between the two allows us to make the distinction between a company which runs a Terraform `script' to spin up a server when they need one and a company which maintains their Infrastructure Code as a first-class citizen.
 
+% Our distinction between the two allows us to make the distinction between a company which runs a Terraform `script' to spin up a server when they need one and a company which maintains their Infrastructure Code as a first-class citizen.
