@@ -1,6 +1,7 @@
 \documentclass{csse4400}
 
 \usepackage{languages}
+\usepackage{changepage}
 
 \title{Getting Started with the Cloud}
 \author{Brae Webb \& Richard Thomas \& Evan Hughes}
@@ -29,7 +30,7 @@ Also install the Terraform plugin for your IDE.
 
 \section{This Week}
 Our goal is to get acquainted with AWS Academy Learner Lab.
-We use the lab to learn how to deploy and manage infrastructure with AWS.
+You will use the lab to learn how to deploy and manage infrastructure with AWS.
 Additionally, Learner Lab will be used to develop the Cloud Infrastructure assignment.
 If you have not already enrolled in the AWS Academy courses, you need to do so now.
 \begin{itemize}
@@ -96,25 +97,28 @@ Amazon offers a range of built-in AMIs. There are also community AMIs or you can
 As we just want a simple server today, we will use one of the built-in AMIs.
 
 We will use the Amazon Linux 2023 AMI today,
-it is considered one of the fundamental images.
-Every AMI has a unique AMI code,
-which is \texttt{ami-08b5b3a93ed654d19} for the Amazon Linux 2023 AMI.
+it is a general purpose image.
+Every AMI has a unique AMI code, which changes every time the image is updated.
+A recent AMI for the Amazon Linux 2023 is \texttt{ami-0c421724a94bba6d6}.
 %Search for it via the code and select it.
 
-\vspace{3mm}
-\noindent
-\includegraphics[width=\textwidth]{images/launch-instance}
-
 \teacher{This AMI is a RedHat style distro with \texttt{yum} as its package manager.}
+
+\begin{center}
+  \noindent
+  \begin{adjustwidth}{-8mm}{-8mm}
+    \includegraphics[width=0.96\paperwidth]{images/launch-instance}
+  \end{adjustwidth}
+\end{center}
 
 \subsection{Instance Settings}
 The settings to configure your instance are:
 \begin{enumerate}
 \item Add a `Name' tag. Call it the name of your website, e.g. \texttt{hextris}.
-\item Select an appropriate AMI, i.e. Amazon Linux 2023 AMI, \texttt{ami-053a45fff0a704a47}.
+\item Select an appropriate AMI (e.g. Amazon Linux kernel-6.18 2023 AMI, \texttt{ami-0c421724a94bba6d6}). You may need to select the drop down list to see it, or search for it by its AMI.
 \item Select a 64-bit (x86) architecture.
 \item The instance type defines the computing, memory, networking and storage capabilities of your instance. We do not need a large server, choose \texttt{t2.micro}.
-\item Select the existing \texttt{vockey} (Type: RSA) key pair option.
+\item For Key pair (login), select the existing \texttt{vockey} (Type: rsa) key pair option.
 \item In network settings, choose `Create security group' and select to allow SSH traffic from anywhere, and HTTPS and HTTP access from the internet.
 \item Keep the `Configure storage' settings as default.
 \item Do not worry about the `Advanced details' options for now.
@@ -210,7 +214,7 @@ Is this ok [y/N]:
 ..... 
 Complete!
 > sudo systemctl enable httpd
-Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service to /usr/lib/systemd/system/httpd.service.
+Created symlink /etc/systemd/system/multi-user.target.wants/httpd.service to /usr/lib/systemd/system/httpd.service.
 > sudo systemctl start httpd
 \end{code}
 
@@ -336,14 +340,14 @@ Add the following basic \texttt{resource} block to \texttt{main.tf}:
 
 \begin{code}[language=terraform,numbers=none]{main.tf}
 resource "aws_instance" "hextris-server" {
-    ami           = "ami-08b5b3a93ed654d19"
+    ami           = "ami-0c421724a94bba6d6"
     instance_type = "t2.micro"
     key_name      = "vockey"
     
     tags = {
         Name = "hextris"
     }
-}      
+}
 \end{code}
 
 To create the server, invoke \texttt{terraform apply},
@@ -361,7 +365,7 @@ Terraform will perform the following actions:
 
   # aws_instance.hextris-server will be created
   + resource "aws_instance" "hextris-server" {
-      + ami                                  = "ami-08b5b3a93ed654d19"
+      + ami                                  = "ami-0c421724a94bba6d6"
       (omitted)
       + instance_type                        = "t2.micro"
       (omitted)
@@ -380,7 +384,7 @@ Do you want to perform these actions?
   Enter a value: 
 \end{code}
 
-If the plan looks sensible enter \texttt{yes} to enact the changes.
+If the plan looks sensible, enter \texttt{yes} to enact the changes.
 
 \begin{code}[numbers=none]{}
   Enter a value: yes
@@ -409,7 +413,7 @@ systemctl start httpd
 
 yum install -y git
 cd /var/www/html
-git clone https://github.com/Hextris/hextris .  
+git clone https://github.com/Hextris/hextris .
 \end{code}
 
 \teacher{The hash bang is required.}
@@ -427,7 +431,7 @@ user_data = file("./serve-hextris.sh")
 
 If you run the \texttt{terraform plan} command now,
 you will notice that Terraform has identified that this change will require creating a new EC2 instance.
-Where possible, Terraform will try to update a resource in-place
+Where possible, Terraform will try to update a resource in-place,
 but since this changes how an instance is started, it needs to be replaced.
 Go ahead and apply the changes.
 
@@ -439,12 +443,12 @@ We \textit{could} go to the AWS Console and find the public IP address.
 However, it turns out that Terraform already knows the public IP address.
 In fact, if you open the Terraform state file (\texttt{terraform.tfstate}),
 you should be able to find it hidden away in there.
-But, we do not want to go hunting through this file all the time.
+We do not want to go hunting through this file all the time.
 Instead we will use the \texttt{output} keyword.
 
 We can specify certain attributes as `output' attributes.
-Output attributes are printed to the terminal when the module is invoked directly
-but as we will see later, they can also be used by other Terraform configuration files.
+Output attributes are printed to the terminal when the module is invoked directly but,
+as we will see later, they can also be used by other Terraform configuration files.
 
 \vspace{-1em}
 \begin{code}[language=terraform,numbers=none]{main.tf}
@@ -500,8 +504,8 @@ When we setup our EC2 instance using the AWS Console,
 it helpfully created a new security group for us.
 We specified that this security group should allow SSH, HTTP, and HTTPS traffic by allowing traffic from ports 22, 80, and 443 respectively.
 When configuring with Terraform, security groups and their attachment to EC2 instances are separate resources.
-Refer back to the Terraform documentation for details or,
-as is normally quicker, \href{https://www.google.com/search?q=terraform+aws+security+group}{Google ``terraform aws security group''}.
+Refer to the Terraform documentation for details or, as is often quicker,
+\href{https://www.google.com/search?q=terraform+aws+security+group}{Google ``terraform aws security group''}.
 
 First, let us create an appropriate security group.
 Recall that in the AWS Console configuration,
@@ -588,7 +592,7 @@ You should be prompted to confirm that you want to destroy all of the resources 
 Once Terraform has finished taking everything down,
 confirm that you can no longer access the website and that the AWS console says the instances have been destroyed.
 
-Now go ahead and apply the changes to bring everything back:
+Now go ahead and apply the changes to bring everything back.
 \bash{terraform apply}
 
 Confirm that this brings the website back exactly as before (with a different IP address).
@@ -606,7 +610,7 @@ A quick note about automated testing.
 As with all the practicals thus far,
 this practical has automated tests enabled on your repository.
 
-From within your repository, you can run the tests locally with:
+From within your repository, the following script will run the tests locally.
 \bash{.csse6400/bin/unittest.sh}
 
 While the emails saying that the tests failed can be annoying,
@@ -663,10 +667,10 @@ To use the data source we need to change the \texttt{ami} attribute of the \text
 
 \begin{code}[language=terraform,numbers=none]{}
 resource "aws_instance" "hextris-server" {
-  ami           = data.aws_ami.latest.id
-  instance_type = "t2.micro"
-  key_name      = "vockey"
-  user_data = file("./serve-hextris.sh")
+  ami             = data.aws_ami.latest.id
+  instance_type   = "t2.micro"
+  key_name        = "vockey"
+  user_data       = file("./serve-hextris.sh")
   security_groups = [aws_security_group.hextris-server.name]
 
   tags = {
@@ -675,8 +679,8 @@ resource "aws_instance" "hextris-server" {
 }
 \end{code}
 
-And now, if we run \texttt{terraform plan}, we will see that it wants to destroy and recreate the EC2 instance.
-This is because the AMI has changed since this practical was first updated for this year.
+If we run \texttt{terraform plan}, we may see that it wants to destroy and recreate the EC2 instance.
+This would be because the AMI has changed since this practical was last updated.
 
 
 \bibliographystyle{ieeetr}
@@ -695,7 +699,7 @@ it can help decrease latency and reduce risk from a major disaster.
 Generally, pick a region and stick with it.
 We have picked \texttt{us-east-1} because it is the least expensive.
 
-\begin{figure}[ht]
+\begin{figure}[t!]
 \includegraphics[width=\textwidth]{images/aws_regions}
 \caption{AWS Regions as of March 2025 \cite{aws-regions}}
 \end{figure}
