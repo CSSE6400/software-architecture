@@ -85,7 +85,7 @@ workspace "Blackboard" "Simplified architecture of old version of Blackboard."  
             include *
         }
 
-        deployment * "UQ Infrastructure" "UQI" {
+        deployment * "UQ Infrastructure" "UQInfra" {
             include *
         }
 
