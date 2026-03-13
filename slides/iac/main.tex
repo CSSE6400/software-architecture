@@ -24,9 +24,12 @@
     \item Who has used IaC before this course?
 }
 
+
 \point[Infrastructure as Code]{How did we get here?}
 
+
 \point[Pre-2000]{The \highlight{Iron Age}}
+
 
 \point[\Large Iron Age]{
 \begin{center}
@@ -40,17 +43,20 @@
 }
 \note{Developer only had a few machines --- so few the machines often got fun names.}
 
+
 \point[\Large Scaling]{
 \begin{center}
 \includegraphics[trim=50 75 20 75,clip,width=0.95\textwidth]{diagrams/physical_server_deployment}
 \end{center}
 }
 \note{
-I used to have scheduling examples for software projects,
-where ordering servers was on the critical path, and had to happen before software development started.
+    I used to have scheduling examples for software projects,
+    where ordering servers was on the critical path, and had to happen before software development started.
 }
 
+
 \point[Introducing...]{The \highlight{Cloud Age}}
+
 
 \point[\Large The Cloud Age]{
 \begin{center}
@@ -58,15 +64,26 @@ where ordering servers was on the critical path, and had to happen before softwa
 \end{center}
 }
 \note[itemize]{
-    \item Summarise: things got complicated quickly, we need more hardware and it's easier to provision.
-    \item Largely thanks to virtualisation --- no physical activity for a new machine.
+    \item Things got complicated quickly
+    \begin{itemize}
+        \Large
+        \item We need more hardware and it is easier to provision
+    \end{itemize}
+    \vspace{0.5em}
+    \item Largely thanks to virtualisation
+    \begin{itemize}
+        \Large
+        \item No physical activity to spin up a new machine
+    \end{itemize}
 }
+
 
 \point[When faced with complexity]{Automate it!}
 \note[itemize]{
-    \item We have too much to manage to do it manually.
-    \item We're about to start enumerating automation techniques.
+    \item We have too much to manage to do it manually
+    \item We're about to start enumerating automation techniques
 }
+
 
 \begin{frame}{The larger story}
 
@@ -83,6 +100,7 @@ where ordering servers was on the critical path, and had to happen before softwa
 
 \end{frame}
 
+
 \begin{frame}
 \large
 \only<1->{
@@ -95,6 +113,7 @@ where ordering servers was on the critical path, and had to happen before softwa
     Compute resources, networking resources, and storage resources.
 \end{defn}}
 \end{frame}
+
 
 \point[\Large Infrastructure Code]%
 {   
@@ -119,7 +138,8 @@ where ordering servers was on the critical path, and had to happen before softwa
     \end{tikzpicture}
 \end{center}
 }
-\note{IC often thought of as the right-hand side but includes all.}
+\note{IC often thought of as the right-hand side, but includes all}
+
 
 \begin{frame}[fragile]{Shell Scripts}
 \begin{code}[language=bash]{}
@@ -133,7 +153,7 @@ INST=$(aws ec2 run-instances --security-group-ids "$SG" \
          --instance-type t2.micro)
 \end{code}
 \end{frame}
-\note{Using AWS CLI to create EC2 access like the practical.}
+\note{Using AWS CLI to create EC2 access like in the practical}
 
 \begin{frame}[fragile]{Python}
 \begin{code}[language=python]{}
@@ -153,7 +173,7 @@ def create_instance():
     )
 \end{code}
 \end{frame}
-\note{Using AWS Python library (boto3).}
+\note{Using AWS Python library (boto3)}
 
 
 \begin{frame}[fragile]{Terraform}
@@ -174,20 +194,24 @@ resource "aws_security_group" "hextris-server" {
 }
 \end{code}
 \end{frame}
-\note{Finally, Terraform.}
+\note{Finally, Terraform}
+
 
 \question{Notice anything different?}
 \note[itemize]{
-    \item Prompting for declarative.
-    \item Might notice verbosity.
+    \item Prompting for declarative
+    \item Might notice verbosity
 }
+
 
 \point[\Large The \highlight{main} difference]{Imperative vs. Declarative}
 \note[itemize]{
     \item \highlight{Imperative} -- Describe the steps to take to deploy the infrastructure
     \item \highlight{Declarative} -- Describe the desired infrastructure
-    \item IC is heading towards a more \highlight{declarative} paradigm.
+    \vspace{0.3em}
+    \item IC is heading towards a more \highlight{declarative} paradigm
 }
+
 
 \point[\LARGE Declarative IaC]
 {
@@ -205,39 +229,46 @@ resource "aws_security_group" "hextris-server" {
     \end{itemize}
 }
 
+
 \point[\Large Infrastructure Code]{
 \Large
 \begin{itemize}[<+->]
-    \item Provisions and manages \highlight{infrastructure resources}.
-    \item Only one part of the movement to \highlight{automate} the complexities of development.
+    \item Provisions and manages \highlight{infrastructure resources}
+    \item Only one part of the movement to \highlight{automate} the complexities of development
     \item Ranges from simple shell scripts up to\dots?
-    \item Tendency to be \highlight{declarative}.
+    \item Tendency to be \highlight{declarative}
 \end{itemize}
 }
-\note{Summarising what we've already covered.}
+\note{Summarising what we've already covered}
+
 
 \point[\Large Typo?]{Infrastructure Code $\neq$ Infrastructure \highlight{as} Code}
 \note[itemize]{
-    \item Mention that this distinction is ours.
-    \item Real world unfortunately mixes the two.
+    \item Mention that this distinction is ours
+    \item Real world unfortunately mixes the two
 }
+
 
 \definition{Infrastructure as Code}%
 {Following the same \highlight{good coding practices} to manage Infrastructure Code as standard code.}
 
-\point[\Large Warning!]{Infrastructure as Code still \highlight{early} and quite \highlight{bad}.}
+
+\point[\Large Warning!]{Infrastructure as Code still \highlight{early} and quite \highlight{bad}}
 \note[itemize]{
-    \item Code reuse is low.
-    \item Importing existing resources is non-trivial.
-    \item Refactoring is painful.
-    \item State management can be tricky.
+    \item Code reuse is low
+    \item Importing existing resources is non-trivial
+    \item Refactoring is painful
+    \item State management can be tricky
 }
 
+
 \question{What are \highlight{good coding practices}?}
-\note{Ask the class.}
+\note{Ask the class}
+
 
 \point[\Large Good Coding Practice \#1]{\highlight{Everything} as Code}
 \note{A practice we do but barely discuss in `regular' programming because it doesn't make sense not to do it.}
+
 
 \begin{frame}[fragile]
 \begin{code}[language=shell]{}
@@ -349,9 +380,9 @@ Snowflakes
     \end{center}
 \end{frame}
 \note[itemize]{
-    \item Traditional test pyramid.
-    \item Unit testing relies on isolated testing.
-    \item But\dots isolated testing doesn't make \highlight{much} sense for IaC.
+    \item Traditional test pyramid
+    \item Unit testing relies on isolated testing
+    \item But\dots isolated testing doesn't make \highlight{much} sense for IaC
 }
 
 \begin{frame}{IaC Test Pyramid}
@@ -393,7 +424,7 @@ func TestTerraformAwsInstance(t *testing.T) {
 }
 \end{code}
 \end{frame}
-\note{An example of validation.}
+\note{An example of validation}
 
 \begin{frame}[fragile]
 \begin{code}[language=Gherkin]{}
@@ -405,7 +436,7 @@ Scenario: Only selected ports should be publicly open
     Then it must only have tcp protocol and port 22,443 for 0.0.0.0/0
 \end{code}
 \end{frame}
-\note{An example of compliance testing.}
+\note{An example of compliance testing}
 
 \point[\Large Benefits]{
 \begin{enumerate}
@@ -413,6 +444,6 @@ Scenario: Only selected ports should be publicly open
 \end{enumerate}
 }
 
-\point[\Large Prac Next Week]{Learn how to use Terraform to write IaC and deploy resources on AWS.}
+\point[\Large Week 4 Prac]{Learn how to use Terraform to write IaC and deploy resources on AWS.}
 
 \end{document}
