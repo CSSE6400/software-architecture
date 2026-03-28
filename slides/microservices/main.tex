@@ -4,7 +4,7 @@
 \usepackage{tabto}
 \usepackage{tikz}
 %\usepackage{pgfpages}
-%\setbeameroption{show notes on second screen}
+\setbeameroption{show notes on second screen}
 
 \title{Microservices Architecture}
 \subtitle{Software Architecture}
@@ -141,9 +141,9 @@
 	\end{tikzpicture}   
 \end{frame}
 \note[itemize]{
-    \item Multiple clients demonstrates common scenario of multiple interfaces to system (e.g. mobile, web).
-    \vspace{0.2em}
-    \item Client UIs may be monolithic to provide a rich interface.
+    \item Multiple clients demonstrates common scenario of multiple interfaces to system (e.g. mobile, web)
+    \vspace{0.3em}
+    \item Client UIs may be monolithic to provide a rich interface
 }
 
 \begin{frame}{API Layer Components}
@@ -171,7 +171,7 @@
         \includegraphics[trim=45 45 45 45,clip,width=0.99\paperwidth]{diagrams/general-topology-service1-component.png}
     \end{adjustwidth}
 \end{frame}
-\note{Services 2 \& 3 are essentially the same.}
+\note{Services 2 \& 3 are essentially the same}
 
 \begin{frame}{Client with Monolithic UI}
     \centering
@@ -211,15 +211,15 @@ OO Modelling -- Identify entities in the problem domain
 \note[itemize]{
     \item Intuitive approach -- Design services around main entities
     \vspace{0.5em}
-    \item Usually introduces \highlight{synchronous} flow of logic between services
+    \item Often introduces \highlight{synchronous} flow of logic between services
     \begin{enumerate}
-        \item \large Customer places an Order
-        \item \large Order calls Product to get details
-        \item \large Product calls Pricing to determine price
+        \item \large \highlight{Customer} places an \highlight{Order}
+        \item \large \highlight{Order} queries \highlight{Product} to get details
+        \item \large \highlight{Product} queries \highlight{Pricing} to determine price
     \end{enumerate}
 }
 
-\begin{frame}{Problem with Synchronous Logic}
+}\begin{frame}{Problem with Synchronous Logic}
     \vspace{1mm}
     \begin{columns}[t]
     \begin{column}{0.5\textwidth}
@@ -255,11 +255,11 @@ OO Modelling -- Identify entities in the problem domain
 	\end{tikzpicture}   
 \end{frame}
 \note[itemize]{
+    \item Chains of request (synchronous logical flow) don't scale
+    \vspace{1em}
     \item DB Icon made by setiawanap from www.flaticon.com
     \item Cogs Icon made by Design Circle from www.flaticon.com
     \item Load Balancer Icon made by DinosoftLabs from www.flaticon.com
-    \vspace{1em}
-    \item Chains of request (synchronous logical flow) don't scale.
 }
 
 
@@ -283,7 +283,7 @@ OO Modelling -- Identify entities in the problem domain
     Services are cohesive business processes.
 }
 
-\point[\Large DDD Consideration]{
+\point[\Large DDD Paradox]{
     \vspace{0.5em}
     Services are \highlight{bounded contexts}.
 
@@ -306,7 +306,7 @@ OO Modelling -- Identify entities in the problem domain
 
 \corollary{Low Coupling}
 {
-    There should be minimal coupling between services.
+    Minimise coupling between services.
 }
 
 \corollary{No Reuse}{
@@ -497,7 +497,12 @@ OO Modelling -- Identify entities in the problem domain
 
 \questionanswer{How bad is coupling with choreography or orchestration?}
 {For a large system, \highlight{very bad}.}
-\note{In 2017, Uber had over 1400 services ... consider how bad coupling would be with either approach.}
+\note{
+    In 2017, Uber had over \highlight{1400} services
+	\begin{itemize}
+	    \Large\item Consider how bad coupling would be with either approach
+	\end{itemize}
+}
 
 \questionanswer{
     How do we scale large microservices-based systems?
@@ -519,13 +524,16 @@ OO Modelling -- Identify entities in the problem domain
 	\end{tikzpicture}   
 \end{frame}
 \note[itemize]{
-    \item Use the tried and true \highlight{Observer} pattern, with the \highlight{Event-Driven Architecture} pattern.
+    \item Use the tried and true \highlight{Observer} pattern
+	\begin{itemize}
+	    \Large\item With the \highlight{Event-Driven Architecture} pattern
+	\end{itemize}
     \vspace{0.2em}
-    \item Clients send \highlight{commands} telling services to do something.
+    \item Clients send \highlight{commands} telling services to do something
     \vspace{0.2em}
-    \item Services \highlight{publish events} indicating what they have done.
+    \item Services \highlight{publish events} indicating what they have done
     \vspace{0.2em}
-    \item Services \highlight{listen for events} to decide how to coordinate their part of the system behaviour.
+    \item Services \highlight{listen for events} to decide how to coordinate their part of the system behaviour
 }
 
 \begin{frame}{Service 1 Components with Event Queue}
@@ -534,7 +542,7 @@ OO Modelling -- Identify entities in the problem domain
         \includegraphics[trim=45 45 45 45,clip,width=0.99\paperwidth]{diagrams/event-queue-service1-component.png}
     \end{adjustwidth}
 \end{frame}
-\note{Services 2 \& 3 are essentially the same.}
+\note{Services 2 \& 3 are essentially the same}
 
 \begin{frame}{}
     \begin{adjustwidth}{-10.5mm}{-10mm}
@@ -547,11 +555,11 @@ OO Modelling -- Identify entities in the problem domain
 	\end{tikzpicture}   
 \end{frame}
 \note[itemize]{
-    \item Sahara eCommerce system as a simple microservices architecture, using event-driven messaging between services.
-    \vspace{0.2em}
-    \item Services publish events indicating what they have done.
-    \vspace{0.1em}
-    \item Also an example of a multi-tenanted system built across in-house servers, AWS and OCI.
+    \item Sahara eCommerce system as a simple microservices architecture, using event-driven messaging between services
+    \vspace{0.3em}
+    \item Services publish events indicating what they have done
+    \vspace{0.5em}
+    \item Also an example of a multi-tenanted system built across in-house servers, AWS and OCI
 }
 
 \questionanswer{Are \highlight{browsing} and \highlight{purchasing} separate contexts?}{
@@ -561,9 +569,19 @@ OO Modelling -- Identify entities in the problem domain
 \end{itemize}
 }
 \note[itemize]{
-    \item Probably different business processes, but possibly the same context.
-    \item If separate services, browse needs to send an event for every change to the shopping cart, and purchase needs to listen for these.
-    \item Possibly merge into one service, as one context.
+    \item Probably different \highlight{business processes}
+	\begin{itemize}
+	    \Large\item But possibly the same \highlight{context}
+	\end{itemize}
+	\vspace{0.6em}
+    \item If separate services:
+	\begin{itemize}
+	    \Large
+	    \item Browse needs to send an event for every change to the shopping cart
+		\item Purchase needs to listen for these
+	\end{itemize}
+	\vspace{0.3em}
+    \item Possibly merge into one service, as one context
 }
 
 \question{
@@ -578,7 +596,7 @@ OO Modelling -- Identify entities in the problem domain
         \vspace{0.5em}
         \item \highlight{Commands} \& \highlight{Events} describe \highlight{behaviour}
         \vspace{0.5em}
-        \item They will help you better model your \highlight{domain}
+        \item Help you to better model your \highlight{domain}
         \vspace{0.5em}
         \item Leading to \highlight{independent}, \highlight{scalable} services
     \end{itemize}
