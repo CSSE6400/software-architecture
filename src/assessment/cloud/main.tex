@@ -1,0 +1,517 @@
+\documentclass{csse4400}
+
+\usepackage{languages}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{xltabular}
+\usepackage{pdflscape}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{dirtree}
+
+
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+
+\title{AgeOverflow}
+\author{Richard Thomas \& Millie Hughes}
+\date{Semester 1, 2026}
+
+\begin{document}
+
+\input{copyright-footer}
+\maketitle
+
+%\warning{This document is a draft and is subject to change.}
+
+\section*{Summary}
+In this assignment, you will demonstrate your ability to \textit{design},
+\textit{implement}, and \textit{deploy} a web API that can process a high load,
+i.e. a scalable application.
+You are to deploy an API to analyse images of headshots to identify an individual's generation cohort.
+Specially your application needs to support:
+\begin{itemize}
+    \item Analysing images received via an API request.
+    \item Providing access to a specified REST API, e.g. for use by front-end interfaces and other applications.
+    \item Remaining responsive while analysing images.
+    \item Reporting statistics about the analysed images.
+\end{itemize}
+
+\noindent
+Your service will be deployed to AWS and will undergo automated correctness and load-testing to ensure it meets the requirements.
+
+\info{The scenario in this document is purely fictional for the purposes of this assignment and does not represent the views or opinions of the authors.}
+
+
+\section{Introduction}
+For this assignment, you are working for AgeOverflow, a new UQ start-up.
+AgeOverflow uses (fictional) machine learning techniques.
+The analysis is able to identify percentage certainty of the given assets to their generational cohort,
+with an age approximation.
+
+\paragraph{Task}
+AgeOverflow uses a microservices architecture to implement their analysis platform.
+The CTO saw on your resume that you are taking Software Architecture
+and has assigned you to design and implement the generation cohort analysis service.
+This service must scale to cope with the anticipated large number of requests.
+
+\paragraph{Requirements}
+Automated identification of generational cohorts is an important service to ensure legal compliance in Australia,
+and potentially other countries.
+Manual verification by personnel is labour intensive and time consuming.
+Automated analysis provides faster responses with varying degrees of certainty, to allow manual review only when its required.
+This is critical as tens or hundreds of thousands of analyses need to be performed daily for users of new services.
+
+AgeOverflow's Generation Cohort Analysis Service (GCAS) needs to be designed to scale to match demand.
+Clients will obtain photographic documentation from users.
+These images will be sent to the GCAS for analysis.
+
+The algorithms used to analyse the images are computationally intensive.
+It is not possible to return a result immediately for a submitted image set.
+Clients, will need to query the GCAS to obtain results at a later time.
+Results can be queried for a single verification, or a batch of verifications for a client or individual.
+
+As clients have a significant backlog of users to verify,
+the service must be able to provide results in a timely manner.
+Delayed verification can put a range of our clients under legal scrutiny.
+
+Persistence is an important characteristic of the platform.
+Resubmitting analysis requests due to lost data would place unnecessary legal and data risk on clients,
+at times when they may be under extreme pressure to deliver results to federal authorities.
+Upon receiving an analysis request, and after error checking,
+the GCAS must guarantee that the data has been saved to persistent storage before returning a success response.
+
+
+\section{Interface}
+As you are operating in a microservices context,
+other service providers have been given an API specification for your service.
+They have been developing their services based on this specification so you must match it \emph{exactly}.
+
+The interface specification is available to all service owners online: 
+
+\url{https://csse6400.uqcloud.net/assessment/cloud/}
+
+\textbf{Version 1.0.1}: Ordering of lists returned from \texttt{GET} queries is specified.
+
+\textbf{Version 1.0.2}: Corrected specification of ages in the 80 bucket for returned statistics.
+
+\textbf{Version 1.0.3}: Corrected 404 error conditions for \texttt{GET /analysis/{customer\_id}/requests/{request\_id}}.
+
+
+\section{Implementation}
+The following constraints apply to the implementation of your assignment solution.
+
+\subsection{Analysis Engine}
+You must use the provided command line tool (\texttt{ageoverflow-engine}) to analyse the image sets sent to your service.
+The tool has varying performance, due to the difficulty of identifying cohorts.
+You will have to work around this bottleneck in the design and development of the GCAS.
+
+Your service \textbf{must} utilise the provided \texttt{ageoverflow-engine} command line tool provided for this assignment.
+The compiled binaries are available in the tool's GitHub repository:
+
+\url{https://github.com/CSSE6400/AgeOverflow-Engine}
+
+\noindent
+Do \textbf{\textit{not}} include this binary in your assignment repository.
+The README documentation in the tool's repository describes how to copy it into your assignment's Docker image.
+
+\warning{You are \textbf{not} allowed to reimplement or modify this tool.}
+
+The analysis engine requires pre-processing of the images.
+This is done by an upstream service.
+For testing purposes, you \textbf{must} use the sample images provided in the \link{analysis engine's repository}
+{https://github.com/CSSE6400/AgeOverflow-Engine}.
+If you try to generate your own images, they are likely to fail analysis or give false results.
+
+\subsection{AWS Services}
+Please make note of the \link{AWS services}
+{https://csse6400.uqcloud.net/resources/LearnerLab-Restrictions.pdf}
+that you can use in the AWS Learner Lab, and the limitations that are placed on the usage of these services.
+The most up-to-date list of available services, and restrictions on their usage,
+is described in the Learner Lab \texttt{Readme} tab.
+
+\subsection{External Services}
+You may \textbf{not} use services or products from outside of the AWS Learner Lab environment.
+For example, you may not host instances of the \texttt{engine} command line tool on another cloud platform
+(e.g.~Google Cloud).
+
+You may \textbf{not} use services or products that run on AWS infrastructure external to your Learner Lab environment.
+For example, you may not deploy a third-party product like MongoDB Atlas on AWS and then use it from your service.
+
+You may \textbf{not} deploy machine learning or GPU backed services.
+
+\subsection{Scaling}
+A simplistic approach to manage high volumes of requests or high processing demands,
+is to have many compute nodes running to cater for the demand.
+Stage 3 of this assignment assesses your ability to scale your application to meet demand.
+This means your application needs to scale up \textit{\textbf{and}} down to be economically efficient.
+From an evaluation perspective, this means
+\begin{itemize}[itemsep=3pt,parsep=3pt,topsep=3pt]
+	\item starting your application with many compute nodes available and idle,
+	\item scaling up faster than demand requires,
+	\item or not scaling down in a timely manner,
+\end{itemize}
+will limit your final grade for stage 3. See the criteria on page \pageref{criteria} for details.
+
+\subsection{AWS Budget}
+You have been provisioned two Learner Labs for this course.
+One is for practical exercises and experimentation.
+The other is for this assignment.
+Each lab has a budget of \textbf{\$50 USD} to spend on AWS resource usage.
+You will no longer be able to access your lab if you exceed this budget.
+You need to ensure you do not leave services running when you do not need them.
+Some services can consume your entire budget in just a few days.
+You also need to ensure you do not go overboard in stage 3,
+by scaling up so many services that they consume a large portion of your budget during testing.
+
+\warning{
+  Ensure your service does not exceed the resource limits of AWS Learner Labs.
+  If you use up your allocated budget in the Learner Lab, you will not be able to run any services.
+  \textbf{Note:} AWS will \textbf{deactivate} your account if it has twenty or more concurrently running instances.
+}
+
+
+\section{Submission}
+This assignment has three submissions.
+
+\begin{enumerate}[topsep=5pt,partopsep=2pt,itemsep=3pt,parsep=4pt]
+  \item March 27$^{th}$ -- API Functionality
+  \item April 13$^{th}$ -- Deployed to Cloud
+  \item May 1$^{st}$ -- Scalable Application
+\end{enumerate}
+All submissions are due at 15:00 on the specified date.
+Your solution for each submission must be committed and pushed to the GitHub repository specified in Section \ref{sec:github}.
+
+Each submission is to be in its \textbf{own branch}.
+You \textbf{\textit{must}} use the branch names \textbf{\textit{exactly}} as indicated below.
+Failure to use these branch names may result in your submission not being marked,
+and you obtaining a grade of X for the submission.
+\begin{itemize}[topsep=6pt,partopsep=2pt,itemsep=3pt,parsep=4pt]
+  \item \textbf{stage-1} for API Functionality, due on March 27$^{th}$
+  \item \textbf{stage-2} for Deployed to Cloud, due on April 13$^{th}$
+  \item \textbf{stage-3} for Scalable Application, due on May 1$^{st}$
+\end{itemize}
+
+When marking a stage, we will checkout the branch for that stage.
+Any code in the main branch, or \textit{any} other branch, will be ignored when marking.
+We will checkout the latest commit in the branch being marked.
+If the commit date and time is after the submission deadline, late penalties will be applied,
+unless you have an extension.
+Late penalties are described in the \link{course profile}
+{https://course-profiles.uq.edu.au/course-profiles/CSSE6400-21413-7620\#assessment-detail-0}.
+
+\textbf{\underline{Note:}} Experience has shown that the large majority of students who make a late submission,
+lose more marks from the late penalty than they gain from any improvements they make to their solution.
+We \textit{strongly} encourage you to submit your work on-time.
+
+You should commit and push your work to your repository regularly.
+If a misconduct case is raised about your submission,
+a history of regular progress on the assignment through a series of commits
+could support your argument that the work was your own.
+
+Extension requests \textbf{must} be made \emph{prior} to the submission deadline via \link{my.UQ}{https://my.uq.edu.au/}.
+
+Your repository \textbf{must} contain everything required to successfully deploy your application.
+
+%\begin{samepage}
+\subsection{API Functionality Submission}
+Your first submission \textbf{must} include all of the following in your repository.
+\begin{itemize}
+  \item Docker image (Dockerfile) of your implementation of the service API,
+        including the source code and a mechanism to build and run the service.%
+        \footnote{If you use external libraries,
+                  ensure that you pin the versions to avoid external changes breaking your application.}
+  \item A \texttt{local.sh} script that can be used to build and run your service locally.
+        This script \textbf{must} be in the \emph{root} directory of your repository.
+        The \texttt{local.sh} script must launch your container with port 8080 being passed from the container
+        to the testing environment, and your service \textbf{must} be available at \texttt{http://localhost:8080/api/v1/}.
+\end{itemize}
+We will run a suite of tests against your API at this URL.
+%\end{samepage}
+
+\begin{samepage}
+\subsection{Deployed to Cloud \& Scalability Submissions}
+The second and third submissions \textbf{must} include all of the following in your repository.
+\begin{itemize}
+  \item Your implementation of the service API, including the source code and a mechanism to build the service.%
+        \footnote{If you use external libraries,
+                  ensure that you pin the versions to avoid external changes breaking your application.}
+  \item Terraform code that provisions your service in a fresh AWS environment.
+%  \item A \texttt{deploy.sh} script that uses your Terraform code to deploy your application.
+%        This script \textbf{must} be in the \emph{root} directory of your repository.
+%        This script may perform other tasks as required by your implementation.
+\end{itemize}
+\end{samepage}
+
+\noindent
+When deploying your second and third submissions to mark, we will follow reproducible steps, outlined below.
+You may re-create the process yourself.
+
+\begin{enumerate}
+  \item Your Git repository will be cloned locally.
+  \item The submission branch will be checked out.
+  \item If a \texttt{before.sh} file exists in the root directory, it will be run.
+  \item We will run \texttt{terraform init}, \texttt{terraform plan}, and \texttt{terraform apply -auto-approve}
+        in the root directory of your project.
+  \item We will then run \texttt{terraform output -raw api > api.txt}.
+        The result of this must be that \texttt{api.txt} contains the URL at which your API is deployed
+        (e.g. \texttt{http://my-api.com/api/v1/} or \\
+        \texttt{http://123.231.213.012/api/v1/}).
+        The \texttt{api.txt} file must \textbf{only} contain the URL.
+        Do not include \textbf{\textit{any}} other text in the output.
+  \item Automated functionality and load tests will be run against the URL discovered in the \texttt{api.txt} file.
+\end{enumerate}
+
+\subsection{GitHub Repository}\label{sec:github}
+You will be provisioned with a private repository on GitHub for this assignment, via 
+\link{GitHub Classroom.}{https://classroom.github.com/a/_o6vwSxE}
+You must associate your GitHub username with your UQ student ID in the 
+\href{https://classroom.github.com/a/_o6vwSxE}{Classroom}.
+
+Associating your GitHub username with another student's ID,
+or getting someone else to associate their GitHub username with your student ID, is \link{academic misconduct}
+{https://my.uq.edu.au/information-and-services/manage-my-program/student-integrity-and-conduct/academic-integrity-and-student-conduct}.
+
+If for some reason you have accidentally associated your GitHub username with the wrong student ID,
+contact the course staff as soon as possible.
+
+\subsection{Folder Structure}
+
+Your Github repository should look similar to the following, at a minimum:
+
+\dirtree{%
+.1 /.
+.2 .github.
+.3 workflows.
+.4 cloud.yml.
+.2 .gitignore.
+.2 README.md.
+.2 refs.md.
+.2 AI.md.
+.2 AI-log.md.
+.2 local.sh.
+.2 ....
+}
+
+\subsection{Tips}
+
+\paragraph{Terraform plan/apply hanging}
+If your \texttt{terraform plan} or \texttt{terraform apply} command hangs without any output, check your AWS credentials. Using credentials of an expired Learner Lab session will cause Terraform to hang.
+
+\paragraph{Fresh AWS Learner Lab}
+Your AWS Learner Lab can be reset using the reset button in the toolbar.
+
+\noindent
+\vspace{-3mm}
+\begin{center}
+  \includegraphics[trim=0 13 0 15,clip,width=0.85\textwidth]{images/reset-button.png}
+\end{center}
+
+\noindent
+To ensure that you are not accidentally depending on anything specific to your Learner Lab environment,
+we recommend that you reset your lab prior to final submission.
+Note that resetting the lab can take a \textit{considerable} amount of time, on the order of hours.
+You should do this at \textit{least} 3 to 4 hours before the submission deadline.
+Please do not wait to the last minute.
+
+\paragraph{Deploying with Docker}
+In this course, you have been shown how to use Docker containers to deploy on ECS.
+You may refer to the practical worksheets for a description of how to deploy with containers \cite{prac-week5}.
+
+
+\section{Criteria}
+Your assignment submission will be assessed on its ability to support the specified use cases.
+Testing is divided into functionality, deployment, and scalability testing,
+corresponding to the three submission stages of the assignment.
+Functionality testing is to ensure that your backend software and API
+meet the MVP requirements by satisfying the API specification without any excessive load.
+Deployment is to ensure that this MVP can then be hosted on the target cloud provider.
+Scalability testing is based upon several likely usage scenarios.
+The scenarios create different scaling requirements.
+
+\subsection{API Functionality} % Pesistence: Does not need to be "truly" persistent.
+10\%, from the 40\% of the grade for the assignment, is for correctly implementing the API specification,
+irrespective of whether it is able to cope with high loads.
+A suite of automated API tests will assess the correctness of your implementation, via a sequence of API calls.
+
+\subsection{Deployed to Cloud} % Persistence working correctly in the cloud.
+10\%, from the 40\% of the grade for the assignment, is for deploying a correctly implemented service to AWS,
+irrespective of whether it is able to cope with high loads.
+The deployment will be assessed by running a script that deploys your service to AWS
+and then runs a suite of automated API tests to assess the correctness of your implementation.
+
+\subsection{Scalable Application}\label{sec:scenarios} % Can it scale!
+20\%, from the 40\% of the grade for the assignment, will be derived from how well your service handles various scenarios.
+These scenarios will require you to consider how your application performs under different load characteristics.
+Examples of possible scenarios are described below.
+These are not descriptions of specific tests that will be run,
+rather they are examples of the types of tests that may be run.
+
+\paragraph{Normal Circumstances}
+Average number of analysis requests are submitted by a wide range of clients.
+These requests are distributed fairly evenly over the working day.
+Few of the analysis requests are urgent.
+Queries for results are also distributed fairly evenly over the day.
+
+\paragraph{Curiosity Killed the Server}
+A client creates a web portal allowing an auditor to view results for their users.
+Tens of thousands of requests will try to access their users' results in a short period of time.
+
+\paragraph{Compliance Early Stages}
+There is a significant increase in the number of analysis request submitted by a few clients.
+These clients also mark a much higher number of the requests as being urgent as they are new users.
+Other clients are operating as per normal circumstances.
+There are many more queries for results, often being repeated for any pending analysis jobs.
+Auditors make many requests for batches of results from clients or for users.
+
+\paragraph{Compliance Mid Stages}
+There are periods of time where several clients submit a large volume of analysis requests.
+There are other periods of time with reduced numbers of analysis requests.
+Up to 15\% of the requests may be given an urgent status.
+Queries for results follow the same fluctuating pattern as analysis requests.
+Auditors make a moderate number of requests for batches of results from clients or for users.
+
+\paragraph{Compliance Peak}
+Almost all clients submit a very large volume of analysis requests.
+Up to 30\% of the requests may be given an urgent status.
+The service must still analyse non-urgent requests in a timely manner.
+If it does not, the risk is that clients will start to make all requests urgent.
+Due to the high volume of analysis requests, there will be a high volume of queries for results.
+Any results that are still pending analysis jobs, will be repeated.
+Auditors make a moderate number of requests for batches of results from almost all clients.
+Clients start querying batches of results for individual users.
+
+\paragraph{Compliance Tail}
+Almost all clients submit a large volume of analysis requests, but timing may be variable.
+Up to 10\% of the requests may be given an urgent status.
+Due to the high volume of analysis requests, there will be a high volume of queries for results.
+Most requests for results that are still pending analysis jobs, will be repeated.
+Auditors make a moderate number of requests for batches of results from almost all clients.
+Clients query batches of results for a moderate number of users.
+
+\paragraph{Auditing and BAU}
+Some clients submit a large volume of analysis requests due to influx of new users or backlog.
+Up to 5\% of the requests may be given an urgent status.
+Other clients are back to operating as per normal circumstances.
+There will be a moderate volume of queries for results.
+Most requests for results that are still pending analysis jobs, will be repeated.
+Auditors make a large number of requests for batches of results from almost all clients.
+Clients query batches of results for a large number of users.
+
+\paragraph{Research Project}
+An internal researcher wants to analyse the results of the analysis against a false positive database provided by the clients.
+They will query all the results from all the clients to generate their database of results.
+The system must remain responsive to analysis requests while processing the researcher's queries.
+
+\subsection{Marking}
+Persistence is a core functional requirement of your service.
+Your grade for the assignment will be capped at \textbf{4}, if your implementation does not save
+\begin{itemize}[topsep=2pt,partopsep=0pt,itemsep=1pt,parsep=1pt]
+    \item analysis requests, with their associated images, or 
+    \item analysis results to persistent storage.
+\end{itemize}
+
+Your persistence mechanism must be robust, so that it can cope with catastrophic failure of your service.
+If all running instances of your services are terminated,
+the system must be able to restart and guarantee that it has not lost \textit{any} data
+about analysis requests for which it returned a success response to the client.
+It must also guarantee it has not lost any analysis results,
+after changing the status of analysis job from ``pending''.
+
+There will not be a test that explicitly kills all services and restarts the system.
+This will be assessed based on the services you use and how your implementation invokes those services.
+Not saving data to a persistent data store, or returning a success response before the data has been saved,
+or not saving an analysis job result effectively,
+are the criteria that determine whether you have successfully implemented persistence.
+
+Functionality of your service is worth \textbf{10\%} from the 40\% of the grade for the assignment.
+This is based on successful implementation of the given API specification
+and the ability to use the provided tool in your implementation.
+
+Deploying your service is worth \textbf{10\%} from the 40\% of the grade for the assignment.
+This is based on the successful deployment, using Terraform,
+of your service to AWS and the ability to access the service via the API.
+Your service must be fully functional while deployed,
+so the functionality tests can be run which determines the marks for deployment.
+
+Scaling your application to successfully handle the usage scenarios accounts for the remaining \textbf{20\%}
+of the grade for the assignment.
+The scenarios described in section \ref{sec:scenarios} provide guidance
+as to the type of scalability issues your system is expected to handle.
+They are not literal descriptions of the exact loads that will be used.
+Tests related to scenarios that involve more complex behaviour will have higher weight than other tests.
+
+The scenarios will evaluate whether your service is being wasteful in resource usage.
+The amount of resources deployed in your AWS account will be monitored to ensure that
+your service implements a scaling up \textbf{\emph{and}} scaling down procedure.
+
+All stages of the assessment will be marked using automation.
+A subset of the functionality tests will be released before the first submission deadline.
+%These tests may consume a \textbf{\emph{significant}} portion of your AWS credit.
+%You are advised to be prudent in how many times you execute these tests.
+%The number of tests to be released is at the Course Coordinator's discretion.
+
+Please refer to the marking criteria at the end of this document.
+
+
+\section{Academic Integrity}
+As this is a higher-level course, you are expected to be familiar with the importance of academic integrity in general,
+and the details of UQ's rules.
+If you need a reminder, review the \link{Academic Integrity Modules}
+{https://web.library.uq.edu.au/study-and-learning-support/coursework/academic-integrity-modules}.
+Submissions will be checked to ensure that the work submitted is not plagiarised or of no academic merit.
+
+This is an \textit{individual} assignment.
+You may \textbf{not} discuss details of approaches to solve the problem with other students in the course.
+As some students may have an extension and then decide to make a late submission, 
+you may \textbf{not} discuss details of a submission stage with other students
+until \textbf{five weeks} \textit{after} the original submission date.
+i.e. You may not discuss how to
+\begin{itemize}
+    \item implement \textbf{functionality} until \emph{after} \textbf{May 18$^{th}$};%
+          \footnote{Students may improve their functionality for the stage-2 submission,
+                    consequently you may not discuss how to implement functionality until after this date.}
+    \item \textbf{deploy} the service to the cloud until \emph{after} \textbf{May 18$^{th}$}; and
+    \item implement \textbf{scalability} until \emph{after} \textbf{June 5$^{th}$}.
+\end{itemize}
+
+All code that you submit \textbf{must} be your own work.
+You may \textbf{not} directly copy code that you have found on-line to solve parts of the assignment.
+If you find ideas from on-line sources (e.g. Stack Overflow),
+you must \link{cite and reference}{https://guides.library.uq.edu.au/referencing} these sources.
+Use the \link{IEEE referencing style}{https://libraryguides.vu.edu.au/ieeereferencing/gettingstarted}
+for citations and references.
+Citations must be included in a comment at the location where the idea is used in your code.
+All references for citations \textbf{must} be included in a file called \texttt{refs.md}.
+This file must be in the root directory of your repository.
+
+\subsection{AI Usage}
+You are developing a moderately complex software system.
+It is expected that you will make use of generative AI tools (e.g. Copilot) to assist you in implementing and testing your solutions.
+
+You \textbf{must} include, in the root directory of your repository,
+a file called \texttt{AI.md} that indicates the generative AI tools that you used,
+how you used them, and the extent of their use.
+(e.g. All code was written by providing Copilot with class descriptions and then revising the generated code.
+Classes A and B were produced by the following prompts to ChatGPT
+and were then adapted to work in the assignment's context.)
+
+You \textbf{must} also include, in the root directory of your repository,
+a file called \texttt{AI-log.md} that contains a log of the history of your interaction with the AI tool(s)
+that you used while developing your solution.
+
+Uncited or unreferenced material, or unacknowledged use of generative AI tools,
+will be treated as not being your own work.
+Significant amounts of cited or acknowledged work from other sources,
+will be considered to be of no academic merit.
+
+
+\bibliographystyle{ieeetr}
+\bibliography{ours}
+
+
+\input{criteria}
+
+\end{document}
+
+

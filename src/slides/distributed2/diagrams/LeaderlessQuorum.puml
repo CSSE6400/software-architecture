@@ -1,0 +1,51 @@
+@startuml LeaderlessQuorum
+
+' left to right direction
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Dynamic.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!include DEVICONS/laravel.puml
+!include DEVICONS/javascript.puml
+!include DEVICONS/mysql.puml
+!include DEVICONS/chrome.puml
+
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v11.1/dist
+!includeurl AWSPuml/AWSCommon.puml
+!includeurl AWSPuml/Database/RDS.puml
+!includeurl AWSPuml/Compute/EC2.puml
+!includeurl AWSPuml/Compute/EC2AutoScaling.puml
+!includeurl AWSPuml/NetworkingContentDelivery/ElasticLoadBalancing.puml
+!includeurl AWSPuml/Storage/SimpleStorageService.puml
+' make orange
+AddContainerTag("AWS", $borderColor="#ff9900", $bgColor="#ffffff", $fontColor="#000000")
+
+AddContainerTag("browser", $bgColor="#bcddfc", $fontColor="#000000")
+AddContainerTag("database", $bgColor="#ccfddd", $fontColor="#000000", $borderColor="#cccccc")
+
+skinparam roundcorner 20
+skinparam Padding 20
+skinparam NoteBorderColor transparent
+skinparam NoteBackgroundColor #FDDDCC
+' skinparam NoteFontColor white
+
+UpdateElementStyle(node, $borderColor="#cccccc", $fontColor="#5c5c5c")
+UpdateElementStyle(container, $bgColor="#5388cb")
+
+hide stereotype
+
+ContainerDb(db, "Replica 1", "Container: Cassandra", $tags="database")
+
+ContainerDb(db2, "Replica 2", "Container: Cassandra", $tags="database")
+
+ContainerDb(db3, "Replica 3", "Container: Cassandra", $tags="database")
+
+
+
+' ' Rel_U(db2, client, "Query Products", $tags="browser")
+' Rel_U(db3, client, "Query Products", $tags="browser")
+
+' Lay_L(db, db2)
+' Lay_L(db2, db3)
+
+@enduml

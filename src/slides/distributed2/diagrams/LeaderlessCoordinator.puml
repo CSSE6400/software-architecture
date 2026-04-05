@@ -1,0 +1,62 @@
+@startuml LeaderlessCoordinator
+
+' left to right direction
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!include DEVICONS/laravel.puml
+!include DEVICONS/javascript.puml
+!include DEVICONS/mysql.puml
+!include DEVICONS/chrome.puml
+
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v11.1/dist
+!includeurl AWSPuml/AWSCommon.puml
+!includeurl AWSPuml/Database/RDS.puml
+!includeurl AWSPuml/Compute/EC2.puml
+!includeurl AWSPuml/Compute/EC2AutoScaling.puml
+!includeurl AWSPuml/NetworkingContentDelivery/ElasticLoadBalancing.puml
+!includeurl AWSPuml/Storage/SimpleStorageService.puml
+' make orange
+AddContainerTag("AWS", $borderColor="#ff9900", $bgColor="#ffffff", $fontColor="#000000")
+
+AddContainerTag("browser", $bgColor="#bcddfc", $fontColor="#000000")
+AddContainerTag("database", $bgColor="#ccfddd", $fontColor="#000000", $borderColor="#cccccc")
+
+skinparam roundcorner 20
+skinparam Padding 20
+
+
+UpdateElementStyle(node, $borderColor="#cccccc", $fontColor="#5c5c5c")
+UpdateElementStyle(container, $bgColor="#5388cb")
+
+hide stereotype
+
+Container(product_browsing, "Product Browsing", "Container: Java", "Provides backend logic for browsing or searching for products.")
+Container(product_purchasing, "Product Purchasing", "Container: Java", "Provides backend logic for purchasing products.")
+Container(customer_account, "Customer Account Management", "Container: Java", "Provides backend logic for customer account management.")
+Container(product_fulfillment, "Product Fulfillment", "Container: Java", "Provides backend logic for fulfilling products.")
+
+ContainerDb(replica1, "Replica 1 (Coordinator)", "Container: Cassandra", "Stores customer credentials, products, and orders.", $tags="database")
+ContainerDb(replica2, "Replica 2", "Container: Cassandra", "Stores customer credentials, products, and orders.", $tags="database")
+ContainerDb(replica3, "Replica 3", "Container: Cassandra", "Stores customer credentials, products, and orders.", $tags="database")
+
+Rel(product_browsing, replica1, "Find Products", "JPA")
+
+Rel(product_purchasing, replica1, "Updates & Queries", "JPA")
+
+Rel(customer_account, replica1, "Updates & Queries", "JPA")
+
+Rel(product_fulfillment, replica1, "Updates", "JPA")
+
+Rel(replica1, replica2, "Forward Request")
+Rel(replica1, replica3, "Forward Request")
+
+
+' Rel(db1, replica1, "Replication stream")
+' Rel(db2, replica2, "Replication stream")
+
+' BiRel_Left(db2, db1, "Sync stream", "Performs conflict resolution")
+
+
+@enduml

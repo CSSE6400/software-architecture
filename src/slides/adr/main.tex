@@ -1,0 +1,226 @@
+\documentclass{slide}
+
+\usepackage{pgfpages}
+\usepackage{languages}
+\usepackage{changepage}
+
+%\setbeameroption{show notes on second screen}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=violet,
+    filecolor=purple,      
+    urlcolor=blue,
+    citecolor=black,
+}
+
+\title{Architectural Decision Records}
+\subtitle{Software Architecture}
+\author{Richard Thomas \& Guangdong Bai}
+\date{\week{2}}
+
+\begin{document}
+
+\maketitle
+\note[enumerate]{
+    \item ADRs are the `why' of the architecture
+    \item Good if obvious approach is wrong
+    \item Mechanism for preserving assumptions of an architecture
+}
+
+
+\begin{frame}{Developer Reaction to Reading Software Architecture Documentation}
+
+\begin{figure}
+    \href{https://pixabay.com/vectors/computer-internet-unhappy-user-1295358/}{\includegraphics[width=0.9\textwidth]{images/frustration.png}}
+\end{figure}
+
+\end{frame}
+\note[enumerate]{
+    \item ADRs follow on from views
+    \item But separated from views to make them more accessible
+}
+
+
+\questionanswer{How do you know why certain decisions were made in the architectural design?}
+{\highlight{Architectural Decision Records (ADRs)}}
+
+
+\begin{frame}{Record Decisions that Influence}
+
+\Large{
+\begin{itemize}
+    \item \highlight{Structure} of the architecture
+    \item Delivery of \highlight{quality attributes}
+    \item \highlight{Dependencies} between important parts of the architecture
+	\vspace{1mm}
+    \item \highlight{Interfaces} between important parts of the architecture
+    \begin{itemize}
+        \large{\item or external interfaces}
+    \end{itemize}
+    \item \highlight{Principles} about implementation techniques or platforms
+    \hfill
+    \item More "why certain decisions were made" than "what are in structure, interfaces, etc."
+\end{itemize}
+}
+\note{
+    \begin{description}
+        \item[Structure] e.g. \highlight{plugin} architecture: build core platform, expecting others to add to it; or
+                         \highlight{microservices} architecture: allow scaling and small teams
+        \item[Quality attributes] e.g. need to be \highlight{highly scalable} so using cloud services
+        \item[Dependencies/Interfaces] picked dependency \textit{Y}, i.e. SMS API because \textit{rationale}.
+                                       ADRs don't record details of interface, just \textit{rationale}.
+        \item[Principles]
+            \begin{itemize}
+                \item use Haskell because we get computer science grads
+                \item use on-prem because government org \& regulations
+                \item use language \textit{X} because of obscure dependency
+            \end{itemize}
+    \end{description}
+}
+
+\end{frame}
+
+
+\begin{frame}
+
+\begin{figure}
+    \href{https://decodenatura.com/bad-comments-and-how-to-fix-them/}{\includegraphics[width=0.9\textwidth]{images/warning-comment.png}}
+\end{figure}
+
+\end{frame}
+\note[enumerate]{
+    \item Think of ADRs as warnings
+    \item Why is this not a good ADR? (\textit{No rationale})
+}
+
+
+\questionanswer{Why ADRs?}
+{My code will defeat the architectural design,\\
+\highlight{if} I do not know why it was designed that way.}
+\note[enumerate]{
+    \item I will break things if I don't know why it works a certain way
+    \item I'll just \textit{fix that}
+}
+
+
+\begin{frame}{Why ADRs}
+
+\LARGE{
+\begin{itemize}
+    \item \highlight{Team} alignment, ensuring all stakeholders are on the same page regarding architectural choices
+      \vspace{1mm}
+      \begin{itemize}
+        \Large{\item Onboarding team members sync up on past decisions}
+      \end{itemize}
+    \item \highlight{Traceability} allowing team to track how architecture \highlight{evolves}
+    \item \highlight{Justification} to defend \highlight{decisions} when questioned later
+    \item Preserve \highlight{knowledge} for future reference
+\end{itemize}
+}
+
+\end{frame}
+
+
+\point[ADRs]{Record a \highlight{single} decision}
+\note[enumerate]{
+	\item Keeps it short.
+	\item More likely to write it (and read it).
+}
+
+
+\point[ADRs]{Are \highlight{never} deleted\\
+Mark as \highlight{superseded} and link to new decision}
+\note[enumerate]{
+	\item Preserves bad decisions --- less likely to repeat them
+	\vspace{2mm}
+	\item Superseded decision:
+            \begin{enumerate}
+                \large\item it was a bad idea
+                \item it was a good idea at the time, but conditions have changed
+            \end{enumerate}
+}
+
+
+\questionanswer{Where are ADRs documented?}
+{Each decision is a separate file in the project repository%
+\footnote{See the \texttt{adrs} directory in the \href{https://csse6400.uqcloud.net/resources/c4_model.zip}{C4 Model}
+          on the course website.}}
+\note[itemize]{
+    \item C4 allows you to link to ADRs
+    \item Useful to note as ADRs will be required for the project
+}
+
+
+\begin{frame}{ADR Management Tools}
+
+\LARGE{
+\begin{itemize}
+    \item \href{https://github.com/thomvaill/log4brains}{Log4brains}\footnote{\url{https://github.com/thomvaill/log4brains}}
+     \begin{itemize}
+        \Large{\item Generates ADRs from Markdown files}
+	    \Large{\item Web-based UI for browsing ADRs}
+    \end{itemize}
+    \vspace{0.4em}
+    \item \href{https://github.com/npryce/adr-tools}{adr-tools}\footnote{\url{https://github.com/npryce/adr-tools}}
+    \begin{itemize}
+        \Large{\item Light-weight command-line tool}
+	    \Large{\item Generates ADR templates automatically}
+    \end{itemize}
+\end{itemize}
+}
+
+\end{frame}
+
+
+\begin{frame}{ADR Template \cite{nygard-adr}}
+
+\Large{
+\begin{description}
+    \item[Title] Short phrase describing the decision
+    \item[Date] When the decision was made
+    \item[Status] Current status of the decision
+    \begin{itemize}
+        \large{\item proposed, accepted, deprecated, superseded, rejected}
+    \end{itemize}
+    \item[Summary] Summarise the decision and its rationale
+    \item[Context] Describe the facts that influence the decision
+    \item[Decision] Explain how the decision will solve the problem
+    \item[Consequences] Impact of the decision
+    \begin{itemize}
+        \large{\item what's easier to do}
+        \large{\item what's harder to do}
+    \end{itemize}
+\end{description}
+}
+
+\end{frame}
+\note{
+    \begin{description}
+        \item[Title] Descriptive, easy to find, part of the filename
+        \item[Status] Rejected is an option --- prevents repeating proposals
+        \item[Summary] Describe context
+    \end{description}
+}
+
+\begin{frame}{ADR Example}
+
+\begin{figure}
+    \href{https://github.com/CSSE6400/software-architecture/blob/main/notes/views/c4_model/adrs/0001-independent-business-logic.md}
+        {\includegraphics[height=\textheight]{images/adr-example.png}}
+\end{figure}
+
+\end{frame}
+\note[itemize]{
+    \item From Sahara example in the Views lecture/notes
+    \item Functional requirement: Ability to change mode of interaction with the system
+    \item Independent business logic enables this
+    \item Format of the summary is a why statement --- summarise the context and decision
+}
+
+\point[Reading...]{``Architectural Decision Records'' Notes \cite{adr-notes}}
+
+
+\references{articles,books,ours}
+
+\end{document}

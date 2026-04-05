@@ -1,0 +1,29 @@
+@startuml AsyncLag
+
+' left to right direction
+
+skinparam shadowing false
+skinparam ParticipantBorderColor black
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ParticipantFontColor black
+skinparam SequenceLifeLineBorderColor black
+
+autonumber
+
+participant ProductBrowsing
+database Leader #ccfddd
+database Follower1 #ccfddd
+database Follower2 #ccfddd
+
+ProductBrowsing -> Leader : UPDATE products SET name=...
+Leader -> Follower1 : UPDATE
+& Leader -> Follower2 : UPDATE
+Leader -> ProductBrowsing : OK
+activate Leader #DDCCFD
+Follower1 -> Leader : OK
+Follower2 -> Leader : OK
+deactivate Leader
+
+
+@enduml

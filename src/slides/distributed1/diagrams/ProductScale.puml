@@ -1,0 +1,44 @@
+@startuml ProductScale
+
+left to right direction
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!include DEVICONS/laravel.puml
+!include DEVICONS/javascript.puml
+!include DEVICONS/mysql.puml
+!include DEVICONS/chrome.puml
+
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v11.1/dist
+!includeurl AWSPuml/AWSCommon.puml
+!includeurl AWSPuml/Database/RDS.puml
+!includeurl AWSPuml/Compute/EC2.puml
+!includeurl AWSPuml/Compute/EC2AutoScaling.puml
+!includeurl AWSPuml/Storage/SimpleStorageService.puml
+' make orange
+AddContainerTag("AWS", $borderColor="#ff9900", $bgColor="#ffffff", $fontColor="#000000")
+
+AddContainerTag("browser", $bgColor="#bcddfc", $fontColor="#000000")
+AddContainerTag("database", $bgColor="#ccfddd", $fontColor="#000000", $borderColor="#cccccc")
+
+skinparam roundcorner 20
+skinparam Padding 20
+
+
+UpdateElementStyle(node, $borderColor="#cccccc", $fontColor="#5c5c5c")
+UpdateElementStyle(container, $bgColor="#5388cb")
+
+SHOW_LEGEND()
+
+Deployment_Node(scale, "Auto-scaling Group", "Desired Capacity: 4", $sprite="EC2AutoScaling,color=#ff9900", $tags="AWS") {
+    Deployment_Node(product_browsing_server, "Product Browsing Server", "Deployment Node: Ubuntu 20.04 LTS & Java 17 LTS", $sprite="EC2,color=#ff9900", $tags="AWS") {
+        Container(product_browsing, "Product Browsing", "Container: Java", "Provides backend logic for browsing or searching for products.")
+    }
+}
+
+Rel(web_application, product_browsing, "Find & Retrieve Product Details", "RMI")
+
+Rel(product_browsing, db, "Find Products", "JPA")
+
+@enduml

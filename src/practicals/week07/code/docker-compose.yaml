@@ -1,0 +1,47 @@
+services:
+  database:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: verySecretPassword
+      POSTGRES_USER: administrator
+      POSTGRES_DB: todo
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    restart: always
+    volumes:
+      - ./todo:/app/todo
+      - ./credentials:/root/.aws/credentials
+#    env_file: "aws.env"  # AWS credentials stored in .env file.
+    environment:
+      SQLALCHEMY_DATABASE_URI: postgresql://administrator:verySecretPassword@database:5432/todo
+      CELERY_BROKER_URL: sqs://
+      CELERY_RESULT_BACKEND: db+postgresql://administrator:verySecretPassword@database:5432/todo
+    ports:
+      - "6400:6400"
+    depends_on:
+      - database
+# Alternative to run Flask app from here, rather than in Dockerfile.dev.
+#    command: poetry run flask --app todo run --debug --host 0.0.0.0 --port 6400
+
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    restart: always
+    volumes:
+      - ./credentials:/root/.aws/credentials
+#    env_file: "aws.env"  # AWS credentials stored in .env file.
+    environment:
+      CELERY_BROKER_URL: sqs://
+      CELERY_RESULT_BACKEND: db+postgresql://administrator:verySecretPassword@database:5432/todo
+    command: poetry run celery --app todo.tasks.ical worker --loglevel=info

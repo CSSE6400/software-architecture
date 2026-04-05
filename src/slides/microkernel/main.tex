@@ -1,0 +1,423 @@
+\documentclass{slide}
+% \usepackage{pgfpages}
+
+%\setbeameroption{show notes on second screen}
+
+\title{Microkernel Architecture}
+\subtitle{Software Architecture}
+\author{Richard Thomas}
+\date{\week{3}}
+
+\usepackage{changepage}
+\usepackage{tabto}
+\usepackage{tikz}
+
+\begin{document}
+
+\maketitle
+
+\point[\huge So far\dots]{%
+\begin{description}
+    \item[Simplicity] -- Monolith, Pipeline
+    \item[Modularlity] -- Layered, Pipeline
+\end{description}}
+\note{Emphasise quality attributes and how architectural styles deliver those attributes}
+
+
+\definition{Extensibility}{Features or extensions can be easily added to the software over its lifespan.}
+
+
+\questionanswer{How easy is it to extend \highlight{Monolith}, \highlight{Layered} or \highlight{Pipeline}?}
+{\begin{description}
+    \item<2->[Monolith] -- Everything in one container \tabto{15em}\includegraphics[trim=22 19 22 15,clip,width=10mm]{../../shared/images/thumbs-down.png}
+    \item<3->[Layered] -- Typically all layers \tabto{15em}\includegraphics[trim=22 19 22 15,clip,width=10mm]{../../shared/images/thumbs-down.png}
+    \item<4->[Pipeline] -- Create a new filter \tabto{15em}\includegraphics[width=10mm]{../../shared/images/thumbs-up.png}
+\end{description}}
+\note{Discuss issues of extending a monolith or layered architecture}
+
+
+\definition{Interoperability}{Software can easily share information and exchange data with internal components and other systems.}
+
+
+\questionanswer{What about interoperability?}
+{\begin{description}
+    \item<2->[Monolith] -- Everything in one container
+    {\LARGE\begin{itemize}
+        \setlength{\itemindent}{2em}
+        \item Internal ~\includegraphics[width=7.5mm]{../../shared/images/thumbs-up.png}
+                 \tabto{9em}External ~\includegraphics[trim=22 19 22 15,clip,width=7.5mm]{../../shared/images/thumbs-down.png}
+    \end{itemize}}
+    \item<3->[Layered] -- Nearest Neighbour
+    {\LARGE\begin{itemize}
+        \setlength{\itemindent}{2em}
+        \item Internal ~\includegraphics[width=7.5mm]{../../shared/images/thumbs-up.png}
+                 \tabto{9em}External ~\includegraphics[trim=22 19 22 15,clip,width=7.5mm]{../../shared/images/thumbs-down.png}
+    \end{itemize}}
+    \item<4->[Pipeline] -- Standard Interface
+    {\LARGE\begin{itemize}
+        \setlength{\itemindent}{2em}
+        \item Internal ~\includegraphics[width=7.5mm]{../../shared/images/thumbs-up.png}
+                 \tabto{9em}External ~\includegraphics[trim=22 19 22 15,clip,width=7.5mm]{../../shared/images/thumbs-down.png}
+    \end{itemize}}
+\end{description}}
+\note[itemize]{
+    \item Layered -- Only interoperable between nearest neighbour layers
+    \item Discuss issues of broad interoperability
+}
+
+
+\questionanswer{What if I want simplicity, extensibility and interoperability?}
+{Consider \highlight{Microkernel Architecture}}
+
+
+\section{Microkernel Architecture}
+
+\begin{frame}
+\begin{defn}[Microkernel Architecture]
+    Core system providing interfaces that allow plug-ins to extend its functionality.
+\end{defn}
+\vspace{8mm}
+\includegraphics[trim=197 197 197 195,clip,width=\textwidth]{../../notes/microkernel/diagrams/generic-microkernel.png}
+\end{frame}
+\note[itemize]{
+    \item Monolith -- Commonly use method invocation to communicate with plug-ins
+    \item Other message passing protocols may be used
+}
+
+
+\definition{Registry}{Tracks which plug-ins are available to the core system and how to access them.}
+\note[itemize]{
+    \item Monolith -- Registry can be simply plug-in name and reference to delegate object
+    \item More detail about communication protocol and data structure required for other message passing approaches
+}
+
+
+\begin{frame}{Loading Plug-ins}
+    \vspace{1mm}
+    {\huge
+    \begin{description}
+        \item[Static Loading] when application starts
+        \vspace{3mm}
+        \item[Dynamic Loading] as needed at run-time
+        \vspace{3mm}
+        \item[Registry] designed for the selected strategy
+    \end{description}
+    }
+\end{frame}
+\note[itemize]{
+    \item Dynamic loading requires a plug-in registration and de-registration interface
+    \item Could mention that one of the reasons for JARs in Java was to allow dynamic loading of classes
+}
+
+
+\questionanswer{Can you think of a \highlight{microkernel architecture}?}{Web Browser?}
+\note[itemize]{
+    \item Eclipse
+    \vspace{0.4em}
+    \item Operating Systems
+    \begin{itemize}
+        \large
+        \item Some Unix variants
+        \item Zircon - Google OS kernel
+        \item Nintendo Switch OS
+    \end{itemize}
+    \item Insurance Claims Processing
+    \vspace{0.2em}
+    \item Payroll
+    \vspace{0.2em}
+    \item WordPress
+}
+
+
+\definition{Independent Plug-in Principle}{Plug-ins should be independent, with no dependencies on other plug-ins.
+The only dependency on the core system is through the plug-in interface.}
+
+
+\definition{Standard Interface Principle}{There should be a single interface that defines how the core system uses plug-ins.}
+
+
+\questionanswer{Does a plug-in architecture equate to a microkernel architecture?}
+{What about the \highlight{Linux kernel}?}
+\note[itemize]{
+    \item Not a microkernel -- kernel has a lot of complex logic
+    \vspace{0.5em}
+    \item Core of a microkernel provides a framework in which plug-ins deliver functionality
+}
+
+
+\begin{frame}{Plug-ins with Separate Databases}
+    \vspace{0.75em}
+    \begin{itemize}
+        \LARGE\item Plug-ins cannot access core system data
+        \begin{itemize}
+            \Large\item Core system may pass data to the plug-in
+        \end{itemize}
+        \LARGE\item Plug-ins may have their own persistent data
+    \end{itemize}
+    \vspace{3mm}
+    \centering
+    \includegraphics[trim=197 197 197 195,clip,width=0.9\textwidth]{../../notes/microkernel/diagrams/plug-in-databases.png}
+\end{frame}
+
+
+\begin{frame}{Plug-ins as External Services}
+    \begin{itemize}
+        \LARGE\item Need communication protocol
+        \vspace{2mm}
+        \LARGE\item Registry records communication contract
+        \begin{itemize}
+            \Large\item e.g. URL of the REST endpoint \& data passed to it
+        \end{itemize}
+    \end{itemize}
+    \vspace{8mm}
+    \includegraphics[trim=197 197 197 195,clip,width=\textwidth]{../../notes/microkernel/diagrams/rest-microkernel.png}
+\end{frame}
+\note[itemize]{
+    \item May be deployed on same or separate infrastructure
+    \item Allows broad range of communication protocols
+}
+
+
+\begin{frame}{Adapting Non-Conforming Interfaces}
+    \begin{adjustwidth}{-7.5mm}{-7.5mm}
+        \includegraphics[trim=195 197 195 195,clip,width=0.97\paperwidth]{../../notes/microkernel/diagrams/adapter-plug-in.png}
+    \end{adjustwidth}
+\end{frame}
+\note{Introduce \emph{adapter} design pattern as approach to manage 3rd party services as plug-ins}
+
+
+\section{Technical \& Domain Partitioning}
+
+\begin{frame}
+    \vspace{4mm}
+    \begin{columns}[t]
+    \column<1->{0.39\textwidth}
+        \centering
+        \LARGE Technical Partitioning
+        \begin{figure}
+            \centering
+            \includegraphics[trim=197 197 197 195,clip,width=0.29\textheight]{../../notes/microkernel/diagrams/technical-partitioning.png}
+        \end{figure}
+    \column<2->{0.61\textwidth}
+        \centering
+        \LARGE Domain Partitioning
+        \begin{figure}
+            \centering
+            \includegraphics[trim=197 195 197 195,clip,width=\textwidth]{../../notes/microkernel/diagrams/domain-partitioning.png}
+        \end{figure}
+    \end{columns}
+\end{frame}
+\note[itemize]{
+    \item Summarise differences between technical and domain partitioning
+    \vspace{0.5em}
+    \item Review layered architecture as technical partitioning
+    \begin{itemize}
+        \large
+        \item Emphasise it is not the only way to perform technical partitioning
+    \end{itemize}
+    \item Example of on-line store partitioned into domains
+}
+
+
+\questionanswer{Is the microkernel architecture suited to \highlight{technical} or \highlight{domain} partitioning?}
+{Core system can be partitioned either way.}
+
+
+\begin{frame}{Domain Standard Interfaces}
+    \vspace{3mm}
+    \centering
+    \includegraphics[trim=197 197 197 195,clip,width=1\textheight]{../../notes/microkernel/diagrams/domain-microkernel.png}
+\end{frame}
+\note[itemize]{
+    \item Each domain can have its own plug-in interface
+    \vspace{0.5em}
+    \item Some domains may share a plug-in interface
+}
+
+
+\begin{frame}{Distributed Microkernel}
+    \begin{itemize}
+        \Large\item Partitions in the core system can be distributed
+        \begin{itemize}
+            \large
+            \item Technical or domain partitions
+            \item Plug-ins could also be distributed
+        \end{itemize}
+    \end{itemize}
+    \vspace{3mm}
+    \centering
+    \includegraphics[trim=195 197 195 195,clip,width=0.6\textwidth]{../../notes/microkernel/diagrams/separate-ui-microkernel.png}
+\end{frame}
+\note{Comment on additional complexity}
+
+
+\questionanswer{What types of systems could use a \highlight{microkernel architecture}?}
+{
+\begin{itemize}
+    \item Social media aggregator
+    \item IoT management \& processing
+    \item Media server
+\end{itemize}
+}
+
+
+\section{Media Server Example}
+
+
+\begin{frame}{Media Server \& Renderer}
+    \begin{adjustwidth}{-10mm}{-10mm}
+        \centering
+        \includegraphics[trim=99 140 99 20,clip,width=0.98\paperwidth]{diagrams/overall_context}
+    \end{adjustwidth}
+\end{frame}
+\note{Introduce concept of media server and renderer (e.g. Plex)}
+
+
+\begin{frame}{Domain Colour Key}
+    \begin{adjustwidth}{-7.5mm}{-7.5mm}
+        \includegraphics[trim=20 595 22 96,clip,width=0.97\paperwidth]{diagrams/key.png}
+    \end{adjustwidth}
+\end{frame}
+\note[itemize]{
+    \item Key showing colours of different domains
+    \item Rectangular boxes for Software Systems
+    \item Rounded boxes for Containers
+    \item Plug icons for Components (shown on later slides)
+}
+
+
+\begin{frame}{Media Renderer}
+    \vspace{3mm}
+    \includegraphics[trim=80 100 80 20,clip,width=\textwidth]{diagrams/renderer_container}
+\end{frame}
+\note[itemize]{
+    \item Consumer (user), uses renderer to browse and watch content on the server
+    \item Core Rendering System is the Media Renderer's core
+    \item UI Plug-Ins provide customised user interfaces
+}
+
+
+\begin{frame}{Core Rendering System Components}
+    \includegraphics[trim=195 197 195 195,clip,width=\textwidth]{diagrams/render_core_component.png}
+\end{frame}
+\note[itemize]{
+    \item Components are domain partitions of the renderer's core
+    \item Only UI component is extended by plug-ins, via a UI plug-in interface
+}
+
+
+\begin{frame}
+    \vspace{3.5mm}
+    \begin{adjustwidth}{-10mm}{-10mm}
+        \centering
+        \includegraphics[trim=135 128 125 50,clip,height=0.95\paperheight]{diagrams/media_server_container}
+    \end{adjustwidth}
+	\begin{tikzpicture}[overlay,remember picture]
+	\node[rectangle,shift={(3.65,3.85)},
+		  text width=6.8cm,above] at (current page.west) {\color{primary}\Large Media Server};
+	\end{tikzpicture}   
+\end{frame}
+\note[itemize]{
+    \item Renderer uses server to allow consumer to browse and watch content on the server
+    \vspace{1em}
+    \item Core Media Server simply coordinates how the plug-ins deliver behaviour
+    \begin{itemize}
+        \Large
+        \item \highlight{Simplicity} quality attribute
+        \item Example of why it is a \highlight{micro}kernel
+    \end{itemize}
+    \vspace{1em}
+    \item Four types of plug-ins deliver customised behaviour
+    \begin{itemize}
+        \Large
+        \item Each corresponding to a media server \highlight{domain}
+    \end{itemize}
+}
+
+
+\begin{frame}
+    \vspace{2mm}
+    \begin{adjustwidth}{-10mm}{-10mm}
+        \centering
+        \includegraphics[trim=54 100 54 0,clip,height=0.97\paperheight]{diagrams/media_server_core_component}
+    \end{adjustwidth}
+	\begin{tikzpicture}[overlay,remember picture]
+	\node[rectangle,shift={(3.65,3.85)},
+		  text width=6.8cm,above] at (current page.west) {\color{primary}\Large Core Media Server Components};
+	\end{tikzpicture}   
+\end{frame}
+\note[itemize]{
+    \item Components are domain partitions of the server's core
+    \item Colour coding of domains
+}
+
+
+\begin{frame}{Library Management Plug-ins Components}
+    \vspace{4mm}
+    \centering
+    \includegraphics[trim=165 160 165 195,clip,width=0.95\textwidth]{diagrams/libmgt_component}
+\end{frame}
+\note[itemize]{
+    \item Components scrape metadata from different sources
+    \item \highlight{Scrape Metadata} is the interface implemented by the plug-ins
+}
+
+
+\begin{frame}{Scrape Metadata Interface}
+   \centering
+    \includegraphics[trim=35 50 20 45,clip,width=\textwidth]{diagrams/scrape_metadata_class.png}
+\end{frame}
+\note[itemize]{
+    \item Simplified interface for library management scrapers
+    \vspace{0.5em}
+    \item MediaData \& MetaData classes pass standardised data structures to and from each scraper
+    \begin{itemize}
+        \Large
+        \item One option is to extract data as JSON
+    \end{itemize}
+}
+
+
+\begin{frame}
+    \vspace{5mm}
+    \begin{adjustwidth}{-10mm}{-10mm}
+        \centering
+        \includegraphics[trim=227 250 218 290,clip,width=1.07\textwidth]{diagrams/deployment}
+    \end{adjustwidth}
+	\begin{tikzpicture}[overlay,remember picture]
+	\node[rectangle,shift={(3.65,3.8)},
+		  text width=6.8cm,above] at (current page.west) {\color{primary}\Large System Deployment};
+	\end{tikzpicture}   
+\end{frame}
+\note[itemize]{
+    \item Renderer uses Media Server to browse library and play media
+    \vspace{0.2em}
+    \item Renderer could run on its own platform
+    \vspace{0.5em}
+    \item Core Media Server uses plug-ins for each domain to deliver customised behaviour
+    \begin{itemize}
+        \Large
+        \item Plug-ins use the metadata stored in the Library Database
+        \item Plug-ins use the media files stored on the File System
+    \end{itemize}
+}
+
+% End Media Server Example
+
+
+\section{Conclusion}
+
+\begin{frame}{Microkernel Pros \& Cons}
+    \vspace{1mm}
+    {\huge
+    \begin{description}
+        \item[Simplicity] Core system \& Plug-in interface \tabto{16em}\includegraphics[width=10mm]{../../shared/images/thumbs-up.png}
+        \item[Extensibility] Plug-ins \tabto{16em}\includegraphics[width=10mm]{../../shared/images/thumbs-up.png}
+        \item[Interoperability] Plug-ins \tabto{16em}\includegraphics[width=10mm]{../../shared/images/thumbs-up.png}
+        \item[Scalability] \tabto{16em}\includegraphics[trim=22 19 22 15,clip,width=10mm]{../../shared/images/thumbs-down.png}
+        \item[Reliability] \tabto{16em}\includegraphics[trim=22 19 22 15,clip,width=10mm]{../../shared/images/thumbs-down.png}
+    \end{description}
+    }
+\end{frame}
+
+\end{document}

@@ -1,0 +1,314 @@
+# Need to finish fixing spec if we want to upgrade to Open API v.3.
+
+openapi: 3.0.4
+info:
+  description: |
+    A text-to-speech service to provide improved accessibility to the University of Queensland's teaching content.
+
+    Note that the URL used in the cURL examples below are just illustrative, you should replace [http://chatterbox.services.its.uq.edu.au/api/v1/](http://chatterbox.services.its.uq.edu.au/api/v1) with the host of your service.
+  version: "0.1.1"
+  title: "Chatterbox"
+  contact:
+    name: CSSE6400
+    url: https://csse6400.uqcloud.net
+    email: noreply@uq.edu.au
+host: "chatterbox.services.its.uq.edu.au"
+basePath: "/api/v1"
+tags:
+- name: "tts"
+  description: "Text-to-speech service"
+paths:
+  /health:
+    get:
+      tags: ["tts"]
+      summary: "Query the health of the chatterbox service."
+      description: |
+        The health endpoint is a useful for determining whether an instance is still healthy.
+        This can help if you are configuring auto-scaling groups.
+        
+        We do not specify the response payload for this endpoint,
+        however you may find it useful to return a more detailed status of your system.
+        For example: https://eloquentcode.com/rest-api-design-health-check-endpoint
+      responses:
+        "200":
+          description: "Service is healthy"
+        "503":
+          description: "Service is not healthy"
+  /text:
+    get:
+      tags: ["tts"]
+      summary: "List all generated audios."
+      description: |
+        List all of the generated audios in descending order of creation date-time.
+        The response is paginated with 10 elements on each page by default.
+      produces:
+        - "application/json"
+      parameters:
+        - name: start
+          in: query
+          description: Starting index of the results.
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: limit
+          in: query
+          description: The maximum amount of results to return.
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: "List of generated audios."
+          schema:
+            type: object
+            
+            properties:
+              size:
+                type: integer
+                example: 1
+                description: |
+                  The length of the response. Must be under the requested limit.
+              start:
+                type: integer
+                example: 0
+                description: |
+                  The starting index of the results, should equal the request parameter.
+              _links:
+                type: object
+                properties: 
+                  next:
+                    type: string
+                    nullable: true
+                    description: |
+                      The endpoint of the next page of results.
+
+                      Limit parameter should equal request.
+
+                      If there are no more results, field should be null.
+                    example: http://chatterbox.services.its.uq.edu.au/api/v1/text?limit=5&start=10
+                  prev:
+                    type: string
+                    description: |
+                      The endpoint of the previous page of results.
+
+                      Limit parameter should equal request.
+
+                      If there are no prior results, field should be null.
+                    example: http://chatterbox.services.its.uq.edu.au/api/v1/text?limit=5&start=0
+
+              data:
+                type: array
+                items:
+                  $ref: "#/definitions/TextResponse"
+
+              error:
+                type: object
+                description: Unspecified field to describe any errors.
+            
+    post:
+      tags: ["tts"]
+      summary: Request a new message is translated into synthesized speech.
+      description: |
+        - If the requested operation is SYNC, the request should not return until a speech file has been generated (or error).
+
+        - If the requested operation is ASYNC, the request should return immediantly regardless of whether the request has finished, if the request is still working the status should just be PENDING.
+
+        - Messages greater than 280 characters must be ASYNC or a bad request should be returned.
+
+        The error field in the response is left unspecified, you should populate this field as you see appropriate.
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "body"
+          in: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/TextRequest"
+      responses:
+        "200":
+          description: "The request returned successfully."
+          schema:
+            $ref: "#/definitions/TextResponse"
+        "400":
+          description: |
+            Body parameter was malformed or invalid.
+
+            Return value is not specified but should describe the error.
+        "500":
+          description: "An unknown error occurred trying to process the request. The response should contain as much of the payload as possible, the error field should be populated in this case."
+          schema:
+            $ref: "#/definitions/TextResponse"
+  /text/{id}:
+    parameters:
+      - name: "id"
+        in: "path"
+        description: "The identifier of the text resource."
+        required: true
+        schema:
+          type: string
+    get:
+      tags: ["tts"]
+      summary: "Retrieve details about a text-to-speech request."
+      produces:
+        - "application/json"
+      
+      responses:
+        "200":
+          description: "Successfully found a text resource."
+          schema:
+            $ref: "#/definitions/TextResponse"
+        "404":
+          description: "Unknown resource identifier."
+    delete:
+      tags: ["tts"]
+      summary: "Delete a text-to-speech job."
+      description: |
+        This endpoint will remove all known information about a text-to-speech job, including any generated audio files.
+      responses:
+        "200":
+          description: "Resource successfully deleted."
+        "404":
+          description: "Unknown resource identifier."
+  /model:
+    get:
+      tags: ["tts"]
+      summary: "List all available text-to-speech models for the service."
+      description: |
+        Provides a list of available text-to-speech model identifiers.
+        This content should not be paginated.
+
+        Note that when using the chatterbox CLI, dots (.) are replaced by forward slashes (/).
+        
+        You must support at least:
+          - tts_models.en.ek1.tacotron2
+          - tts_models.en.ljspeech.tacotron2-DDC
+          - tts_models.en.ljspeech.glow-tts
+          - tts_models.en.ljspeech.fast_pitch
+
+        Other models you may support are:
+          - tts_models.en.ljspeech.tacotron2-DDC_ph
+          - tts_models.en.sam.tacotron-DDC
+
+        You may find the performance characteristics interesting/helpful, documented here: https://github.com/csse6400/tts-cli
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "List of available text-to-speech model identifiers."
+          schema:
+            type: array
+            items:
+              type: "string"
+              description: "Text-to-speech model"
+            example: |
+              ["tts_models.en.ek1.tacotron2",
+               "tts_models.en.ljspeech.tacotron2-DDC",
+               "tts_models.en.ljspeech.glow-tts",
+               "tts_models.en.ljspeech.fast_pitch"]
+  /model/{id}:
+    get:
+      tags: ["tts"]
+      summary: "Retrieve details about a specified text-to-speech model."
+      description: "Details can be found here: [https://github.com/CSSE6400/tts-cli/blob/main/chatterbox/.models.json](https://github.com/CSSE6400/tts-cli/blob/main/chatterbox/.models.json)"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: The string identifier of the model as listed by the /model endpoint.
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: "All known details about the text-to-speech model."
+          content:
+            application/json:
+            schema:
+              $ref: "#/definitions/Model"
+              example: |
+                {
+                  "name": "tts_models.en.ljspeech.glow-tts",
+                  "description": "",
+                  "author": "Eren Gölge @erogol",
+                  "license": "MPL",
+                  "url": "https://coqui.gateway.scarf.sh/v0.0.9/tts_models--en--ljspeech--glow-tts.zip"
+                }
+        404:
+          description: "Unknown resource identifier."
+definitions:
+  Model:
+    type: "object"
+    properties: 
+      name:
+        type: "string"
+        description: "Text-to-speech model"
+        example: "tts_models.en.ljspeech.glow-tts"
+      description: 
+        type: "string"
+        description: "A description of the model"
+        example: ""
+      author:
+        type: "string"
+        description: "Author of the model. This field may be null."
+        example: "Eren Gölge @erogol"
+      license:
+        type: "string"
+        description: "License of the model. This field may be null."
+        example: "MPL"
+      url:
+        type: "string"
+        format: "uri"
+        description: "URL to download the model. This field may be null."
+        example: "https://coqui.gateway.scarf.sh/v0.0.9/tts_models--en--ljspeech--glow-tts.zip"
+  TextRequest:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+        example: "Hello, CSSE6400!"
+        description: "Content of the text request, synchronous requests must be between 1 and 280 characters. Asynchronous requests must be less than 9001 characters."
+      operation:
+        type: "string"
+        description: "Perform the request synchronously or asynchronously"
+        enum:
+          - SYNC
+          - ASYNC
+      model:
+        type: "string"
+        description: "Text-to-speech model"
+        example: "tts_models.en.ljspeech.glow-tts"
+  TextResponse:
+    allOf:
+      - type: "object"
+        properties:
+          id:
+            type: "string"
+            format: "uuid"
+            description: "Unique identifier of the text request"
+      - $ref: "#/definitions/TextRequest"
+      - type: "object"
+        properties:
+          status:
+            type: "string"
+            enum:
+              - PENDING
+              - COMPLETED
+              - FAILED
+          resource:
+            type: "string"
+            format: "uri"
+            description: "URL where the .wav file can be found, if the request is completed."
+            example: "https://presignedurldemo.s3.eu-west-2.amazonaws.com/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAJJWZ7B6WCRGMKFGQ%2F20180210%2Feu-west-2%2Fs3%2Faws4_request&X-Amz-Date=20180210T171315Z&X-Amz-Expires=1800&X-Amz-Signature=12b74b0788aa036bc7c3d03b3f20c61f1f91cc9ad8873e3314255dc479a25351&X-Amz-SignedHeaders=host"
+          created_at:
+            type: "string"
+            format: "date-time"
+            example: "2022-04-01T00:43:29.111Z"
+          processed_at:
+            type: "string"
+            format: "date-time"
+            example: "2022-04-09T07:43:31.111Z"
+          error:
+            type: "object"
