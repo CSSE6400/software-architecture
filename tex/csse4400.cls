@@ -8,6 +8,7 @@
 
 \RequirePackage[sfdefault]{cabin}
 \RequirePackage[T1]{fontenc}
+\usepackage[free]{fontawesome5}
 
 % Thin margins
 \RequirePackage[left=0.5 in,right=0.5 in,top=0.5in,bottom=1in]{geometry}
@@ -16,6 +17,19 @@
 
 % Pretty quotes
 \RequirePackage{xparse}
+
+\RequirePackage{tcolorbox}
+
+\tcbset{
+    arc=0mm,
+    boxrule=0.1pt,
+    titlerule=0pt,
+    coltitle=black,
+    leftrule=1pt,
+    colback=white,
+    toptitle=4pt,
+    bottomtitle=4pt
+}
 
 \let\oldquote\quote
 \let\endoldquote\endquote
@@ -54,21 +68,6 @@
     \begin{tcolorbox}
         {\color{red} TODO: #1}
     \end{tcolorbox}
-}
-
-% Teaching macro
-\newif\ifteachermode
-\newcommand{\teacher}[1]{
-    \ifteachermode
-    \begin{tcolorbox}[
-        title=For the teacher,
-        colframe = green!25,
-        colback  = green!10,
-        coltitle = green!20!black
-    ]
-        {#1}
-    \end{tcolorbox}
-    \fi
 }
 
 % Undo the effects of an appendix in the full notes
@@ -141,11 +140,25 @@
 }
 
 % Misc environments
-\RequirePackage{tcolorbox}
 
-\definecolor{info}{RGB}{135, 206, 235}
+\definecolor{teacher}{RGB}{64, 160, 43}
+% Teaching macro
+\newif\ifteachermode
+\newcommand{\teacher}[1]{
+    \ifteachermode
+    \begin{tcolorbox}[
+        title={\color{teacher} \faChalkboardTeacher{} } Teacher,
+        colframe=teacher,
+        colbacktitle=teacher!10!white
+    ]
+        {#1}
+    \end{tcolorbox}
+    \fi
+}
+
+\definecolor{info}{RGB}{4, 165, 229}
 \newcommand{\hint}[1]{
-    \begin{tcolorbox}[title=Hint,colframe=info]
+    \begin{tcolorbox}[title=Hint,colframe=info,coltitle=black]
     #1
     \end{tcolorbox}
 }
@@ -167,9 +180,13 @@
     {\begin{tcolorbox}\color{blue} draft (\today~\currenttime)\\}{\end{tcolorbox}}
 
 % Aside
-\definecolor{aside}{RGB}{120, 128, 181}
+\definecolor{aside}{RGB}{108, 111, 133}
 \newcommand\aside[1]{
-    \begin{tcolorbox}[title=Aside]
+    \begin{tcolorbox}[
+        title={\color{aside} \faStickyNote{} } Aside,
+        colframe=aside,
+        colbacktitle=aside!10!white
+    ]
     #1
     \end{tcolorbox}
 }
@@ -184,15 +201,35 @@
 
 % Info
 \newcommand\info[1]{
-    \begin{tcolorbox}[title=Info,colframe=info]
+    \begin{tcolorbox}[
+        title={\color{info} \faInfo{} } Info,
+        colframe=info,
+        colbacktitle=info!10!white
+    ]
     #1
     \end{tcolorbox}
 }
 
 % Warning
-\definecolor{warning}{RGB}{255, 164, 0}
+\definecolor{warning}{RGB}{223, 142, 29}
 \newcommand\warning[1]{
-    \begin{tcolorbox}[title=Warning,colframe=warning]
+    \begin{tcolorbox}[
+        title={\color{warning} \faExclamationTriangle{} } Warning,
+        colframe=warning,
+        colbacktitle=warning!10!white
+    ]
+    #1
+    \end{tcolorbox}
+}
+
+% Task
+\definecolor{task}{RGB}{136, 57, 239}
+\newcommand\task[1]{
+    \begin{tcolorbox}[
+        title={\color{task} \faTasks{} } Task,
+        colframe=task,
+        colbacktitle=task!10!white
+    ]
     #1
     \end{tcolorbox}
 }
