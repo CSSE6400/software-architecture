@@ -109,25 +109,15 @@ resource on the Internet.
 There are three main components of a URL:
 
 / Protocol: The protocol used to access the resource, e.g. #emph[http] or #emph[https];.
-
 / Host: The host name of the server that hosts the resource, e.g. #emph[example.com] or #emph[localhost];.
-
 / Path: The path to the resource on the server, how the server identifies the resource.
 
-#block[
-:\/\/ /
-
-]
 A URL can also contain a #emph[port] number, which is the port number
 that the server is listening on. If the port number is not specified,
 the default port number for the protocol is used. For example, the
 default port number for #emph[http] is 80, and the default port number
 for #emph[https] is 443.
 
-#block[
-:\/\/ : /
-
-]
 The URL #emph[http:\/\/example.com/hello-world] is equivalent to
 #emph[http:\/\/example.com:80/hello-world];.
 
@@ -136,10 +126,6 @@ pairs that are used to pass information to the server. Query parameters
 are separated from the path by a question mark \(`?`). Each query
 parameter is separated from the next by an ampersand \(`&`).
 
-#block[
-:\/\/ / ?
-
-]
 == HTTP
 <http>
 HTTP is a request-response abstraction for networking.
@@ -149,95 +135,58 @@ HTTP is a request-response abstraction for networking.
 The HTTP request is a message sent to the server. It contains the
 following information:
 
-/ URL: #block[
-An endpoint to which the request is sent.
-]
-
-/ Method: #block[
-Described later.
-]
-
-/ Headers: #block[
-Specify type of data, e.g. JSON, HTML, etc. and other metadata about the
-request.
-]
-
-/ Body: #block[
-The optional data to send to the server.
-]
+/ URL: An endpoint to which the request is sent.
+/ Method: Described later.
+/ Headers: Specify type of data, e.g. JSON, HTML, etc. and other metadata about the request.
+/ Body: The optional data to send to the server.
 
 === Response
-<response>
+
 The HTTP response is a message sent from the server. It contains the
 following information:
 
-/ Status code: #block[
-A number between 100 and 599 giving details about the response.
-]
+/ Status code: A number between 100 and 599 giving details about the response.
 
-/ Headers: #block[
-Specify type of response data, e.g. JSON, HTML, etc. and other metadata
+/ Headers: Specify type of response data, e.g. JSON, HTML, etc. and other metadata
 about the response.
-]
 
-/ Body: #block[
-Content of the response.
-]
+/ Body: Content of the response.
 
 ==== Status Codes
-<status-codes>
-/ 200s: #block[
-Indicate the request was successful, 200 is the most common.
-]
 
-/ 300s: #block[
-Redirects the requester to another location.
-]
-
-/ 400s: #block[
-Indicates that the request was wrong, e.g. 404 meaning that the request
+/ 200s: Indicate the request was successful, 200 is the most common.
+/ 300s: Redirects the requester to another location.
+/ 400s: Indicates that the request was wrong, e.g. 404 meaning that the request
 was for something that does not exist.
-]
+/ 500s: Indicates that the server had a problem fulfilling the request.
 
-/ 500s: #block[
-Indicates that the server had a problem fulfilling the request.
-]
 
 ==== Methods
 <methods>
-/ GET: #block[
-Queries the server for information.
-]
+/ GET: Queries the server for information.
 
-/ POST: #block[
-Creates a new resource on the server.
-]
 
-/ PUT: #block[
-Updates an existing resource on the server.
-]
+/ POST: Creates a new resource on the server.
 
-/ DELETE: #block[
-Deletes an existing resource on the server.
-]
+
+/ PUT: Updates an existing resource on the server.
+
+
+/ DELETE: Deletes an existing resource on the server.
+
 
 == JSON
-<json>
-JavaScript Object Notation \(JSON) is a data format commonly used to
-pass data to an API. It is fairly succinct and communicates the
-important points to a human reader better than some alternative formats.
-The popularity of JSON is largely due to its compatibility with
-JavaScript which has taken over as the defacto web development language.
-JSON is the map-esque data type in JavaScript. Detractors of JSON claim
-that its main disadvantage compared to XML \(an alternative data format)
-is that it lacks a schema. However, , they are optional, just as in XML,
-but are used much less than in XML.
 
-#block[
-csse6400.json \"Course Code\": \"CSSE6400\", \"Course Title\":
-\"Software Architecture\"
+JavaScript Object Notation \(JSON) is a data format commonly used to pass data to an API. It is fairly succinct and communicates the important points to a human reader better than some alternative formats. The popularity of JSON is largely due to its compatibility with JavaScript which has taken over as the defacto web development language. JSON is the map-esque data type in JavaScript. Detractors of JSON claim that its main disadvantage compared to XML \(an alternative data format) is that it lacks a schema. However, they are optional, just as in XML, but are used much less than in XML.
 
-]
+#codly(header: [#icon("ph:file", width: 1em, y: -0.15em) csse6400.json])
+```json
+{
+    "Course Code": "CSSE6400",
+    "Course Title": "Software Architecture"
+}
+```
+
 == REST
 <rest>
 REST is an architectural style guided by a set of architectural
@@ -318,16 +267,17 @@ GitHub Codespaces.
 This endpoint should return a 200 status code and a JSON object with a
 single field, #strong[status];, which should be set to #strong[ok];.
 
-#block[
+```http
 GET /api/v1/health HTTP/1.1
 
-]
-#block[
-HTTP/1.1 200 OK Content-Type: application/json
+HTTP/1.1 200 OK 
+Content-Type: application/json
 
-\"status\": \"ok\"
+{ 
+  "status": "ok" 
+}
+```
 
-]
 === GET /api/v1/todos
 <get-apiv1todos>
 This endpoint should return a list of all the tasks in the todo list.
@@ -340,37 +290,46 @@ Optional query parameters:
 - #strong[window] An integer value indicating how many days past today's
   date a task should be due by.
 
-#block[
-GET /api/v1/todos?completed\=true&window\=7 HTTP/1.1
+```http
+GET /api/v1/todos?completed=true&window=7 HTTP/1.1
 
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+[
+    {
+      "id": 1,
+      "title": "Watch CSSE6400 Lecture",
+      "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+      "completed": true,
+      "deadline_at": "2026-02-27T18:00:00",
+      "created_at": "2026-02-20T14:00:00",
+      "updated_at": "2026-02-20T14:00:00"
+    },
+    ...
 ]
-#block[
-HTTP/1.1 200 OK Content-Type: application/json
-
-\[ \"id\": 1, \"title\": \"Watch CSSE6400 Lecture\", \"description\":
-\"Watch the CSSE6400 lecture on ECHO360 for week 1\", \"completed\":
-true, \"deadline\_at\": \"2026-02-27T18:00:00\", \"created\_at\":
-\"2026-02-20T14:00:00\", \"updated\_at\": \"2026-02-20T14:00:00\" , ...
-\]
-
-]
+```
 === GET /api/v1/todos/
 <get-apiv1todos-1>
 This endpoint should return a single item from the todo list.
 
-#block[
+```http
 GET /api/v1/todos/1 HTTP/1.1
 
-]
-#block[
-HTTP/1.1 200 OK Content-Type: application/json
+HTTP/1.1 200 OK
+Content-Type: application/json
 
-\"id\": 1, \"title\": \"Watch CSSE6400 Lecture\", \"description\":
-\"Watch the CSSE6400 lecture on ECHO360 for week 1\", \"completed\":
-false, \"deadline\_at\": \"2026-02-27T18:00:00\", \"created\_at\":
-\"2026-02-20T14:00:00\", \"updated\_at\": \"2026-02-20T14:00:00\"
+{
+    "id": 1,
+    "title": "Watch CSSE6400 Lecture",
+    "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+    "completed": false,
+    "deadline_at": "2026-02-27T18:00:00",
+    "created_at": "2026-02-20T14:00:00",
+    "updated_at": "2026-02-20T14:00:00"
+}
+```
 
-]
 === POST /api/v1/todos
 <post-apiv1todos>
 This endpoint should create a new task in the todo list. The title field
@@ -381,23 +340,30 @@ Attempting to post any other fields than
 `title, description, completed, deadline_at` will cause a 400 error to
 be returned.
 
-#block[
-POST /api/v1/todos HTTP/1.1 Content-Type: application/json
+```http
+POST /api/v1/todos HTTP/1.1
+Content-Type: application/json
 
-\"title\": \"Watch CSSE6400 Lecture\", \"description\": \"Watch the
-CSSE6400 lecture on ECHO360 for week 1\", \"completed\": false,
-\"deadline\_at\": \"2026-02-27T18:00:00\",
+{
+    "title": "Watch CSSE6400 Lecture",
+    "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+    "completed": false,
+    "deadline_at": "2026-02-27T18:00:00",
+}
 
-]
-#block[
-HTTP/1.1 201 Created Content-Type: application/json
+HTTP/1.1 201 Created
+Content-Type: application/json
 
-\"id\": 1, \"title\": \"Watch CSSE6400 Lecture\", \"description\":
-\"Watch the CSSE6400 lecture on ECHO360 for week 1\", \"completed\":
-false, \"deadline\_at\": \"2026-02-27T18:00:00\", \"created\_at\":
-\"2026-02-20T14:00:00\", \"updated\_at\": \"2026-02-20T14:00:00\"
-
-]
+{
+    "id": 1,
+    "title": "Watch CSSE6400 Lecture",
+    "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+    "completed": false,
+    "deadline_at": "2026-02-27T18:00:00",
+    "created_at": "2026-02-20T14:00:00",
+    "updated_at": "2026-02-20T14:00:00"
+}
+```
 === PUT /api/v1/todos/
 <put-apiv1todos>
 This endpoint should update a task in the todo list. The `created_at`,
@@ -410,41 +376,49 @@ be returned.
 Attempting to put a task id that does not exist will cause a 404 error
 to be returned.
 
-#block[
-PUT /api/v1/todos/1 HTTP/1.1 Content-Type: application/json
+```http
+PUT /api/v1/todos/1 HTTP/1.1
+Content-Type: application/json
 
-\"title\": \"Join the Richard Thomas fan club\",
+{
+    "title": "Join the Richard Thomas fan club",
+}
 
-]
-#block[
-HTTP/1.1 200 OK Content-Type: application/json
+HTTP/1.1 200 OK
+Content-Type: application/json
 
-\"id\": 1, \"title\": \"Join the Richard Thomas fan club\",
-\"description\": \"Watch the CSSE6400 lecture on ECHO360 for week 1\",
-\"completed\": false, \"deadline\_at\": \"2026-02-27T18:00:00\",
-\"created\_at\": \"2026-02-20T14:00:00\", \"updated\_at\":
-\"2026-02-20T14:00:00\"
-
-]
+{
+    "id": 1,
+    "title": "Join the Richard Thomas fan club",
+    "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+    "completed": false,
+    "deadline_at": "2026-02-27T18:00:00",
+    "created_at": "2026-02-20T14:00:00",
+    "updated_at": "2026-02-20T14:00:00"
+}
+```
 === DELETE /api/v1/todos/
 <delete-apiv1todos>
 This endpoint should delete a task from the todo list. If the task does
 not exist, a 200 is returned with an empty response.
 
-#block[
+```http
 DELETE /api/v1/todos/1 HTTP/1.1
 
-]
-#block[
-HTTP/1.1 200 OK Content-Type: application/json
+HTTP/1.1 200 OK
+Content-Type: application/json
 
-\"id\": 1, \"title\": \"Join the Richard Thomas fan club\",
-\"description\": \"Watch the CSSE6400 lecture on ECHO360 for week 1\",
-\"completed\": false, \"deadline\_at\": \"2026-02-27T18:00:00\",
-\"created\_at\": \"2026-02-20T14:00:00\", \"updated\_at\":
-\"2026-02-20T14:00:00\"
+{
+    "id": 1,
+    "title": "Join the Richard Thomas fan club",
+    "description": "Watch the CSSE6400 lecture on ECHO360 for week 1",
+    "completed": false,
+    "deadline_at": "2026-02-27T18:00:00",
+    "created_at": "2026-02-20T14:00:00",
+    "updated_at": "2026-02-20T14:00:00"
+}
+```
 
-]
 == Implementation with FastAPI
 
 
