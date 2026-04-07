@@ -9,6 +9,8 @@
 \RequirePackage[sfdefault]{cabin}
 \RequirePackage[T1]{fontenc}
 \usepackage[free]{fontawesome5}
+\usepackage{minted}
+\usepackage[latte]{catppuccinpalette}
 
 % Thin margins
 \RequirePackage[left=0.5 in,right=0.5 in,top=0.5in,bottom=1in]{geometry}
@@ -255,3 +257,8 @@
     \vspace{4pt}
     }
     {\end{tcolorbox}}
+
+% Code
+\setminted{
+    bgcolor=CtpLatteBackground
+}
