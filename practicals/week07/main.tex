@@ -153,7 +153,7 @@ terraform {
   required_providers {
     aws = {
       source = "hashicorp/aws"
-      version = "~> 5.0"
+      version = "~> 6.0"
     }
   }
 }
@@ -224,8 +224,13 @@ AWS_SECRET_ACCESS_KEY=...
 AWS_SESSION_TOKEN=...
 \end{code}
 
+\bash{
+docker run --rm -it --env-file aws.env ghcr.io/csse6400/queue:main --name "test" --client-name "Client 1"
+}
+
+After pulling the queue image, it should output the following.
+
 \begin{code}[numbers=none,keepspaces=true]{}
-$ docker run --rm -it --env-file aws.env ghcr.io/csse6400/queue:main --name "test" --client-name "Client 1"
 
 
   __________
@@ -243,6 +248,14 @@ $ docker run --rm -it --env-file aws.env ghcr.io/csse6400/queue:main --name "tes
 Unable to find a Queue by this name test
 \end{code}
 
+\warning{
+  There appears to be a bug in GitHub's Container Registry (GHCR) in relation to public images.
+  If you receive the following error message from Docker: \newline
+  \texttt{docker: Error response from daemon: error from registry: denied}\newline
+  It may be because Docker is logged into \texttt{ghcr.io}.
+  Try logging out using \texttt{docker logout ghcr.io}, in order to be able to pull the public image.
+}
+
 
 \subsection{SQS Standard}
 
@@ -254,7 +267,7 @@ We will create a message publisher and a message subscriber.
   Make sure these are all in the same folder so we can reuse the \texttt{aws.env} file. 
 }
 
-To create the subscriber run the following command:
+To create the subscriber run the following command.
 
 \bash{
 docker run --rm -it --env-file aws.env ghcr.io/csse6400/queue:main --name "csse6400_prac" --client-name "Client 1" --receive
@@ -275,7 +288,8 @@ docker run --rm -it --env-file aws.env ghcr.io/csse6400/queue:main --name "csse6
 \end{figure}
 
 When the publisher connects to the queue it will put 100 messages of increasing increment into the queue.
-On the subscriber we will be able to see the messages being received, an example is provided below:
+On the subscriber we will be able to see the messages being received, an example is provided below.
+Refresh the SQS dashboard to see in flight and available change as the messages are processed.
 
 \begin{figure}[H]
   \includegraphics[width=\textwidth]{images/stacksubdata}
@@ -285,7 +299,7 @@ Hopefully, like our example, you can see that some of the messages arrive out of
 Next, add more publishers and subscribers and experiment with different configurations.
 
 \info{
-  When making multiple publishers, you may want to change the client-name CLI parameter,
+  When making multiple publishers, you may want to change the \texttt{client-name} CLI parameter,
   so you can keep track of when the messages arrived at the subscribers.
 }
 
@@ -320,7 +334,7 @@ You can see this in FIFO queue's dashboard Monitoring tab.
 The queue test code has a CLI parameter which prepends a string to the message.
 Re-run the test code using \texttt{--prepend "A-"} to send non-duplicate messages.
 
-As before try experimenting with different publisher / subscriber configurations to see how they behave.
+As before, try experimenting with different publisher / subscriber configurations to see how they behave.
 
 \info{
   When making multiple publishers, you may want to change the client-name CLI parameter,
@@ -328,7 +342,7 @@ As before try experimenting with different publisher / subscriber configurations
 }
 
 \warning{
-  \textbf{Please remember to \texttt{terraform destroy} to delete your resources!}
+  \textbf{Please remember to delete your resources using \texttt{terraform destroy}!}
 }
 
 
@@ -434,7 +448,7 @@ def get_calendar(task_id):
 Next we will modify our \texttt{docker-compose.yml} to include a local queuing service called Redis.
 Later we will use AWS SQS, but as Celery supports multiple queues,
 we can use this to make the local development easier.
-%
+
 \begin{code}[numbers=none]{docker-compose.yml}
   redis:
     image: redis:latest
@@ -447,7 +461,7 @@ we can use this to make the local development easier.
 Now that we have a queue,
 we will create the worker that accepts jobs from the queue.
 We will create this worker in \texttt{todo/tasks/ical.py}.
-%
+
 \begin{code}[language=python,numbers=none]{todo/tasks/ical.py}
 import os
 
@@ -531,8 +545,8 @@ For this we will modify our \texttt{docker-compose.yml} file.
     command: poetry run celery --app todo.tasks.ical worker --loglevel=info
 \end{code}
 
-Note that we are re-using the same image development image as the Flask server.
-This makes sense since it shares very similar dependencies.
+Note that we are re-using the same development image as the Flask server.
+This makes sense now, since it shares very similar dependencies.
 It would make sense to separate the dependencies between the two containers as they grow larger.
 
 We are overriding the command to run when the container starts to use the celery command.
@@ -662,7 +676,7 @@ terraform {
   required_providers {
     aws = {
       source = "hashicorp/aws"
-      version = "~> 5.0"
+      version = "~> 6.0"
     }
   }
 }
