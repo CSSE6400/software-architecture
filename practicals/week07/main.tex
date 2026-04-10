@@ -139,7 +139,7 @@ Furthermore, ElastiCache also offers support for Memcached, another popular open
     You may work through it on your own if you wish.
 }
 
-We will demonstrate working with the two queue flavours of AWS SQS.
+We will demonstrate working with the two flavours of queues provided by AWS SQS.
 A standard queue, named \texttt{csse6400\_prac} and a FIFO queue, named \texttt{csse6400\_prac.fifo}.
 The Terraform code below can be used to create these two queues.
 
@@ -148,6 +148,7 @@ The Terraform code below can be used to create these two queues.
   Though the FIFO name needs to have \texttt{.fifo} at the end, make sure to mention this.
 }
 
+\vspace{-1em}
 \begin{code}[language=terraform, numbers=none]{q-demo.tf}
 terraform {
   required_providers {
@@ -449,6 +450,7 @@ Next we will modify our \texttt{docker-compose.yml} to include a local queuing s
 Later we will use AWS SQS, but as Celery supports multiple queues,
 we can use this to make the local development easier.
 
+\vspace{-1em}
 \begin{code}[numbers=none]{docker-compose.yml}
   redis:
     image: redis:latest
@@ -489,19 +491,26 @@ as we will later require our Flask server to use Celery to put jobs into the tas
 \bash{pipx run poetry add celery redis celery\[sqs\] boto3}
 
 \noindent
-The above will install the Celery core and Redis and AWS SQS drivers for communication.
-
-We will now start our local Redis queue and our worker to ensure that they can communicate.
+The above will install the Celery core, Redis, and AWS SQS drivers for communication.
+Start the local Redis queue using \texttt{docker compose}.
 
 \bash{docker compose up redis}
+
+\noindent
+Create the environment variables Celery needs to access the local Redis queue.
+Then start the worker to ensure that the queue and worker can communicate.
 
 \begin{code}[language=bash,numbers=none]{}
 $ export CELERY_BROKER_URL=redis://localhost:6379
 $ export CELERY_RESULT_BACKEND=redis://localhost:6379
 $ pipx run poetry run python3 -m celery --app todo.tasks.ical worker --loglevel=info
 \end{code}
+% Windows specific:
+% $ pipx run poetry run python3 -m celery --app todo.tasks.ical worker --loglevel=info --pool=solo
+% Windows doesn't support Celery's default prefork pool.
 
-You should see something like the below.
+\noindent
+You should see something like the following example output.
 This indicates that the worker has successfully subscribed to the queue and is ready to accept events.
 %
 \begin{code}[numbers=none]{}
@@ -530,9 +539,11 @@ This indicates that the worker has successfully subscribed to the queue and is r
 ...
 \end{code}
 
+\noindent
 Finally, we will run Celery inside a new container.
-For this we will modify our \texttt{docker-compose.yml} file.
-%
+Modify the \texttt{docker-compose.yml} file as follows.
+
+\vspace{-1em}
 \begin{code}[numbers=none]{docker-compose.yml}
   worker:
     build:
@@ -546,7 +557,7 @@ For this we will modify our \texttt{docker-compose.yml} file.
 \end{code}
 
 Note that we are re-using the same development image as the Flask server.
-This makes sense now, since it shares very similar dependencies.
+This is for simplicity now, since it shares very similar dependencies.
 It would make sense to separate the dependencies between the two containers as they grow larger.
 
 We are overriding the command to run when the container starts to use the celery command.
@@ -609,17 +620,19 @@ we need to configure the server to talk to our Redis container.
 Add the Celery environment variables to the \texttt{app}'s \texttt{environment} in \texttt{docker-compose.yml}.
 %
 \begin{code}[numbers=none]{docker-compose.yml}
-  environment:
-    CELERY_BROKER_URL: redis://redis:6379
-    CELERY_RESULT_BACKEND: redis://redis:6379
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379
+      CELERY_RESULT_BACKEND: redis://redis:6379
 \end{code}
 
 You should now be able to start the server and worker with \texttt{docker compose}.
 
+\vspace{-0.5em}
 \bash{docker compose up}
 
-You can now send a POST request to the \texttt{/api/v1/todos/ical} endpoint
-to start a job and follow the subsequent URLs to see the result of the job.
+\vspace{-0.3em}
+Try sending a POST request to the \texttt{/api/v1/todos/ical} endpoint
+to start a job and follow the subsequent URLs, from Section \ref{sect:apiext}, to see the result of the job.
 
 \subsection{Creating the Calendar}
 
@@ -627,9 +640,10 @@ Once we have confirmed that the task queue can communicate with our worker,
 we can return to the calendar generation.
 We will use the \texttt{icalendar} library for this.
 
+\vspace{-0.3em}
 \bash{pipx run poetry add icalendar}
 
-\vspace{-2em}
+\vspace{-2.2em}
 \begin{code}[language=python,numbers=none]{todo/tasks/ical.py}
 import icalendar
 import time
@@ -657,10 +671,14 @@ def create_ical(tasks):
     return cal.to_ical().decode("utf-8")
 \end{code}
 
-Now you should be able to test your application.
+\noindent
+Now you can test your application.
+\vspace{-.2em}
 \begin{enumerate}
     \item Start it with \texttt{docker compose}.
+          \vspace{-1em}
           \bash{docker compose up --build}
+    \newpage
     \item Open the user interface on \url{http://localhost:6400} and create some tasks.
     \item Follow the cURL interaction from Section \ref{sect:apiext} to generate an appropriate iCal.
 \end{enumerate}
@@ -705,7 +723,7 @@ Celery will then attempt to find appropriate AWS credentials to use to authentic
 We can pass the credentials in as environment variables,
 using the \texttt{aws.env} file we created in section \ref{sec:q-cli}.
 
-\vspace{-1.5em}
+\vspace{-1.25em}
 \begin{code}[numbers=none]{docker-compose.yml}
     volumes:
       - ./todo:/app/todo
@@ -714,6 +732,7 @@ using the \texttt{aws.env} file we created in section \ref{sec:q-cli}.
       CELERY_BROKER_URL: sqs://
 \end{code}
 
+\noindent
 Ensure that you update both the worker and the server (app).
 
 \subsection{Credentials File}
@@ -740,8 +759,7 @@ If we tried to go to the status or result page for a task we submitted, we would
 
 To work around this issue,
 we will use our existing PostgreSQL database as our persistent store to track tasks.
-
-We can update our \texttt{docker-compose.yml} as below to allow Celery to use our PostgreSQL database.
+Update the \texttt{docker-compose.yml} file as below to allow Celery to use our PostgreSQL database.
 %
 \begin{code}[numbers=none]{docker-compose.yml}
     environment:
