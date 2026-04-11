@@ -5,6 +5,7 @@
 \usepackage{tabto}
 \usepackage{languages}
 \usepackage{scrextend}  % For \begin{labeling
+\usepackage{changepage}
 
 % \usepackage{pgfpages}
 %\setbeameroption{show notes on second screen}
@@ -12,7 +13,7 @@
 \title{Distributed Systems II}
 \subtitle{Software Architecture}
 \author{Brae Webb \& Richard Thomas \& Guangdong Bai}
-\date{\week{6}}
+\date{\week{7}}
 
 % \titlegraphic {
 %     \tweet%
@@ -63,10 +64,10 @@
 \end{center}
 }
 \note[itemize]{
-    \item We scaled a stateless service.
-    \item Stateless: Services don't require persistent data \highlight{between} requests.
-    \item Persistent state is saved in the database.
-    \item This is normally easy to do.
+    \item We scaled a stateless service
+    \item Stateless: Services don't require persistent data \highlight{between} requests
+    \item Persistent state is saved in the database
+    \item This is normally easy to do
 }
 
 \question{What is the \highlight{problem}?}
@@ -78,23 +79,25 @@
 \end{center}
 }
 \note[itemize]{
-    \item Database has state, persistent data.
-    \item This is much harder to scale.
+    \item Database has state, \highlight{persistent} data
+    \item This is much harder to scale
 }
 
 \point[\Large Stateless vs. Stateful Systems]{
 \vspace{1em}
     \begin{labeling}{Stateless}
-        \item[\color{secondary} Stateless] Does \highlight{not} utilise \highlight{persistent data}. Or: each request is independent. 
+        \item[\color{secondary} Stateless] Does \highlight{not} utilise \highlight{persistent data}.\\
+             Or: each request is independent. 
         \vspace{1em}
-        \item[\color{secondary} Stateful] Does utilise \highlight{persistent data}. Or: the server or service remembers and uses data from previous interactions.
+        \item[\color{secondary} Stateful] Does utilise \highlight{persistent data}.\\
+             Or: server or service remembers and uses data from previous interactions.
     \end{labeling}
 }
 
 \point[\Large Disclaimer]{This is \highlight{not} a database course}
 
 \image{images/infs3200}
-\note{This is a database course.}
+\note{This is a database course}
 
 
 %%%%%%%%%%%%%%%
@@ -137,19 +140,22 @@
 
 \question{How do we replicate our data?}
 \note[itemize]{
-    \item Easy without updates, just copy it.
-    \item Updates, or writes, must \highlight{propagate} changes.
+    \item Easy without updates, just copy it
+    \item Updates, or writes, must \highlight{propagate} changes
 }
 
 \point[\Large First Approach]{Leader-Follower Replication}
 
 \image[height=\textheight]{diagrams/LeaderFollower}
 \note[itemize]{
-    \item Leader-Follower is the most common implementation.
-    \item Multiple followers, only \textit{one} leader.
+    \item Leader-Follower is the most common implementation
+    \item Multiple followers, only \highlight{one} leader
 }
 
-\definition{Leader-based Replication}{one node (the leader) handles all write operations, and multiple other nodes (followers) replicate the data and handle read operations.}
+\definition{Leader-based Replication}{
+    One node (the leader) handles all write operations,
+    and multiple other nodes (followers) replicate the data and handle read operations.
+}
 
 \point[\Large Leader-based Replication]{
     \vspace{1em}
@@ -162,8 +168,10 @@
 
 \image{diagrams/LeaderFollowerSpread}
 \note[itemize]{
-    \item Built-in to PostgreSQL, MySQL, MongoDB, RethinkDB, and Espresso.
-    \item Can be added to Oracle and SQL Server.
+    \item Different services could read from different replicas
+    \vspace{0.5em}
+    \item Built-in to PostgreSQL, MySQL, MongoDB, RethinkDB, and Espresso
+    \item Can be added to Oracle and SQL Server
 }
 
 \point[\Large Propagating Changes]{
@@ -171,10 +179,10 @@
 }
 
 \image[height=\textheight]{diagrams/Sync}
-\note{Synchronous update.}
+\note{Synchronous update}
 
 \image[height=\textheight]{diagrams/Async}
-\note{Asynchronous update.}
+\note{Asynchronous update}
 
 \image[height=\textheight]{diagrams/SyncVsAsync}
 \note[itemize]{
@@ -216,25 +224,27 @@
 % \point{Leader failure}
 
 \definition{Stale data}{
-   Outdated or inconsistent data that does not reflect the latest updates, mainly due to replication delays, caching, or network issues in distributed systems.
+   Outdated or inconsistent data that does not reflect the latest updates, mainly due to replication delays,
+   caching, or network issues in distributed systems.
 }
 
 \image{diagrams/ReplicationLag}
+\note{Update of Lifelike Inflatable \highlight{Nicholas Cage} is not propagated to a follower before it's queried}
 
 \definition{Replication Lag}{
     The time taken for replicas to update \highlight{stale} data.
 }
-\note{\textit{Replication Lag}: Time it takes for the product name change to update across \highlight{all} followers.}
+\note{\highlight{Replication Lag}: Time it takes for the product name change to update across \highlight{all} followers.}
 
 \image[height=\textheight]{diagrams/AsyncLag}
-\note{The purple lifeline bar is \textit{replication lag}.}
+\note{Purple lifeline bar is \highlight{replication lag}}
 
 \point[\Large Eventually, all replicas must become consistent]{
     The system is \highlight{eventually consistent}.
 }
 \note[itemize]{
-    \item If writes stop for long enough.
-    \item Eventually is intentionally \highlight{ambiguous}.
+    \item If writes stop for long enough
+    \item Eventually is intentionally \highlight{ambiguous}
 }
 
 \point[\Large Eventual Consistency]{Sufficient? Problems?}
@@ -247,13 +257,13 @@
 {braewebb}%
 {}%
 {}%
-\note[item]<1->{Read user details.\vspace{1em}}
+\note[item]<1->{Read user details\vspace{1em}}
 
 \only<2->{
 \includegraphics[width=0.3\textwidth]{diagrams/ReadYourWrites}
 }
-\note[item]<2->{Decide I don't like my name.\vspace{1em}}
-\note[item]<2->{Update name.\vspace{1em}}
+\note[item]<2->{Decide I don't like my name\vspace{1em}}
+\note[item]<2->{Update name\vspace{1em}}
 
 \only<3->{
 \tweet%
@@ -263,23 +273,22 @@
 {}%
 {}%
 }
-\note[item]<3->{Read user details.}
-
+\note[item]<3->{Read user details}
 \end{center}
 \end{frame}
 
 \image{diagrams/ReadYourWritesExample}
 \note[itemize]{
-    \item Typical interaction in simple Leader-Follower replication.
-    \item Write is to \highlight{leader}.
-    \item Read is from \highlight{follower}.
-    \item \textit{Replication lag} means reading a field immediately after updating it \highlight{may} lead to reading \highlight{stale} data.
+    \item Typical interaction in simple Leader-Follower replication
+    \item Write is to \highlight{leader}
+    \item Read is from \highlight{follower}
+    \item \highlight{Replication lag} means reading a field immediately after updating it \highlight{may} lead to reading \highlight{stale} data.
 }
 
 \definition{Read-your-writes Consistency}{
-    Users always see the updates that \highlight{they have made} (even though others see stale data).
+    Users always see the updates that \highlight{they have made}, even though others may see stale data.
 }
-\note{Doesn't care what other users see.}
+\note{Doesn't care what other users see}
 
 \begin{frame}
 \begin{center}
@@ -291,7 +300,7 @@
 {My fist post}%
 {}%
 }
-\note[item]<1->{Misspell a tweet.\vspace{1em}}
+\note[item]<1->{Misspell a tweet\vspace{1em}}
 
 \only<2->{
 \tweet%
@@ -301,7 +310,7 @@
 {My first post}%
 {}%
 }
-\note[item]<2->{Correct spelling, and I see my \textit{updated} tweet.\vspace{1em}}
+\note[item]<2->{Correct spelling, and I see my \textit{updated} tweet\vspace{1em}}
 
 \only<3->{
 \tweet%
@@ -311,7 +320,7 @@
 {My fist post}%
 {}%
 }
-\note[item]<3->{Other users may still see \textit{stale}, misspelt post.}
+\note[item]<3->{Other users may still see \textit{stale}, misspelt post}
 \end{center}
 \end{frame}
 
@@ -327,7 +336,7 @@
 \note{User doesn't travel back in time.}
 
 \definition{Causal Consistency}{
-    Causally related updates appear in order (e.g., comments appear under the right post).
+    Causally related updates appear in order (e.g. comments appear under the right post).
 }
 \note{To generalize time to any dependent relations.}
 
@@ -350,15 +359,14 @@
 
 \image[height=\textheight]{diagrams/MultiLeader}
 \note[itemize]{
-    \item Application can be partitioned to perform certain types of writes to a specific leader.
-    \item Reads are from replicas, as with Leader-Follower replication.
+    \item Application can be partitioned to perform certain types of writes to a specific leader
+    \item Reads are from replicas, as with Leader-Follower replication
 }
 
 \point[\Large Why multi-leader?]{
 \vspace{1em}
 \begin{itemize}[<+->]
-    \item If you have multiple leaders,
-          you can write to any,
+    \item If you have multiple leaders, you can write to any,
           allowing \highlight{writes to scale}.
           \vspace{1em}
     \item A leader going down doesn't prevent writes,
@@ -366,9 +374,9 @@
 \end{itemize}
 }
 \note[itemize]{
-    \item Available via extensions in most databases, often not supported natively.
-    \item Best to avoid where possible.
-    \item Example: Globally distributed data centres.
+    \item Available via extensions in most databases, often not supported natively
+    \item Best to avoid where possible
+    \item Example: Globally distributed data centres
 }
 
 % \point[Multi-leader Replication]{Use Cases}
@@ -383,7 +391,7 @@
 \image{diagrams/WriteConflict}
 \note[enumerate]{
     \item Fulfilment centre finds faulty pillow and decreases inventory.
-    \item Customer orders 20 pillows, what they saw as the number available.
+    \item Customer orders 20 pillows, the number that \highlight{they saw} were available.
     \item -1 Pillows?
     \item How do we resolve this?
 }
@@ -391,7 +399,7 @@
 \point[\Large Where possible]{Avoid write conflicts}
 
 \image{diagrams/AvoidWriteConflict}
-\note{Requires application to ensure all writes to a field/table/shard are via the \highlight{same} leader.}
+\note{Requires application to ensure all writes to a field/table/shard are via the \highlight{same} leader}
 
 \point[\Large Where impossible]{Convergence}
 
@@ -405,18 +413,19 @@
     \item Custom resolution logic
 \end{itemize}
 }
-\note{Yes, this can be \highlight{challenging}.}
+\note{Yes, this can be \highlight{challenging}}
 
 \image[height=\textheight]{diagrams/ResolveWriteConflict}
 
 \point[\Large Resolving Conflicts]{
-\vspace{1em}
+\vspace{0.5em}
 \begin{labeling}{On Write}
     \item[\color{secondary} On Write] When a conflict is first noticed, take proactive resolution action. 
-    \item[] Example: Last Write Wins (LWW) in DynamoDB. 
-    \vspace{0.5em}
-    \item[\color{secondary} On Read] Stores all conflicting versions on write. When a conflict is next read, ask for a resolution.
-    \item[] Example: \emph{git pull}
+    \item[] e.g. Last Write Wins (LWW) in DynamoDB. 
+    \vspace{0.25em}
+    \item[\color{secondary} On Read] Store all conflicting versions on write.
+         When a conflict is next read, ask for a resolution.
+    \item[] e.g. \emph{git pull}
 \end{labeling} 
 }
 \note[itemize]{
@@ -428,16 +437,21 @@
 
 \point[\Large Third Approach]{Leaderless Replication}
 \note[itemize]{
-    \item Early distributed databases were leaderless.
-    \item Resurgance after Amazon created Dynamo.
-    \item Dynamo is an internal service and \highlight{not} DynamoDB.
-    \item Riak, Cassandra, and Voldemort are leaderless databases.
+    \item Early distributed databases were leaderless
+    \item Resurgence after Amazon created Dynamo
+    \item Dynamo is an internal service and \highlight{not} DynamoDB
+    \item Riak, Cassandra, and Voldemort are leaderless databases
 }
 
-\image[width=1.05\textwidth]{diagrams/Leaderless}
-\note{Reads and writes can be written to any node.}
+\begin{frame}{Leaderless Replication}
+  \begin{adjustwidth}{-10mm}{-10mm}
+    \centering
+    \includegraphics[width=0.98\paperwidth]{diagrams/Leaderless}
+  \end{adjustwidth}    
+\end{frame}
+\note{Reads and writes can be written to any node}
 
-\point[\Large How do they work?]{
+\point[\Large How does IT work?]{
     \vspace{0.5em}
     Each read/write is sent to \highlight{multiple} replicas.
 }
@@ -446,27 +460,26 @@
 \note{Leaderless Write}
 
 \image{diagrams/LeaderlessExampleRead}
-\note{Leaderless Read: At least one of the reads has the updated value.}
+\note{Leaderless Read: At least one of the reads has the updated value}
 
 \point[\Large How are changes propagated?]{
     \vspace{0.6em}
     \begin{itemize}[<+->]
         \item Read Repair
-        \note[item]<1->{Read Repair: Client detects stale data on read and writes updated data to that replica.\vspace{1em}}
+        \note[item]<1->{Read Repair: Client detects stale data on read and writes updated data to that replica
+                        \vspace{1em}}
         \vspace{0.5em}
         \item Anti-Entropy Process
-        \note[item]<2>{Anti-Entropy Process: Background process looks for stale or missing data and updates replicas.}
+        \note[item]<2>{Anti-Entropy Process: Background process looks for stale or missing data and updates replicas}
     \end{itemize}
 }
 
 \question{How do we know it's consistent?}
 
 \image{diagrams/LeaderlessExampleBad}
-\note{Reading from a single replica means we can't know if data is stale or inconsistent.}
+\note{Reading from a single replica means we \highlight{can't} know if data is stale or inconsistent}
 
-\questionanswer{How do we know it's consistent?}{
-    Quorum Reads and Writes
-}
+\questionanswer{How do we know it's consistent?}{Quorum Reads and Writes}
 
 \definecolor{eq1}{RGB}{116, 137, 227}
 \definecolor{eq2}{RGB}{227, 116, 137}
@@ -477,11 +490,15 @@
 \textcolor{eq1}{w} + \textcolor{eq2}{r} > \textcolor{focus}{n}
 \end{equation*}
 }
+\note[item]<1->{Nodes read from must overlap with the nodes written to\vspace{1em}}
+
 \only<2>{
 \begin{equation*}
 \textcolor{eq1}{2} + \textcolor{eq2}{2} > \textcolor{focus}{3}
 \end{equation*}
 }
+\note[item]<2->{Regardless of number of reads or writes}
+
 \only<3>{
 \begin{equation*}
 \textcolor{eq1}{1} + \textcolor{eq2}{3} > \textcolor{focus}{3}
@@ -491,11 +508,10 @@
 \Large
 \begin{description}
     \item[$\textcolor{focus}{n}$] total replicas
-    \item[$\textcolor{eq1}{w}$] amount of replicas to {\color{eq1}\textsl{write}} to
-    \item[$\textcolor{eq2}{r}$] amount of replicas to {\color{eq2}\textsl{read}} from
+    \item[$\textcolor{eq1}{w}$] amount of replicas to {\color{eq1}\textit{write}} to
+    \item[$\textcolor{eq2}{r}$] amount of replicas to {\color{eq2}\textit{read}} from
 \end{description}
 }
-\note{Nodes read from must overlap with the nodes written to.}
 
 \begin{frame}
 \begin{center}
@@ -517,10 +533,10 @@
 \end{center}
 \end{frame}
 \note[itemize]{
-    \item Graphical representation of previous equation. \vspace{3mm}
+    \item Graphical representation of previous equation \vspace{1em}
     \item \textcolor{eq2}{\textbf{Orange}} inner group (\highlight{reads}), overlaps with \\ 
-           \textcolor{eq1}{\textbf{Blue}} inner group (\highlight{writes}). \vspace{3mm}
-    \item Showing how reads overlap writes via a quorum.
+          \textcolor{eq1}{\textbf{Blue}} inner group (\highlight{writes}) \vspace{1em}
+    \item Showing how reads overlap writes via a quorum
 }
 
 \questionanswer{What about write conflicts?}{Same problem as with Multi-leader replication.}
@@ -529,8 +545,8 @@
 \note{
   Same scenario as before:
   \begin{enumerate}
-    \item Customer queries how many pillows are available.
-    \item Retrieves 20.
+    \item Customer queries how many pillows are available
+    \item Retrieves 20
   \end{enumerate}
 }
 
@@ -539,10 +555,11 @@
 \note{
   Same scenario as before:
   \begin{enumerate}
-    \item Fulfilment centre finds faulty pillow and decreases inventory.
-    \item Customer orders 20 pillows, what they saw as the number available.
+    \item Fulfilment centre finds faulty pillow and decreases inventory
+    \item Customer orders 20 pillows, the number that \highlight{they saw} were available
     \item -1 Pillows?
     \item How do we resolve this?
+    \item Potentially manual process -- contact customer and inform them of the stock deficiency
   \end{enumerate}
 }
 
@@ -579,9 +596,9 @@
 
 \image{diagrams/Partitioning}
 \note[itemize]{
-    \item Pioneered in the 1980s.
-    \item Allow scalability of large data, not just large load.
-    \item Partitioning is normally combined with replication.
+    \item Pioneered in the 1980s
+    \item Allows scalability of \highlight{large data}, not just \highlight{large load}
+    \item Partitioning is normally combined with replication
 }
 
 \question{How should we decide which data is stored where?}
@@ -601,14 +618,14 @@
 }
 
 \questionanswer{Have we seen this before?}{Hashing?}
-\note{Hash tables hash entries to maximize the spread between buckets.}
+\note{Hash tables hash entries to maximize the spread between buckets}
 
 \questionanswer{What is the problem with this?}{
     Range queries are inefficient, i.e. get all students between s4444444 and s4565656.
 }
 
 \question{How do we route queries?}
-\note{Unlike stateless, only one node can process queries.}
+\note{Unlike stateless, only one node can process queries}
 
 \point[\Large Query-Insensitive Load Balancer]{
     \vspace{0.5em}
@@ -661,6 +678,11 @@
         \only<3->{\highlight{Independent databases}}
         \only<-2>{Independent databases}
     \end{itemize}
+}
+\note[itemize]{
+    \item Mention microservices should use independent databases
+    \vspace{0.5em}
+    \item Other ways to design independent databases are out of scope for CSSE6400
 }
 
 %\point{Distributed state creates a lot of \highlight{complexity}}
