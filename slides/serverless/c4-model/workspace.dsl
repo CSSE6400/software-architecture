@@ -9,7 +9,7 @@ workspace "Serverless Architecture" "A simple example of serverless architecture
             paymentProvider = container "Payment Provider" "Payment facilities provided by Stripe." "Stripe" "external"
         }
         authServiceProvider = softwareSystem "Authorisation Service" "User authentication provided by Auth0." "external" {
-            authService = container "Authorisation Service" "User authentication provided by Auth0" "AUth0" "external"
+            authService = container "Authorisation Service" "User authentication provided by Auth0" "Auth0" "external"
         }
         apiGateway = softwareSystem "API Gateway" "AWS API Gateway." "Amazon Web Services - API Gateway" {
             apiGatewayService = container "API Gateway" "AWS API Gateway." "" "Amazon Web Services - API Gateway"
@@ -24,22 +24,27 @@ workspace "Serverless Architecture" "A simple example of serverless architecture
             lambdaService = container "Lambda Service" "AWS Lambda Service polls Message Queue and batches messages to send to Lambda Functions." "" "Amazon Web Services - Lambda"
         }
         productDbGoogleHost = softwareSystem "Simple Product Database Host" "Google cloud SQL database storing product details." "Google Cloud Platform - Cloud SQL" {
-            googleProductDB = container "Product Database" "Database storing product details." "MySQL 8.0" "Google Cloud Platform - Cloud SQL"
+            googleProductDB = container "Product Database" "Database storing product details." "MySQL 8.4.8" "Google Cloud Platform - Cloud SQL"
         }
         orderDbGoogleHost = softwareSystem "Simple Order Database Host" "Google cloud SQL database storing orders." "Google Cloud Platform - Cloud SQL" {
-            googleOrderDB = container "Order Database" "Database storing orders." "MySQL 8.0" "Google Cloud Platform - Cloud SQL"
+            googleOrderDB = container "Order Database" "Database storing orders." "MySQL 8.4.8" "Google Cloud Platform - Cloud SQL"
         }
-        productDbHost = softwareSystem "Product Database Host" "Google cloud SQL database storing product details." "Amazon Web Services - RDS MySQL instance" {
-            productDB = container "Product Database" "Database storing product details." "MySQL 8.0" "Amazon Web Services - RDS MySQL instance"
+        productDbHost = softwareSystem "Product Database Host" "AWS RDS database storing product details." "Amazon Web Services - RDS MySQL instance" {
+            productDB = container "Product Database" "Database storing product details." "MySQL 8.4.8" "Amazon Web Services - RDS MySQL instance"
         }
-        orderDbHost = softwareSystem "Order Database Host" "Google cloud SQL database storing orders." "Amazon Web Services - RDS MySQL instance" {
-            orderDB = container "Order Database" "Database storing orders." "MySQL 8.0" "Amazon Web Services - RDS MySQL instance"
+        orderDbHost = softwareSystem "Order Database Host" "AWS RDS SQL database storing orders." "Amazon Web Services - RDS MySQL instance" {
+            orderDB = container "Order Database" "Database storing orders." "MySQL 8.4.8" "Amazon Web Services - RDS MySQL instance"
         }
         
         # Serverless Functions
-        searchFunc = softwareSystem "Search for Product" "Find product from customer's query." "Amazon Web Services - Lambda" {
-            searchQuery = container "Search for Product" "Find product from customer's query." "Java" "Amazon Web Services - Lambda Lambda Function" {
-                searchController = component "Search for Product" "Find product from customer's query." "Java"
+        searchFunc = softwareSystem "Search for Product" "Find relevant products from customer's query." "Amazon Web Services - Lambda" {
+            searchQuery = container "Search for Product" "Find relevant products from customer's query." "Java" "Amazon Web Services - Lambda Lambda Function" {
+                searchController = component "Search for Product" "Find relevant products from customer's query." "Java"
+            }
+        }
+        browseFunc = softwareSystem "Browse Products" "Return products based on browsing pattern." "Amazon Web Services - Lambda" {
+            browseQuery = container "Browse Products" "Return products based on browsing pattern." "Java" "Amazon Web Services - Lambda Lambda Function" {
+                browseController = component "Browse Products" "Return products based on browsing pattern." "Java"
             }
         }
         purchaseFunc = softwareSystem "Purchase Products" "Process customer's purchase." "Amazon Web Services - Lambda" {
@@ -141,19 +146,19 @@ workspace "Serverless Architecture" "A simple example of serverless architecture
         }
         
         # Simple BaaS Store relationships.
-        spaSignIn -> authService "Authenticate user." "REST API JSON/HTTPS"
-        smSignIn -> authService "Authenticate user." "REST API JSON/HTTPS"
-        spaBrowsing -> googleProductDB "Search for products." "REST API JSON/HTTPS"
-        smBrowsing -> googleProductDB "Search for products." "REST API JSON/HTTPS"
-        spaPurchasing -> paymentProvider "Pay for purchases." "REST API JSON/HTTPS"
-        spaPurchasing -> googleOrderDB "Save order." "REST API JSON/HTTPS"
-        smPurchasing -> paymentProvider "Pay for purchases." "REST API JSON/HTTPS"
-        smPurchasing -> googleOrderDB "Save order." "REST API JSON/HTTPS"
+        spaSignIn -> authService "Authenticate User" "REST API JSON/HTTPS"
+        smSignIn -> authService "Authenticate User" "REST API JSON/HTTPS"
+        spaBrowsing -> googleProductDB "Search for Products" "REST API JSON/HTTPS"
+        smBrowsing -> googleProductDB "Search for Products" "REST API JSON/HTTPS"
+        spaPurchasing -> paymentProvider "Pay for Purchases" "REST API JSON/HTTPS"
+        spaPurchasing -> googleOrderDB "Save Order" "REST API JSON/HTTPS"
+        smPurchasing -> paymentProvider "Pay for Purchases" "REST API JSON/HTTPS"
+        smPurchasing -> googleOrderDB "Save Order" "REST API JSON/HTTPS"
         
         # Simple FaaS Store relationships.
         # Authentication hidden to focus on FaaS.
-#        faasWebSignIn -> authService "Authenticate user." "REST API JSON/HTTPS"
-#        faasMobileSignIn -> authService "Authenticate user." "REST API JSON/HTTPS"
+#        faasWebSignIn -> authService "Authenticate User" "REST API JSON/HTTPS"
+#        faasMobileSignIn -> authService "Authenticate User" "REST API JSON/HTTPS"
         faasWebBrowsing -> apiGatewayService "Search for products." "REST API JSON/HTTPS"
         faasMobileBrowsing -> apiGatewayService "Search for products." "REST API JSON/HTTPS"
         apiGatewayService -> searchQuery "Send Search Query" "REST API JSON/HTTPS"
@@ -175,18 +180,21 @@ workspace "Serverless Architecture" "A simple example of serverless architecture
         browsing -> cartView "Uses"
         search -> cartView "Uses"
         cartView -> purchase "Uses"
-        browsing -> productDB "Find & Retrieve Product Details" "REST API JSON/HTTPS"
         search -> apiGatewayService "Send Search Query to Backend" "REST API JSON/HTTPS"
         purchase -> apiGatewayService "Send Purchase Request to Backend" "REST API JSON/HTTPS"
-        apiGatewayService -> purchaseProduct "Send Purchase Request" "REST API JSON/HTTPS"
+		# Following relationship is a duplicate from the FaaS example.
+#        apiGatewayService -> purchaseProduct "Send Purchase Request" "REST API JSON/HTTPS"
         purchaseProduct -> orderDB "Store Order" "REST API JSON/HTTPS"
         purchaseProduct -> paymentProvider "Process Payment" "REST API JSON/HTTPS"
         paymentProvider -> apiGatewayService "Payment Confirmed" "REST API JSON/HTTPS"
         apiGatewayService -> paymentConfirmed "Payment Confirmed" "REST API JSON/HTTPS"
         paymentConfirmed -> orderDB "Update Order" "REST API JSON/HTTPS"
         paymentConfirmed -> queue "Order Paid Event" "Message"
-        apiGatewayService -> searchQuery "Send Search Query" "REST API JSON/HTTPS"
+		# Following relationship is a duplicate from the FaaS example.
+#        apiGatewayService -> searchQuery "Send Search Query" "REST API JSON/HTTPS"
         searchQuery -> productDB "Search Query" "REST API JSON/HTTPS"
+		apiGatewayService -> browseQuery "Send Browsing Pattern" "REST API JSON/HTTPS"
+        browseQuery -> productDB "Browsing Query" "REST API JSON/HTTPS"
         # Order Fulfilment.
         lambdaService -> queue "Poll for Messages"
         lambdaService -> fulfilment "Ship Order Message Batch"
@@ -287,6 +295,10 @@ workspace "Serverless Architecture" "A simple example of serverless architecture
                 deploymentNode "Product Search Function" "" "Java" "Amazon Web Services - Lambda" {
                     bpSearchFuncInstance = containerInstance searchQuery
                 }
+                
+                deploymentNode "Browsing Function" "" "Java" "Amazon Web Services - Lambda" {
+                    bpBrowseFuncInstance = containerInstance browseQuery
+                }
 
                 deploymentNode "Product Database" "" "" "Amazon Web Services - RDS MySQL instance" {
                     bpProductDBInstance = containerInstance productDB
@@ -298,7 +310,7 @@ workspace "Serverless Architecture" "A simple example of serverless architecture
             }
 
 #            deploymentNode "Sahara" "" "Sahara eCommerce Data Centre" {
-#                deploymentNode "Inventory Management Server" "" "Ubuntu 20.04 LTS & Java 17 LTS" "" {
+#                deploymentNode "Inventory Management Server" "" "Ubuntu 24.04 LTS & Java 25 LTS" "" {
 #                    bpInventoryServerInstance = containerInstance inventoryMgt
 #                }
 #            }
@@ -360,7 +372,7 @@ workspace "Serverless Architecture" "A simple example of serverless architecture
             }
 
 #            deploymentNode "Sahara" "" "Sahara eCommerce Data Centre" {
-#                deploymentNode "Inventory Management Server" "" "Ubuntu 20.04 LTS & Java 17 LTS" "" {
+#                deploymentNode "Inventory Management Server" "" "Ubuntu 24.04 LTS & Java 25 LTS" "" {
 #                    bpInventoryServerInstance = containerInstance inventoryMgt
 #                }
 #            }

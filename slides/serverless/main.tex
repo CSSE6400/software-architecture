@@ -9,22 +9,22 @@
 \title{Serverless Architecture}
 \subtitle{Software Architecture}
 \author{Richard Thomas}
-\date{\week{8}}
+\date{\week{7}}
 
 \begin{document}
 
 \maketitle
 
 \oxymoron{Serverless}{Logic running on someone else's server.}
-\note{Developers can focus on logic, not infrastructure to deliver it.}
+\note{Developers can focus on logic, not infrastructure to deliver it}
 
 \definition{Backend as a Service (BaaS)}{Cloud-hosted applications or services that deliver functionality used by an application front-end.}
 \note[itemize]{
-    \item Front-end may be a SPA or mobile app.
-    \vspace{0.2em}
-    \item Back-end provides sophisticated functionality (e.g. database, machine learning, location services, authentication, \dots).
-    \vspace{0.2em}
-    \item Front-end ties back-end services together to deliver the application's functionality.
+    \item Front-end may be a SPA or mobile app
+    \vspace{0.3em}
+    \item Back-end provides sophisticated functionality (e.g. database, machine learning, location services, authentication, \dots)
+    \vspace{0.3em}
+    \item Front-end ties back-end services together to deliver the application's functionality
 }
 
 \begin{frame}{BaaS Iceberg \cite{serverless-images}}
@@ -34,33 +34,35 @@
 \begin{frame}{BaaS Example}
     \begin{adjustwidth}{-12mm}{-12mm}
         \centering
-        \includegraphics[trim=195 195 195 195,clip,width=0.99\paperwidth]{diagrams/baas-example.png}
+        \includegraphics[trim=100 140 100 62,clip,width=0.98\paperwidth]
+                        {c4-model/images/baas_store_container_diagram}
     \end{adjustwidth}
 \end{frame}
 \note[itemize]{
-    \item Example of simple system with back-end functionality delivered \highlight{entirely} via BaaS.
+    \item Simple system with back-end functionality delivered \highlight{entirely} via BaaS
     \vspace{0.3em}
-    \item Feature-rich front-ends coordinate behaviour delivered by BaaS.
+    \item Feature-rich front-ends coordinate behaviour delivered by BaaS
     \vspace{0.5em}
     \item Consequence for Front-ends
           \begin{itemize}
               \large
               \item Tightly coupled to BAAS
+              \vspace{0.1em}
               \item Contains both UI and functional behaviour logic -- Poor Cohesion
           \end{itemize}
     \vspace{0.2em}
-    \item Front-end could have a layered design -- many SPAs don't.
+    \item Front-end could have a layered design -- many SPAs don't
 }
 
 \definition{Functions as a Service (FaaS)}{
 Application logic that is triggered by an event and runs in a \highlight{transient}, \highlight{stateless} compute node.
 }
 \note[itemize]{
-    \item Node may only exist for duration of function call.
-    \vspace{0.2em}
-    \item Server infrastructure (e.g. type of node, lifespan, scaling, \dots) are managed by hosting provider.
-    \vspace{0.2em}
-    \item e.g. AWS Lambda, Google App Engine, Azure Automation, \dots.
+    \item Node may only exist for duration of function call
+    \vspace{0.3em}
+    \item Server infrastructure (e.g. type of node, lifespan, scaling, \dots) are managed by hosting provider
+    \vspace{0.3em}
+    \item e.g. AWS Lambda, Google App Engine, Azure Automation, \dots
 }
 
 \begin{frame}{FaaS Iceberg \cite{serverless-images}}
@@ -70,30 +72,31 @@ Application logic that is triggered by an event and runs in a \highlight{transie
 \begin{frame}{FaaS Example}
     \begin{adjustwidth}{-12mm}{-12mm}
         \centering
-        \includegraphics[trim=195 195 195 195,clip,width=0.99\paperwidth]{diagrams/faas-example.png}
+        \includegraphics[trim=95 138 95 40,clip,width=0.98\paperwidth]{c4-model/images/faas_deployment_diagram}
     \end{adjustwidth}
 \end{frame}
 \note[itemize]{
-    \item Example of simple system with back-end functionality delivered by FaaS.
+    \item Simple system --- back-end functionality delivered by FaaS
           \begin{itemize}
-              \large\item Some services delivered via BaaS.\\ (e.g. Authentication -- not shown on diagram for simplicity.)
+              \large\item Some services delivered via BaaS\\
+                          (e.g. Authentication -- not shown on diagram for simplicity)
           \end{itemize}
-    \item Feature-rich front-ends coordinate behaviour delivered by FaaS.
+    \item Feature-rich front-ends coordinate behaviour delivered by FaaS
     \vspace{0.2em}
-    \item Front-ends invoke functions via an API.
+    \item Front-ends invoke functions via an API
     \vspace{0.2em}
-    \item API Gateway provides some separation between front-end and functions.
+    \item API Gateway provides some separation between front-end and functions
     \vspace{0.2em}
-    \item Allows a bit more separation between UI and logic.
+    \item Allows a bit more separation between UI and logic
 }
 
 \definition{Serverless Architecture}{Software system delivering functionality through BaaS or FaaS.}
 \note[itemize]{
-    \item Many people focus on FaaS when considering Serverless.
-    \vspace{0.2em}
-    \item Mobile App or Single Page Web App (SPA) coordinate services.
-    \vspace{0.2em}
-    \item Front-end ties back-end services together to deliver application's functionality.
+    \item Many people focus on FaaS when considering Serverless
+    \vspace{0.3em}
+    \item Mobile App or Single Page Web App (SPA) coordinate services
+    \vspace{0.3em}
+    \item Front-end ties back-end services together to deliver application's functionality
 }
 
 
@@ -104,63 +107,67 @@ Application logic that is triggered by an event and runs in a \highlight{transie
 \begin{frame}{Sahara Browse \& Order --- Serverless}
     \begin{adjustwidth}{-12mm}{-12mm}
         \centering
-        \includegraphics[trim=195 195 195 195,clip,width=0.99\paperwidth]{diagrams/sahara-deployment-1.png}
+        \includegraphics[trim=102 157 223 81,clip,width=0.86\paperwidth]
+                        {c4-model/images/browse-purchase_deployment_diagram}
     \end{adjustwidth}
 \end{frame}
 \note[itemize]{
-    \item Only browse, search and purchase are shown.
-    \item Uses both BaaS \& FaaS.
-    \item Shopping cart is implemented within the web and mobile app for this architecture.
-    \item Order Scenario 1: Customer checks out their shopping cart in the web or mobile app.
-    \item Order Scenario 2: App calls Purchase Products function via API Gateway.
-    \item Order Scenario 3: Purchase Products stores order in DB and sends a payment request to Payment Provider.
-    \item Order Scenario 4: We provide Payment Provider with API end point to call to report payment result.
-    \item Order Scenario 5-9: Notes continue on \highlight{next slide}.
+    \item Only browse, search and purchase are shown
+    \item Uses both BaaS \& FaaS
+    \item Shopping cart is implemented within the web and mobile app for this architecture
+    \item Order Step 1: Customer checks out their shopping cart in the web or mobile app
+    \item Order Step 2: App calls Purchase Products function via API Gateway
+    \item Order Step 3: Purchase Products stores order in DB and sends a payment request to Payment Provider
+    \item Order Step 4: Provide Payment Provider with API endpoint to call to report payment result
+    \item Order Steps 5-9: Notes continue on \highlight{next slide}
 }
 
 \begin{frame}{Sahara Browse \& Order --- Serverless}
     \begin{adjustwidth}{-12mm}{-12mm}
         \centering
-        \includegraphics[trim=195 195 195 195,clip,width=0.99\paperwidth]{diagrams/sahara-deployment-1.png}
+        \includegraphics[trim=102 157 223 81,clip,width=0.86\paperwidth]
+                        {c4-model/images/browse-purchase_deployment_diagram}
     \end{adjustwidth}
 \end{frame}
 \note[itemize]{
-    \item Order Scenario 5: Payment success causes Payment Confirmed function to be invoked.
-    \item Order Scenario 6: Payment Confirmed updates order in DB with payment status.
-    \item Order Scenario 7: Payment Confirmed adds Payment Confirmation message to the Queue.
-    \item Order Scenario 8: Payment Confirmation message is picked up by a fulfilment function to pack \& send order.
-    \item Order Scenario 9: Once order is shipped, another message would trigger an `order sent' function.
+    \item Order Step 5: Payment success causes Payment Confirmed function to be invoked
+    \item Order Step 6: Payment Confirmed updates order in DB with payment status
+    \item Order Step 7: Payment Confirmed adds Payment Confirmation message to the Queue
+    \item Order Step 8: Payment Confirmation message is picked up by a fulfilment function to pack \& send order
+    \item Order Step 9: Once order is shipped, another message would trigger an `order sent' function
 }
 
 \begin{frame}{Sahara Fulfilment --- Serverless}
     \begin{adjustwidth}{-12mm}{-12mm}
         \centering
-        \includegraphics[trim=195 195 195 195,clip,width=0.92\paperwidth]{diagrams/sahara-deployment-2.png}
+        \includegraphics[trim=195 105 145 175,clip,width=0.86\paperwidth]
+                        {c4-model/images/order_fulfilment_deployment_diagram}
     \end{adjustwidth}
 \end{frame}
 \note[itemize]{
-    \item Only fulfilment functions are shown.
-    \item Shows Lambda Service polling Queue, demonstrating how Lambda Functions are invoked via events in a message queue.
-    \item Fulfilment Scenario 1: Lambda Service monitors Queue for `ship order' messages.
-    \item Fulfilment Scenario 2: Lambda Service batches groups of `ship order' messages and sends them to Fulfill Order function.
-    \item Fulfilment Scenario 3: Fulfil Order gets order details from DB and sends pick list to Fulfilment App.
-    \item Fulfilment Scenario 4: When order is shipped, Fulfilment App calls Order Shipped function via API Gateway.
-    \item Fulfilment Scenario 5-8: Notes continue on \highlight{next slide}.
+    \item Only fulfilment functions are shown
+    \item Shows Lambda Service polling Queue, demonstrating how Lambda Functions are invoked via events in a message queue
+    \item Fulfilment Step 1: Lambda Service monitors Queue for `ship order' messages
+    \item Fulfilment Step 2: Lambda Service batches groups of `ship order' messages and sends them to Fulfil Order function
+    \item Fulfilment Step 3: Fulfil Order gets order details from DB and sends pick list to Fulfilment App
+    \item Fulfilment Step 4: When order is shipped, Fulfilment App calls Order Shipped function via API Gateway
+    \item Fulfilment Steps 5-8: Notes continue on \highlight{next slide}
 }
 
 \begin{frame}{Sahara Fulfilment --- Serverless}
     \begin{adjustwidth}{-12mm}{-12mm}
         \centering
-        \includegraphics[trim=195 195 195 195,clip,width=0.92\paperwidth]{diagrams/sahara-deployment-2.png}
+        \includegraphics[trim=195 105 145 175,clip,width=0.86\paperwidth]
+                        {c4-model/images/order_fulfilment_deployment_diagram}
     \end{adjustwidth}
 \end{frame}
 \note[itemize]{
-    \item Fulfilment Scenario 5: Order Shipped sends email to customer and updates order status in DB.
-    \item Fulfilment Scenario 5a: Simplification of order picking, packing and shipping steps.
-    \item Fulfilment Scenario 5b: Each step sends messages to Queue to trigger other functions.
-    \item Fulfilment Scenario 6: Customer queries order status in the web or mobile app.
-    \item Fulfilment Scenario 7: App calls Order Status function via API Gateway.
-    \item Fulfilment Scenario 8: Order Status queries Order DB and sends status back to customer via App.
+    \item Fulfilment Step 5: Order Shipped sends email to customer and updates order status in DB
+    \item Fulfilment Step 5a: Simplification of order picking, packing and shipping steps
+    \item Fulfilment Step 5b: Each step sends messages to Queue to trigger other functions
+    \item Fulfilment Step 6: Customer queries order status in the web or mobile app
+    \item Fulfilment Step 7: App calls Order Status function via API Gateway
+    \item Fulfilment Step 8: Order Status queries Order DB and sends status back to customer via App
 }
 
 
@@ -201,7 +208,7 @@ Application logic that is triggered by an event and runs in a \highlight{transie
             \Large\item Hope DB provider is secure
         \end{itemize}
     \end{itemize}
-    \note<1>{Spoofing messages is an issue for all BaaS services.}
+    \note<1>{Spoofing messages is an issue for all BaaS services}
     \vspace{1mm}
     \item<2-> Application logic is in front-end
     \vspace{-4pt}
@@ -215,8 +222,8 @@ Application logic that is triggered by an event and runs in a \highlight{transie
     \end{itemize}
     \note<2>{
     		\begin{itemize}
-    			\item Modern expectations are that almost all systems will have multiple front-ends.
-    			\item Duplication of front-end logic is a smaller, but still partial, concern for FaaS.
+    			\item Modern expectations are that almost all systems will have multiple front-ends
+    			\item Duplication of front-end logic is a smaller, but still partial, concern for FaaS
     		\end{itemize}
     	}
     \item<3-> No control over server optimisation
@@ -238,8 +245,8 @@ Application logic that is triggered by an event and runs in a \highlight{transie
     \end{itemize}
     \note<1>{
     		\begin{itemize}
-    			\item Server running function can be killed when function is not running.
-    			\item Can occasionally send messages to functions to keep them alive --- Not ideal.
+    			\item Server running function can be killed when function is not running
+    			\item Can occasionally send messages to functions to keep them alive --- Not ideal
     		\end{itemize}
     	}
     \vspace{1mm}
@@ -260,7 +267,7 @@ Application logic that is triggered by an event and runs in a \highlight{transie
             \Large\item Some languages worse than others (e.g. Java)
         \end{itemize}
     \end{itemize}
-    \note<3>{Java has concurrency benefits over other languages.}
+    \note<3>{Java has concurrency benefits over other languages}
     \vspace{1mm}
     \item<4-> Proliferation of functions
     \vspace{-4pt}
@@ -275,17 +282,17 @@ Application logic that is triggered by an event and runs in a \highlight{transie
     \begin{itemize}
         \item<2-> Rich client apps with common backend
             \begin{itemize}
-                \Large\item BaaS
+                \LARGE\item BaaS
             \end{itemize}
         \vspace{2mm}
         \item<3-> High latency processing
             \begin{itemize}
-                \Large\item Within function duration constraints
+                \LARGE\item Within function duration constraints
             \end{itemize}
         \vspace{2mm}
         \item<4-> Apps with variable load
             \begin{itemize}
-                \Large\item Take advantage of auto-scaling
+                \LARGE\item Take advantage of auto-scaling
             \end{itemize}
     \end{itemize}
 }
@@ -294,13 +301,13 @@ Application logic that is triggered by an event and runs in a \highlight{transie
     \begin{itemize}
         \item<2-> Quick response required
             \begin{itemize}
-                \Large\item Can't wait for FaaS to start
+                \LARGE\item Can't wait for FaaS to start
             \end{itemize}
         \item<3-> Compute intensive processing
         \vspace{2mm}
         \item<4-> Apps with steady load
             \begin{itemize}
-                \Large\item Server-based approaches are cheaper
+                \LARGE\item Server-based approaches are cheaper
             \end{itemize}
     \end{itemize}
 }
@@ -308,13 +315,18 @@ Application logic that is triggered by an event and runs in a \highlight{transie
 \point[Self-Study Exercise]{
 \vspace{4mm}
 \begin{itemize}
-    \item Redesign your scalability assignment to be serverless.
+    \item Redesign your scalability assignment to be serverless
      \begin{itemize}
         \LARGE\item What parts of your design would benefit from being serverless?
     \end{itemize}
    \vspace{2mm}
-    \item Implement your revised design.
+    \item Implement your revised design
 \end{itemize}
+}
+\note[itemize]{
+    \item Not for your assignment submission
+    \vspace{0.3em}
+    \item Learner Labs limits number of concurrently executing Lambdas
 }
 
 \begin{frame}{Pros \& Cons}
@@ -335,14 +347,14 @@ Application logic that is triggered by an event and runs in a \highlight{transie
     }
 \end{frame}
 \note[itemize]{
-    \item Modularity: Deployed functions are naturally modular.
-    \item Modularity: Higher-level abstractions to group deployed functions is difficult.
-    \item Testability: Unit testing FaaS functions is easy.
-    \item Testability: Integration testing is harder.
-    \item Maintainability: Backend modularity and independence should facilitate its maintenance.
-    \item Maintainability: Frontend contains UI and application logic.
-    \item Security BaaS: Front-end access back-end directly. No server-side protection of db or other resources.
-    \item Security FaaS: Every function needs its own security policy (e.g. IAM), which is easy to get wrong.
+    \item Modularity: Deployed functions are naturally modular
+    \item Modularity: Higher-level abstractions to group deployed functions is difficult
+    \item Testability: Unit testing FaaS functions is easy
+    \item Testability: Integration testing is harder
+    \item Maintainability: Backend modularity and independence should facilitate its maintenance
+    \item Maintainability: Frontend contains UI and application logic
+    \item Security BaaS: Front-end accesses back-end directly --- No server-side protection of db or other resources
+    \item Security FaaS: Every function needs its own security policy (e.g. IAM), --- easy to get wrong
 }
 
 \references{serverless}
