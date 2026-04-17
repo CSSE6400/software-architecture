@@ -88,7 +88,7 @@ into the project. Watchtower is a Python library that allows us to send logs to 
 monitor an application&#8217;s performance in real time.
 </p><!--l. 50--><p class="indent" >   Currently the project is configured to log API accesses made with Flask and to log database queries created by
 SQL Alchemy. This results in an unstructured log stream as seen in Figure <a 
-href="#x1-2003r1">1<!--tex4ht:ref: fig:cloud-logs --></a>.
+href="#x1-4026r2">2<!--tex4ht:ref: fig:cloud-logs --></a>.
 </p>
    <hr class="figure" /><div class="figure" 
 >
@@ -146,7 +146,7 @@ class="ectt-1200">watchtower </span>to log to AWS CloudWatch.
       <li class="itemize">
       <!--l. 76--><p class="noindent" >Logging has been introduced for Flask and SQL Alchemy.</p></li></ul>
 <!--l. 79--><p class="indent" >   Our first task will be to replicate the logs in Figure <a 
-href="#x1-2003r1">1<!--tex4ht:ref: fig:cloud-logs --></a>. Once you have copied <span 
+href="#x1-4026r2">2<!--tex4ht:ref: fig:cloud-logs --></a>. Once you have copied <span 
 class="ectt-1200">credentials </span>into the project root
 directory, start the application using docker compose.  </p><div class="framedenv" id="shaded*-1">
    <!--l. 82-->
@@ -672,32 +672,44 @@ and information about SQL Alchemy is prefixed with <span
 class="ectt-1200">INFO:sqlalchemy.engine.Engine</span>. These prefixes indicate
 into which stream the logs are put.
 </p><!--l. 114--><p class="indent" >   Open the AWS CloudWatch console and go to <span 
-class="ectt-1200">Logs &#x003E; Log groups </span>on the side panel. You should see a log
-group called <span 
+class="ectt-1200">Logs &#x003E; Log Management </span>on the side panel. You should see a
+log group called <span 
 class="ectt-1200">taskoverflow</span>. If you click on that group you will see log streams associated with <span 
 class="ectt-1200">INFO:werkzeug</span>
 and <span 
 class="ectt-1200">INFO:sqlalchemy.engine.Engine</span>.
 </p>
-<div class="center" 
+   <hr class="figure" /><div class="figure" 
 >
-<!--l. 119--><p class="noindent" >
-</p><!--l. 120--><p class="noindent" ><img 
+                                                                                                    
+                                                                                                    
+<a 
+ id="x1-4026r2"></a>
+                                                                                                    
+                                                                                                    
+<div class="ajdustwidth" style="margin-left:-1.77829em;margin-right:-1.77829em;">
+<!--l. 122--><p class="noindent" ><img 
 src="images/log-group.png" alt="PIC"  
-width="525" height="525"  /></p></div>
+width="567" height="567"  /> </p></div>
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;2: </span><span  
+class="content">TaskOverflow log streams in CloudWatch.</span></div><!--tex4ht:label?: x1-4026r2 -->
+                                                                                                    
+                                                                                                    
+   </div><hr class="endfigure" />
    
    <h4 class="subsectionHead"><span class="titlemark">2.1    </span> <a 
  id="x1-50002.1"></a>Structured Logging</h4>
-<!--l. 125--><p class="noindent" >Our first task will be to convert the current logging into a structured logging format. As we saw in logging lecture
-<span class="cite">[<a 
-href="#Xlogging-slides">2</a>]</span>, structured logging can be as simple as logging a JSON object. This allows logging services to quickly filter
-through logs based on criteria selected from the object&#8217;s fields.
-</p><!--l. 129--><p class="indent" >   In <span 
+<!--l. 130--><p class="noindent" >Our first task will be to convert the current logging into a structured logging format. As we saw in the logging
+lecture <span class="cite">[<a 
+href="#Xlogging-slides">2</a>]</span>, structured logging can be as simple as logging a JSON object. This allows logging services to quickly
+filter through logs based on criteria selected from the object&#8217;s fields.
+</p><!--l. 135--><p class="indent" >   In <span 
 class="ectt-1200">todo/__init__.py </span>we have the following code within the <span 
 class="ectt-1200">create_app </span>function. This code configures
 watchtower to log to AWS CloudWatch.    </p><div class="framedenv" id="code-1">
-<!--l. 132--><p class="indent" >   <span 
-class="ectt-1200">» cat todo/__init__.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 132--><pre class="listings" id="listing-3"><span class="label"><a 
+<!--l. 138--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/__init__.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 138--><pre class="listings" id="listing-3"><span class="label"><a 
  id="x1-5001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">create_app</span></span><span style="color:#000000"><span 
@@ -794,13 +806,21 @@ class="ectt-1200">...</span></span>
 <span class="label"><a 
  id="x1-5009r9"></a></span></pre>
    </div>
-<!--l. 143--><p class="indent" >   We want to wrap all our logs in JSON objects and inject metadata into these objects. This makes it easier to
+<!--l. 149--><p class="indent" >   We want to wrap all our logs in JSON objects and inject metadata into these objects. This makes it easier to
 search the logs. To do this, we will create a custom log formatter that is a subclass of <br 
 class="newline" /><span 
 class="ectt-1200">watchtower.CloudWatchLogFormatter</span>.    </p><div class="framedenv" id="code-1">
-<!--l. 148--><p class="indent" >   <span 
-class="ectt-1200">» cat todo/__init__.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 148--><pre class="listings" id="listing-4"><span class="label"><a 
+<!--l. 154--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/log_formatter.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 154--><pre class="listings" id="listing-4"><span class="label"><a 
  id="x1-5010r1"></a></span><span style="color:#006699"><span 
+class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">logging</span></span> 
+<span class="label"><a 
+ id="x1-5011r2"></a></span><span style="color:#006699"><span 
+class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">watchtower</span></span> 
+<span class="label"><a 
+ id="x1-5012r3"></a></span><span style="color:#006699"><span 
 class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">flask</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -808,12 +828,9 @@ class="ectt-1200">has_request_context</span></span><span style="color:#000000"><
 class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">request</span></span> 
 <span class="label"><a 
- id="x1-5011r2"></a></span><span style="color:#000000"><span 
-class="ectt-1200">...</span></span> 
+ id="x1-5013r4"></a></span> 
 <span class="label"><a 
- id="x1-5012r3"></a></span> 
-<span class="label"><a 
- id="x1-5013r4"></a></span><span style="color:#006699"><span 
+ id="x1-5014r5"></a></span><span style="color:#006699"><span 
 class="ectt-1200">class</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">StructuredFormatter</span></span><span style="color:#000000"><span 
 class="ectt-1200">(</span></span><span style="color:#000000"><span 
@@ -823,7 +840,7 @@ class="ectt-1200">CloudWatchLogFormatter</span></span><span style="color:#000000
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-5014r5"></a></span><span 
+ id="x1-5015r6"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
@@ -836,7 +853,7 @@ class="ectt-1200">record</span></span><span style="color:#000000"><span
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-5015r6"></a></span><span 
+ id="x1-5016r7"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -849,7 +866,7 @@ class="ectt-1200">msg</span></span><span style="color:#000000"> </span><span sty
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">{</span></span> 
 <span class="label"><a 
- id="x1-5016r7"></a></span><span 
+ id="x1-5017r8"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -868,7 +885,7 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">created</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-5017r8"></a></span><span 
+ id="x1-5018r9"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -887,7 +904,7 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">name</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-5018r9"></a></span><span 
+ id="x1-5019r10"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -906,7 +923,7 @@ class="ectt-1200">.</span></span><span style="color:#000000"><span
 class="ectt-1200">msg</span></span><span style="color:#000000"><span 
 class="ectt-1200">,</span></span> 
 <span class="label"><a 
- id="x1-5019r10"></a></span><span 
+ id="x1-5020r11"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -915,7 +932,7 @@ class="ectt-1200">&#x00A0;</span><span
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">}</span></span> 
 <span class="label"><a 
- id="x1-5020r11"></a></span><span 
+ id="x1-5021r12"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -927,7 +944,7 @@ class="ectt-1200">has_request_context</span></span><span style="color:#000000"><
 class="ectt-1200">()</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-5021r12"></a></span><span 
+ id="x1-5022r13"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -957,7 +974,7 @@ class="ectt-1200">REQUEST_ID</span></span><span style="color:#669900"><span
 class="tctt-1200">'</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-5022r13"></a></span><span 
+ id="x1-5023r14"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -987,7 +1004,7 @@ class="ectt-1200">PATH_INFO</span></span><span style="color:#669900"><span
 class="tctt-1200">'</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-5023r14"></a></span><span 
+ id="x1-5024r15"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1017,7 +1034,7 @@ class="ectt-1200">REQUEST_METHOD</span></span><span style="color:#669900"><span
 class="tctt-1200">'</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-5024r15"></a></span><span 
+ id="x1-5025r16"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1031,11 +1048,32 @@ class="ectt-1200">.</span></span><span style="color:#006699"><span
 class="ectt-1200">format</span></span><span style="color:#000000"><span 
 class="ectt-1200">(</span></span><span style="color:#000000"><span 
 class="ectt-1200">record</span></span><span style="color:#000000"><span 
-class="ectt-1200">)</span></span> 
+class="ectt-1200">)</span></span>
+ 
 <span class="label"><a 
- id="x1-5025r16"></a></span> 
+ id="x1-5026r17"></a></span></pre>
+   </div>
+<!--l. 173--><p class="indent" >   These are just some metadata fields we might want to add to our logging. We may also consider
+<span 
+class="ectt-1200">socket.gethostname() </span>to identify the instance handling a request, or other helpful information.
+</p><!--l. 177--><p class="indent" >   We then need to get the <span 
+class="ectt-1200">CloudWatchLogHandler </span>to use our <span 
+class="ectt-1200">StructuredFormatter</span>. Add the following code
+to the <span 
+class="ectt-1200">todo/__init__.py </span>file.    </p><div class="framedenv" id="code-1">
+<!--l. 180--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/__init__.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 180--><pre class="listings" id="listing-5"><span class="label"><a 
+ id="x1-5027r1"></a></span><span style="color:#006699"><span 
+class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">.</span></span><span style="color:#000000"><span 
+class="ectt-1200">log_formatter</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">StructuredFormatter</span></span> 
 <span class="label"><a 
- id="x1-5026r17"></a></span><span style="color:#006699"><span 
+ id="x1-5028r2"></a></span><span style="color:#000000"><span 
+class="ectt-1200">...</span></span> 
+<span class="label"><a 
+ id="x1-5029r3"></a></span><span style="color:#006699"><span 
 class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">create_app</span></span><span style="color:#000000"><span 
 class="ectt-1200">(</span></span><span style="color:#000000"><span 
@@ -1045,13 +1083,13 @@ class="ectt-1200">None</span></span><span style="color:#000000"><span
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-5027r18"></a></span><span 
+ id="x1-5030r4"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">...</span></span> 
 <span class="label"><a 
- id="x1-5028r19"></a></span><span 
+ id="x1-5031r5"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1059,7 +1097,7 @@ class="ectt-1200">handler</span></span><span style="color:#000000"> </span><span
 class="ectt-1200">=</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">...</span></span> 
 <span class="label"><a 
- id="x1-5029r20"></a></span><span 
+ id="x1-5032r6"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1071,41 +1109,44 @@ class="ectt-1200">StructuredFormatter</span></span><span style="color:#000000"><
 class="ectt-1200">()</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-5030r21"></a></span><span 
+ id="x1-5033r7"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">...</span></span>
  
 <span class="label"><a 
- id="x1-5031r22"></a></span></pre>
+ id="x1-5034r8"></a></span></pre>
    </div>
-<!--l. 172--><p class="indent" >   These are just some metadata fields we might want to add to our logging. We may also consider
-<span 
-class="ectt-1200">socket.gethostname() </span>to identify the instance handling a request, or other helpful information.
    
-</p>
    <h4 class="subsectionHead"><span class="titlemark">2.2    </span> <a 
  id="x1-60002.2"></a>Correlation IDs</h4>
-<!--l. 178--><p class="noindent" >Correlation IDs are a mechanism to help understand the path of a request, event, message, etc. through a
-system. When logging it is often helpful to be able to trace the execution of a particular request
+<!--l. 192--><p class="noindent" >Correlation IDs are a mechanism to help understand the path of a request, event, message, etc. through a system
 <span class="cite">[<a 
-href="#Xlogging-slides">2</a>]</span>.
-</p><!--l. 181--><p class="indent" >   For our system we will generate a new random identifier for each incoming request. This identifier will be
-included as part of the logging metadata. For a system with multiple API endpoints requests will often come with
-an established REQUEST_ID header.    </p><div class="framedenv" id="code-1">
-<!--l. 185--><p class="indent" >   <span 
-class="ectt-1200">» cat todo/__init__.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 185--><pre class="listings" id="listing-5"><span class="label"><a 
+href="#Xlogging-slides">2</a>]</span>. When logging it is often helpful to be able to trace the execution of a particular request.
+</p><!--l. 196--><p class="indent" >   For our system we will generate a new random identifier for each incoming request. This identifier will be
+included as part of the logging metadata. A system with multiple API endpoints requests, will often come with an
+established REQUEST_ID header.    </p><div class="framedenv" id="code-1">
+<!--l. 200--><p class="indent" >   <span 
+class="ectt-1200">» cat todo/__init__.py</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 200--><pre class="listings" id="listing-6"><span class="label"><a 
  id="x1-6001r1"></a></span><span style="color:#006699"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">uuid</span></span> 
 <span class="label"><a 
- id="x1-6002r2"></a></span><span style="color:#000000"><span 
+ id="x1-6002r2"></a></span><span style="color:#006699"><span 
+class="ectt-1200">from</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">flask</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
+class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">Flask</span></span><span style="color:#000000"><span 
+class="ectt-1200">,</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
+class="ectt-1200">request</span></span> 
+<span class="label"><a 
+ id="x1-6003r3"></a></span><span style="color:#000000"><span 
 class="ectt-1200">...</span></span> 
 <span class="label"><a 
- id="x1-6003r3"></a></span> 
+ id="x1-6004r4"></a></span> 
 <span class="label"><a 
- id="x1-6004r4"></a></span><span style="color:#006699"><span 
+ id="x1-6005r5"></a></span><span style="color:#006699"><span 
 class="ectt-1200">def</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">create_app</span></span><span style="color:#000000"><span 
 class="ectt-1200">(</span></span><span style="color:#000000"><span 
@@ -1115,13 +1156,13 @@ class="ectt-1200">None</span></span><span style="color:#000000"><span
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-6005r5"></a></span><span 
+ id="x1-6006r6"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">...</span></span> 
 <span class="label"><a 
- id="x1-6006r6"></a></span><span 
+ id="x1-6007r7"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1136,7 +1177,7 @@ class="ectt-1200">requests</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-6007r7"></a></span><span 
+ id="x1-6008r8"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1147,9 +1188,9 @@ class="ectt-1200">(</span></span><span style="color:#000000"><span
 class="ectt-1200">handler</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-6008r8"></a></span> 
+ id="x1-6009r9"></a></span> 
 <span class="label"><a 
- id="x1-6009r9"></a></span><span 
+ id="x1-6010r10"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1157,7 +1198,7 @@ class="ectt-1200">@app</span></span><span style="color:#000000"><span
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">before_request</span></span> 
 <span class="label"><a 
- id="x1-6010r10"></a></span><span 
+ id="x1-6011r11"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
@@ -1166,7 +1207,7 @@ class="ectt-1200">before_request</span></span><span style="color:#000000"><span
 class="ectt-1200">()</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-6011r11"></a></span><span 
+ id="x1-6012r12"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1190,7 +1231,7 @@ class="ectt-1200">uuid4</span></span><span style="color:#000000"><span
 class="ectt-1200">()</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-6012r12"></a></span><span 
+ id="x1-6013r13"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1207,9 +1248,9 @@ class="ectt-1200">started</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-6013r13"></a></span> 
+ id="x1-6014r14"></a></span> 
 <span class="label"><a 
- id="x1-6014r14"></a></span><span 
+ id="x1-6015r15"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
@@ -1217,7 +1258,7 @@ class="ectt-1200">@app</span></span><span style="color:#000000"><span
 class="ectt-1200">.</span></span><span style="color:#000000"><span 
 class="ectt-1200">after_request</span></span> 
 <span class="label"><a 
- id="x1-6015r15"></a></span><span 
+ id="x1-6016r16"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span 
@@ -1228,7 +1269,7 @@ class="ectt-1200">response</span></span><span style="color:#000000"><span
 class="ectt-1200">)</span></span><span style="color:#000000"><span 
 class="ectt-1200">:</span></span> 
 <span class="label"><a 
- id="x1-6016r16"></a></span><span 
+ id="x1-6017r17"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1245,7 +1286,7 @@ class="ectt-1200">finished</span></span><span style="color:#669900"><span
 class="ectt-1200">"</span></span><span style="color:#000000"><span 
 class="ectt-1200">)</span></span> 
 <span class="label"><a 
- id="x1-6017r17"></a></span><span 
+ id="x1-6018r18"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
@@ -1255,31 +1296,42 @@ class="ectt-1200">&#x00A0;</span><span style="color:#006699"><span
 class="ectt-1200">return</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">response</span></span> 
 <span class="label"><a 
- id="x1-6018r18"></a></span><span 
+ id="x1-6019r19"></a></span> 
+<span class="label"><a 
+ id="x1-6020r20"></a></span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span 
+class="ectt-1200">&#x00A0;</span><span style="color:#33997E"><span 
+class="ectt-1200">#</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">Load</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">the</span></span><span style="color:#33997E"> </span><span style="color:#33997E"><span 
+class="ectt-1200">models</span></span> 
+<span class="label"><a 
+ id="x1-6021r21"></a></span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span 
 class="ectt-1200">&#x00A0;</span><span style="color:#000000"><span 
 class="ectt-1200">...</span></span>
  
 <span class="label"><a 
- id="x1-6019r19"></a></span></pre>
+ id="x1-6022r22"></a></span></pre>
    </div>
-<!--l. 206--><p class="indent" >   The code above in <span 
+<!--l. 224--><p class="indent" >   The code above in <span 
 class="ectt-1200">create_app </span>will generate a unique identifier for each incoming request. It will also log when
 a request starts being processed and when it finishes processing.
    
-                                                                                                    
-                                                                                                    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.3    </span> <a 
  id="x1-70002.3"></a>Verify and Refine</h4>
-<!--l. 210--><p class="noindent" >Ensure that the above modifications are working as expected by returning to the AWS CloudWatch logs. Launch
+<!--l. 228--><p class="noindent" >Ensure that the above modifications are working as expected by returning to the AWS CloudWatch logs. Launch
 the service locally and make some API requests.
-</p><!--l. 213--><p class="indent" >   You should now be able to go to the <span 
-class="ectt-1200">Log Insights </span>interface from the sidebar. This interface allows you
-to query structured logging data. Try the following query to ensure that your logs seem sensible.
-</p><div class="framedenv" id="code-1">
-<!--l. 217--><pre class="listings" id="listing-6"><span class="label"><a 
+</p><!--l. 231--><p class="indent" >   You should now be able to go to the <span 
+class="ectt-1200">Log Insights </span>interface from the sidebar. This interface allows you to
+query structured logging data. Select the taskoverflow log group and run the following query to ensure that your
+logs seem sensible.       </p><div class="framedenv" id="code-1">
+                                                                                                    
+                                                                                                    
+<!--l. 236--><pre class="listings" id="listing-7"><span class="label"><a 
  id="x1-7001r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">fields</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">request_id</span></span><span style="color:#000000"><span 
@@ -1315,13 +1367,13 @@ class="ectt-1200">400</span></span>
 <span class="label"><a 
  id="x1-7004r4"></a></span></pre>
    </div>
-<!--l. 223--><p class="indent" >   Take the time to refine your logging now to produce logs that are easy to search through and understand the
+<!--l. 242--><p class="indent" >   Take the time to refine your logging now to produce logs that are easy to search through and understand the
 trace of your API requests.
    
 </p>
    <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
  id="x1-80003"></a>Load Testing</h3>
-<!--l. 229--><p class="noindent" >We will now generate some load on our API using <span 
+<!--l. 248--><p class="noindent" >We will now generate some load on our API using <span 
 class="ectt-1200">k6 </span>and see how it performs. We briefly saw <span 
 class="ectt-1200">k6 </span>at the end of the
 <span 
@@ -1329,19 +1381,19 @@ class="Cabin-Italic-tlf-t1-x-x-120">Scaling Stateless Components </span>practica
 href="#Xprac-week6">1</a>]</span>. To review, <span 
 class="ectt-1200">k6 </span>is a load testing tool that is written in Go but provides an
 interface using a subset of JavaScript.
-</p><!--l. 233--><p class="indent" >   It will help us to generate a large number of concurrent API requests. If you have not already done so, install <span 
+</p><!--l. 252--><p class="indent" >   It will help us to generate a large number of concurrent API requests. If you have not already done so, install <span 
 class="ectt-1200">k6</span>
-from: <a 
+from <a 
 href="https://k6.io/docs/get-started/installation/" class="url" ><span 
-class="ectt-1200">https://k6.io/docs/get-started/installation/</span></a>
+class="ectt-1200">https://k6.io/docs/get-started/installation/</span></a>.
    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.1    </span> <a 
  id="x1-90003.1"></a>Scenario</h4>
-<!--l. 238--><p class="noindent" >We want to simulate the following scenario using our testing framework.
+<!--l. 257--><p class="noindent" >We want to simulate the following scenario using our testing framework.
    
 </p>
-<!--l. 240--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 259--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-10000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Indecisive planners and studious reviewers</span></span>
    Our TaskOverflow application is being used at a point in semester where most students have already setup
@@ -1349,21 +1401,18 @@ their tasks. These students are routinely visiting the website and listing the t
 same time, there are 40 very indecisive students who, quite late in semester, are trying to setup their tasks for the
 rest of semester. They continually create a task, realise that they have mis-typed, delete the task, and start
 over.
-</p><!--l. 251--><p class="indent" >   As the tasks are shared globally amongst all students, the indecisive planners are altering the list of task seen
+</p><!--l. 270--><p class="indent" >   As the tasks are shared globally amongst all students, the indecisive planners are altering the list of task seen
 by the organised students.
    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.2    </span> <a 
  id="x1-110003.2"></a>Setup</h4>
-<!--l. 255--><p class="noindent" >To get started, we will create a file called <span 
+<!--l. 274--><p class="noindent" >To get started, we will create a file called <span 
 class="ectt-1200">planners-and-studiers.js</span>. Most <span 
 class="ectt-1200">k6 </span>tests start with the following
 imports.    </p><div class="framedenv" id="code-1">
-<!--l. 259--><p class="indent" >   <span 
-class="ectt-1200">» cat planners-and-studiers.js</span> </p></div>   <div class="framedenv" id="code-1">
-                                                                                                    
-                                                                                                    
-<!--l. 259--><pre class="listings" id="listing-7"><span class="label"><a 
+<!--l. 278--><p class="indent" >   <span 
+class="ectt-1200">» cat planners-and-studiers.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 278--><pre class="listings" id="listing-8"><span class="label"><a 
  id="x1-11001r1"></a></span><span style="color:#404040"><span 
 class="ectt-1200">import</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">http</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1404,28 +1453,30 @@ class="ectt-1200">;</span></span>
    </div>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 267--><p class="noindent" ><span 
+      <!--l. 286--><p class="noindent" ><span 
 class="ectt-1200">http </span>holds the methods used to make HTTP requests,
+                                                                                                    
+                                                                                                    
       </p></li>
       <li class="itemize">
-      <!--l. 268--><p class="noindent" ><span 
+      <!--l. 287--><p class="noindent" ><span 
 class="ectt-1200">check </span>allows us to assert the state of HTTP responses, and
       </p></li>
       <li class="itemize">
-      <!--l. 269--><p class="noindent" ><span 
+      <!--l. 288--><p class="noindent" ><span 
 class="ectt-1200">sleep </span>gives us the ability to put a simulated user to sleep rather than continuously spamming the
       service with requests.</p></li></ul>
-<!--l. 272--><p class="indent" >   The ENDPOINT line retrieves the endpoint URL from the ENDPOINT environment variable.
+<!--l. 291--><p class="indent" >   The ENDPOINT line retrieves the endpoint URL from the ENDPOINT environment variable.
    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.3    </span> <a 
  id="x1-120003.3"></a>User Simulation</h4>
-<!--l. 276--><p class="noindent" >The behaviour of our users will be defined by an exported JavaScript function. Our studying student
+<!--l. 295--><p class="noindent" >The behaviour of our users will be defined by an exported JavaScript function. Our studying student
 will be listing out all of the tasks they have left to complete by using the <span 
 class="ectt-1200">/api/v1/todos </span>endpoint.
 </p><div class="framedenv" id="code-1">
-<!--l. 280--><p class="indent" >   <span 
-class="ectt-1200">» cat planners-and-studiers.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 280--><pre class="listings" id="listing-8"><span class="label"><a 
+<!--l. 299--><p class="indent" >   <span 
+class="ectt-1200">» cat planners-and-studiers.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 299--><pre class="listings" id="listing-9"><span class="label"><a 
  id="x1-12001r1"></a></span><span style="color:#404040"><span 
 class="ectt-1200">export</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
 class="ectt-1200">function</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1563,27 +1614,27 @@ class="ectt-1200">}</span></span>
 <span class="label"><a 
  id="x1-12014r14"></a></span></pre>
    </div>
-<!--l. 296--><p class="indent" >   Of course, this test is very basic as it only ensures the response code is 200. There is no guarantee that the
+<!--l. 315--><p class="indent" >   Of course, this test is very basic as it only ensures the response code is 200. There is no guarantee that the
 returned data is sensible.
 </p>
    <div class="tcolorbox tcolorbox" id="tcolobox-3">     
 <div class="tcolorbox-title">
-<!--l. 305--><p class="indent" >   <img 
+<!--l. 324--><p class="indent" >   <img 
 src="main5x.png" alt="icon: info"  />  Info</p></div> 
-<div class="tcolorbox-content"><!--l. 305--><p class="noindent" >If  you  would  like  a  challenge,  you  can  use  the  <span 
+<div class="tcolorbox-content"><!--l. 324--><p class="noindent" >If  you  would  like  a  challenge,  you  can  use  the  <span 
 class="ectt-1200">randomIntBetween </span>function  to  have  the  studier
 occasionally tick off tasks.
-</p><!--l. 305--><p class="noindent" ><a 
+</p><!--l. 324--><p class="noindent" ><a 
 href="https://k6.io/docs/javascript-api/jslib/utils/randomintbetween/" class="url" ><span 
 class="ectt-1200">https://k6.io/docs/javascript-api/jslib/utils/randomintbetween/</span></a> </p> 
 </div> 
 </div>
-<!--l. 307--><p class="indent" >   Next we need to simulate our indecisive students. For them, we will need to make a POST request to the
+<!--l. 326--><p class="indent" >   Next we need to simulate our indecisive students. For them, we will need to make a POST request to the
 <span 
 class="ectt-1200">/api/v1/todos </span>endpoint to create a task. Then we will need to use the ID given by the POST response to
 DELETE the mis-typed task.    </p><div class="framedenv" id="code-1">
-<!--l. 311--><p class="indent" >   <span 
-class="ectt-1200">» cat planners-and-studiers.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 311--><pre class="listings" id="listing-9"><span class="label"><a 
+<!--l. 330--><p class="indent" >   <span 
+class="ectt-1200">» cat planners-and-studiers.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 330--><pre class="listings" id="listing-10"><span class="label"><a 
  id="x1-12015r1"></a></span><span style="color:#404040"><span 
 class="ectt-1200">export</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
 class="ectt-1200">function</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -1976,16 +2027,14 @@ class="ectt-1200">}</span></span>
    
    <h4 class="subsectionHead"><span class="titlemark">3.4    </span> <a 
  id="x1-130003.4"></a>Configure Behaviour</h4>
-                                                                                                    
-                                                                                                    
-<!--l. 352--><p class="noindent" >We have now outlined how our user agents will interact with our API. We can use the <span 
+<!--l. 371--><p class="noindent" >We have now outlined how our user agents will interact with our API. We can use the <span 
 class="ectt-1200">options </span>to configure
 how these interactions occur over time. To prevent overloading the API immediately, and allow any
 auto-scaling behaviour to be triggered, we will gradually increase the amount of studiers. We will
 have a consistent amount of planners, 20, who will perform a total of 400 corrections over the test.
 </p><div class="framedenv" id="code-1">
-<!--l. 360--><p class="indent" >   <span 
-class="ectt-1200">» cat planners-and-studiers.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 360--><pre class="listings" id="listing-10"><span class="label"><a 
+<!--l. 379--><p class="indent" >   <span 
+class="ectt-1200">» cat planners-and-studiers.js</span> </p></div>   <div class="framedenv" id="code-1"><!--l. 379--><pre class="listings" id="listing-11"><span class="label"><a 
  id="x1-13001r1"></a></span><span style="color:#404040"><span 
 class="ectt-1200">export</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">const</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2258,31 +2307,33 @@ class="ectt-1200">};</span></span>
  id="x1-13020r20"></a></span></pre>
    </div>
    
+                                                                                                    
+                                                                                                    
    <h4 class="subsectionHead"><span class="titlemark">3.5    </span> <a 
  id="x1-140003.5"></a>Running the Tests</h4>
-<!--l. 384--><p class="noindent" >Now we have a completed load test. Deploy the service to AWS:
+<!--l. 403--><p class="noindent" >Now we have a completed load test. Deploy the service to AWS:
 </p>
    <div class="framedenv" id="shaded*-1">
-   <!--l. 387-->
-<pre class="lstlisting" id="listing-11"><span class="label"><a 
+   <!--l. 406-->
+<pre class="lstlisting" id="listing-12"><span class="label"><a 
  id="x1-14001r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">terraform</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">init</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div> <div class="framedenv" id="shaded*-1">
-   <!--l. 388-->
-<pre class="lstlisting" id="listing-12"><span class="label"><a 
+   <!--l. 407-->
+<pre class="lstlisting" id="listing-13"><span class="label"><a 
  id="x1-14002r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">$</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">terraform</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
 class="ectt-1200">apply</span></span><span 
 class="ectt-1200">&#x00A0;</span></pre>
    </div>
-<!--l. 390--><p class="indent" >   Once the deployment is finished, you should be given a URL where the endpoint is deployed. Use that
+<!--l. 409--><p class="indent" >   Once the deployment is finished, you should be given a URL where the endpoint is deployed. Use that
 endpoint to set the <span 
 class="ectt-1200">ENDPOINT </span>environment variable and run the tests.       </p><div class="framedenv" id="code-1">
-<!--l. 394--><pre class="listings" id="listing-13"><span class="label"><a 
+<!--l. 413--><pre class="listings" id="listing-14"><span class="label"><a 
  id="x1-14003r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">&#x003E;</span></span><span style="color:#000000"> </span><span style="color:#006699"><span 
 class="ectt-1200">export</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2304,9 +2355,9 @@ class="ectt-1200">js</span></span>
 <span class="label"><a 
  id="x1-14005r3"></a></span></pre>
    </div>
-<!--l. 399--><p class="indent" >   These tests should take less than 10 minutes to run. You should see that most of the tests pass but that there
+<!--l. 418--><p class="indent" >   These tests should take less than 10 minutes to run. You should see that most of the tests pass but that there
 will be a few failures throughout, as seen below.       </p><div class="framedenv" id="code-1">
-<!--l. 403--><pre class="listings" id="listing-14"><span class="label"><a 
+<!--l. 422--><pre class="listings" id="listing-15"><span class="label"><a 
  id="x1-14006r1"></a></span><span style="color:#000000"><span 
 class="ectt-1200">WARN</span></span><span style="color:#000000"><span 
 class="ectt-1200">[0152]</span></span><span style="color:#000000"> </span><span style="color:#000000"><span 
@@ -2952,28 +3003,28 @@ class="ectt-1200">m0s</span></span>
    
    <h3 class="sectionHead"><span class="titlemark">4    </span> <a 
  id="x1-150004"></a>Debugging</h3>
-<!--l. 450--><p class="noindent" >Now we can start to debug our service. We desire to not only increase our 92% pass rate to 100%, but also to
+<!--l. 469--><p class="noindent" >Now we can start to debug our service. We desire to not only increase our 92% pass rate to 100%, but also to
 increase the amount of studiers and planners.
    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">4.1    </span> <a 
  id="x1-160004.1"></a>Tips</h4>
    
-                                                                                                    
-                                                                                                    
-<!--l. 456--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 475--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-17000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Open TaskOverflow</span></span>
    If you open TaskOverflow, you should find it has been left in an unusual state after the tests. See if you can find
 out from the logs how this occurred.
    
 </p>
-<!--l. 461--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 480--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-18000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Follow an Interaction</span></span>
    Use the correlation IDs that we have included to see where potential bottlenecks may be occurring. You can
 introduce more fine-grained logs to identify where time is being spent.
    
+                                                                                                    
+                                                                                                    
 </p>
    <h3 class="likesectionHead"><a 
  id="x1-19000"></a>References</h3>
