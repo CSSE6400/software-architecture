@@ -25,7 +25,7 @@ def create_app(config_overrides=None):
     logging.getLogger('werkzeug').addHandler(handler)
     logging.getLogger("sqlalchemy.engine").addHandler(handler)
     logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
-   
+
     requests = logging.getLogger("requests")
     requests.addHandler(handler)
 

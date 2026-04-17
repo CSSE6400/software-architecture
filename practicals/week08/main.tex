@@ -111,19 +111,25 @@ You should see logs similar to the above.
 Notice that information about Flask is prefixed with \texttt{INFO:werkzeug} and information about SQL Alchemy is prefixed with \texttt{INFO:sqlalchemy.engine.Engine}.
 These prefixes indicate into which stream the logs are put.
 
-Open the AWS CloudWatch console and go to \texttt{Logs > Log groups} on the side panel.
+Open the AWS CloudWatch console and go to \texttt{Logs > Log Management} on the side panel.
 You should see a log group called \texttt{taskoverflow}.
 If you click on that group you will see log streams associated with \texttt{INFO:werkzeug}
 and \texttt{INFO:sqlalchemy.engine.Engine}.
 
-\begin{center}
-    \includegraphics[width=\textwidth]{images/log-group}
-\end{center}
+\begin{figure}[ht]
+    \centering
+    \begin{adjustwidth}{-7.5mm}{-7.5mm}
+        \includegraphics[width=0.95\paperwidth]{images/log-group}
+    \end{adjustwidth}
+    \caption{TaskOverflow log streams in CloudWatch.}
+    \label{fig:cloud-logs}
+\end{figure}
 
 \subsection{Structured Logging}
 
 Our first task will be to convert the current logging into a structured logging format.
-As we saw in logging lecture \cite{logging-slides}, structured logging can be as simple as logging a JSON object.
+As we saw in the logging lecture \cite{logging-slides},
+structured logging can be as simple as logging a JSON object.
 This allows logging services to quickly filter through logs based on criteria selected from the object's fields.
 
 In \texttt{todo/\_\_init\_\_.py} we have the following code within the \texttt{create\_app} function.
@@ -145,9 +151,10 @@ This makes it easier to search the logs.
 To do this, we will create a custom log formatter that is a subclass of \\
 \texttt{watchtower.CloudWatchLogFormatter}.
 %
-\begin{code}[language=python,numbers=none]{todo/\_\_init\_\_.py}
+\begin{code}[language=python,numbers=none]{todo/log\_formatter.py}
+import logging
+import watchtower
 from flask import has_request_context, request
-...
 
 class StructuredFormatter(watchtower.CloudWatchLogFormatter):
     def format(self, record):
@@ -161,7 +168,18 @@ class StructuredFormatter(watchtower.CloudWatchLogFormatter):
             record.msg['url'] = request.environ.get('PATH_INFO')
             record.msg['method'] = request.environ.get('REQUEST_METHOD')
         return super().format(record)
+\end{code}
 
+These are just some metadata fields we might want to add to our logging.
+We may also consider \texttt{socket.gethostname()} to identify the instance handling a request,
+or other helpful information.
+
+We then need to get the \texttt{CloudWatchLogHandler} to use our \texttt{StructuredFormatter}.
+Add the following code to the \texttt{todo/\_\_init\_\_.py} file.
+%
+\begin{code}[language=python,numbers=none]{todo/\_\_init\_\_.py}
+from .log_formatter import StructuredFormatter
+...
 def create_app(config_overrides=None): 
     ...
     handler = ...
@@ -169,21 +187,19 @@ def create_app(config_overrides=None):
     ...
 \end{code}
 
-These are just some metadata fields we might want to add to our logging.
-We may also consider \texttt{socket.gethostname()} to identify the instance handling a request,
-or other helpful information.
-
 \subsection{Correlation IDs}
 
-Correlation IDs are a mechanism to help understand the path of a request, event, message, etc. through a system.
-When logging it is often helpful to be able to trace the execution of a particular request \cite{logging-slides}.
+Correlation IDs are a mechanism to help understand the path of a
+request, event, message, etc. through a system \cite{logging-slides}.
+When logging it is often helpful to be able to trace the execution of a particular request.
 
 For our system we will generate a new random identifier for each incoming request.
 This identifier will be included as part of the logging metadata.
-For a system with multiple API endpoints requests will often come with an established REQUEST\_ID header.
+A system with multiple API endpoints requests, will often come with an established REQUEST\_ID header.
 %
 \begin{code}[language=python,numbers=none]{todo/\_\_init\_\_.py}
 import uuid
+from flask import Flask, request
 ...
 
 def create_app(config_overrides=None): 
@@ -200,6 +216,8 @@ def create_app(config_overrides=None):
     def after_request(response):
         requests.info("Request finished")
         return response
+
+    # Load the models 
     ...
 \end{code}
 
@@ -212,7 +230,8 @@ Launch the service locally and make some API requests.
 
 You should now be able to go to the \texttt{Log Insights} interface from the sidebar.
 This interface allows you to query structured logging data.
-Try the following query to ensure that your logs seem sensible.
+Select the taskoverflow log group and
+run the following query to ensure that your logs seem sensible.
 %
 \begin{code}[numbers=none]{}
 fields request_id, url, method, @timestamp, message.message, @message, @method
@@ -231,8 +250,8 @@ We briefly saw \texttt{k6} at the end of the \textit{Scaling Stateless Component
 To review, \texttt{k6} is a load testing tool that is written in Go but provides an interface using a subset of JavaScript.
 
 It will help us to generate a large number of concurrent API requests.
-If you have not already done so, install \texttt{k6} from:
-\url{https://k6.io/docs/get-started/installation/}
+If you have not already done so, install \texttt{k6} from
+\url{https://k6.io/docs/get-started/installation/}.
 
 \subsection{Scenario}
 We want to simulate the following scenario using our testing framework.
