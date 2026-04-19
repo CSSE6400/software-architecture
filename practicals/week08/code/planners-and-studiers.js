@@ -25,7 +25,7 @@ export function indecisivePlanner() {
         "title": "CSSE6400 Clout Assignment",
         "completed": false,
         "description": "",
-        "deadline_at": "2025-09-05T15:00:00",
+        "deadline_at": "2026-05-01T15:00:00",
     });
 
     const params = {
@@ -61,7 +61,7 @@ export const options = {
             executor: "ramping-vus",
             stages: [
                 { duration: "1m", target: 1500 },
-                { duration: "3m", target: 7500 },
+                { duration: "3m", target: 15000 },
                 { duration: "2m", target: 0 },
             ],
         },
@@ -69,7 +69,7 @@ export const options = {
             exec: 'indecisivePlanner',
             executor: "shared-iterations",
             vus: 20,
-            iterations: 400,
+            iterations: 360,
         },
     },
 };

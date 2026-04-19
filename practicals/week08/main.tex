@@ -1,6 +1,6 @@
 \documentclass{csse4400}
 
-% \teachermodetrue
+%\teachermodetrue
 
 \usepackage{float}
 \usepackage{languages}
@@ -9,7 +9,7 @@
 \title{Load Testing \& Bottlenecks}
 \author{Brae Webb \& Richard Thomas}
 
-\date{\week[practical]{9}}
+\date{\week[practical]{8}}
 \begin{document}
 
 \maketitle
@@ -122,7 +122,7 @@ and \texttt{INFO:sqlalchemy.engine.Engine}.
         \includegraphics[width=0.95\paperwidth]{images/log-group}
     \end{adjustwidth}
     \caption{TaskOverflow log streams in CloudWatch.}
-    \label{fig:cloud-logs}
+    \label{fig:log-groups}
 \end{figure}
 
 \subsection{Structured Logging}
@@ -239,8 +239,8 @@ fields request_id, url, method, @timestamp, message.message, @message, @method
 | limit 400
 \end{code}
 
-Take the time to refine your logging now to produce logs that are easy to search through
-and understand the trace of your API requests.
+Take some time now to refine your logging to produce logs that are easy to search through
+and to understand how to trace API requests.
 
 
 \section{Load Testing}
@@ -288,7 +288,7 @@ const ENDPOINT = __ENV.ENDPOINT;
     \item \texttt{sleep} gives us the ability to put a simulated user to sleep rather than continuously spamming the service with requests.
 \end{itemize}
 
-The ENDPOINT line retrieves the endpoint URL from the ENDPOINT environment variable.
+The ENDPOINT constant retrieves the endpoint URL from the ENDPOINT environment variable.
 
 \subsection{User Simulation}
 
@@ -336,7 +336,7 @@ export function indecisivePlanner() {
         "title": "CSSE6400 Clout Assignment",
         "completed": false,
         "description": "",
-        "deadline_at": "2025-09-05T15:00:00",
+        "deadline_at": "2026-05-01T15:00:00",
     });
 
     const params = {
@@ -368,13 +368,13 @@ export function indecisivePlanner() {
 
 \subsection{Configure Behaviour}
 
-We have now outlined how our user agents will interact with our API.
-We can use the \texttt{options} to configure how these interactions occur over time.
+We have outlined how our user agents will interact with our API.
+The \texttt{options} object allows us to configure how these interactions occur over time.
 To prevent overloading the API immediately,
 and allow any auto-scaling behaviour to be triggered,
 we will gradually increase the amount of studiers.
 We will have a consistent amount of planners, 20,
-who will perform a total of 400 corrections over the test.
+who will perform a total of 400 corrections over the test run.
 %
 \begin{code}[language=JavaScript,numbers=none]{planners-and-studiers.js}
 export const options = {
@@ -400,15 +400,15 @@ export const options = {
 
 \subsection{Running the Tests}
 
-Now we have a completed load test.
-Deploy the service to AWS:
+Now that we have implemented a load test.
+Deploy the service to AWS using Terraform and test it.
 
 \bash{terraform init}
 \bash{terraform apply}
 
-Once the deployment is finished,
-you should be given a URL where the endpoint is deployed.
-Use that endpoint to set the \texttt{ENDPOINT} environment variable and run the tests.
+Once the deployment is finished, Terraform should return the URL where the service is deployed.
+Query the health endpoint to make sure the service is running.
+Use the URL to set the \texttt{ENDPOINT} environment variable and run the tests.
 %
 \begin{code}[language=bash,numbers=none]{}
 > export ENDPOINT=...
@@ -416,59 +416,89 @@ Use that endpoint to set the \texttt{ENDPOINT} environment variable and run the 
 \end{code}
 
 These tests should take less than 10 minutes to run.
-You should see that most of the tests pass but that there will be a few failures throughout,
-as seen below.
+Most of the tests should pass but there should be a few failures throughout, as seen below.
+Note that the exact number and percentages of successes and failures will be unique to each test run.
+%
+% Change this page to landscape and add the k6 header.
+%> k6 run planners-and-studiers.js
+%
+%         /\      Grafana   /‾‾/
+%    /\  /  \     |\  __   /  /
+%   /  \/    \    | |/ /  /   ‾‾\
+%  /          \   |   (  |  (‾)  |
+% / __________ \  |_|\_\  \_____/
+%
+%     execution: local
+%        script: planners-and-studiers.js
+%        output: -
+%
+%     scenarios: (100.00%) 2 scenarios, 15020 max VUs, 10m30s max duration (incl. graceful stop):
+%              * planner: 360 iterations shared among 20 VUs (maxDuration: 10m0s, exec: indecisivePlanner, gracefulStop: 30s)
+%              * studier: Up to 15000 looping VUs for 6m0s over 3 stages (gracefulRampDown: 30s, exec: studyingStudent, gracefulStop: 30s)
 %
 \begin{code}[language=bash,numbers=none]{}
-WARN[0152] Request Failed                                error="Get \"http://taskoverflow-451078826.us-east-1.elb.amazonaws.com/api/v1/todos\": request timeout"
-WARN[0183] Request Failed                                error="Get \"http://taskoverflow-451078826.us-east-1.elb.amazonaws.com/api/v1/todos\": request timeout"
-WARN[0239] Request Failed                                error="Get \"http://taskoverflow-451078826.us-east-1.elb.amazonaws.com/api/v1/todos\": request timeout"
+WARN[0152] Request Failed                                error="Get \"http://taskoverflow-451078826.us-east-1.elb.amazonaws.com/api/v1/todos\": dial: i/o timeout"
+WARN[0183] Request Failed                                error="Get \"http://taskoverflow-451078826.us-east-1.elb.amazonaws.com/api/v1/todos\": dial: i/o timeout"
+WARN[0239] Request Failed                                error="Get \"http://taskoverflow-451078826.us-east-1.elb.amazonaws.com/api/v1/todos\": dial: i/o timeout"
 WARN[0241] Request Failed                                error="Delete \"$%7Burl%7D/$%7BwrongId%7D\": unsupported protocol scheme \"\""
-WARN[0272] Request Failed                                error="Get \"http://taskoverflow-451078826.us-east-1.elb.amazonaws.com/api/v1/todos\": request timeout"
-WARN[0330] Request Failed                                error="Get \"http://taskoverflow-451078826.us-east-1.elb.amazonaws.com/api/v1/todos\": request timeout"
-WARN[0339] Request Failed                                error="Get \"http://taskoverflow-451078826.us-east-1.elb.amazonaws.com/api/v1/todos\": request timeout"
-WARN[0371] Request Failed                                error="Get \"http://taskoverflow-451078826.us-east-1.elb.amazonaws.com/api/v1/todos\": request timeout"
-WARN[0412] Request Failed                                error="Get \"http://taskoverflow-451078826.us-east-1.elb.amazonaws.com/api/v1/todos\": request timeout"
+WARN[0272] Request Failed                                error="Get \"http://taskoverflow-451078826.us-east-1.elb.amazonaws.com/api/v1/todos\": dial: i/o timeout"
+WARN[0330] Request Failed                                error="Get \"http://taskoverflow-451078826.us-east-1.elb.amazonaws.com/api/v1/todos\": dial: i/o timeout"
+WARN[0339] Request Failed                                error="Get \"http://taskoverflow-451078826.us-east-1.elb.amazonaws.com/api/v1/todos\": dial: i/o timeout"
+WARN[0371] Request Failed                                error="request timeout"
+WARN[0412] Request Failed                                error="Get \"http://taskoverflow-451078826.us-east-1.elb.amazonaws.com/api/v1/todos\": dial: i/o timeout"
 
     TOTAL RESULTS
 
-    checks_total...................: 16498  32.852733/s
-    checks_succeeded...............: 92.47% 15257 out of 16498
-    checks_failed..................: 7.52%  1241 out of 16498
+    checks_total...................: 28105  70.103828/s
+    checks_succeeded...............: 92.47% 25989 out of 28105
+    checks_failed..................: 7.52%  2116 out of 28105
 
       is status 200
          92% -   15257 /   1241
 
     HTTP
-    http_req_duration...........................................: avg=14.05s min=0s       med=3.82s max=59.99s p(90)=49.14s p(95)=51.71s
-      { expected_response:true }................................: avg=14.32s min=227.64ms med=3.81s max=59.72s p(90)=49.3s  p(95)=51.7s
-    http_req_failed.............................................: 5.13%  847 out of 16498
-    http_reqs...................................................: 16498  32.852733/s
+    http_req_duration..........................................: avg=7.09s min=0s       med=964.15ms max=1m1s  p(90)=21.72s p(95)=27.89s
+      { expected_response:true }...............................: avg=7.19s min=214.35ms med=1s       max=1m0s  p(90)=22.01s p(95)=28.39s
+    http_req_failed............................................: 3.88%  1092 out of 28105
+    http_reqs..................................................: 28105  70.103828/s
 
     EXECUTION
-    iteration_duration..........................................: avg=2m0s   min=20.22s   med=2m3s  max=2m38s  p(90)=2m10s  p(95)=2m20s
-    iterations..................................................: 10422  20.753496/s
-    vus.........................................................: 3      min=3            max=7520
-    vus_max.....................................................: 7520   min=7520         max=7520
+    iteration_duration.........................................: avg=2m0s  min=20.21s   med=2m0s     max=2m27s p(90)=2m8s   p(95)=2m12s
+    iterations.................................................: 15492  38.642537/s
+    vus........................................................: 27     min=27            max=15020
+    vus_max....................................................: 15020  min=15020         max=15020
 
     NETWORK
-    data_received...............................................: 1.5 GB 3.1 MB/s
-    data_sent...................................................: 2.3 MB 4.5 kB/s
+    data_received..............................................: 969 MB 2.4 MB/s
+    data_sent..................................................: 3.3 MB 8.3 kB/s
 
 
 
 
-running (08m22.2s), 0000/7520 VUs, 10422 complete and 6329 interrupted iterations
-planner   [======================================] 20 VUs         08m22.2s/10m0s  400/400 shared iters
-studier   [======================================] 0000/7500 VUs  7m0s
+running (07m22.2s), 0000/15020 VUs, 15492 complete and 12377 interrupted iterations
+planner [======================================] 20 VUs          07m22.2s/10m0s  400/400 shared iters
+studier [======================================] 0000/15000 VUs  6m0s
 \end{code}
 
+\teacher{
+  The number of VUs has doubled from 2025, just to get a similar result.
+  The timeouts may require a second run of the tests to appear.
+  This may then lead to many timeouts.
+}
 
-\section{Debugging}
 
-Now we can start to debug our service.
-We desire to not only increase our 92\% pass rate to 100\%,
-but also to increase the amount of studiers and planners.
+\section{Debugging \& Scaling Improvements}
+
+Explore the logs to determine if there are any errors that are causing some of the failures.
+Consider how to improve the service's ability to scale.
+Increase the number of studiers and planners and use the logs to look for bottlenecks.
+Design other scenarios to explore other usage patterns.
+We want to increase our 92\% pass rate to be closer to 100\%.
+
+In almost all systems, it is possible to design test scenarios that will have timeout failures.
+The goal is usually not to have a system that can handle any load,
+but to design a system that can handle expected load behaviours
+and have some overhead to handle reasonable unexpected load.
 
 \subsection{Tips}
 
@@ -484,14 +514,14 @@ You can introduce more fine-grained logs to identify where time is being spent.
 \teacher{
 Solutions are roughly:
 
-1. Discover that DELETE /api/v1/todos/undefined is being requested from the logs.
-Change 
-    const wrongId = request.id;
-to
-    const wrongId = request.json().id;
+1. Discover that \texttt{DELETE /api/v1/todos/undefined} is being requested from the logs.
+In the \texttt{indecisivePlanner()} function, change \\
+\texttt{const wrongId = request.id;} \\
+to \\
+\texttt{const wrongId = request.json().id;} \\
 
 2. Find that more tests are failing then there are timeouts.
-Change expected HTTP status code for POST to 201.
+Change expected HTTP status code for POST to 201, in the \texttt{indecisivePlanner()} function. \\
 
 3. Recognise that even with these fixes, the requests still timeout.
 Upgrade the ECS task from 1 CPU / 2GB memory to maybe 4 CPU / 8GB memory.
