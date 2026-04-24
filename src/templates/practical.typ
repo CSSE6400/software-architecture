@@ -39,18 +39,27 @@
   show heading: set block(above: 1.4em, below: 1em)
   show heading: set text(font: "Noto Sans")
   set text(font: "Noto Serif", size: 12pt)
+  set par(justify: true)
 
   // Style
-  show: catppuccin.with(flavors.latte)
+  import "@preview/rose-pine:0.2.0": apply
+  show: apply(variant: "rose-pine-dawn")
+  set page(fill: rgb("#fff"))
 
+  
   // Icons
   provide-icons(json("icons/ph.json"))
+
+  // Checkboxes
+  import "@preview/cheq:0.3.0": checklist
+  show: checklist
 
   // Code
   codly(
     languages: codly-languages,
     zebra-fill: none,
-    number-format: none
+    number-format: none,
+    fill: rgb("#fffaf3")
   )
   show: codly-init.with()
 
@@ -64,7 +73,7 @@
 
   // Cover Section
   align(top + right)[
-    #text(size: 10pt)[Last Updated on #gitHash]
+    #text(size: 8pt)[Last Updated on #gitHash]
   ]
   align(top)[
     #line(length: 100%, stroke: 1pt)
@@ -72,7 +81,7 @@
       columns: (auto, 1fr),
       rows: (auto, auto),
       gutter: 2pt,
-      row-gutter: 20pt,
+      row-gutter: 30pt,
       text(size: 12pt, weight: "bold")[#title],
       align(right)[#text(size: 10pt)[Software Architecture]],
       grid.cell(colspan: 2, align(right)[#text(size: 10pt)[#authors.join(", ")]]),
@@ -93,12 +102,20 @@
   ..args
 )
 
-#let teacher(..args) = clue(
-  title: "Teacher",
-  icon: text(fill: rgb("#40a02b"))[#icon("ph:chalkboard-teacher", width: 1.5em)],
-  accent-color: rgb("#40a02b"),
-  ..args
+#let show-teaching-notes = (
+  sys.inputs.at("teacher", default: "true") == "true"
 )
+// Teaching notes box for notes only for teachers, controlled by build CLI flag.
+#let teacher(..args) = context {
+  if show-teaching-notes {
+    return clue(
+      title: "Teacher",
+      icon: text(fill: rgb("#40a02b"))[#icon("ph:chalkboard-teacher", width: 1.5em)],
+      accent-color: rgb("#40a02b"),
+      ..args
+    )
+  }
+}
 
 // Extra Assets
 #let edstem = link(edstemLink)[#box(baseline: 20%)[#image("assets/ed.png", width: 1em)] Edstem]
