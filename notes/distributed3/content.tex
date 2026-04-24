@@ -7,7 +7,7 @@
 \section{Introduction}
 
 In our introduction to distributed systems we described the fallacies of distributed systems \cite{distributed1-notes}.
-Some of these fallacies (e.g. the network is reliable, the network is secure and the topology never changes)
+Some of these fallacies (e.g. the network is reliable, the network is secure, and the topology never changes)
 apply Murphy's Law, \textit{if anything can go wrong it will}, to the context of distributed systems.
 We will now move on to O'Toole's Commentary, \textit{Murphy was an optimist}.
 
@@ -15,15 +15,14 @@ Large distributed systems may consist of hundreds or thousands of computing plat
 communicating over large distances and using unreliable internet connections.
 Failure of some part of the system is practically guaranteed \cite{datacenter-computer},
 the system must be designed to cater for \emph{partial failure}.
-Even for small systems, some part will eventually fail,
-so fault handling must be part of the design.
+Even for small systems, some part will \textit{eventually} fail, so fault handling must be part of the design.
 
 
 \section{Fault Handling}\label{sec:faults}
 
 We mentioned that, paradoxically, distributed systems can be more reliable than non-distributed systems
 because a distributed system spreads risk of failure over multiple machines \cite{distributed1-notes}.
-This is managed through health checks, load-balancing and auto-scaling.
+This is managed through health checks, load-balancing, and auto-scaling.
 We also described the use of transactions as a mechanism to deal with some potential failures
 that affect storage of persistent data \cite{distributed2-notes}.
 
@@ -264,7 +263,8 @@ An additional complication to implementing linearisable single-leader replicatio
 A typical approach is to have a lock of some form that is acquired by the leader, and all other replicas are followers.
 Acquiring the lock itself must be a linearisable operation.
 If more than one replica believes it is the leader, it means that write behaviour cannot be linearisable.
-A coordination service, such as \link{etcd}{https://etcd.io/}, can be used to implement distributed locks in a linearisable fashion.
+A coordination service, such as \link{etcd}{https://github.com/etcd-io/etcd},
+can be used to implement distributed locks in a linearisable fashion.
 
 \subsubsection{Multi-Leader Replication}
 Multi-leader replication cannot provide linearisability,
@@ -372,7 +372,7 @@ there needs to be a mechanism to indicate when the order is completed.
 \emph{Total order broadcast} is one technique that does this.
 Messages are ordered by their delivery time, not when a result is returned.
 So, if a message has been received, another message cannot be performed before it.
-Coordination services, such as \link{etcd}{https://etcd.io/}, implement total order broadcast.
+Coordination services, such as \link{etcd}{https://github.com/etcd-io/etcd}, implement total order broadcast.
 
 
 \section{Consensus}\label{sec:consensus}
