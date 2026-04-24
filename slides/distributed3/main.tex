@@ -1,7 +1,7 @@
 \documentclass{slide}
 
 %\usepackage{pgfpages}
-%\setbeameroption{show notes on second screen}
+\setbeameroption{show notes on second screen}
 
 \title{Distributed Computing III}
 \subtitle{
@@ -19,12 +19,12 @@
 
 \questionanswer{What communication faults may occur?}{
     \begin{itemize}[<+(1)->]
-        \item Message not delivered	\note<2>{Lost in transit.}
-        \item Message delayed		\note<3>{Network delay or receiver overloaded,\\but message will be processed later.}
-        \item Receiver failed		\note<4>{Receiver software has crashed or node has died.}
-        \item Receiver busy			\note<5>{Receiver temporarily not replying\\(e.g. garbage collection has frozen other processes).}
-        \item Reply not received		\note<6>{Request was processed but reply lost in transit.}
-        \item Reply delayed			\note<7>{Reply will be received later.}
+        \item Message not delivered	\note<2>{Lost in transit}
+        \item Message delayed		\note<3>{Network delay or receiver overloaded,\\but message will be processed later}
+        \item Receiver failed		\note<4>{Receiver software has crashed or node has died}
+        \item Receiver busy			\note<5>{Receiver temporarily not replying\\(e.g. garbage collection has frozen other processes)}
+        \item Reply not received		\note<6>{Request was processed but reply lost in transit}
+        \item Reply delayed			\note<7>{Reply will be received later}
     \end{itemize}
 }
 
@@ -40,7 +40,7 @@
         \item Query switches
         		\note<5>{Need permissions to do this.\\Will only have this in your own data centre.}
         \item Timeout
-        		\note<6>{UDP reduces network transmission time guarantee\\-- does not perform retransmission.}
+        		\note<6>{UDP reduces network transmission time guarantee\\~~~~-- does not perform retransmission}
     \end{itemize}
 }
 
@@ -54,11 +54,11 @@
     \item How many retries? How often?
     \item Exponential backoff with jitter
     \item How long to wait to restart?
-    \item Too long reduces responsiveness.
-    \item Unacknowledged messages need to be sent to other nodes \\-- reducing performance.
-    \item Too short may prematurely declare nodes dead.
-    \item May lead to contention -- two nodes processing the same request.
-    \item May lead to cascading failure -- load is sent to other nodes, slowing them down so they are then declared dead \dots.
+    \item Too long reduces responsiveness
+    \item Unacknowledged messages need to be sent to other nodes \\~~~~-- reducing performance
+    \item Too short may prematurely declare nodes dead
+    \item May lead to contention -- two nodes processing the same request
+    \item May lead to cascading failure -- load is sent to other nodes, slowing them down so they are then declared dead \dots
 }
 
 \definition{Idempotency}{
@@ -103,10 +103,10 @@
     Nodes in a distributed system may `lie'. \\--- Send faulty or corrupted messages or responses.
 }
 \note[itemize]{
-    \item A message that causes the receiver to fail.
-    \item Incorrect responses (e.g. they have finished processing a message but haven't).
-    \item Can be due to faults or malicious hosts.
-    \item Difficult to deal with all possible variations of these faults.
+    \item A message that causes the receiver to fail
+    \item Incorrect responses (e.g. they have finished processing a message but haven't)
+    \item Can be due to faults or malicious hosts
+    \item Difficult to deal with all possible variations of these faults
 }
 
 \questionanswer{Can we design a system to be Byzantine fault tolerant?}{
@@ -115,7 +115,7 @@
 \note[itemize]{
     \item Most systems don't attempt to
     \item Some need to (e.g. safety critical systems, blockchain, \dots)
-    \item Refer to CSSE3012 Safety Critical guest lecture.
+    \item Refer to CSSE3012 Safety Critical guest lecture
 }
 
 \begin{frame}{Limited Fault Tolerance}
@@ -173,17 +173,17 @@
 
 \image[trim=40 90 40 90,clip,width=\textwidth]{diagrams/poison-message-01.png}
 \note[itemize]{
-    \item Normal message/event is sent from a Producer.
+    \item Normal message/event is sent from a Producer
 }
 
 \image[trim=40 90 40 90,clip,width=\textwidth]{diagrams/poison-message-02.png}
 \note[itemize]{
-    \item Normal message/event is queued (in Message Queue).
+    \item Normal message/event is queued (in Message Queue)
 }
 
 \image[trim=40 90 40 90,clip,width=\textwidth]{diagrams/poison-message-03.png}
 \note[itemize]{
-    \item Normal message/event is dequeued and processed by a Consumer.
+    \item Normal message/event is dequeued and processed by a Consumer
 }
 
 \begin{frame}
@@ -197,50 +197,50 @@
     \end{columns}
 \end{frame}
 \note[itemize]{
-    \item Receiver can't process message.
-    \item Always fails -- Not due to transient failure.
-    \item Failed messages are retried.
-    \item Returned to front of queue -- Preserve message order.
-    \item Next receiver fails to process message -- Infinite loop.
-    \item Blocks sending of following messages.
+    \item Receiver can't process message
+    \item Always fails -- Not due to transient failure
+    \item Failed messages are retried
+    \item Returned to front of queue -- Preserve message order
+    \item Next receiver fails to process message -- Infinite loop
+    \item Blocks sending of following messages
 }
 
 % Next 5 slides are an example of a poison message blocking the queue.
 
 \image[trim=40 90 40 90,clip,width=\textwidth]{diagrams/poison-message-04.png}
 \note[itemize]{
-    \item This set of slides is an example of a poison message blocking the queue.
-    \item Poison message is at head of queue.
+    \item This set of slides is an example of a poison message blocking the queue
+    \item Poison message is at head of queue
 blocking issue.
 }
 
 \image[trim=40 90 40 90,clip,width=\textwidth]{diagrams/poison-message-05.png}
 \note[itemize]{
-    \item This set of slides is an example of a poison message blocking the queue.
-    \item Poison message is dequeued by a Consumer.
+    \item This set of slides is an example of a poison message blocking the queue
+    \item Poison message is dequeued by a Consumer
 }
 
 \image[trim=40 90 40 90,clip,width=\textwidth]{diagrams/poison-message-06.png}
 \note[itemize]{
-    \item This set of slides is an example of a poison message blocking the queue.
-    \item Consumer fails (crashes).
-    \item Poison message is added back to the head of the queue (re-try).
+    \item This set of slides is an example of a poison message blocking the queue
+    \item Consumer fails (crashes)
+    \item Poison message is added back to the head of the queue (re-try)
 }
 
 \image[trim=40 90 40 90,clip,width=\textwidth]{diagrams/poison-message-07.png}
 \note[itemize]{
-    \item This set of slides is an example of a poison message blocking the queue.
-    \item Next Consumer dequeues poison message and fails (crashes).
+    \item This set of slides is an example of a poison message blocking the queue
+    \item Next Consumer dequeues poison message and fails (crashes)
 }
 
 \image[trim=40 90 40 90,clip,width=\textwidth]{diagrams/poison-message-08.png}
 \note[itemize]{
-    \item This set of slides is an example of a poison message blocking the queue.
-    \item Poison message is added back to the head of the queue again (re-try).
+    \item This set of slides is an example of a poison message blocking the queue
+    \item Poison message is added back to the head of the queue again (re-try)
     \item Infinite loop ...
-    \item \textbf{Comment} that poison messages block processing regardless of how they're delivered.
-    \item A message queue or service isn't the key blocking point.
-    \item Async messages sent directly to a consumer requires it to queue them as they're processed, leading to the same blocking issue.
+    \item \textbf{Comment} that poison messages block processing regardless of how they're delivered
+    \item A message queue or service isn't the key blocking point
+    \item Async messages sent directly to a consumer requires it to queue them as they're processed, leading to the same blocking issue
 }
 
 \questionanswer{What causes a message to be poisonous?}{
