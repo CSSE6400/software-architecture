@@ -25,13 +25,13 @@ ________________________________________________________________________________
 Thomas</div>
 ____________________________________________________________________________________________
    <span 
-class="Cabin-Regular-tlf-t1-">Last Updated on 2024/04/30 </span></div>
+class="Cabin-Regular-tlf-t1-">Last Updated on 2026/04/24 </span></div>
    
    <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
  id="x1-10001"></a>Introduction</h3>
 <!--l. 9--><p class="noindent" >In our introduction to distributed systems we described the fallacies of distributed systems <span class="cite">[<a 
 href="#Xdistributed1-notes">1</a>]</span>. Some of these
-fallacies (e.g. the network is reliable, the network is secure and the topology never changes) apply Murphy&#8217;s Law, <span 
+fallacies (e.g. the network is reliable, the network is secure, and the topology never changes) apply Murphy&#8217;s Law, <span 
 class="Cabin-Italic-tlf-t1-x-x-120">if</span>
 <span 
 class="Cabin-Italic-tlf-t1-x-x-120">anything can go wrong it will</span>, to the context of distributed systems. We will now move on to O&#8217;Toole&#8217;s Commentary,
@@ -42,72 +42,73 @@ over large distances and using unreliable internet connections. Failure of some 
 guaranteed <span class="cite">[<a 
 href="#Xdatacenter-computer">2</a>]</span>, the system must be designed to cater for <span 
 class="Cabin-Italic-tlf-t1-x-x-120">partial failure</span>. Even for small systems, some part will
-eventually fail, so fault handling must be part of the design.
+<span 
+class="Cabin-Italic-tlf-t1-x-x-120">eventually </span>fail, so fault handling must be part of the design.
    
 </p>
    <h3 class="sectionHead"><span class="titlemark">2    </span> <a 
  id="x1-20002"></a>Fault Handling</h3>
-<!--l. 24--><p class="noindent" >We mentioned that, paradoxically, distributed systems can be more reliable than non-distributed systems
+<!--l. 23--><p class="noindent" >We mentioned that, paradoxically, distributed systems can be more reliable than non-distributed systems
 because a distributed system spreads risk of failure over multiple machines <span class="cite">[<a 
 href="#Xdistributed1-notes">1</a>]</span>. This is managed through health
-checks, load-balancing and auto-scaling. We also described the use of transactions as a mechanism to deal with
+checks, load-balancing, and auto-scaling. We also described the use of transactions as a mechanism to deal with
 some potential failures that affect storage of persistent data <span class="cite">[<a 
 href="#Xdistributed2-notes">3</a>]</span>.
-</p><!--l. 30--><p class="indent" >   The challenge, particularly when implementing health checks, is determining when a fault has occurred. Most
+</p><!--l. 29--><p class="indent" >   The challenge, particularly when implementing health checks, is determining when a fault has occurred. Most
 distributed systems communicate over a TCP/IP network. This introduces a layer of uncertainty in trying to
 determine if a fault exists. A message sent over a TCP/IP network may not be delivered, may be
 delayed, or the response may not be received. Possible causes of these faults include the following.
 </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 36--><p class="noindent" >The request sent to another service in the system may not have been delivered.
+      <!--l. 35--><p class="noindent" >The request sent to another service in the system may not have been delivered.
       </p></li>
       <li class="itemize">
-      <!--l. 37--><p class="noindent" >The request may be delayed and is waiting in a queue to be processed. (e.g. either the network or
+      <!--l. 36--><p class="noindent" >The request may be delayed and is waiting in a queue to be processed. (e.g. either the network or
       the service is overloaded).
       </p></li>
       <li class="itemize">
-      <!--l. 38--><p class="noindent" >The node running the service may have failed.
+      <!--l. 37--><p class="noindent" >The node running the service may have failed.
                                                                                                     
                                                                                                     
       </p></li>
       <li class="itemize">
-      <!--l. 39--><p class="noindent" >The service may be busy and has temporarily stopped responding.
+      <!--l. 38--><p class="noindent" >The service may be busy and has temporarily stopped responding.
       </p></li>
       <li class="itemize">
-      <!--l. 40--><p class="noindent" >The service may have processed the request and replied, but it has not been received.
+      <!--l. 39--><p class="noindent" >The service may have processed the request and replied, but it has not been received.
       </p></li>
       <li class="itemize">
-      <!--l. 41--><p class="noindent" >The response may be delayed and will be received later.</p></li></ul>
-<!--l. 44--><p class="noindent" >There are techniques that can be used to identify some faults, but they are not perfect. </p>
+      <!--l. 40--><p class="noindent" >The response may be delayed and will be received later.</p></li></ul>
+<!--l. 43--><p class="noindent" >There are techniques that can be used to identify some faults, but they are not perfect. </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 47--><p class="noindent" >If a compute node is running and reachable, but does not have a process listening on the destination
+      <!--l. 46--><p class="noindent" >If a compute node is running and reachable, but does not have a process listening on the destination
       port, the operating system should close or refuse the TCP connection. This should result in a RST or
       FIN packet being received by the message sender, with the caveat that the packet may be lost.
       </p></li>
       <li class="itemize">
-      <!--l. 48--><p class="noindent" >If a process crashes, but the compute node is still running, a monitor program running on the node
+      <!--l. 47--><p class="noindent" >If a process crashes, but the compute node is still running, a monitor program running on the node
       can report the failure to a health monitoring sub-system.
       </p></li>
       <li class="itemize">
-      <!--l. 49--><p class="noindent" >If a router knows that an IP address is not reachable, it can reply with a destination unreachable
+      <!--l. 48--><p class="noindent" >If a router knows that an IP address is not reachable, it can reply with a destination unreachable
       packet. But, a router has no additional ways of knowing if an address is not reachable than the rest
       of the system.
       </p></li>
       <li class="itemize">
-      <!--l. 50--><p class="noindent" >If the system is running on your own hardware, you may be able to query network switches to detect
+      <!--l. 49--><p class="noindent" >If the system is running on your own hardware, you may be able to query network switches to detect
       link failures.</p></li></ul>
    
    <h4 class="subsectionHead"><span class="titlemark">2.1    </span> <a 
  id="x1-30002.1"></a>Retry and Restart</h4>
-<!--l. 55--><p class="noindent" >In general, despite the techniques above, the application needs to have a strategy to detect faults and to decide
+<!--l. 54--><p class="noindent" >In general, despite the techniques above, the application needs to have a strategy to detect faults and to decide
 whether to retry a request or that a node is dead. Fault handling has to be responsive in light of the uncertainty of
 the fault. A general strategy is to retry sending a message a certain number of times and having a
 time limit. If no response is received within the time limit the system will then decide that the node
 is dead, will spin up a new node, and remove the dead node from the load balancer&#8217;s list of active
 nodes.
-</p><!--l. 62--><p class="indent" >   The challenge with this strategy is deciding how many retry requests and how long to wait. Multiple retries can
+</p><!--l. 61--><p class="indent" >   The challenge with this strategy is deciding how many retry requests and how long to wait. Multiple retries can
 swamp an already overloaded node, reducing its performance even more or possibly leading to it crashing. In the
 first lecture on distributed systems we introduced exponential backoff as a mechanism to reduce the impact of
 retrying requests <span class="cite">[<a 
@@ -118,18 +119,18 @@ spread out these peaks <span class="cite">[<a
 href="#Xbackoff-jitter">6</a>]</span>.
                                                                                                     
                                                                                                     
-</p><!--l. 69--><p class="indent" >   Determining how long to wait before deciding that a node is dead has its own challenges. If the system
+</p><!--l. 68--><p class="indent" >   Determining how long to wait before deciding that a node is dead has its own challenges. If the system
 decides that a node is dead, then all clients who have sent messages to that node, and have not received a reply,
 will need to resend their messages to other nodes. Waiting too long reduces the system&#8217;s responsiveness, as
 processes wait for a the dead node to reply. It may also reduce the system&#8217;s overall performance as a backlog of
 requests need to be processed.
-</p><!--l. 75--><p class="indent" >   Waiting too short a time may lead to prematurely declaring a node dead. If the node is declared dead but it is
+</p><!--l. 74--><p class="indent" >   Waiting too short a time may lead to prematurely declaring a node dead. If the node is declared dead but it is
 just responding slowly because of system load, then resending messages to other nodes increases the load on
 other nodes. This can lead to a cascading failure, where all nodes are overloaded to the point that they are all
 declared dead. There is an additional problem of declaring a node dead, which is just slow to respond. It will still be
 processing requests until it is shutdown, but those requests will be resent to other nodes. This leads to the
 possibility that some actions will be performed twice.
-</p><!--l. 83--><p class="indent" >   One option to reduce the variability of message delays is to use UDP rather than TCP at the network level.
+</p><!--l. 82--><p class="indent" >   One option to reduce the variability of message delays is to use UDP rather than TCP at the network level.
 UDP does not retransmit lost packets, which helps reduces the variability of transmission time. The drawback is
 that the system will need to manage more messages not being received, as it will not have the automated
 retransmission of packets provided by TCP. It depends on the type of system, which approach is more beneficial.
@@ -141,13 +142,13 @@ pointless.)
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">2.1.1    </span> <a 
  id="x1-40002.1.1"></a>Idempotency</h5>
-<!--l. 93--><p class="noindent" >Retrying operations introduces a potential complication. What happens if the receiving node received the
+<!--l. 92--><p class="noindent" >Retrying operations introduces a potential complication. What happens if the receiving node received the
 message and processed it, but the response failed to be returned to the sender. The sender can retry the
 operation, but that may have an adverse effect on the receiver if it repeats the behaviour.
-</p><!--l. 97--><p class="indent" >   One option is for each message to have an identifier. The receiver can decide that it has already processed the
+</p><!--l. 96--><p class="indent" >   One option is for each message to have an identifier. The receiver can decide that it has already processed the
 message and just return the result without processing it again. Or, if the operation will not have any adverse effect
 (e.g. it is a query with no side effects), it can be processed again.
-</p><!--l. 101--><p class="indent" >   The intent is that the server&#8217;s state will be the same, regardless of whether it receives
+</p><!--l. 100--><p class="indent" >   The intent is that the server&#8217;s state will be the same, regardless of whether it receives
 a message once or multiple times. This behaviour is called the <a 
 href="https://microservices.io/post/microservices/patterns/2020/10/16/idempotent-consumer.html" >idempotent consumer
 pattern</a><span class="footnote-mark"><a 
@@ -157,12 +158,12 @@ href="#fn1x0" id="fn1x0-bk"><sup class="textsuperscript">1</sup></a></span><a
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.2    </span> <a 
  id="x1-50002.2"></a>Timing Faults</h4>
-<!--l. 106--><p class="noindent" >We introduced the issue of write conflicts, when discussing multi-leader replication <span class="cite">[<a 
+<!--l. 105--><p class="noindent" >We introduced the issue of write conflicts, when discussing multi-leader replication <span class="cite">[<a 
 href="#Xdistributed2-notes">3</a>]</span>. The issue of determining
 order of events is applicable to more than just writing to a database. Any situation where event order is important
 across multiple services (e.g. message queues in an event driven architecture), will have similar issues to
 overcome.
-</p><!--l. 111--><p class="indent" >   One intuitive strategy for dealing with some cases of determining event order, is to use a timestamp to record
+</p><!--l. 110--><p class="indent" >   One intuitive strategy for dealing with some cases of determining event order, is to use a timestamp to record
 when the event was created. For write conflicts, the idea being that the most recent write is the correct value in
 the case of a write conflict. There are two problems with this strategy. It is likely that the clocks on the
 different machines will not be perfectly in sync. It is possible that the machine on which the last
@@ -171,16 +172,16 @@ close succession, it is probable that some writes will have timestamps indicatin
 writes.
                                                                                                     
                                                                                                     
-</p><!--l. 119--><p class="indent" >   Trying to synchronise clocks on different computers is difficult. Synchronising using Network Time Protocol
+</p><!--l. 118--><p class="indent" >   Trying to synchronise clocks on different computers is difficult. Synchronising using Network Time Protocol
 (NTP) is not reliable. Network transmission time means that two machines that access one NTP server at the same
 time are likely to get the time result after different lengths of network delays. The clocks on the two machines are
 also likely to lose or gain time at different rates after their times have been synchronised. There is a Precision Time
 Protocol (PTP) that can be used for synchronisation of under a microsecond <span class="cite">[<a 
 href="#Xieee-1588">7</a>]</span>, but it takes significant resources
 to implement.
-</p><!--l. 127--><p class="indent" >   Another problem is that computer clocks have finite precision. Two events can occur in close enough
+</p><!--l. 126--><p class="indent" >   Another problem is that computer clocks have finite precision. Two events can occur in close enough
 succession, even on the same machine, that they will end up having the same timestamp.
-</p><!--l. 130--><p class="indent" >   There are a few strategies that can be applied to deal with determining the order of events, which do not rely
+</p><!--l. 129--><p class="indent" >   There are a few strategies that can be applied to deal with determining the order of events, which do not rely
 on timestamps. Leslie Lamport, who was referred to in the service-based architecture lecture <span class="cite">[<a 
 href="#Xservice-based-slides">8</a>]</span>, suggested a
 strategy of using a logical clock to overcome issues of drift between real clocks on different computers <span class="cite">[<a 
@@ -195,7 +196,7 @@ href="#Xdata-intensive">10</a>]</span>.
 </p>
    <h4 class="subsectionHead"><span class="titlemark">2.3    </span> <a 
  id="x1-60002.3"></a>Byzantine Faults</h4>
-<!--l. 141--><p class="noindent" >Byzantine<span class="footnote-mark"><a 
+<!--l. 140--><p class="noindent" >Byzantine<span class="footnote-mark"><a 
 href="#fn2x0" id="fn2x0-bk"><sup class="textsuperscript">2</sup></a></span><a 
  id="x1-6001f2"></a>
 faults are those that are caused by nodes that &#8220;lie&#8221;. Most distributed systems are implemented with the
@@ -204,31 +205,31 @@ are correct. Faults relate to the node not responding. A lying node is one whose
 Three common scenarios of lying nodes are: </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 150--><p class="noindent" >Sending confirmation of receipt of a message but failing to process or losing the message.
+      <!--l. 149--><p class="noindent" >Sending confirmation of receipt of a message but failing to process or losing the message.
       </p></li>
       <li class="itemize">
-      <!--l. 151--><p class="noindent" >Processing a message request but failing to send a response.
+      <!--l. 150--><p class="noindent" >Processing a message request but failing to send a response.
       </p></li>
       <li class="itemize">
-      <!--l. 152--><p class="noindent" >Sending contradictory results to different nodes.</p></li></ul>
+      <!--l. 151--><p class="noindent" >Sending contradictory results to different nodes.</p></li></ul>
    
    <h5 class="likesubsubsectionHead"><a 
  id="x1-7000"></a>Byzantine Generals Problem</h5>
-<!--l. 156--><p class="noindent" >The Byzantine Generals Problem <span class="cite">[<a 
+<!--l. 155--><p class="noindent" >The Byzantine Generals Problem <span class="cite">[<a 
 href="#Xbyzantine-generals">11</a>]</span> is a fictional scenario where several generals need to agree on a battle plan.
 Their armies are situated in different positions, so they can only communicate by sending messengers. These
 messengers can get delayed or lost (like packets in a network).
-</p><!--l. 160--><p class="indent" >   To complicate their decision making process, some of the generals may be traitors, though most generals are
+</p><!--l. 159--><p class="indent" >   To complicate their decision making process, some of the generals may be traitors, though most generals are
 loyal. Loyal generals will only send honest messages. Traitors may send dishonest messages or send messages
 disguised as coming from another general.
-</p><!--l. 165--><p class="indent" >   The problem was proposed by Leslie Lamport as an analogy of some of the extreme faults that may exist in a
+</p><!--l. 164--><p class="indent" >   The problem was proposed by Leslie Lamport as an analogy of some of the extreme faults that may exist in a
 distributed system. A Byzantine fault-tolerant system is one that continues to work correctly, even if some nodes
 are sending incorrect messages. This may be due to errors in the node itself or in the network connection.
 Data may be corrupted in storage or in transit, it may also be intercepted or spoofed by malicious
                                                                                                     
                                                                                                     
 attackers.
-</p><!--l. 170--><p class="indent" >   Most systems do not attempt to be Byzantine fault-tolerant, as the cost is often too high for the potential
+</p><!--l. 169--><p class="indent" >   Most systems do not attempt to be Byzantine fault-tolerant, as the cost is often too high for the potential
 hazard. Stakeholders need to decide if the cost is warranted for a particular system. Flight control systems need to
 be Byazntine fault-tolerant. There are enough airplanes in the air at any one time that <a 
 href="https://www.scienceabc.com/innovation/what-are-bit-flips-and-how-are-spacecraft-protected-from-them.html" >cosmic ray bit
@@ -238,7 +239,7 @@ href="#fn3x0" id="fn3x0-bk"><sup class="textsuperscript">3</sup></a></span><a
 is guaranteed to happen. The control systems need to deal with potentially critical sensor data being corrupted.
 Blockchain protocols are designed to allow mutually distrusting parties to agree on the result of a transaction. A
 blockchain network needs to assume that a hacker could breach the network.
-</p><!--l. 180--><p class="indent" >   Not catering for Byzantine faults does not mean that a system design should assume that all messages are
+</p><!--l. 179--><p class="indent" >   Not catering for Byzantine faults does not mean that a system design should assume that all messages are
 correct. Simple error detection (e.g. checksums) should be used to catch corrupted data. Any user input should be
 sanitised before it is used as data in the system. These strategies do not handle subtler data corruption or
 persistent malicious attack, but they catch simple errors that should not propagate into the rest of the
@@ -247,7 +248,7 @@ system.
 </p>
    <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
  id="x1-80003"></a>Consistency</h3>
-<!--l. 188--><p class="noindent" >Consistency is the simple idea that different parts of a system agree on the same value for a data element.
+<!--l. 187--><p class="noindent" >Consistency is the simple idea that different parts of a system agree on the same value for a data element.
 Implementing consistency is much more complex than the idea, due to many of the faults that are described in
 section <a 
 href="#x1-20002">2<!--tex4ht:ref: sec:faults --></a>.
@@ -255,7 +256,7 @@ href="#x1-20002">2<!--tex4ht:ref: sec:faults --></a>.
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.1    </span> <a 
  id="x1-90003.1"></a>Eventual Consistency</h4>
-<!--l. 193--><p class="noindent" >Eventual consistency is a <span 
+<!--l. 192--><p class="noindent" >Eventual consistency is a <span 
 class="Cabin-Italic-tlf-t1-x-x-120">weak </span>guarantee. What it guarantees is that all replicated versions of the database will
 eventually have consistent values for all data they store. The issue is the time it takes to synchronise data. It
 provides no guarantee of how long until reading a specific value from all replicated databases will return the same
@@ -271,7 +272,7 @@ class="Cabin-Italic-tlf-t1-x-x-120">stale</span>) value.
  id="x1-9001r1"></a>
                                                                                                     
                                                                                                     
-<!--l. 201--><p class="noindent" ><img 
+<!--l. 200--><p class="noindent" ><img 
 src="diagrams/eventual-consistency-seq.png" alt="PIC"  
 width="367" height="113"  />
 <br /> </p><div class="caption" 
@@ -280,38 +281,38 @@ class="content">Eventual consistency issues.</span></div><!--tex4ht:label?: x1-9
                                                                                                     
                                                                                                     
    </div><hr class="endfigure" />
-<!--l. 206--><p class="indent" >   Figure <a 
+<!--l. 205--><p class="indent" >   Figure <a 
 href="#x1-9001r1">1<!--tex4ht:ref: fig:eventual-consistency-seq --></a> demonstrates the synchronisation issue with an example of searching for a &#8220;Nick Cage reversable
 pillow&#8221; from the Sahara on-line store. The product database is replicated to two followers. Searches started after
 the product has been added to the store may still return that it is not available, until all replicas have been
 updated.
-</p><!--l. 212--><p class="indent" >   This leads to the potential for subtle errors in the system logic. It is difficult to think about the consequences of
+</p><!--l. 211--><p class="indent" >   This leads to the potential for subtle errors in the system logic. It is difficult to think about the consequences of
 retrieving stale data, as most programmers&#8217; intuition is based on the experience of modifying a value and always
 retrieving the new value. The system design needs to take into account that <span 
 class="Cabin-Italic-tlf-t1-x-x-120">all </span>database reads are performed
 under the assumption that the value may be stale. Testing for errors caused by data not being consistent is
 difficult, as you have to force data inconsistencies.
-</p><!--l. 218--><p class="indent" >
+</p><!--l. 217--><p class="indent" >
                                                                                                     
                                                                                                     
    
 </p>
    <h4 class="subsectionHead"><span class="titlemark">3.2    </span> <a 
  id="x1-100003.2"></a>Linearisability</h4>
-<!--l. 221--><p class="noindent" >Contrary to eventual consistency, linearisability is a <span 
+<!--l. 220--><p class="noindent" >Contrary to eventual consistency, linearisability is a <span 
 class="Cabin-Italic-tlf-t1-x-x-120">strong </span>guarantee. A database system that implements
 linearisability provides an abstraction layer that allows clients who use the database to work as if
 there is only a single instance of the database, regardless of how many replicas have been deployed.
 This provides a simple interaction model that corresponds to expectations from non-distributed
 systems.
-</p><!--l. 227--><p class="indent" >   Linearisability means that once a client has written data to the database, all clients who read the that data will
+</p><!--l. 226--><p class="indent" >   Linearisability means that once a client has written data to the database, all clients who read the that data will
 see the same value, regardless of the replica from which they read the data. The challenge is implementing
 linearisability.
    
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.1    </span> <a 
  id="x1-110003.2.1"></a>Application</h5>
-<!--l. 233--><p class="noindent" >Situations where linearisability can be useful include when uniqueness needs to be guaranteed. For example,
+<!--l. 232--><p class="noindent" >Situations where linearisability can be useful include when uniqueness needs to be guaranteed. For example,
 when a customer registers as a member of the Sahara eCommerce system, they need a unique identifier. If two
 people attempt to register at the same time and select the same user id, the system needs to be able to linearise
 the requests to return an error message to one of the users. The same issue arises in banking applications. If a
@@ -319,34 +320,34 @@ user transfers money from their account at the same time as an automated payment
 account debit service may need to guarantee that the account balance does not become negative. It
 needs to be able to linearise these two operations and disallow one, if it would result in a negative
 balance.
-</p><!--l. 243--><p class="indent" >   In some situations, it is acceptable to not require linearisability of operations. If two customers order the last
+</p><!--l. 242--><p class="indent" >   In some situations, it is acceptable to not require linearisability of operations. If two customers order the last
 item of a product in the Sahara eCommerce system, the stakeholders and designers may decide that they will
 allow both orders to proceed. The resolution may be that when the fulfillment service or the warehouse discover
 that the product is out of stock, they generate an event that changes one of the customers&#8217; orders to become a
 backorder.
-</p><!--l. 249--><p class="indent" >   The simplistic implementation of linearisability is to have a single database. This defeats the purpose of
+</p><!--l. 248--><p class="indent" >   The simplistic implementation of linearisability is to have a single database. This defeats the purpose of
 replicating a database to improve performance and reliability.
    
 </p>
    <h5 class="subsubsectionHead"><span class="titlemark">3.2.2    </span> <a 
  id="x1-120003.2.2"></a>Single-Leader Replication</h5>
-<!--l. 253--><p class="noindent" >Single-leader replication can be implemented in such a way as to provide linearisability. This is implemented by
+<!--l. 252--><p class="noindent" >Single-leader replication can be implemented in such a way as to provide linearisability. This is implemented by
 only allowing reads to be from the leader or from followers that are synchronously updated by the leader. This
 means that the replicated databases can guarantee that all reads after a write will return the current
 value.
-</p><!--l. 257--><p class="indent" >   Forcing all reads to be from the leader defeats one of the purposes of replicating a database, which is the
+</p><!--l. 256--><p class="indent" >   Forcing all reads to be from the leader defeats one of the purposes of replicating a database, which is the
 performance benefit of performing queries on followers and only using the leader for update operations.
 Synchronous updates of at least some followers defeats the performance benefit of asynchronous
 communication, but at least allows queries on followers. Either of these approaches maintain the reliability
 advantage of replicating the database.
-</p><!--l. 263--><p class="indent" >   An additional complication to implementing linearisable single-leader replication is determining which replica
+</p><!--l. 262--><p class="indent" >   An additional complication to implementing linearisable single-leader replication is determining which replica
 is the leader. A typical approach is to have a lock of some form that is acquired by the leader, and all other replicas
                                                                                                     
                                                                                                     
 are followers. Acquiring the lock itself must be a linearisable operation. If more than one replica believes it
 is the leader, it means that write behaviour cannot be linearisable. A coordination service, such as
 <a 
-href="https://etcd.io/" >etcd</a><span class="footnote-mark"><a 
+href="https://github.com/etcd-io/etcd" >etcd</a><span class="footnote-mark"><a 
 href="#fn4x0" id="fn4x0-bk"><sup class="textsuperscript">4</sup></a></span><a 
  id="x1-12001f4"></a>,
 can be used to implement distributed locks in a linearisable fashion.
@@ -510,7 +511,7 @@ class="Cabin-Italic-tlf-t1-x-x-120">Total order broadcast </span>is one techniqu
 this. Messages are ordered by their delivery time, not when a result is returned. So, if a message
 has been received, another message cannot be performed before it. Coordination services, such as
 <a 
-href="https://etcd.io/" >etcd</a><span class="footnote-mark"><a 
+href="https://github.com/etcd-io/etcd" >etcd</a><span class="footnote-mark"><a 
 href="#fn6x0" id="fn6x0-bk"><sup class="textsuperscript">6</sup></a></span><a 
  id="x1-18002f6"></a>,
 implement total order broadcast.
@@ -925,13 +926,13 @@ class="Cabin-Italic-tlf-t1-x-x-120">MySQL Conference and Expo</span>, (Santa Cla
 </p>
      </div>
    <div class="footnotes">       <aside role="doc-footnote" class="footnotetext">
-<!--l. 103--><p class="noindent" ><a 
+<!--l. 102--><p class="noindent" ><a 
  id="x1-4002x2.1.1"></a><span class="footnote-mark"><a 
 href="#fn1x0-bk" id="fn1x0"><sup class="textsuperscript">1</sup></a></span><a 
 href="https://microservices.io/post/microservices/patterns/2020/10/16/idempotent-consumer.html" class="url" ><span 
 class="ectt-1000">https://microservices.io/post/microservices/patterns/2020/10/16/idempotent-consumer.html</span></a></p></aside> 
  <aside role="doc-footnote" class="footnotetext">
-<!--l. 142--><p class="noindent" ><a 
+<!--l. 141--><p class="noindent" ><a 
  id="x1-6002x2.3"></a><span class="footnote-mark"><a 
 href="#fn2x0-bk" id="fn2x0"><sup class="textsuperscript">2</sup></a></span><span 
 class="Cabin-Regular-tlf-t1-">Byzantine carries a connotation of being an excessively complicated, intrigue filled and corrupt environment. This is probably a</span>
@@ -941,17 +942,17 @@ href="https://www.britannica.com/place/Byzantine-Empire" class="url" ><span
 class="ectt-1000">https://www.britannica.com/place/Byzantine-Empire</span></a><span 
 class="Cabin-Regular-tlf-t1-">).</span></p></aside> 
  <aside role="doc-footnote" class="footnotetext">
-<!--l. 174--><p class="noindent" ><a 
+<!--l. 173--><p class="noindent" ><a 
  id="x1-7002x"></a><span class="footnote-mark"><a 
 href="#fn3x0-bk" id="fn3x0"><sup class="textsuperscript">3</sup></a></span><a 
 href="https://www.scienceabc.com/innovation/what-are-bit-flips-and-how-are-spacecraft-protected-from-them.html" class="url" ><span 
 class="ectt-1000">https://www.scienceabc.com/innovation/what-are-bit-flips-and-how-are-spacecraft-protected-from-them.html</span></a></p></aside> 
  <aside role="doc-footnote" class="footnotetext">
-<!--l. 267--><p class="noindent" ><a 
+<!--l. 266--><p class="noindent" ><a 
  id="x1-12002x3.2.2"></a><span class="footnote-mark"><a 
 href="#fn4x0-bk" id="fn4x0"><sup class="textsuperscript">4</sup></a></span><a 
-href="https://etcd.io/" class="url" ><span 
-class="ectt-1000">https://etcd.io/</span></a></p></aside> 
+href="https://github.com/etcd-io/etcd" class="url" ><span 
+class="ectt-1000">https://github.com/etcd-io/etcd</span></a></p></aside> 
  <aside role="doc-footnote" class="footnotetext">
 <!--l. 314--><p class="noindent" ><a 
  id="x1-17002x3.3"></a><span class="footnote-mark"><a 
@@ -962,8 +963,8 @@ class="ectt-1000">https://mathworld.wolfram.com/TotallyOrderedSet.html</span></a
 <!--l. 375--><p class="noindent" ><a 
  id="x1-18003x3.3.1"></a><span class="footnote-mark"><a 
 href="#fn6x0-bk" id="fn6x0"><sup class="textsuperscript">6</sup></a></span><a 
-href="https://etcd.io/" class="url" ><span 
-class="ectt-1000">https://etcd.io/</span></a></p></aside> 
+href="https://github.com/etcd-io/etcd" class="url" ><span 
+class="ectt-1000">https://github.com/etcd-io/etcd</span></a></p></aside> 
  <aside role="doc-footnote" class="footnotetext">
 <!--l. 555--><p class="noindent" ><a 
  id="x1-24002x5"></a><span class="footnote-mark"><a 
