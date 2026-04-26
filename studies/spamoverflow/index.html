@@ -21,27 +21,30 @@ dl dd {text-align: left}</style>
  id="Q1-1-1"></a>
 _________________________________________________________________________________________________
 <h1 class="titleHead">SpamOverflow</h1>                                                                              Software Architecture
-   <div class="date" >May 12, 2026</div>                                                                                                                       <div class="author" >Richard Thomas &amp; Millie
+   <div class="date" >May 5, 2026</div>                                                                                                                        <div class="author" >Richard Thomas &amp; Millie
 Hughes</div>
 _____________________________________________________________________________________________
    <span 
-class="Cabin-Regular-tlf-t1-">Last Updated on 2026/04/06 </span></div>
+class="Cabin-Regular-tlf-t1-">Last Updated on 2026/04/26 </span></div>
    
    <h3 class="sectionHead"><span class="titlemark">1    </span> <a 
  id="x1-10001"></a>Brief</h3>
-<!--l. 26--><p class="noindent" >Design a service for scanning and filtering spam/malicious emails. Specially the service needs to support:
+<!--l. 24--><p class="noindent" >Design a service for scanning and filtering spam/malicious emails. Specially the service needs to support:
 </p>
       <ul class="itemize1">
       <li class="itemize">
-      <!--l. 29--><p class="noindent" >Scanning an email via an API request.
+      <!--l. 27--><p class="noindent" >Scanning an email via an API request.
       </p></li>
       <li class="itemize">
-      <!--l. 30--><p class="noindent" >Providing access to a specified REST API, e.g. for use by front-end interfaces and internal teams.
+      <!--l. 28--><p class="noindent" >Providing access to a specified REST API, e.g. for use by front-end interfaces and internal teams.
       </p></li>
       <li class="itemize">
-      <!--l. 31--><p class="noindent" >Remaining responsive while scanning emails.</p></li></ul>
+      <!--l. 29--><p class="noindent" >Remaining responsive while scanning emails.
+      </p></li>
+      <li class="itemize">
+      <!--l. 30--><p class="noindent" >Being available when called, as an important email infrastructure service.</p></li></ul>
    
-<!--l. 34--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 33--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-2000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Task</span></span>
    You are working for SpamOverflow, a new competitor in the email security space. SpamOverflow uses a
@@ -50,7 +53,7 @@ resume that you are taking Software Architecture and has assigned you to design 
 service must be scalable to cope with a large influx of emails.
    
 </p>
-<!--l. 41--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 40--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-3000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Requirements</span></span>
    Email filtering software can filter email as it arrives or after. SpamOverflow will implement a service
@@ -58,10 +61,10 @@ that does not impede the flow of traffic (i.e. does not prevent email from arriv
 an API call when the mail server receives an email message. The service then pulls the email from
 the user&#8217;s inbox, as fast as it can, to prevent the user from seeing the malicious email or clicking any
 links.
+                                                                                                    
+                                                                                                    
 </p><!--l. 48--><p class="indent" >   Commercial email providers send an API request for each email received. For optimal performance this service
 needs to be able to handle a large number of requests in a short period of time.
-                                                                                                    
-                                                                                                    
 </p><!--l. 51--><p class="indent" >   Since these emails can be dangerous, the service must be able to report that it is bad or good in a timely
 manner. Though genuine emails that are incorrectly marked as dangerous should be returned to the user as
 quickly as possible.
@@ -108,7 +111,7 @@ class="enumerate-enumitem">What are the likely bottlenecks?</dd></dl>
    
    <h4 class="likesubsectionHead"><a 
  id="x1-7000"></a>Design (20 minutes)</h4>
-<!--l. 201--><p class="noindent" >In your group, design an appropriate architecture for SpamOverflow. You need to consider the flow of an API
+<!--l. 177--><p class="noindent" >In your group, design an appropriate architecture for SpamOverflow. You need to consider the flow of an API
 request through your service, use the <a 
 href="https://csse6400.uqcloud.net/api/spamoverflow" >API specification</a> and quality scenarios in section <a 
 href="#x1-90003">3<!--tex4ht:ref: sec:scenarios --></a> to ensure all use cases
@@ -119,14 +122,14 @@ have been considered.
 </p>
    <h4 class="likesubsectionHead"><a 
  id="x1-8000"></a>Presentation (15 minutes)</h4>
-<!--l. 212--><p class="noindent" >In the remaining time, each group should present their proposed architecture design. This is an opportunity for
+<!--l. 186--><p class="noindent" >In the remaining time, each group should present their proposed architecture design. This is an opportunity for
 discussion amongst the class to point out limitations of the proposed system designs.
    
 </p>
    <h3 class="sectionHead"><span class="titlemark">3    </span> <a 
  id="x1-90003"></a>Quality Scenarios</h3>
    
-<!--l. 219--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 193--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-10000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Q1: Steady Stream</span></span>
    Steady receipt of email messages at a rate of <span 
@@ -134,7 +137,7 @@ class="Cabin-Italic-tlf-t1-x-x-120">M </span>per minute, fairly evenly spread ac
 Approximately 20% of the messages are malicious.
    
 </p>
-<!--l. 223--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 197--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-11000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Q2: Bad &#8216;News&#8217; Stream</span></span>
    Steady receipt of email messages at a rate of <span 
@@ -142,13 +145,13 @@ class="Cabin-Italic-tlf-t1-x-x-120">N </span>per minute, fairly evenly spread ac
 Approximately 80% of the messages are malicious.
    
 </p>
-<!--l. 227--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 201--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-12000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Q3: Peaks and Troughs</span></span>
    Periods of receipt of a high volume of email messages, followed by periods of low volume.
    
 </p>
-<!--l. 230--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 204--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-13000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Q4: High Value Customer</span></span>
    The Department of Defence (DoD) has adopted SpamOverflow. They are a high value customer and you must
@@ -157,7 +160,7 @@ guarantees a certain level of responsiveness. You cannot ignore their requests t
 requests.
    
 </p>
-<!--l. 236--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 210--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-14000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Q5: Leaked Directory</span></span>
    A bad actor has managed to get the email addresses of all employees of &#x003C;Large Company&#x003E;. They have sent a
@@ -165,7 +168,7 @@ phishing email to all of the users advertising a pay raise with a link to a fake
 10,000 employees at the same time.
    
 </p>
-<!--l. 241--><p class="noindent" ><span class="paragraphHead"><a 
+<!--l. 215--><p class="noindent" ><span class="paragraphHead"><a 
  id="x1-15000"></a><span 
 class="Cabin-Bold-tlf-t1-x-x-120">Q6: Personalised Attack</span></span>
                                                                                                     
