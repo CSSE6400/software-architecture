@@ -1,0 +1,235 @@
+\documentclass{csse4400}
+
+% \teachermodetrue
+
+\usepackage{float}
+\usepackage{languages}
+
+\title{Terraform Collaboration Guide}
+\author{CSSE6400 Teaching Team}
+\date{Assignment Guide}
+
+\begin{document}
+
+\maketitle
+
+\aside{
+  Use this guide when setting up Terraform for your team assignment.
+  Each team should use one shared Terraform state file stored in S3.
+}
+
+\section{Overview}
+
+Terraform records the resources it manages in a state file.
+When working alone, this is usually a local file named \texttt{terraform.tfstate}.
+When working in a team, local state causes problems because each person may have a different view of the infrastructure.
+
+For the assignment, your team should store Terraform state in a shared S3 bucket.
+This lets every team member run \texttt{terraform plan} against the same state.
+It also allows Terraform to lock the state while someone is applying changes.
+
+\warning{
+  Never commit \texttt{terraform.tfstate}, \texttt{terraform.tfstate.backup},
+  \texttt{.terraform/}, AWS credentials, or Learner Lab tokens.
+}
+
+\section{Choose a Region and Bucket Name}
+
+Your team needs one S3 bucket for Terraform state.
+Choose one AWS region and one bucket name before configuring Terraform.
+Every team member must use the same region, bucket, and state file path.
+
+\begin{code}[numbers=none]{}
+AWS region:       us-east-1
+S3 state bucket:  csse6400-team-00-tfstate-a1b2
+State file path:  taskoverflow/terraform.tfstate
+\end{code}
+
+\noindent
+Replace \texttt{us-east-1} with the AWS region your team is using.
+Replace \texttt{csse6400-team-00-tfstate-a1b2} with your team's actual bucket name.
+
+\info{
+  S3 bucket names are globally unique.
+  Include your course, team number, and a short unique suffix in the name.
+}
+
+\section{Step 1: Create the Bucket}
+
+One team member should create the bucket.
+Do this before running \texttt{terraform init} with the S3 backend.
+First set your chosen values in the terminal.
+
+\begin{code}[language=shell,numbers=none]{}
+export TF_STATE_BUCKET=csse6400-team-00-tfstate-a1b2
+export AWS_REGION=us-east-1
+\end{code}
+
+\noindent
+For \texttt{us-east-1}, use:
+
+\begin{code}[language=shell,numbers=none]{}
+aws s3api create-bucket \
+  --bucket "$TF_STATE_BUCKET" \
+  --region "$AWS_REGION"
+
+aws s3api put-bucket-versioning \
+  --bucket "$TF_STATE_BUCKET" \
+  --versioning-configuration Status=Enabled
+\end{code}
+
+\noindent
+For other regions, change \texttt{AWS\_REGION} and include a location constraint:
+
+\begin{code}[language=shell,numbers=none]{}
+export AWS_REGION=ap-southeast-2
+
+aws s3api create-bucket \
+  --bucket "$TF_STATE_BUCKET" \
+  --region "$AWS_REGION" \
+  --create-bucket-configuration LocationConstraint="$AWS_REGION"
+
+aws s3api put-bucket-versioning \
+  --bucket "$TF_STATE_BUCKET" \
+  --versioning-configuration Status=Enabled
+\end{code}
+
+\info{
+  Bucket versioning is recommended so that accidental state changes are easier to recover from.
+}
+
+\warning{
+  The bucket that stores Terraform state should be created before the backend is configured.
+  Do not put this same bucket in the Terraform configuration that will use it as a backend.
+}
+
+\section{Step 2: Create Backend Files}
+
+In your Terraform directory, create \texttt{backend.tf}.
+
+\begin{code}[language=terraform,numbers=none]{backend.tf}
+terraform {
+  backend "s3" {}
+}
+\end{code}
+
+\noindent
+Create \texttt{backend.hcl}.
+This file tells Terraform which S3 bucket should store the shared state.
+
+\begin{code}[language=terraform,numbers=none]{backend.hcl}
+bucket       = "csse6400-team-00-tfstate-a1b2"
+key          = "taskoverflow/terraform.tfstate"
+region       = "us-east-1"
+encrypt      = true
+use_lockfile = true
+\end{code}
+
+\noindent
+The \texttt{region} value must match the region where your team created the bucket.
+
+\info{
+  \texttt{use\_lockfile = true} enables S3 state locking.
+  This helps stop two team members from applying changes to the same state at the same time.
+}
+
+\warning{
+  Backend blocks cannot use Terraform variables.
+  Do not write \texttt{bucket = var.bucket\_name} inside a backend configuration.
+  If Terraform rejects \texttt{use\_lockfile}, update Terraform or ask a tutor.
+}
+
+\section{Step 3: Initialise Terraform}
+
+Run Terraform initialisation from the Terraform directory.
+
+\bash{
+terraform init -backend-config=backend.hcl
+}
+
+\noindent
+If this is a fresh project, Terraform should initialise the S3 backend.
+If there is already local state, Terraform may ask whether to migrate that state to S3.
+
+\warning{
+  Only migrate state from the machine that has the correct current state.
+  If multiple people have already run \texttt{terraform apply} locally,
+  stop and ask a tutor before migrating.
+}
+
+\newpage
+\section{Step 4: Ignore Local Files}
+
+Make sure your repository ignores generated Terraform files and local credentials.
+
+\begin{code}[numbers=none]{.gitignore}
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.backup
+credentials
+aws.env
+\end{code}
+
+\noindent
+Commit \texttt{backend.tf}.
+You may commit \texttt{backend.hcl} if it only contains the team bucket name and no secrets.
+If each student needs different local settings,
+commit \texttt{backend.example.hcl} instead and keep \texttt{backend.hcl} ignored.
+
+\section{Normal Team Workflow}
+
+Before making changes:
+
+\begin{code}[language=shell,numbers=none]{}
+git pull
+terraform init -backend-config=backend.hcl
+terraform validate
+terraform plan
+\end{code}
+
+\noindent
+Before opening a pull request:
+
+\begin{code}[language=shell,numbers=none]{}
+terraform fmt
+terraform validate
+terraform plan
+\end{code}
+
+\noindent
+When applying shared infrastructure changes:
+
+\begin{code}[language=shell,numbers=none]{}
+git pull
+aws sts get-caller-identity
+terraform init -backend-config=backend.hcl
+terraform plan
+terraform apply
+\end{code}
+
+\warning{
+  Only one person should run \texttt{terraform apply} at a time.
+  Tell your team before applying.
+  Do not use \texttt{-lock=false} during normal team work.
+}
+
+\section{Changing the Backend}
+
+If you change \texttt{backend.tf} or \texttt{backend.hcl},
+reinitialise Terraform.
+Do this carefully:
+a wrong bucket name or wrong region can point your team at a different state file.
+
+\bash{
+terraform init -reconfigure -backend-config=backend.hcl
+}
+
+\warning{
+  If \texttt{terraform plan} wants to destroy something important,
+  do not apply until the team understands why.
+  Ask a tutor if unsure.
+}
+
+\end{document}

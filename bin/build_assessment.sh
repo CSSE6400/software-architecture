@@ -32,3 +32,9 @@ for folder in ${REPO_ROOT}/assessment/project/project-descriptions/*; do
         build_assignment "${folder}" "project-$(basename "${folder}")"
     fi
 done
+
+for folder in ${REPO_ROOT}/assessment/project/guides/*; do
+    if [[ -f "${folder}/latexmkrc" && -f "${folder}/main.tex" && -f "${folder}/publish" ]]; then
+        build_assignment "${folder}" "project-guide-$(basename "${folder}")"
+    fi
+done
