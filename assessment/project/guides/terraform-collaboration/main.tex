@@ -3,6 +3,7 @@
 % \teachermodetrue
 
 \usepackage{float}
+\usepackage{enumitem}
 \usepackage{languages}
 
 \title{Terraform Collaboration Guide}
@@ -45,15 +46,16 @@ Every team member must use the \textit{\textbf{same}} account, region, bucket, a
 AWS account ID:   123456789012
 AWS region:       us-east-1
 S3 state bucket:  csse6400-t00-123456789012-us-east-1-tfstate
-State file path:  taskoverflow/terraform.tfstate
+State file path:  project-name/terraform.tfstate
 \end{code}
 
 \noindent
-Replace
-\begin{itemize}
-  \item \texttt{123456789012} with the AWS account ID from the shared AWS account allocated to your team for the project,
-  \item \texttt{us-east-1} with the AWS region your team is using, and
+Replace the following values.
+\begin{itemize}[itemsep=2pt,parsep=2pt,topsep=2pt]
+  \item \texttt{123456789012} with the ID of the shared AWS account allocated to your team for the project.
+  \item \texttt{us-east-1} with the AWS region your team is using.
   \item \texttt{t00} with your team number.
+  \item \texttt{project-name} with the name of your project.
 \end{itemize}
 
 \info{
@@ -113,7 +115,7 @@ aws s3api put-bucket-versioning \
 \end{code}
 
 \info{
-  Bucket versioning is recommended so that accidental state changes are easier to recover from.
+  Bucket versioning is recommended so that it is easier to recover from accidental state changes.
 }
 
 \warning{
@@ -195,9 +197,10 @@ aws.env
 
 \noindent
 Commit \texttt{backend.tf}.
-You may commit \texttt{backend.hcl} if it only contains the team bucket name and no secrets.
-If each student needs different local settings,
-commit \texttt{backend.example.hcl} instead and add \texttt{backend.hcl} to \texttt{.gitignore}.
+You may commit \texttt{backend.hcl}, if it only contains the team bucket name and no secrets.
+If each student needs different local settings, commit \texttt{backend.example.hcl} instead,
+and add \texttt{backend.hcl} to \texttt{.gitignore}.
+
 
 \section{Normal Team Workflow}
 
@@ -235,6 +238,7 @@ terraform apply
   Tell your team before applying.
   Do not use \texttt{-lock=false} during normal team work.
 }
+
 
 \section{Changing the Backend}
 
