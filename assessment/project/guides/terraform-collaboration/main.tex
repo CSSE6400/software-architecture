@@ -3,6 +3,7 @@
 % \teachermodetrue
 
 \usepackage{float}
+\usepackage{enumitem}
 \usepackage{languages}
 
 \title{Terraform Collaboration Guide}
@@ -17,6 +18,7 @@
   Use this guide when setting up Terraform for your team assignment.
   Each team should use one shared Terraform state file stored in S3.
 }
+
 
 \section{Overview}
 
@@ -33,23 +35,28 @@ It also allows Terraform to lock the state while someone is applying changes.
   \texttt{.terraform/}, AWS credentials, or Learner Lab tokens.
 }
 
+
 \section{Choose an Account, Region, and Bucket Name}
 
 Your team needs one S3 bucket for Terraform state.
 Choose one AWS account, one AWS region, and one bucket name before configuring Terraform.
-Every team member must use the same account, region, bucket, and state file path.
+Every team member must use the \textit{\textbf{same}} account, region, bucket, and state file path.
 
 \begin{code}[numbers=none]{}
 AWS account ID:   123456789012
 AWS region:       us-east-1
 S3 state bucket:  csse6400-t00-123456789012-us-east-1-tfstate
-State file path:  taskoverflow/terraform.tfstate
+State file path:  project-name/terraform.tfstate
 \end{code}
 
 \noindent
-Replace \texttt{123456789012} with the AWS account ID from your team's assignment Learner Lab.
-Replace \texttt{us-east-1} with the AWS region your team is using.
-Replace \texttt{t00} with your team number.
+Replace the following values.
+\begin{itemize}[itemsep=2pt,parsep=2pt,topsep=2pt]
+  \item \texttt{123456789012} with the ID of the shared AWS account allocated to your team for the project.
+  \item \texttt{us-east-1} with the AWS region your team is using.
+  \item \texttt{t00} with your team number.
+  \item \texttt{project-name} with the name of your project.
+\end{itemize}
 
 \info{
   S3 bucket names are globally unique.
@@ -57,10 +64,11 @@ Replace \texttt{t00} with your team number.
   and helps your team spot accidental account or region mismatches.
 }
 
+
 \section{Step 1: Create the Bucket}
 
 One team member should create the bucket.
-Do this before running \texttt{terraform init} with the S3 backend.
+Do this \textit{\textbf{before}} running \texttt{terraform init} with the S3 backend.
 First set your chosen values in the terminal.
 
 \begin{code}[language=shell,numbers=none]{}
@@ -71,8 +79,8 @@ export TF_STATE_BUCKET="csse6400-t${TEAM_NUMBER}-${AWS_ACCOUNT_ID}-${AWS_REGION}
 \end{code}
 
 \warning{
-  Use the AWS account ID from the shared assignment Learner Lab account that will host the project.
-  Do not create a separate state bucket in each team member's personal practical lab.
+  Use the shared AWS account allocated to your team to host the project.
+  Do \textit{\textbf{not}} create a separate state bucket in each team member's personal Learner Lab account.
 }
 
 \noindent
@@ -107,18 +115,19 @@ aws s3api put-bucket-versioning \
 \end{code}
 
 \info{
-  Bucket versioning is recommended so that accidental state changes are easier to recover from.
+  Bucket versioning is recommended so that it is easier to recover from accidental state changes.
 }
 
 \warning{
-  The bucket that stores Terraform state should be created before the backend is configured.
-  Do not put this same bucket in the Terraform configuration that will use it as a backend.
+  The bucket that stores Terraform state should be created \textit{\textbf{before}} the backend is configured.
+  Do \textit{\textbf{not}} put this same bucket in the Terraform configuration that will use it as a backend.
 }
+
 
 \section{Step 2: Create Backend Files}
 
 In your Terraform directory, create \texttt{backend.tf}.
-
+%
 \begin{code}[language=terraform,numbers=none]{backend.tf}
 terraform {
   backend "s3" {}
@@ -128,16 +137,17 @@ terraform {
 \noindent
 Create \texttt{backend.hcl}.
 This file tells Terraform which S3 bucket should store the shared state.
-
+%
 \begin{code}[language=terraform,numbers=none]{backend.hcl}
 bucket       = "csse6400-t00-123456789012-us-east-1-tfstate"
-key          = "taskoverflow/terraform.tfstate"
+key          = "project-name/terraform.tfstate"
 region       = "us-east-1"
 encrypt      = true
 use_lockfile = true
 \end{code}
 
 \noindent
+Replace \texttt{project-name} with the name of your project.
 The \texttt{region} value must match the region where your team created the bucket.
 
 \info{
@@ -150,6 +160,7 @@ The \texttt{region} value must match the region where your team created the buck
   Do not write \texttt{bucket = var.bucket\_name} inside a backend configuration.
   If Terraform rejects \texttt{use\_lockfile}, update Terraform or ask a tutor.
 }
+
 
 \section{Step 3: Initialise Terraform}
 
@@ -169,11 +180,11 @@ If there is already local state, Terraform may ask whether to migrate that state
   stop and ask a tutor before migrating.
 }
 
-\newpage
+
 \section{Step 4: Ignore Local Files}
 
-Make sure your repository ignores generated Terraform files and local credentials.
-
+Make sure generated Terraform files and local credentials are included in your \texttt{.gitignore} file.
+%
 \begin{code}[numbers=none]{.gitignore}
 .terraform/
 terraform.tfstate
@@ -186,9 +197,10 @@ aws.env
 
 \noindent
 Commit \texttt{backend.tf}.
-You may commit \texttt{backend.hcl} if it only contains the team bucket name and no secrets.
-If each student needs different local settings,
-commit \texttt{backend.example.hcl} instead and keep \texttt{backend.hcl} ignored.
+You may commit \texttt{backend.hcl}, if it only contains the team bucket name and no secrets.
+If each student needs different local settings, commit \texttt{backend.example.hcl} instead,
+and add \texttt{backend.hcl} to \texttt{.gitignore}.
+
 
 \section{Normal Team Workflow}
 
@@ -226,6 +238,7 @@ terraform apply
   Tell your team before applying.
   Do not use \texttt{-lock=false} during normal team work.
 }
+
 
 \section{Changing the Backend}
 
