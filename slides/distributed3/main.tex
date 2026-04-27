@@ -31,16 +31,19 @@
 \questionanswer{How do we detect faults?}{
     \begin{itemize}[<+(1)->]
         \item No listener on port -- RST or FIN packet
-        		\note<2>{Assumes node is running \& reachable.\\OS should close or refuse connection.\\
-        				 Error packet may be lost in transit.}
+        		\note<2>{Assumes node is running \& reachable\\ \vspace{0.3em}
+        		         OS should close or refuse connection\\
+        		         \large ~~~~~-- Resulting in a RST or FIN packet being sent\\ \vspace{0.3em}
+        				 \Large Error packet may be lost in transit}
         \item Process crashes -- Monitor report failure
-        		\note<3>{Assumes node is running \& reachable.\\Most reliable.}
+        		\note<3>{Assumes node is running \& reachable\\ \vspace{0.3em}
+        		         Most reliable}
         \item IP address not reachable -- unreachable packet
-        		\note<4>{Router has to determine address is not reachable,\\which is no easier than for your application.}
+        		\note<4>{Router has to determine address is not reachable\\ ~~~~~-- Which is no easier than for your application}
         \item Query switches
-        		\note<5>{Need permissions to do this.\\Will only have this in your own data centre.}
+        		\note<5>{Need permissions to do this\\ ~~~~~-- Will only have this in your own data centre}
         \item Timeout
-        		\note<6>{UDP reduces network transmission time guarantee\\~~~~-- does not perform retransmission}
+        		\note<6>{UDP reduces network transmission time guarantee\\~~~~-- Does not perform retransmission}
     \end{itemize}
 }
 
@@ -452,23 +455,23 @@ blocking issue.
 \point[\huge Linearisability]{
 \vspace{3mm}
 \begin{itemize}
-    \item<1-> Once value is written, all reads see same value
+    \item<1-> Once value is written, all reads see \highlight{same} value
     \begin{itemize}
         \LARGE\item<1-> Regardless of replica read from
-        	\note<1>{Abstraction over replicated database.\\Used when uniqueness needs to be guaranteed.}
+        	\note<1>{Abstraction over replicated database\\ \vspace{0.3em} Used when \highlight{uniqueness} needs to be guaranteed}
     \end{itemize}
     \vspace{2mm}
     \item<2-> Single-leader replication
     \begin{itemize}
         \LARGE\item<2-> Read from leader
         \LARGE\item<2-> Read from synchronous follower
-        	\note<2>{SLR -- defeats most performance benefits.\\Maintains reliability benefits.}
+        	\note<2>{SLR -- defeats most performance benefits\\ \vspace{0.3em} Maintains reliability benefits}
     \end{itemize}
     \item<3-> Multi-leader replication can't be linearised
     \vspace{2mm}
     \item<4-> Leaderless replication
     \begin{itemize}
-        \LARGE\item<4-> Lock value on quorum \emph{before} writing
+        \LARGE\item<4-> Lock value on quorum \highlight{before} writing
         	\note<4>{Leaderless -- similar performance cost to SLR}
     \end{itemize}
 \end{itemize}
@@ -479,7 +482,7 @@ blocking issue.
 \begin{itemize}
     \item<1-> Order is based on causality
     \begin{itemize}
-        \LARGE\item<1-> What event needs to happen before another
+        \LARGE\item<1-> What event needs to happen \highlight{before} another
         \LARGE\item<1-> Allows concurrent events
     \end{itemize}
     \note<1>{
