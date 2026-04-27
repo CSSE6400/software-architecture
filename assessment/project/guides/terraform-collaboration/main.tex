@@ -33,25 +33,28 @@ It also allows Terraform to lock the state while someone is applying changes.
   \texttt{.terraform/}, AWS credentials, or Learner Lab tokens.
 }
 
-\section{Choose a Region and Bucket Name}
+\section{Choose an Account, Region, and Bucket Name}
 
 Your team needs one S3 bucket for Terraform state.
-Choose one AWS region and one bucket name before configuring Terraform.
-Every team member must use the same region, bucket, and state file path.
+Choose one AWS account, one AWS region, and one bucket name before configuring Terraform.
+Every team member must use the same account, region, bucket, and state file path.
 
 \begin{code}[numbers=none]{}
+AWS account ID:   123456789012
 AWS region:       us-east-1
-S3 state bucket:  csse6400-team-00-tfstate-a1b2
+S3 state bucket:  csse6400-t00-123456789012-us-east-1-tfstate
 State file path:  taskoverflow/terraform.tfstate
 \end{code}
 
 \noindent
+Replace \texttt{123456789012} with the AWS account ID from your team's assignment Learner Lab.
 Replace \texttt{us-east-1} with the AWS region your team is using.
-Replace \texttt{csse6400-team-00-tfstate-a1b2} with your team's actual bucket name.
+Replace \texttt{t00} with your team number.
 
 \info{
   S3 bucket names are globally unique.
-  Include your course, team number, and a short unique suffix in the name.
+  Including the team number, AWS account ID, and AWS region makes collisions unlikely
+  and helps your team spot accidental account or region mismatches.
 }
 
 \section{Step 1: Create the Bucket}
@@ -61,9 +64,16 @@ Do this before running \texttt{terraform init} with the S3 backend.
 First set your chosen values in the terminal.
 
 \begin{code}[language=shell,numbers=none]{}
-export TF_STATE_BUCKET=csse6400-team-00-tfstate-a1b2
 export AWS_REGION=us-east-1
+export TEAM_NUMBER=00
+export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+export TF_STATE_BUCKET="csse6400-t${TEAM_NUMBER}-${AWS_ACCOUNT_ID}-${AWS_REGION}-tfstate"
 \end{code}
+
+\warning{
+  Use the AWS account ID from the shared assignment Learner Lab account that will host the project.
+  Do not create a separate state bucket in each team member's personal practical lab.
+}
 
 \noindent
 For \texttt{us-east-1}, use:
@@ -79,10 +89,12 @@ aws s3api put-bucket-versioning \
 \end{code}
 
 \noindent
-For other regions, change \texttt{AWS\_REGION} and include a location constraint:
+For other regions, set \texttt{AWS\_REGION} before generating the bucket name,
+and include a location constraint:
 
 \begin{code}[language=shell,numbers=none]{}
 export AWS_REGION=ap-southeast-2
+export TF_STATE_BUCKET="csse6400-t${TEAM_NUMBER}-${AWS_ACCOUNT_ID}-${AWS_REGION}-tfstate"
 
 aws s3api create-bucket \
   --bucket "$TF_STATE_BUCKET" \
@@ -118,7 +130,7 @@ Create \texttt{backend.hcl}.
 This file tells Terraform which S3 bucket should store the shared state.
 
 \begin{code}[language=terraform,numbers=none]{backend.hcl}
-bucket       = "csse6400-team-00-tfstate-a1b2"
+bucket       = "csse6400-t00-123456789012-us-east-1-tfstate"
 key          = "taskoverflow/terraform.tfstate"
 region       = "us-east-1"
 encrypt      = true
