@@ -1,7 +1,7 @@
 \documentclass{slide}
 
-%\usepackage{pgfpages}
-\setbeameroption{show notes on second screen}
+\usepackage{pgfpages}
+%\setbeameroption{show notes on second screen}
 
 \title{Distributed Computing III}
 \subtitle{
@@ -110,7 +110,7 @@
 }
 
 \questionanswer{Can we design a system to be Byzantine fault tolerant?}{
-    Yes, but, it is \emph{challenging}.
+    Yes, but, it is \highlight{challenging}.
 }
 \note[itemize]{
     \item Most systems don't attempt to
@@ -141,7 +141,8 @@
     }
 \end{frame}
 
-\point[Assumption]{
+\point[\huge Assumption]{
+    \vspace{0.5em}
     If all nodes are part of our system, we may assume there are no Byzantine faults.
     \begin{itemize}
         \item Santise user input
@@ -326,25 +327,32 @@ blocking issue.
         \end{itemize}
     }
 \end{frame}
+\note{
+    Still issues of
+    \begin{itemize}
+        \item pending messages getting older and
+        \item transient network faults exceeding timeout
+    \end{itemize}
+}
 
 \begin{frame}{Handling Poison Messages}
     \vspace{1mm}
     {\LARGE
-        Discard message
+        Discard Message
         \begin{itemize}
             \Large\item System must not require guarantee of message delivery
-            \Large\item Suitable when message processing speed is most important
+            \Large\item Suitable when message processing \highlight{speed} is most important
         \end{itemize}
         \pause
         \vspace{3mm}
-        Always retry
+        Always Retry
         \begin{itemize}
             \Large\item Requires mechanism to fix message
             \begin{itemize}
                 \large\item Often requires manual intervention
             \end{itemize}
-            \Large\item Suitable when message delivery is most important
-            \Large\item Very long delays in processing
+            \Large\item Suitable when message \highlight{delivery} is most important
+            \Large\item Potential \highlight{very long delays} in processing
         \end{itemize}
     }
 \end{frame}
@@ -352,7 +360,7 @@ blocking issue.
 \begin{frame}{Handling Poison Messages}
     \vspace{1mm}
     {\LARGE
-        Dead-letter queue
+        Dead-Letter Queue
         \begin{itemize}
             \Large\item Long transient failures result in adding many messages
             \begin{itemize}
@@ -368,7 +376,7 @@ blocking issue.
 \begin{frame}{Handling Poison Messages}
     \vspace{1mm}
     {\LARGE
-        Retry queue
+        Retry Queue
         \begin{itemize}
             \Large\item Transient failures also added
             \Large\item Use a previous strategy to deal with poison messages
@@ -387,14 +395,14 @@ blocking issue.
 \definition{Poison Pill Message}{
     Special message used to notify receiver it should no longer wait for messages.
 }
-\note{Emphasise that this is \textbf{different} to a poison message}
+\note{Emphasise that this is \highlight{\textbf{different}} to a poison message}
 
 \questionanswer{Why use a poison pill message?}{
     Graceful shutdown of system.
 }
 \note[itemize]{
-    \item Implementation is challenging with multiple producers and/or consumers.
-    \item It must be the last message received by \textit{all} consumers.
+    \item Implementation is challenging with multiple producers and/or consumers
+    \item It must be the last message received by \highlight{all} consumers
 }
 
 \questionanswer{How to order asynchronous messages?}{
@@ -418,7 +426,7 @@ blocking issue.
 
 \section{Data Issues}
 
-\point[Consistency]{
+\point[\huge Consistency]{
     \vspace{4mm}
     \begin{description}
         \item[Eventual Consistency] weak guarantee
@@ -429,19 +437,19 @@ blocking issue.
     \end{description}
 }
 
-\point[Eventual Consistency]{
+\point[\huge Eventual Consistency]{
 \vspace{4mm}
 \begin{itemize}
     \item Allows stale reads
     \vspace{5mm}
     \item May be appropriate for some systems
     \begin{itemize}
-        \LARGE\item e.g. Social media updates\footnote{See \href{https://csse6400.uqcloud.net/slides/distributed2.pdf}{Distributed II slides 45 - 50}.}
+        \LARGE\item e.g. Social media updates\footnote{See \href{https://csse6400.uqcloud.net/slides/distributed2.pdf}{Distributed II slides 45 - 50}}
     \end{itemize}
 \end{itemize}
 }
 
-\point[Linearisability]{
+\point[\huge Linearisability]{
 \vspace{3mm}
 \begin{itemize}
     \item<1-> Once value is written, all reads see same value
@@ -461,12 +469,12 @@ blocking issue.
     \item<4-> Leaderless replication
     \begin{itemize}
         \LARGE\item<4-> Lock value on quorum \emph{before} writing
-        	\note<4>{Leaderless -- similar performance cost to SLR.}
+        	\note<4>{Leaderless -- similar performance cost to SLR}
     \end{itemize}
 \end{itemize}
 }
 
-\point[Causal Order]{
+\point[\huge Causal Order]{
 \vspace{4mm}
 \begin{itemize}
     \item<1-> Order is based on causality
@@ -476,10 +484,10 @@ blocking issue.
     \end{itemize}
     \note<1>{
 		\begin{itemize}
-		    \item Linearisation defines a \highlight{total} order.
-		    \item Causal ordering defines a \highlight{partial} order.
-		    \item e.g. Git repo history with branching as \highlight{causal order}.
-		    \item Not as strict as linearisability, so less performance cost.
+		    \item Linearisation defines a \highlight{total} order
+		    \item Causal ordering defines a \highlight{partial} order
+		    \item e.g. Git repo history with branching as \highlight{causal order}
+		    \item Not as strict as linearisability, so less performance cost
 	    \end{itemize}
 	}
     \vspace{3mm}
@@ -489,19 +497,19 @@ blocking issue.
         \LARGE\item<2-> Followers read log to execute writes
     \end{itemize}
     \item<3-> Lamport timestamps
-    \note<3>{Next slide is an example of Lamport timestamps.}
+    \note<3>{Next slide is an example of Lamport timestamps}
 \end{itemize}
 }
 
 \image[trim=60 189 440 35,clip,height=\textheight]{../../notes/distributed3/diagrams/lamport-timestamp-seq.png}
 \note[itemize]{
-    \item Each node has an id, \& counts number of operations.
-    \item Timestamp is a tuple (\emph{counterValue}, \emph{nodeID}).
-    \item \emph{nodeID} guarantees every timestamp is unique, even if they have the same counter value.
-    \item Every node stores the maximum counter value seen so far.
-    \item Maximum is passed in every request to another node.
+    \item Each node has an id, \& counts number of operations
+    \item Timestamp is a tuple (\emph{counterValue}, \emph{nodeID})
+    \item \emph{nodeID} guarantees every timestamp is unique, even if they have the same counter value
+    \item Every node stores the maximum counter value seen so far
+    \item Maximum is passed in every request to another node
     \item If a node receives a request or response with a maximum counter value greater than its own counter value,
-          it increases its own counter to the new maximum.
+          it increases its own counter to the new maximum
     \item \textbf{Message 4:} InventoryUpdater sends its current maximum value (\textbf{1}).
     		  ProductDB2’s counter is \textbf{2}, so it increases it to \textbf{3} \& returns to InventoryUpdater.
     		  InventoryUpdater records \textbf{3} as its new maximum value.
@@ -512,11 +520,11 @@ blocking issue.
     A set of nodes in the system agree on some aspect of the system’s state.
 }
 \note[itemize]{
-	\item Abstraction to make it easier to reason about system state.
-	\item e.g. Selecting Leader DB if leader fails, or some Followers think it has failed.
+	\item Abstraction to make it easier to reason about system state
+	\item e.g. Selecting Leader DB if leader fails, or some Followers think it has failed
 }
 
-\point[Consensus Properties]{
+\point[\huge Consensus Properties]{
 \vspace{3mm}
 \begin{description}
     \item[Uniform Agreement] All nodes must agree on the decision
@@ -545,7 +553,7 @@ blocking issue.
 }
 \note{Based on transaction atomicity from ACID\\(Atomicity, Consistency, Isolation, Durability)}
 
-\point[Two-Phase Commit]{
+\point[\huge Two-Phase Commit]{
 \vspace{4mm}
 \begin{description}
     \item[Prepare] Confirm nodes can commit transaction
@@ -556,7 +564,7 @@ blocking issue.
     \end{itemize}
 \end{description}
 }
-\note{Two-Phase commit example is on next slide.}
+\note{Two-Phase commit example is on next slide}
 
 \image[trim=55 70 420 30,clip,height=\textheight]{../../notes/distributed3/diagrams/2phase-commit-seq.png}
 \note[itemize]{
@@ -606,7 +614,7 @@ blocking issue.
         \begin{itemize}
             \Large\item Node fails and never restarts
         \end{itemize}
-      	\note<1>{Cloud-based system that kills crashed nodes.}
+      	\note<1>{Cloud-based system that kills crashed nodes}
         \vspace{3mm}
         \item<2-> Crash Recovery
         \begin{itemize}
@@ -616,8 +624,8 @@ blocking issue.
             \end{itemize}
         \end{itemize}
         	\note<2>{\begin{itemize}
-        			 	\item Any system that allows nodes to be restarted.
-        			 	\item May lose some steps in memory for \highlight{non-critical} tasks.
+        			 	\item Any system that allows nodes to be restarted
+        			 	\item May lose some steps in memory for \highlight{non-critical} tasks
         			 \end{itemize}
         			}
         \vspace{2mm}
@@ -628,7 +636,7 @@ blocking issue.
                 \large\item Byzantine faults
             \end{itemize}
         \end{itemize}
-        	\note<3>{Nodes may send faulty, corrupt or malicious messages.}
+        	\note<3>{Nodes may send faulty, corrupt or malicious messages}
     \end{itemize}
     }
 \end{frame}
