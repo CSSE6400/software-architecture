@@ -23,7 +23,7 @@
         \item Message delayed		\note<3>{Network delay or receiver overloaded,\\but message will be processed later}
         \item Receiver failed		\note<4>{Receiver software has crashed or node has died}
         \item Receiver busy			\note<5>{Receiver temporarily not replying\\(e.g. garbage collection has frozen other processes)}
-        \item Reply not received		\note<6>{Request was processed but reply lost in transit}
+        \item Reply not received	\note<6>{Request was processed but reply lost in transit}
         \item Reply delayed			\note<7>{Reply will be received later}
     \end{itemize}
 }
@@ -561,7 +561,7 @@ blocking issue.
 \begin{description}
     \item[Prepare] Confirm nodes can commit transaction
     \vspace{2mm}
-    \item[Commit] Finalise commit once consensus is reached
+    \item[Commit] Finalise once consensus is reached
     \begin{itemize}
         \LARGE\item Abort if consensus can't be reached
     \end{itemize}
@@ -571,8 +571,8 @@ blocking issue.
 
 \image[trim=55 70 420 30,clip,height=\textheight]{../../notes/distributed3/diagrams/2phase-commit-seq.png}
 \note[itemize]{
-    \item Transaction ID used to track writes
-    \item Prepare does all steps of a commit, \textit{aside} from confirming it -- It cannot be revoked by participant
+    \item Transaction ID used to track writes \\~~~ -- \texttt{transId} returned by \texttt{start()}
+    \item Prepare does all steps of a commit, \textit{aside} from confirming it \\~~~ -- It cannot be revoked by participant
     \item Commit intent is recorded in log before sending to participants
     \item Even if a participant fails, commit can proceed when it recovers
     \item Comment on \highlight{performance costs}
@@ -588,6 +588,17 @@ blocking issue.
             \Large\item Not realistic due to faults above
             \Large\item Minimal performance benefit
         \end{itemize}
+      	\note<1>{
+      	    Assumes bounded 
+      	    \begin{itemize}
+      	        \item network delays,
+      	        \item process pauses, and
+      	        \item clock error
+      	    \end{itemize}
+      	    i.e. Never exceed an upper bound\\
+      	    \vspace{0.5em}
+      	    Not realistic due to unbounded delays as discussed previously
+      	}
         \vspace{2mm}
         \item<2-> Partially Synchronous System
         \vspace{-3pt}
@@ -596,6 +607,14 @@ blocking issue.
             \Large\item Assumes most faults are rare \& transient
             \Large\item Error handling to catch faults
         \end{itemize}
+      	\note<2>{
+      	    Assumes it behaves synchronously \highlight{most of the time}\\
+      	    \vspace{0.4em}
+      	    Realistic for many systems\\
+      	    ~~~ -- Networks and processes \highlight{usually} are well behaved\\
+      	    \vspace{0.4em}
+      	    Design error handling to \highlight{manage} arbitrarily large delays
+      	}
         \vspace{2mm}
         \item<3-> Asynchronous System
         \vspace{-3pt}
@@ -603,8 +622,17 @@ blocking issue.
             \Large\item No timing assumptions
             \vspace{-1pt}
             \Large\item Important message order managed by application
-            \Large\item Difficult \& limited design
+            \Large\item Difficult \& restrictive design options
         \end{itemize}
+      	\note<3>{
+      	    Assumes delays will occur and will affect system logic\\
+      	    \vspace{0.4em}
+      	    Design system to manage all ordering / timing issues\\
+      	    ~~~ -- Do not use a clock for ordering\\
+      	    \vspace{0.4em}
+      	    Managing timeouts is \highlight{difficult}\\
+      	    ~~~ -- Expects \highlight{arbitrarily} large delays\\
+      	}
     \end{itemize}
     }
 \end{frame}
@@ -617,8 +645,8 @@ blocking issue.
         \begin{itemize}
             \Large\item Node fails and never restarts
         \end{itemize}
-      	\note<1>{Cloud-based system that kills crashed nodes}
-        \vspace{3mm}
+      	\note<1>{e.g. Cloud-based system that kills crashed nodes}
+        \vspace{4mm}
         \item<2-> Crash Recovery
         \begin{itemize}
             \Large\item Node fails and restarts
@@ -631,7 +659,7 @@ blocking issue.
         			 	\item May lose some steps in memory for \highlight{non-critical} tasks
         			 \end{itemize}
         			}
-        \vspace{2mm}
+        \vspace{3mm}
         \item<3-> Arbitrary Failure
         \begin{itemize}
             \Large\item Nodes may perform spurious or malicious actions
@@ -644,20 +672,21 @@ blocking issue.
     }
 \end{frame}
 
-\point{
+\point[\huge Conclusion]{
 \begin{itemize}
+    \vspace{2mm}
     \item Distributed systems are hard to build
-    \vspace{4mm}
+    \vspace{3mm}
     \item Large systems have to be distributed
     \begin{itemize}
         \LARGE\item Monoliths can't scale to millions of users
     \end{itemize}
-    \vspace{4mm}
+    \vspace{3mm}
     \item Use environments, tools \& libraries
     \begin{itemize}
         \LARGE\item Leaverage others' experience
     \end{itemize}
-    \vspace{4mm}
+    \vspace{3mm}
     \item CSSE7610 Concurrency: Theory \& Practice
     \begin{itemize}
         \LARGE\item Prove correctness of concurrent \& distributed systems
