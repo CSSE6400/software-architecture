@@ -106,6 +106,22 @@
 
 % Definition environment which matches the notes
 \RequirePackage{tcolorbox}
+% Create a TColorBox for the definition.
+% Uses its internal counter to count definitions.
+% Use as: \definition{Term}{Definition}
+% Check that it works for all slides (only tested on Deployment slides).
+%\newtcolorbox[auto counter]{defn}[2][]{%
+%  squeezed title={\textbf{\textit{Definition~\thetcbcounter:} #1}},
+%  colframe=blue!65!black,
+%  colbacktitle=blue!40!black,
+%  coltitle=white,
+%  colback=blue!2!white,
+%  coltext=black,
+%  fontupper=#2 % Hack to insert second parameter into the text part of the box.
+%               % See https://www.tug.org/docs/latex/tcolorbox/tcolorbox.pdf, page 36.
+%}
+% Previous approach to create an environment for the definition with its own counter.
+% Since LaTeX 2024, the counter remains at 0 for all definitions.
 \newcounter{definition}[part]
 \newenvironment{defn}[1][]
     {\refstepcounter{definition}
