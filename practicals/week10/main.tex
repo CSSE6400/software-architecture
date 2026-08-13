@@ -3,38 +3,351 @@
 % \teachermodetrue
 
 \usepackage{float}
-
 \usepackage{languages}
 
-\title{Empty Practical}
-\author{Millie Hughes \& Brae Webb}
+\title{Managed Authentication with Amazon Cognito}
+\author{Cameron Badman}
 
-\date{\week{0}}
+\date{\week[practical]{10}}
 \begin{document}
 
 \maketitle
 
-\begin{figure}[h]
-  \href{https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/ch02.html}{
-  }
-\caption{A map of data storage techniques from Designing Data-Intensive Applications \cite{data-intensive}.}
-\end{figure}
-
-\section{This Week}
-This week our goal is to:
-\begin{itemize}
-  \item fill in content here.
-\end{itemize}
-
-\section{Databases and Data Models}
-stuff here.
-
-\teacher{
-  Knowledge for teaching.\\
-
-  is here
+\aside{
+  This practical is intended to be a short authentication clinic before project team meetings.
 }
 
+\section{This Week}
+Our goal is to add managed authentication to TaskOverflow without making TaskOverflow responsible for storing passwords.
+Specifically, we will:
+\begin{itemize}
+  \item create an Amazon Cognito User Pool using Terraform;
+  \item sign in as a test user and retrieve a JSON Web Token (JWT);
+  \item add token verification code to TaskOverflow; and
+  \item protect one TaskOverflow endpoint with an authentication decorator.
+\end{itemize}
+
+\section{How This Works}
+
+Up to this point, TaskOverflow has focused on API design, persistence, deployment, scaling, events, and observability.
+One important concern is still missing: user identity.
+Rather than building password storage and account recovery ourselves, we will use Amazon Cognito as a managed identity provider.
+
+\begin{description}
+  \item[Cognito] owns users, passwords, and sign-in.
+  \item[TaskOverflow] receives signed tokens and checks whether they are valid.
+  \item[Route handlers] focus on business logic after authentication has succeeded.
+\end{description}
+
+The request path is:
+\begin{enumerate}
+  \item A user signs in with Cognito.
+  \item Cognito returns a signed JWT.
+  \item The client sends that token to TaskOverflow in the \texttt{Authorization} header.
+  \item TaskOverflow verifies the token signature and claims.
+  \item If the token is valid, the request continues to the protected route.
+\end{enumerate}
+
+\info{
+  This practical deliberately avoids hosted login pages, front-end integration, MFA, and groups.
+  Those are useful production features, but they are outside a 45 minute practical.
+}
+
+\section{Creating a Cognito User Pool}
+
+Create a new file called \texttt{auth.tf} in the Terraform directory for your TaskOverflow deployment.
+Add the following resources.
+
+\begin{code}[language=terraform,numbers=none]{auth.tf}
+resource "aws_cognito_user_pool" "taskoverflow" {
+  name = "taskoverflow-auth"
+
+  username_attributes      = ["email"]
+  auto_verified_attributes = ["email"]
+
+  password_policy {
+    minimum_length    = 8
+    require_lowercase = true
+    require_numbers   = true
+    require_symbols   = false
+    require_uppercase = true
+  }
+}
+
+resource "aws_cognito_user_pool_client" "taskoverflow" {
+  name         = "taskoverflow-cli"
+  user_pool_id = aws_cognito_user_pool.taskoverflow.id
+
+  generate_secret = false
+
+  explicit_auth_flows = [
+    "ALLOW_USER_PASSWORD_AUTH",
+    "ALLOW_REFRESH_TOKEN_AUTH"
+  ]
+}
+
+output "cognito_user_pool_id" {
+  value       = aws_cognito_user_pool.taskoverflow.id
+  description = "Cognito User Pool ID for TaskOverflow."
+}
+
+output "cognito_client_id" {
+  value       = aws_cognito_user_pool_client.taskoverflow.id
+  description = "Cognito App Client ID for TaskOverflow."
+}
+\end{code}
+
+Apply the Terraform configuration.
+
+\bash{terraform apply}
+
+\teacher{
+  The app client does not have a secret because we want students to authenticate from the command line.
+  A public browser or mobile app also cannot safely keep a client secret.
+}
+
+\section{Creating a Test User}
+
+Save the values Terraform printed.
+
+\begin{code}[language=bash,numbers=none]{}
+export COGNITO_USER_POOL_ID=$(terraform output -raw cognito_user_pool_id)
+export COGNITO_CLIENT_ID=$(terraform output -raw cognito_client_id)
+export AWS_REGION=us-east-1
+\end{code}
+
+Create a user for testing.
+Replace the email address with your own.
+
+\begin{code}[language=bash,numbers=none]{}
+aws cognito-idp admin-create-user \
+  --user-pool-id "$COGNITO_USER_POOL_ID" \
+  --username "student@example.com" \
+  --user-attributes Name=email,Value="student@example.com" Name=email_verified,Value=true \
+  --message-action SUPPRESS
+
+aws cognito-idp admin-set-user-password \
+  --user-pool-id "$COGNITO_USER_POOL_ID" \
+  --username "student@example.com" \
+  --password "Taskoverflow1" \
+  --permanent
+\end{code}
+
+\warning{
+  Do not use this password pattern in a real system.
+  It is only here to keep the practical short and repeatable.
+}
+
+Now sign in and store the ID token in a shell variable.
+
+\begin{code}[language=bash,numbers=none]{}
+export ID_TOKEN=$(aws cognito-idp initiate-auth \
+  --auth-flow USER_PASSWORD_AUTH \
+  --client-id "$COGNITO_CLIENT_ID" \
+  --auth-parameters USERNAME="student@example.com",PASSWORD="Taskoverflow1" \
+  --query "AuthenticationResult.IdToken" \
+  --output text)
+\end{code}
+
+\noindent
+The token is what TaskOverflow will receive in the \texttt{Authorization} header.
+It is signed by Cognito and includes claims about the authenticated user.
+
+\section{Verifying Tokens in TaskOverflow}
+
+Install the JWT dependency.
+
+\bash{pipx run poetry add "pyjwt[crypto]"}
+
+\noindent
+Create \texttt{todo/auth/cognito.py}.
+This file verifies tokens issued by the Cognito User Pool.
+
+\begin{code}[language=python,numbers=none]{todo/auth/cognito.py}
+import os
+
+import jwt
+from jwt import PyJWKClient
+
+
+class AuthError(Exception):
+    pass
+
+
+def _required_env(name):
+    value = os.environ.get(name)
+    if not value:
+        raise AuthError(f"Missing environment variable: {name}")
+    return value
+
+
+def verify_cognito_token(token):
+    region = _required_env("AWS_REGION")
+    user_pool_id = _required_env("COGNITO_USER_POOL_ID")
+    client_id = _required_env("COGNITO_CLIENT_ID")
+
+    issuer = f"https://cognito-idp.{region}.amazonaws.com/{user_pool_id}"
+    jwks_url = f"{issuer}/.well-known/jwks.json"
+
+    try:
+        signing_key = PyJWKClient(jwks_url).get_signing_key_from_jwt(token)
+        claims = jwt.decode(
+            token,
+            signing_key.key,
+            algorithms=["RS256"],
+            audience=client_id,
+            issuer=issuer,
+        )
+    except jwt.PyJWTError as err:
+        raise AuthError("Invalid authentication token") from err
+
+    if claims.get("token_use") != "id":
+        raise AuthError("Expected an ID token")
+
+    return claims
+\end{code}
+
+\section{Adding an Authentication Decorator}
+
+Now create \texttt{todo/auth/decorators.py}.
+This decorator reads the \texttt{Authorization} header before the route handler runs.
+
+\begin{code}[language=python,numbers=none]{todo/auth/decorators.py}
+from functools import wraps
+
+from flask import g, jsonify, request
+
+from .cognito import AuthError, verify_cognito_token
+
+
+def _bearer_token():
+    header = request.headers.get("Authorization", "")
+    prefix = "Bearer "
+    if not header.startswith(prefix):
+        raise AuthError("Missing bearer token")
+    return header[len(prefix):]
+
+
+def require_auth(view):
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        try:
+            g.user = verify_cognito_token(_bearer_token())
+        except AuthError as err:
+            return jsonify({"error": str(err)}), 401
+        return view(*args, **kwargs)
+
+    return wrapped
+\end{code}
+
+Create an empty \texttt{todo/auth/\_\_init\_\_.py} file so Python treats the folder as a package.
+
+\section{Protecting a Route}
+
+Add a route that allows us to check which user is authenticated.
+In \texttt{todo/views/routes.py}, import the decorator and Flask's \texttt{g} object.
+
+\begin{code}[language=python,numbers=none]{todo/views/routes.py}
+from flask import g
+from todo.auth.decorators import require_auth
+\end{code}
+
+Then add the following route.
+
+\begin{code}[language=python,numbers=none]{todo/views/routes.py}
+@api.route("/auth/me", methods=["GET"])
+@require_auth
+def me():
+    return jsonify({
+        "sub": g.user.get("sub"),
+        "email": g.user.get("email"),
+        "username": g.user.get("cognito:username"),
+    }), 200
+\end{code}
+
+Finally, protect one existing write endpoint.
+For example, if your TaskOverflow route for creating todos looks like this:
+
+\begin{code}[language=python,numbers=none]{todo/views/routes.py}
+@api.route("/todos", methods=["POST"])
+def create_todo():
+    ...
+\end{code}
+
+\noindent
+add the decorator.
+
+\begin{code}[language=python,numbers=none]{todo/views/routes.py}
+@api.route("/todos", methods=["POST"])
+@require_auth
+def create_todo():
+    ...
+\end{code}
+
+\teacher{
+  The exact route name may differ depending on the starter repository version.
+  The important point is that students protect one route by adding a single authentication decorator.
+}
+
+\section{Testing the Request Path}
+
+Start TaskOverflow with the Cognito environment variables.
+
+\begin{code}[language=bash,numbers=none]{}
+export AWS_REGION=us-east-1
+export COGNITO_USER_POOL_ID=$(terraform output -raw cognito_user_pool_id)
+export COGNITO_CLIENT_ID=$(terraform output -raw cognito_client_id)
+
+pipx run poetry run flask --app todo run --port 6400 --debug
+\end{code}
+
+\noindent
+If you are running TaskOverflow with Docker Compose, add the same values to the app service environment instead.
+
+\begin{code}[numbers=none]{docker-compose.yml}
+    environment:
+      AWS_REGION: us-east-1
+      COGNITO_USER_POOL_ID: ${COGNITO_USER_POOL_ID}
+      COGNITO_CLIENT_ID: ${COGNITO_CLIENT_ID}
+\end{code}
+
+\subsection{Unauthenticated Request}
+
+Call the new endpoint without a token.
+
+\bash{curl -i http://localhost:6400/api/v1/auth/me}
+
+\noindent
+You should receive a \texttt{401 Unauthorized} response.
+
+\subsection{Authenticated Request}
+
+Call the endpoint with the token.
+
+\begin{code}[language=bash,numbers=none]{}
+curl -i \
+  -H "Authorization: Bearer $ID_TOKEN" \
+  http://localhost:6400/api/v1/auth/me
+\end{code}
+
+\noindent
+This request should return information from the Cognito token claims.
+
+\section{Reflection}
+
+For your project, consider:
+\begin{itemize}
+  \item Which endpoints should be public?
+  \item Which endpoints require an authenticated user?
+  \item Which endpoints require a specific role or group?
+  \item Where should authentication be enforced: API Gateway, application middleware, or both?
+\end{itemize}
+
+\warning{
+  Remember to destroy AWS resources when you are finished.
+}
+
+\bash{terraform destroy}
 
 \bibliographystyle{ieeetr}
 \bibliography{books,ours}
